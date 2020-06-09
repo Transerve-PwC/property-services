@@ -1,0 +1,135 @@
+serviceMaps:
+  serviceName: csp
+  mappings:
+  - version: 1.0
+    description: Persists property details in cs_pt_property_v1 table
+    fromTopic: save-property-create
+    isTransaction: true
+    queryMaps:
+
+    - query: INSERT INTO cs_pt_property_v1 (id, transit_number, colony, state, action, created_by, created_date, modified_by, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: Property
+      jsonMaps:
+
+      - jsonPath: $.Property.id
+
+      - jsonPath: $.Property.transit_number
+
+      - jsonPath: $.Property.colony
+
+      - jsonPath: $.Property.state
+
+      - jsonPath: $.Property.action 
+
+      - jsonPath: $.Property.auditDetails.created_by
+
+      - jsonPath: $.Property.auditDetails.created_date
+
+      - jsonPath: $.Property.auditDetails.modified_by
+
+      - jsonPath: $.Property.auditDetails.modified_date
+
+
+    - query: INSERT INTO cs_pt_propertydetails_v1 (id, property_id, transit_number, area, rent_per_sqyd, current_owner, floors, additional_details, created_by, created_date, modified_by, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: Property.details.*
+      jsonMaps:
+
+      - jsonPath: $.Property.details.*.id
+
+      - jsonPath: $.Property.property_id
+
+      - jsonPath: $.Property.details.*.transit_number
+
+      - jsonPath: $.Property.details.*.area
+
+      - jsonPath: $.Property.details.*.rent_per_sqyd
+
+      - jsonPath: $.Property.details.*.current_owner
+
+      - jsonPath: $.Property.details.*.floors
+
+      - jsonPath: $.Property.details.*.additional_details
+
+      - jsonPath: $.Property.auditDetails.created_by
+
+      - jsonPath: $.Property.auditDetails.created_date
+
+      - jsonPath: $.Property.auditDetails.modified_by
+
+      - jsonPath: $.Property.auditDetails.modified_date
+
+
+    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, owner_id, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, allotmen_number, application_status, active_state, is_primary_owner, monthly_rent, revision_period, revision_percentage, created_by, created_date, modified_by, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.Property.ownership.*
+      jsonMaps:
+
+      - jsonPath: $.Property.ownership.*.id
+
+      - jsonPath: $.Property.property_id
+
+      - jsonPath: $.Property.ownership.*.owner_id
+
+      - jsonPath: $.Property.ownership.*.allotment_startdate
+
+      - jsonPath: $.Property.ownership.*.allotment_enddate
+
+      - jsonPath: $.Property.ownership.*.posession_startdate
+
+      - jsonPath: $.Property.ownership.*.posession_enddate
+      
+      - jsonPath: $.Property.ownership.*.allotmen_number
+
+      - jsonPath: $.Property.ownership.*.application_status
+
+      - jsonPath: $.Property.ownership.*.active_state
+
+      - jsonPath: $.Property.ownership.*.is_primary_owner
+
+      - jsonPath: $.Property.ownership.*.monthly_rent
+
+      - jsonPath: $.Property.ownership.*.revision_period
+
+      - jsonPath: $.Property.ownership.*.revision_percentage
+
+      - jsonPath: $.Property.auditDetails.created_by
+
+      - jsonPath: $.Property.auditDetails.created_date
+
+      - jsonPath: $.Property.auditDetails.modified_by
+
+      - jsonPath: $.Property.auditDetails.modified_date
+
+
+    - query: INSERT INTO cs_pt_address_v1 (id, property_id, transit_number, colony, area, district, state, country, pincode, landmark, created_by, created_date, modified_by, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.Property.address.*
+      jsonMaps:
+
+      - jsonPath: $.Property.address.*.id
+
+      - jsonPath: $.Property.property_id
+
+      - jsonPath: $.Property.address.*.transit_number
+
+      - jsonPath: $.Property.address.*.colony
+
+      - jsonPath: $.Property.address.*.area
+
+      - jsonPath: $.Property.address.*.district
+
+      - jsonPath: $.Property.address.*.state
+      
+      - jsonPath: $.Property.address.*.country
+
+      - jsonPath: $.Property.address.*.pincode
+
+      - jsonPath: $.Property.address.*.landmark
+
+      - jsonPath: $.Property.auditDetails.created_by
+
+      - jsonPath: $.Property.auditDetails.created_date
+
+      - jsonPath: $.Property.auditDetails.modified_by
+
+      - jsonPath: $.Property.auditDetails.modified_date
+
+    
