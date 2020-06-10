@@ -2,7 +2,7 @@ serviceMaps:
   serviceName: csp
   mappings:
   - version: 1.0
-    description: Persists property details in cs_pt_property_v1 table
+    description: Persists Properties details in cs_pt_property_v1 table
     fromTopic: save-property-create
     isTransaction: true
     queryMaps:
