@@ -32,6 +32,9 @@ public class Property {
 	@JsonProperty("id")
 	private String id;
 
+	@JsonProperty("property_id")
+	private String property_id;
+
 	@JsonProperty("transit_number")
 	private String transit_number;
 

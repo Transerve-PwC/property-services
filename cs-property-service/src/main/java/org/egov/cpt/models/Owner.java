@@ -15,6 +15,15 @@ import lombok.ToString;
 @ToString
 public class Owner {
 
+	@JsonProperty("id")
+	private String id;
+
+	@JsonProperty("property_id")
+	private String property_id;
+
+	@JsonProperty("owner_id")
+	private String owner_id;
+
 	@JsonProperty("name")
 	private String name;
 
@@ -65,6 +74,9 @@ public class Owner {
 
 	@JsonProperty("revision_percentage")
 	private String revision_percentage;
+
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails = null;
 
 	@Valid
 	@JsonProperty("payment")

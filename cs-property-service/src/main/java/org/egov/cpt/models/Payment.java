@@ -11,6 +11,9 @@ import lombok.ToString;
 @ToString
 public class Payment {
 
+	@JsonProperty("id")
+	private String id;
+
 	@JsonProperty("amount_due")
 	private String amount_due;
 
@@ -25,4 +28,7 @@ public class Payment {
 
 	@JsonProperty("payment_mode")
 	private String payment_mode;
+
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails = null;
 }
