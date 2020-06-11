@@ -63,11 +63,11 @@ serviceMaps:
       basePath: $.Properties.*.owner.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.owner.*.id
+      - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.property_id
+      - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.owner.*.id
+      - jsonPath: $.Properties.*.id
 
       - jsonPath: $.Properties.*.owner.*.allotment_startdate
 
