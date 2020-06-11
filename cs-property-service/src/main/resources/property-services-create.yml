@@ -29,22 +29,14 @@ serviceMaps:
 
       - jsonPath: $.Licenses.*.auditDetails.lastModifiedTime
 
-#      - jsonPath: $.Properties.*.auditDetails.created_by
-#
-#      - jsonPath: $.Properties.*.auditDetails.created_date
-#
-#      - jsonPath: $.Properties.*.auditDetails.modified_by
-#
-#      - jsonPath: $.Properties.*.auditDetails.modified_date
 
-
-    - query: INSERT INTO cs_pt_propertydetails_v1 (id, property_id, transit_number, area, rent_per_sqyd, current_owner, floors, additional_details, created_by, created_date, modified_by, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_propertydetails_v1 (id, property_id, transit_number, area, rent_per_sqyd, current_owner, floors, additional_details, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: Properties.*
       jsonMaps:
 
       - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.property_id
+      - jsonPath: $.Properties.*.id
 
       - jsonPath: $.Properties.*.transit_number
 
@@ -58,16 +50,16 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.additional_details
 
-      - jsonPath: $.Properties.*.auditDetails.created_by
+      - jsonPath: $.Licenses.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.auditDetails.created_date
+      - jsonPath: $.Licenses.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.auditDetails.modified_by
+      - jsonPath: $.Licenses.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.auditDetails.modified_date
+      - jsonPath: $.Licenses.*.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, owner_id, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, allotmen_number, application_status, active_state, is_primary_owner, monthly_rent, revision_period, revision_percentage, created_by, created_date, modified_by, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, owner_id, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, allotmen_number, application_status, active_state, is_primary_owner, monthly_rent, revision_period, revision_percentage, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.owner.*
       jsonMaps:
 
@@ -99,13 +91,13 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.owner.*.revision_percentage
 
-      - jsonPath: $.Properties.*.auditDetails.created_by
+      - jsonPath: $.Licenses.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.auditDetails.created_date
+      - jsonPath: $.Licenses.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.auditDetails.modified_by
+      - jsonPath: $.Licenses.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.auditDetails.modified_date
+      - jsonPath: $.Licenses.*.auditDetails.lastModifiedTime
 
 
 #    - query: INSERT INTO cs_pt_address_v1 (id, property_id, transit_number, colony, area, district, state, country, pincode, landmark, created_by, created_date, modified_by, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
