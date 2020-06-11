@@ -7,7 +7,7 @@ serviceMaps:
     isTransaction: true
     queryMaps:
 
-    - query: INSERT INTO cs_pt_property_v1 (id, transit_number, colony, state, action, created_by, created_date, modified_by, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_property_v1 (id, transit_number, colony, state, action, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: Properties.*
       jsonMaps:
 
@@ -20,14 +20,22 @@ serviceMaps:
       - jsonPath: $.Properties.*.state
 
       - jsonPath: $.Properties.*.action 
+      
+      - jsonPath: $.Licenses.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.auditDetails.created_by
+      - jsonPath: $.Licenses.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.auditDetails.created_date
+      - jsonPath: $.Licenses.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.auditDetails.modified_by
+      - jsonPath: $.Licenses.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Properties.*.auditDetails.modified_date
+#      - jsonPath: $.Properties.*.auditDetails.created_by
+#
+#      - jsonPath: $.Properties.*.auditDetails.created_date
+#
+#      - jsonPath: $.Properties.*.auditDetails.modified_by
+#
+#      - jsonPath: $.Properties.*.auditDetails.modified_date
 
 
     - query: INSERT INTO cs_pt_propertydetails_v1 (id, property_id, transit_number, area, rent_per_sqyd, current_owner, floors, additional_details, created_by, created_date, modified_by, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

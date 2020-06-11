@@ -16,9 +16,9 @@ CREATE TABLE cs_pt_property_v1 (
    action            	CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         BIGINT NOT NULL,
+   created_date         CHARACTER VARYING NOT NULL,
    modified_by     		CHARACTER VARYING (128),
-   modified_date       	BIGINT NOT NULL,
+   modified_date       	CHARACTER VARYING NOT NULL,
 
   CONSTRAINT pk_cs_pt_property_v1 PRIMARY KEY (id),
   CONSTRAINT uk_cs_pt_property_v1 UNIQUE (transit_number)
@@ -35,9 +35,9 @@ CREATE TABLE cs_pt_propertydetails_v1 (
    additional_details   CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         BIGINT NOT NULL,
+   created_date         CHARACTER VARYING NOT NULL,
    modified_by     		CHARACTER VARYING (128),
-   modified_date       	BIGINT NOT NULL,
+   modified_date       	CHARACTER VARYING NOT NULL,
 
   CONSTRAINT pk_cs_pt_propertydetails_v1 PRIMARY KEY (id),
   CONSTRAINT uk_cs_pt_propertydetails_v1 UNIQUE (transit_number),
@@ -63,9 +63,9 @@ CREATE TABLE cs_pt_ownership_v1 (
    revision_percentage  CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         BIGINT NOT NULL,
+   created_date         CHARACTER VARYING NOT NULL,
    modified_by     		CHARACTER VARYING (128),
-   modified_date       	BIGINT NOT NULL,
+   modified_date       	CHARACTER VARYING NOT NULL,
 
   CONSTRAINT pk_cs_pt_ownership_v1 PRIMARY KEY (id),
   CONSTRAINT fk_cs_pt_ownership_v1 FOREIGN KEY (property_id) REFERENCES cs_pt_property_v1 (id)
@@ -86,9 +86,9 @@ CREATE TABLE cs_pt_address_v1 (
    landmark            	CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         BIGINT NOT NULL,
+   created_date         CHARACTER VARYING NOT NULL,
    modified_by     		CHARACTER VARYING (128),
-   modified_date       	BIGINT NOT NULL,
+   modified_date       	CHARACTER VARYING NOT NULL,
 
   CONSTRAINT pk_cs_pt_address_v1 PRIMARY KEY (id),
   CONSTRAINT fk_cs_pt_address_v1 FOREIGN KEY (property_id) REFERENCES cs_pt_property_v1 (id)
@@ -104,9 +104,9 @@ CREATE TABLE cs_pt_property_audit_v1 (
    action            	CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         BIGINT NOT NULL,
+   created_date         CHARACTER VARYING NOT NULL,
    modified_by     		CHARACTER VARYING (128),
-   modified_date       	BIGINT NOT NULL
+   modified_date       	CHARACTER VARYING NOT NULL
 );
 
 CREATE TABLE cs_pt_propertydetails_audit_v1 (
@@ -120,9 +120,9 @@ CREATE TABLE cs_pt_propertydetails_audit_v1 (
    additional_details   CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         BIGINT NOT NULL,
+   created_date         CHARACTER VARYING NOT NULL,
    modified_by     		CHARACTER VARYING (128),
-   modified_date       	BIGINT NOT NULL
+   modified_date       	CHARACTER VARYING NOT NULL
 );
 
 CREATE TABLE cs_pt_ownership_audit_v1 (
@@ -142,7 +142,7 @@ CREATE TABLE cs_pt_ownership_audit_v1 (
    revision_percentage  CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         BIGINT NOT NULL,
+   created_date         CHARACTER VARYING NOT NULL,
    modified_by     		CHARACTER VARYING (128),
-   modified_date       	BIGINT NOT NULL
+   modified_date       	CHARACTER VARYING NOT NULL
 );
