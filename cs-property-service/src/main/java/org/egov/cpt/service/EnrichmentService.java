@@ -1,11 +1,18 @@
 package org.egov.cpt.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.models.AuditDetails;
+import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.Property;
+import org.egov.cpt.models.UserDetailResponse;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.PropertyRequest;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -25,15 +32,15 @@ public class EnrichmentService {
 			request.getProperties().forEach(property -> {
 				String gen_property_id = UUID.randomUUID().toString();
 				property.setId(gen_property_id);
-				property.setProperty_id(gen_property_id);
+				property.setPropertyId(gen_property_id);
 				property.setAuditDetails(propertyAuditDetails);
 
-				if (!CollectionUtils.isEmpty(property.getOwner())) {
-					property.getOwner().forEach(owner -> {
+				if (!CollectionUtils.isEmpty(property.getOwners())) {
+					property.getOwners().forEach(owner -> {
 						String gen_owner_id = UUID.randomUUID().toString();
 						owner.setId(gen_owner_id);
-						owner.setProperty_id(gen_property_id);
-						owner.setOwner_id(request.getRequestInfo().getUserInfo().getId().toString());
+						owner.setPropertyId(gen_property_id);
+						owner.setOwnerId(request.getRequestInfo().getUserInfo().getId().toString());
 						owner.setAuditDetails(propertyAuditDetails);
 
 						if (!CollectionUtils.isEmpty(owner.getPayment()))
@@ -68,5 +75,33 @@ public class EnrichmentService {
 //
 //		setIdgenIds(request);
 //		enrichBoundary(request);
+	}
+
+	/**
+	 * Populates the owner fields inside of property objects from the response got
+	 * from calling user api
+	 * 
+	 * @param userDetailResponse response from user api which contains list of user
+	 *                           which are used to populate owners in properties
+	 * @param properties         List of property whose owner's are to be populated
+	 *                           from userDetailResponse
+	 */
+	public void enrichOwner(UserDetailResponse userDetailResponse, List<Property> properties) {
+
+		List<Owner> users = userDetailResponse.getUser();
+		Map<String, Owner> userIdToOwnerMap = new HashMap<>();
+		users.forEach(user -> userIdToOwnerMap.put(user.getId(), user));
+
+		properties.forEach(property -> {
+
+			property.getOwners().forEach(owner -> {
+
+				if (userIdToOwnerMap.get(owner.getId()) == null)
+					throw new CustomException("OWNER SEARCH ERROR",
+							"The owner of the propertyDetail " + property.getId() + " is not coming in user search");
+//				else
+//					owner.addUserDetail(userIdToOwnerMap.get(owner.getId()));
+			});
+		});
 	}
 }

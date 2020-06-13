@@ -7,19 +7,19 @@ serviceMaps:
     isTransaction: true
     queryMaps:
 
-    - query: INSERT INTO cs_pt_property_v1 (id, transit_number, colony, state, action, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_property_v1 (id, transit_number, colony, master_data_state, master_data_action, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: Properties.*
       jsonMaps:
 
       - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.transit_number
+      - jsonPath: $.Properties.*.transitNumber
 
       - jsonPath: $.Properties.*.colony
 
-      - jsonPath: $.Properties.*.state
+      - jsonPath: $.Properties.*.masterDataState
 
-      - jsonPath: $.Properties.*.action 
+      - jsonPath: $.Properties.*.masterDataAction 
       
       - jsonPath: $.Properties.*.auditDetails.createdBy
 
@@ -36,19 +36,19 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.property_id
+      - jsonPath: $.Properties.*.propertyId
 
-      - jsonPath: $.Properties.*.transit_number
+      - jsonPath: $.Properties.*.transitNumber
 
       - jsonPath: $.Properties.*.area
 
-      - jsonPath: $.Properties.*.rent_per_sqyd
+      - jsonPath: $.Properties.*.rentPerSqyd
 
-      - jsonPath: $.Properties.*.current_owner
+      - jsonPath: $.Properties.*.currentOwner
 
       - jsonPath: $.Properties.*.floors
 
-      - jsonPath: $.Properties.*.additional_details
+      - jsonPath: $.Properties.*.additionalDetails
 
       - jsonPath: $.Properties.*.auditDetails.createdBy
 
@@ -59,37 +59,49 @@ serviceMaps:
       - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, owner_id, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, allotmen_number, application_status, active_state, is_primary_owner, monthly_rent, revision_period, revision_percentage, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.owner.*
+    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, owner_id, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, allotmen_number, application_status, active_state, is_primary_owner, monthly_rent, revision_period, revision_percentage, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.Properties.*.owners.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.owner.*.id
+      - jsonPath: $.Properties.*.owners.*.id
 
-      - jsonPath: $.Properties.*.owner.*.property_id
+      - jsonPath: $.Properties.*.owners.*.propertyId
 
-      - jsonPath: $.Properties.*.owner.*.owner_id
-
-      - jsonPath: $.Properties.*.owner.*.allotment_startdate
-
-      - jsonPath: $.Properties.*.owner.*.allotment_enddate
-
-      - jsonPath: $.Properties.*.owner.*.posession_startdate
-
-      - jsonPath: $.Properties.*.owner.*.posession_enddate
+      - jsonPath: $.Properties.*.owners.*.ownerId
       
-      - jsonPath: $.Properties.*.owner.*.allotmen_number
+      - jsonPath: $.Properties.*.owners.*.name
 
-      - jsonPath: $.Properties.*.owner.*.application_status
+      - jsonPath: $.Properties.*.owners.*.email
 
-      - jsonPath: $.Properties.*.owner.*.active_state
+      - jsonPath: $.Properties.*.owners.*.phone
+      
+      - jsonPath: $.Properties.*.owners.*.gender
 
-      - jsonPath: $.Properties.*.owner.*.is_primary_owner
+      - jsonPath: $.Properties.*.owners.*.dateOfBirth
 
-      - jsonPath: $.Properties.*.owner.*.monthly_rent
+      - jsonPath: $.Properties.*.owners.*.aadhaarNumber
 
-      - jsonPath: $.Properties.*.owner.*.revision_period
+      - jsonPath: $.Properties.*.owners.*.allotmentStartdate
 
-      - jsonPath: $.Properties.*.owner.*.revision_percentage
+      - jsonPath: $.Properties.*.owners.*.allotmentEnddate
+
+      - jsonPath: $.Properties.*.owners.*.posessionStartdate
+
+      - jsonPath: $.Properties.*.owners.*.posessionEnddate
+      
+      - jsonPath: $.Properties.*.owners.*.allotmenNumber
+
+      - jsonPath: $.Properties.*.owners.*.applicationStatus
+
+      - jsonPath: $.Properties.*.owners.*.activeState
+
+      - jsonPath: $.Properties.*.owners.*.isPrimaryOwner
+
+      - jsonPath: $.Properties.*.owners.*.monthlyRent
+
+      - jsonPath: $.Properties.*.owners.*.revisionPeriod
+
+      - jsonPath: $.Properties.*.owners.*.revisionPercentage
 
       - jsonPath: $.Properties.*.auditDetails.createdBy
 
