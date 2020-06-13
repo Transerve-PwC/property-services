@@ -1,34 +1,42 @@
 package org.egov.cpt.models;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.Valid;
+
+import org.egov.common.contract.request.RequestInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class Owner {
+public class UserSearchRequest {
+
+	@JsonProperty("RequestInfo")
+	private RequestInfo requestInfo;
 
 	@JsonProperty("id")
-	private String id;
+	private Set<String> id;
 
-	@JsonProperty("propertyId")
-	private String propertyId;
+	@JsonProperty("transitNumber")
+	private String transitNumber;
 
-	@JsonProperty("ownerId")
-	private String ownerId;
+	@JsonProperty("property_id")
+	private String property_id;
+
+	@JsonProperty("owner_id")
+	private String owner_id;
 
 	@JsonProperty("name")
 	private String name;
@@ -88,35 +96,22 @@ public class Owner {
 	@JsonProperty("payment")
 	private List<Payment> payment;
 
-//	@Builder
-//	public Owner(String id, String property_id, String owner_id, String name, String email, String phone, String gender,
-//			String date_of_birth, String aadhaar_number, String allotment_startdate, String allotment_enddate,
-//			String posession_startdate, String posession_enddate, String allotmen_number, String application_status,
-//			Boolean active_state, String is_primary_owner, String monthly_rent, String revision_period,
-//			String revision_percentage, AuditDetails auditDetails) {
+//	TODO doubt
+	@JsonProperty("pageSize")
+	private int pageSize;
+
+	@JsonProperty("pageNumber")
+	@Default
+	private int pageNumber = 0;
+
+//	@JsonProperty("sort")
+//	@Default
+//	private List<String> sort = Collections.singletonList("name");
 //
-//		this.id = id;
-//		this.propertyId = property_id;
-//		this.ownerId = owner_id;
-//		this.name = name;
-//		this.email = email;
-//		this.phone = phone;
-//		this.gender = gender;
-//		this.dateOfBirth = date_of_birth;
-//		this.aadhaarNumber = aadhaar_number;
-//		this.allotmentStartdate = allotment_startdate;
-//		this.allotmentEnddate = allotment_enddate;
-//		this.posessionStartdate = posession_startdate;
-//		this.posessionEnddate = posession_enddate;
-//		this.allotmenNumber = allotmen_number;
-//		this.applicationStatus = application_status;
-//		this.activeState = active_state;
-//		this.isPrimaryOwner = is_primary_owner;
-//		this.monthlyRent = monthly_rent;
-//		this.revisionPeriod = revision_period;
-//		this.revisionPercentage = revision_percentage;
-//		this.auditDetails = auditDetails;
+//	@JsonProperty("userType")
+//	private String userType;
 //
-//	}
+//	@JsonProperty("roleCodes")
+//	private List<String> roleCodes;
 
 }

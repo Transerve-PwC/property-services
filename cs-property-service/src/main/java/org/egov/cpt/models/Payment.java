@@ -14,20 +14,20 @@ public class Payment {
 	@JsonProperty("id")
 	private String id;
 
-	@JsonProperty("amount_due")
-	private String amount_due;
+	@JsonProperty("amountDue")
+	private String amountDue;
 
-	@JsonProperty("amount_paid")
-	private String amount_paid;
+	@JsonProperty("amountPaid")
+	private String amountPaid;
 
-	@JsonProperty("receipt_number")
-	private String receipt_number;
+	@JsonProperty("receiptNumber")
+	private String receiptNumber;
 
-	@JsonProperty("payment_date")
-	private String payment_date;
+	@JsonProperty("paymentDate")
+	private String paymentDate;
 
-	@JsonProperty("payment_mode")
-	private String payment_mode;
+	@JsonProperty("paymentMode")
+	private String paymentMode;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,40 +28,65 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 public class Property {
 
 	@JsonProperty("id")
 	private String id;
 
-	@JsonProperty("property_id")
-	private String property_id;
+	@JsonProperty("propertyId")
+	private String propertyId;
 
-	@JsonProperty("transit_number")
-	private String transit_number;
+	@JsonProperty("transitNumber")
+	private String transitNumber;
 
 	@JsonProperty("colony")
 	private String colony;
 
+	@JsonProperty("rentPerSqyd")
+	private String rentPerSqyd;
+
+	@JsonProperty("floors")
+	private String floors;
+
 	@JsonProperty("area")
 	private String area;
 
-	@JsonProperty("pin_code")
-	private String pin_code;
+	@JsonProperty("currentOwner")
+	private String currentOwner;
 
-	@JsonProperty("current_owner")
-	private String current_owner;
+	@JsonProperty("masterDataState")
+	private String masterDataState;
 
-	@JsonProperty("state")
-	private String state;
-
-	@JsonProperty("action")
-	private String action;
+	@JsonProperty("masterDataAction")
+	private String masterDataAction;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
 	@Valid
-	@JsonProperty("owner")
-	private List<Owner> owner;
+	@JsonProperty("owners")
+	private List<Owner> owners;
 
+	@JsonProperty("additionalDetails")
+	private String additionalDetails;
+
+//	@Builder
+//	public Property(String id, String property_id, String transit_number, String colony, String rent_per_sqyd,
+//			String floors, String area, String current_owner, String master_data_state, String master_data_action,
+//			AuditDetails auditDetails, List<Owner> owner, String additional_details) {
+//		this.id = id;
+//		this.propertyId = property_id;
+//		this.transitNumber = transit_number;
+//		this.colony = colony;
+//		this.rentPerSqyd = rent_per_sqyd;
+//		this.floors = floors;
+//		this.area = area;
+//		this.currentOwner = current_owner;
+//		this.masterDataState = master_data_state;
+//		this.masterDataAction = master_data_action;
+//		this.auditDetails = auditDetails;
+//		this.owner = owner;
+//		this.additionalDetails = additional_details;
+//	}
 }
