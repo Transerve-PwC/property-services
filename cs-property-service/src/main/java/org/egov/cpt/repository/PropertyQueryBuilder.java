@@ -41,7 +41,9 @@ public class PropertyQueryBuilder {
 			+ " ownership.monthly_rent, ownership.revision_period, ownership.revision_percentage"
 
 			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id "
-			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON ptdl.property_id=ownership.property_id " + " WHERE ";
+			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON ptdl.property_id=ownership.property_id " 
+//			+ " WHERE "
+			;
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
 
@@ -75,46 +77,40 @@ public class PropertyQueryBuilder {
 	 */
 	public String getPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
 
-		Boolean isEmpty = null == criteria.getTransitNumber() && null == criteria.getColony()
-				&& null == criteria.getPhone() && null == criteria.getName();
-
-		if (isEmpty)
-			throw new CustomException("CS_PT_SEARCH_ERROR", " No criteria given for the property search");
-
 		StringBuilder builder = new StringBuilder(SEARCH_QUERY);
-		Boolean appendAndQuery = false;
 
 		if (!ObjectUtils.isEmpty(criteria.getTransitNumber())) {
-			builder.append(" pt.transit_number=?");
+			addClauseIfRequired(preparedStmtList,builder);
+			builder.append("pt.transit_number=?");
 			preparedStmtList.add(criteria.getTransitNumber());
-			appendAndQuery = true;
 		}
 
 		if (null != criteria.getColony()) {
-			if (appendAndQuery)
-				builder.append(AND_QUERY);
+			addClauseIfRequired(preparedStmtList,builder);
 			builder.append("pt.colony = ?");
 			preparedStmtList.add(criteria.getColony());
-			appendAndQuery = true;
 		}
 
 		if (null != criteria.getName()) {
-			if (appendAndQuery)
-				builder.append(AND_QUERY);
+			addClauseIfRequired(preparedStmtList,builder);
 			builder.append("ownership.name = ?");
 			preparedStmtList.add(criteria.getName());
-			appendAndQuery = true;
 		}
 
 		if (null != criteria.getPhone()) {
-			if (appendAndQuery)
-				builder.append(AND_QUERY);
+			addClauseIfRequired(preparedStmtList,builder);
 			builder.append("ownership.phone = ?");
 			preparedStmtList.add(criteria.getPhone());
-			appendAndQuery = true;
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
 
+	private static void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
+        if (values.isEmpty())
+            queryString.append(" WHERE ");
+        else {
+            queryString.append(" AND ");
+        }
+    }
 }

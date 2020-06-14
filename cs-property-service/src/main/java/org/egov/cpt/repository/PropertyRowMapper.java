@@ -1,5 +1,6 @@
 package org.egov.cpt.repository;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,11 +11,14 @@ import java.util.Map;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
+import org.egov.tracer.model.CustomException;
+import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
@@ -39,13 +43,24 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 				AuditDetails auditdetails = getAuditDetail(rs, "property");
 				List<Owner> owners = addOwnersToProperty(rs, currentProperty);
 
+				PGobject pgObj = (PGobject) rs.getObject("additional_details");
+				
 				currentProperty = Property.builder().id(propertyId).propertyId(rs.getString("pdproperty_id"))
 						.transitNumber(rs.getString("transit_number")).colony(rs.getString("colony"))
 						.rentPerSqyd(rs.getString("rent_per_sqyd")).floors(rs.getString("floors"))
 						.area(rs.getString("area")).currentOwner(rs.getString("current_owner"))
 						.masterDataState(rs.getString("master_data_state"))
 						.masterDataAction(rs.getString("master_data_action")).auditDetails(auditdetails).owners(owners)
-						.additionalDetails(rs.getString("additional_details")).build();
+						.build();
+				if(pgObj!=null){
+                    JsonNode additionalDetail;
+					try {
+						additionalDetail = mapper.readTree(pgObj.getValue());
+					} catch (IOException e) {
+						throw new CustomException("PARSING ERROR","The additional_details json cannot be parsed");
+					}
+                    currentProperty.setAdditionalDetails((additionalDetail));
+                }
 
 				propertyMap.put(propertyId, currentProperty);
 			}
