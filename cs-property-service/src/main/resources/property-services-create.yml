@@ -34,29 +34,29 @@ serviceMaps:
       basePath: Properties.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.id
+      - jsonPath: $.Properties.*.propertyDetails.id
 
-      - jsonPath: $.Properties.*.propertyId
+      - jsonPath: $.Properties.*.propertyDetails.propertyId
 
-      - jsonPath: $.Properties.*.transitNumber
+      - jsonPath: $.Properties.*.propertyDetails.transitNumber
 
-      - jsonPath: $.Properties.*.area
+      - jsonPath: $.Properties.*.propertyDetails.area
 
-      - jsonPath: $.Properties.*.rentPerSqyd
+      - jsonPath: $.Properties.*.propertyDetails.rentPerSqyd
 
-      - jsonPath: $.Properties.*.currentOwner
+      - jsonPath: $.Properties.*.propertyDetails.currentOwner
 
-      - jsonPath: $.Properties.*.floors
+      - jsonPath: $.Properties.*.propertyDetails.floors
 
-      - jsonPath: $.Properties.*.additionalDetails
+      - jsonPath: $.Properties.*.propertyDetails.additionalDetails
 
-      - jsonPath: $.Properties.*.auditDetails.createdBy
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.auditDetails.createdTime
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
 
 
     - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, owner_id, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, allotmen_number, application_status, active_state, is_primary_owner, monthly_rent, revision_period, revision_percentage, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

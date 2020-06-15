@@ -9,6 +9,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
+import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.UserDetailResponse;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.PropertyRequest;
@@ -25,15 +26,19 @@ public class EnrichmentService {
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
+		String gen_property_id = UUID.randomUUID().toString();
+
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
-				String gen_property_id = UUID.randomUUID().toString();
+
+				PropertyDetails propertyDetail = getPropertyDetail(property, requestInfo, gen_property_id);
+
 				property.setId(gen_property_id);
-				property.setPropertyId(gen_property_id);
 				property.setAuditDetails(propertyAuditDetails);
+				property.setPropertyDetails(propertyDetail);
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
 					property.getOwners().forEach(owner -> {
@@ -75,6 +80,22 @@ public class EnrichmentService {
 //
 //		setIdgenIds(request);
 //		enrichBoundary(request);
+	}
+
+	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
+		PropertyDetails propertyDetail = new PropertyDetails();
+		String gen_property_details_id = UUID.randomUUID().toString();
+		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		propertyDetail.setId(gen_property_details_id);
+		propertyDetail.setPropertyId(gen_property_id);
+		propertyDetail.setTransitNumber(property.getTransitNumber());
+		propertyDetail.setArea(property.getPropertyDetails().getArea());
+		propertyDetail.setRentPerSqyd(property.getPropertyDetails().getRentPerSqyd());
+		propertyDetail.setCurrentOwner(property.getPropertyDetails().getCurrentOwner());
+		propertyDetail.setFloors(property.getPropertyDetails().getFloors());
+		propertyDetail.setAdditionalDetails(property.getPropertyDetails().getAdditionalDetails());
+		propertyDetail.setAuditDetails(propertyAuditDetails);
+		return propertyDetail;
 	}
 
 	/**
