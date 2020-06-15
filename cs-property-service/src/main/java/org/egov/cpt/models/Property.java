@@ -35,26 +35,11 @@ public class Property {
 	@JsonProperty("id")
 	private String id;
 
-	@JsonProperty("propertyId")
-	private String propertyId;
-
 	@JsonProperty("transitNumber")
 	private String transitNumber;
 
 	@JsonProperty("colony")
 	private String colony;
-
-	@JsonProperty("rentPerSqyd")
-	private String rentPerSqyd;
-
-	@JsonProperty("floors")
-	private String floors;
-
-	@JsonProperty("area")
-	private String area;
-
-	@JsonProperty("currentOwner")
-	private String currentOwner;
 
 	@JsonProperty("masterDataState")
 	private String masterDataState;
@@ -65,11 +50,15 @@ public class Property {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
+	@JsonProperty("propertyDetails")
+	private PropertyDetails propertyDetails;
+
 	@Valid
 	@JsonProperty("owners")
 	private List<Owner> owners;
 
 	@JsonProperty("additionalDetails")
 	private JsonNode additionalDetails;
+
 
 }
