@@ -36,6 +36,9 @@ public class PropertyDetails {
 	@JsonProperty("transitNumber")
 	private String transitNumber;
 
+	@JsonProperty("tenantId")
+	private String tenantId;
+
 	@JsonProperty("area")
 	private String area;
 

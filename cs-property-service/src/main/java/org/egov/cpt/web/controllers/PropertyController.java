@@ -52,11 +52,14 @@ public class PropertyController {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
-//	@PostMapping("/_search")
-//	public String search() {
-//		logger.debug("test search api");
-//		return "test search api response";
-//	}
+	@PostMapping("/_update")
+	public ResponseEntity<PropertyResponse> update(@Valid @RequestBody PropertyRequest propertyRequest) {
+		List<Property> properties = propertyService.updateProperty(propertyRequest);
+		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(),
+				true);
+		PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(resInfo).build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
 	@PostMapping("/_search")
 	public ResponseEntity<PropertyResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
