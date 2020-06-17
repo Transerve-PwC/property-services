@@ -11,6 +11,7 @@ import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.validator.PropertyValidator;
 import org.egov.cpt.web.contracts.PropertyRequest;
+import org.egov.cpt.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -36,14 +37,35 @@ public class PropertyService {
 	@Autowired
 	private PropertyRepository repository;
 
+	@Autowired
+	private WorkflowIntegrator wfIntegrator;
+
 	public List<Property> createProperty(PropertyRequest request) {
 
 		propertyValidator.validateCreateRequest(request); // TODO add validations as per requirement
-		enrichmentService.enrichCreateRequest(request); // TODO assign UUIDs for required fields
+		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request); // TODO create user as owner of the property if does not exists
-		if (config.getIsWorkflowEnabled()) // TODO initially it is false change it to true if want to add workflow
-			updateWorkflow(request, true); // TODO as per my understanding true for create false for update method
+		if (config.getIsWorkflowEnabled()) {
+			wfIntegrator.callWorkFlow(request);
+		}
 		producer.push(config.getSavePropertyTopic(), request);
+		return request.getProperties();
+	}
+
+	/**
+	 * Updates the property
+	 *
+	 * @param request PropertyRequest containing list of properties to be update
+	 * @return List of updated properties
+	 */
+	public List<Property> updateProperty(PropertyRequest request) {
+		List<Property> propertyFromSearch = propertyValidator.validateUpdateRequest(request);
+		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
+		userService.createUser(request);
+		if (config.getIsWorkflowEnabled()) {
+			wfIntegrator.callWorkFlow(request);
+		}
+		producer.push(config.getUpdatePropertyTopic(), request);
 		return request.getProperties();
 	}
 

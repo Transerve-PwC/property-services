@@ -30,6 +30,9 @@ public class Owner {
 	@JsonProperty("ownerId")
 	private String ownerId;
 
+	@JsonProperty("tenantId")
+	private String tenantId;
+
 	@JsonProperty("name")
 	private String name;
 

@@ -7,7 +7,6 @@ import javax.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -38,6 +37,9 @@ public class Property {
 	@JsonProperty("transitNumber")
 	private String transitNumber;
 
+	@JsonProperty("tenantId")
+	private String tenantId;
+
 	@JsonProperty("colony")
 	private String colony;
 
@@ -57,8 +59,7 @@ public class Property {
 	@JsonProperty("owners")
 	private List<Owner> owners;
 
-	@JsonProperty("additionalDetails")
-	private JsonNode additionalDetails;
-
+//	@JsonProperty("additionalDetails")
+//	private JsonNode additionalDetails;
 
 }

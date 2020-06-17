@@ -82,18 +82,45 @@ public class EnrichmentService {
 //		enrichBoundary(request);
 	}
 
+	public void enrichUpdateRequest(PropertyRequest request, List<Property> propertyFromDb) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getId().toString(), false);
+
+		if (!CollectionUtils.isEmpty(request.getProperties())) {
+			request.getProperties().forEach(property -> {
+				property.setAuditDetails(auditDetails);
+
+				if (!CollectionUtils.isEmpty(property.getOwners())) {
+					property.getOwners().forEach(owner -> {
+						owner.setAuditDetails(auditDetails);
+
+						if (!CollectionUtils.isEmpty(owner.getPayment()))
+							owner.getPayment().forEach(payment -> {
+								payment.setAuditDetails(auditDetails);
+							});
+					});
+				}
+			});
+		}
+	}
+
 	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
-		PropertyDetails propertyDetail = new PropertyDetails();
+		PropertyDetails propertyDetail = property.getPropertyDetails();
 		String gen_property_details_id = UUID.randomUUID().toString();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		propertyDetail.setId(gen_property_details_id);
 		propertyDetail.setPropertyId(gen_property_id);
 		propertyDetail.setTransitNumber(property.getTransitNumber());
-		propertyDetail.setArea(property.getPropertyDetails().getArea());
-		propertyDetail.setRentPerSqyd(property.getPropertyDetails().getRentPerSqyd());
-		propertyDetail.setCurrentOwner(property.getPropertyDetails().getCurrentOwner());
-		propertyDetail.setFloors(property.getPropertyDetails().getFloors());
-		propertyDetail.setAdditionalDetails(property.getPropertyDetails().getAdditionalDetails());
+
+//		propertyDetail.setAdditionalDetails(property.getPropertyDetails().getAdditionalDetails());
+//		JsonNode addtionalDetails = propertyDetail.getAdditionalDetails();
+////		((ObjectNode)addtionalDetails).put(addtionalDetails);
+//		propertyDetail.setAdditionalDetails(addtionalDetails);
+
+//		PGobject jsonObject = new PGobject();
+//		jsonObject.setType("json");
+//		jsonObject.setValue(propertyDetail.getAdditionalDetails().toString());
+//		propertyDetail.setAdditionalDetails(jsonObject);
 		propertyDetail.setAuditDetails(propertyAuditDetails);
 		return propertyDetail;
 	}
@@ -120,8 +147,6 @@ public class EnrichmentService {
 				if (userIdToOwnerMap.get(owner.getId()) == null)
 					throw new CustomException("OWNER SEARCH ERROR",
 							"The owner of the propertyDetail " + property.getId() + " is not coming in user search");
-//				else
-//					owner.addUserDetail(userIdToOwnerMap.get(owner.getId()));
 			});
 		});
 	}
