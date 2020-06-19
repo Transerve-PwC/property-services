@@ -54,6 +54,9 @@ public class PropertyDetails {
 	@JsonProperty("additionalDetails")
 	private String additionalDetails;
 
+	@JsonProperty("address")
+	private Address address;
+
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 

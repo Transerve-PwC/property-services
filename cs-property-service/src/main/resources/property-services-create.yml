@@ -233,7 +233,7 @@ serviceMaps:
       basePath: $.Properties.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.address.id
+      - jsonPath: $.Properties.*.propertyDetails.address.id
 
       - jsonPath: $.Properties.*.id
 
@@ -243,24 +243,24 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.colony
 
-      - jsonPath: $.Properties.*.address.area
+      - jsonPath: $.Properties.*.propertyDetails.address.area
 
-      - jsonPath: $.Properties.*.address.district
+      - jsonPath: $.Properties.*.propertyDetails.address.district
 
-      - jsonPath: $.Properties.*.address.state
+      - jsonPath: $.Properties.*.propertyDetails.address.state
       
-      - jsonPath: $.Properties.*.address.country
+      - jsonPath: $.Properties.*.propertyDetails.address.country
 
-      - jsonPath: $.Properties.*.address.pincode
+      - jsonPath: $.Properties.*.propertyDetails.address.pincode
 
-      - jsonPath: $.Properties.*.address.landmark
+      - jsonPath: $.Properties.*.propertyDetails.address.landmark
 
-      - jsonPath: $.Properties.*.auditDetails.createdBy
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.auditDetails.createdTime
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
 
     

@@ -55,9 +55,6 @@ public class Property {
 	@JsonProperty("propertyDetails")
 	private PropertyDetails propertyDetails;
 
-	@JsonProperty("address")
-	private Address address;
-
 	@Valid
 	@JsonProperty("owners")
 	private List<Owner> owners;
