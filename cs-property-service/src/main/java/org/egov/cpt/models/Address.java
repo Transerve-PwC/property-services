@@ -1,9 +1,5 @@
 package org.egov.cpt.models;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,10 +25,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Builder
-public class Property {
+public class Address {
 
 	@JsonProperty("id")
 	private String id;
+
+	@JsonProperty("propertyId")
+	private String propertyId;
 
 	@JsonProperty("transitNumber")
 	private String transitNumber;
@@ -43,23 +42,24 @@ public class Property {
 	@JsonProperty("colony")
 	private String colony;
 
-	@JsonProperty("masterDataState")
-	private String masterDataState;
+	@JsonProperty("area")
+	private String area;
 
-	@JsonProperty("masterDataAction")
-	private String masterDataAction;
+	@JsonProperty("district")
+	private String district;
+
+	@JsonProperty("state")
+	private String state;
+
+	@JsonProperty("country")
+	private String country;
+
+	@JsonProperty("pincode")
+	private String pincode;
+
+	@JsonProperty("landmark")
+	private String landmark;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
-
-	@JsonProperty("propertyDetails")
-	private PropertyDetails propertyDetails;
-
-	@JsonProperty("address")
-	private Address address;
-
-	@Valid
-	@JsonProperty("owners")
-	private List<Owner> owners;
-
 }
