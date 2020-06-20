@@ -87,7 +87,7 @@ public class EnrichmentService {
 
 	public void enrichUpdateRequest(PropertyRequest request, List<Property> propertyFromDb) {
 		RequestInfo requestInfo = request.getRequestInfo();
-		AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getId().toString(), false);
+		AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
 
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
