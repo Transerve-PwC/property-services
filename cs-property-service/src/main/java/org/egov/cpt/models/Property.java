@@ -59,7 +59,4 @@ public class Property {
 	@JsonProperty("owners")
 	private List<Owner> owners;
 
-//	@JsonProperty("additionalDetails")
-//	private JsonNode additionalDetails;
-
 }

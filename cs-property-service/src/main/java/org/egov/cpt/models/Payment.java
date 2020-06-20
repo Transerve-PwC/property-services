@@ -14,6 +14,9 @@ public class Payment {
 	@JsonProperty("id")
 	private String id;
 
+	@JsonProperty("tenantId")
+	private String tenantId;
+
 	@JsonProperty("amountDue")
 	private String amountDue;
 

@@ -38,9 +38,9 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.propertyDetails.id
 
-      - jsonPath: $.Properties.*.propertyDetails.propertyId
+      - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.propertyDetails.transitNumber
+      - jsonPath: $.Properties.*.transitNumber
       
       - jsonPath: $.Properties.*.tenantId
 
@@ -149,9 +149,9 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.propertyDetails.id
 
-      - jsonPath: $.Properties.*.propertyDetails.propertyId
+      - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.propertyDetails.transitNumber
+      - jsonPath: $.Properties.*.transitNumber
 
       - jsonPath: $.Properties.*.tenantId
 
@@ -229,38 +229,38 @@ serviceMaps:
       - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
 
 
-#    - query: INSERT INTO cs_pt_address_v1 (id, property_id, transit_number, tenantid, colony, area, district, state, country, pincode, landmark, created_by, created_date, modified_by, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-#      basePath: $.Properties.*.address.*
-#      jsonMaps:
-#
-#      - jsonPath: $.Properties.*.address.*.id
-#
-#      - jsonPath: $.Properties.*.property_id
-#
-#      - jsonPath: $.Properties.*.address.*.transit_number
-#
-#      - jsonPath: $.Properties.*.tenantId
-#
-#      - jsonPath: $.Properties.*.address.*.colony
-#
-#      - jsonPath: $.Properties.*.address.*.area
-#
-#      - jsonPath: $.Properties.*.address.*.district
-#
-#      - jsonPath: $.Properties.*.address.*.state
-#      
-#      - jsonPath: $.Properties.*.address.*.country
-#
-#      - jsonPath: $.Properties.*.address.*.pincode
-#
-#      - jsonPath: $.Properties.*.address.*.landmark
-#
-#      - jsonPath: $.Properties.*.auditDetails.created_by
-#
-#      - jsonPath: $.Properties.*.auditDetails.created_date
-#
-#      - jsonPath: $.Properties.*.auditDetails.modified_by
-#
-#      - jsonPath: $.Properties.*.auditDetails.modified_date
+    - query: INSERT INTO cs_pt_address_v1 (id, property_id, transit_number, tenantid, colony, area, district, state, country, pincode, landmark, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.Properties.*
+      jsonMaps:
+
+      - jsonPath: $.Properties.*.propertyDetails.address.id
+
+      - jsonPath: $.Properties.*.id
+
+      - jsonPath: $.Properties.*.transitNumber
+
+      - jsonPath: $.Properties.*.tenantId
+
+      - jsonPath: $.Properties.*.colony
+
+      - jsonPath: $.Properties.*.propertyDetails.address.area
+
+      - jsonPath: $.Properties.*.propertyDetails.address.district
+
+      - jsonPath: $.Properties.*.propertyDetails.address.state
+      
+      - jsonPath: $.Properties.*.propertyDetails.address.country
+
+      - jsonPath: $.Properties.*.propertyDetails.address.pincode
+
+      - jsonPath: $.Properties.*.propertyDetails.address.landmark
+
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdBy
+
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdTime
+
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
 
     

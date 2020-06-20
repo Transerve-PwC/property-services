@@ -25,7 +25,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Builder
-public class PropertyDetails {
+public class Address {
 
 	@JsonProperty("id")
 	private String id;
@@ -39,37 +39,27 @@ public class PropertyDetails {
 	@JsonProperty("tenantId")
 	private String tenantId;
 
+	@JsonProperty("colony")
+	private String colony;
+
 	@JsonProperty("area")
 	private String area;
 
-	@JsonProperty("rentPerSqyd")
-	private String rentPerSqyd;
+	@JsonProperty("district")
+	private String district;
 
-	@JsonProperty("currentOwner")
-	private String currentOwner;
+	@JsonProperty("state")
+	private String state;
 
-	@JsonProperty("floors")
-	private String floors;
+	@JsonProperty("country")
+	private String country;
 
-	@JsonProperty("additionalDetails")
-	private String additionalDetails;
+	@JsonProperty("pincode")
+	private String pincode;
 
-	@JsonProperty("address")
-	private Address address;
+	@JsonProperty("landmark")
+	private String landmark;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
-
-//	@Builder
-//	public PropertyDetails(String id, String propertyId, String transitNumber, String area, String rentPerSqyd,
-//			String currentOwner, String floors, String additionalDetails) {
-//		this.id = id;
-//		this.propertyId = propertyId;
-//		this.transitNumber = transitNumber;
-//		this.area = area;
-//		this.rentPerSqyd = rentPerSqyd;
-//		this.currentOwner = currentOwner;
-//		this.floors = floors;
-//		this.additionalDetails = additionalDetails;
-//	}
 }

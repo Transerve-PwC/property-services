@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
@@ -26,14 +27,13 @@ public class EnrichmentService {
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
-		String gen_property_id = UUID.randomUUID().toString();
-
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
 
+				String gen_property_id = UUID.randomUUID().toString();
 				PropertyDetails propertyDetail = getPropertyDetail(property, requestInfo, gen_property_id);
 
 				property.setId(gen_property_id);
@@ -46,14 +46,17 @@ public class EnrichmentService {
 						owner.setId(gen_owner_id);
 						owner.setPropertyId(gen_property_id);
 						owner.setOwnerId(request.getRequestInfo().getUserInfo().getId().toString());
+						owner.setTenantId(property.getTenantId());
 						owner.setAuditDetails(propertyAuditDetails);
 
-						if (!CollectionUtils.isEmpty(owner.getPayment()))
+						if (!CollectionUtils.isEmpty(owner.getPayment())) {
 							owner.getPayment().forEach(payment -> {
 								String gen_payment_id = UUID.randomUUID().toString();
 								payment.setId(gen_payment_id);
+								payment.setTenantId(property.getTenantId());
 								payment.setAuditDetails(propertyAuditDetails);
 							});
+						}
 					});
 				}
 			});
@@ -88,15 +91,19 @@ public class EnrichmentService {
 
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
-				property.setAuditDetails(auditDetails);
+				AuditDetails propertyAuditDetails = property.getAuditDetails();
+				propertyAuditDetails.setLastModifiedBy(auditDetails.getLastModifiedBy());
+				propertyAuditDetails.setLastModifiedTime(auditDetails.getLastModifiedTime());
+
+				property.setAuditDetails(propertyAuditDetails);
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
 					property.getOwners().forEach(owner -> {
-						owner.setAuditDetails(auditDetails);
+						owner.setAuditDetails(propertyAuditDetails);
 
 						if (!CollectionUtils.isEmpty(owner.getPayment()))
 							owner.getPayment().forEach(payment -> {
-								payment.setAuditDetails(auditDetails);
+								payment.setAuditDetails(propertyAuditDetails);
 							});
 					});
 				}
@@ -111,6 +118,17 @@ public class EnrichmentService {
 		propertyDetail.setId(gen_property_details_id);
 		propertyDetail.setPropertyId(gen_property_id);
 		propertyDetail.setTransitNumber(property.getTransitNumber());
+		propertyDetail.setTenantId(property.getTenantId());
+
+		Address address = getAddress(property, requestInfo, gen_property_id);
+		propertyDetail.setAddress(address);
+
+		if (!CollectionUtils.isEmpty(property.getOwners()))
+			property.getOwners().forEach(owner -> {
+				if (owner.getActiveState()) {
+					propertyDetail.setCurrentOwner(owner.getName());
+				}
+			});
 
 //		propertyDetail.setAdditionalDetails(property.getPropertyDetails().getAdditionalDetails());
 //		JsonNode addtionalDetails = propertyDetail.getAdditionalDetails();
@@ -123,6 +141,19 @@ public class EnrichmentService {
 //		propertyDetail.setAdditionalDetails(jsonObject);
 		propertyDetail.setAuditDetails(propertyAuditDetails);
 		return propertyDetail;
+	}
+
+	public Address getAddress(Property property, RequestInfo requestInfo, String gen_property_id) {
+		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		Address address = property.getPropertyDetails().getAddress();
+		String gen_address_id = UUID.randomUUID().toString();
+		address.setId(gen_address_id);
+		address.setPropertyId(gen_property_id);
+		address.setTransitNumber(property.getTransitNumber());
+		address.setTenantId(property.getTenantId());
+		address.setColony(property.getColony());
+		address.setAuditDetails(propertyAuditDetails);
+		return address;
 	}
 
 	/**
