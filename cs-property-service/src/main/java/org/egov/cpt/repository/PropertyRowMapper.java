@@ -121,7 +121,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 		AuditDetails auditdetails = getAuditDetail(rs, "property");
 		Address address = Address.builder().id(rs.getString("aid")).propertyId(rs.getString("aproperty_id"))
-				.transitNumber(rs.getString("atransit_number")).tenantId(rs.getString("atransit_number"))
+				.transitNumber(rs.getString("atransit_number")).tenantId(rs.getString("atenantid"))
 				.colony(rs.getString("colony")).area(rs.getString("addressArea")).district(rs.getString("district"))
 				.state(rs.getString("state")).country(rs.getString("country")).pincode(rs.getString("pincode"))
 				.landmark(rs.getString("landmark")).auditDetails(auditdetails).build();
