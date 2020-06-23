@@ -43,51 +43,30 @@ public class PropertyValidator {
 		Map<String, String> errorMap = new HashMap<>();
 
 //		validateMasterData(request, errorMap);
-//		validateMobileNumber(request, errorMap);
 //		validateFields(request, errorMap);
 		
         validateMobileNumber(request, errorMap);
         validateTransitNumber(request, errorMap);
-        validateEmail(request, errorMap);
-        validAadharNumber(request, errorMap);
+//        validateEmail(request, errorMap);
+//        validAadharNumber(request, errorMap);
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
 	
 	
-    private void validAadharNumber(PropertyRequest request, Map<String, String> errorMap) {
-        
-        List<Property> property =  request.getProperties();
-        property.forEach(properties -> {
-        	properties.getOwners().forEach( owner ->{
-        		if (!isAadharNumberValid(owner.getAadhaarNumber())) {
-                    errorMap.put("INVALID AADHARNUMBER", "Aadhar Number is not valid for user : " + owner.getName());
-                }
-        	});
-        });
-//        List<Owner> owners = property.getOwners();
+//    private void validateEmail(PropertyRequest request, Map<String, String> errorMap) {
 //        
-//        owners.forEach(owner -> {
-//            if (!isAadharNumberValid(owner.getAadhaarNumber())) {
-//                errorMap.put("INVALID AADHARNUMBER", "Aadhar Number is not valid for user : " + owner.getName());
-//            }
+//        List<Property> property =  request.getProperties();
+//        property.forEach(properties -> {
+//        	properties.getOwners().forEach( owner ->{
+//        		if (!isEmailValid(owner.getEmail())) {
+//                    errorMap.put("INVALID EMAIL", "Email is not valid for user : " + owner.getName());
+//                }
+//        	});
 //        });
-        
-    }
-
-    private void validateEmail(PropertyRequest request, Map<String, String> errorMap) {
-        
-        List<Property> property =  request.getProperties();
-        property.forEach(properties -> {
-        	properties.getOwners().forEach( owner ->{
-        		if (!isEmailValid(owner.getEmail())) {
-                    errorMap.put("INVALID EMAIL", "Email is not valid for user : " + owner.getName());
-                }
-        	});
-        });
-    
-    }
+//    
+//    }
     
     
 
@@ -98,13 +77,7 @@ public class PropertyValidator {
         
         List<Property> properties = repository.getProperties(criteria);
         
-        properties.forEach(property ->{
-//            if (property.getTransitNumber().equalsIgnoreCase(request.getProperties().
-//                    get(0).getTransitNumber()
-//                    )) {
-//                errorMap.put("INVALID TRANSIT NUMBER", "Transit number already exist");
-//            }
-        	
+        properties.forEach(property ->{       	
         	request.getProperties().forEach(transit -> {
         		if (property.getTransitNumber().equalsIgnoreCase(transit.getTransitNumber())) {
         			errorMap.put("INVALID TRANSIT NUMBER", "Transit number already exist");
@@ -113,9 +86,6 @@ public class PropertyValidator {
             
         });
         
-//      forEach(transit -> {
-//          transit.getTransitNumber();
-//          })
         
     }
 
@@ -146,7 +116,9 @@ public class PropertyValidator {
 		Map<String, String> errorMap = new HashMap<>();
 
 		validateIds(request, errorMap);
-//		validateMobileNumber(request, errorMap);
+		validateMobileNumber(request, errorMap);
+//        validateEmail(request, errorMap);
+//        validAadharNumber(request, errorMap);
 
 		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
 		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
