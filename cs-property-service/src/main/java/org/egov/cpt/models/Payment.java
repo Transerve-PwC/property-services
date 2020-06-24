@@ -27,7 +27,7 @@ public class Payment {
 	private String receiptNumber;
 
 	@JsonProperty("paymentDate")
-	private String paymentDate;
+	private Long paymentDate;
 
 	@JsonProperty("paymentMode")
 	private String paymentMode;
