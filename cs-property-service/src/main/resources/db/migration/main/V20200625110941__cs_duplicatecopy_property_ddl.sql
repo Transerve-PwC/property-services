@@ -12,9 +12,8 @@ CREATE TABLE cs_pt_duplicatecopy_property_v1 (
    id           			CHARACTER VARYING (256) NOT NULL,
    transit_number       	CHARACTER VARYING (256) NOT NULL,
    tenantid			    	CHARACTER VARYING (256),
-   applicationType			CHARACTER VARYING  (64),
-   duplicatecopy_state    	CHARACTER VARYING (256),
-   duplicatecopy_action   	CHARACTER VARYING (256),
+   state    				CHARACTER VARYING (256),
+   action   				CHARACTER VARYING (256),
   
    created_by           	CHARACTER VARYING (128) NOT NULL,
    created_time         	bigint,
