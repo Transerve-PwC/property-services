@@ -1,0 +1,61 @@
+{
+    "RequestInfo": {
+        "apiId": "Rainmaker",
+        "ver": ".01",
+        "ts": "",
+        "action": "_create",
+        "did": "1",
+        "key": "",
+        "msgId": "20170310130900|en_IN",
+        "authToken": "7c743e64-dac6-4221-a003-5c61ae9afcc0"
+    },
+    "Properties": [
+        {
+            "transitNumber": "tran000",
+            "tenantId": "ch.chandigarh",
+            "colony": "Milk",
+            "masterDataState": "",
+            "masterDataAction": "INITIATE",
+            "propertyDetails": {
+            	"tenantId": "ch.chandigarh",
+                "area": "150sq",
+                "rentPerSqyd": "2",
+                "currentOwner": "AAA",
+                "floors": "1",
+                "additionalDetails": ""
+            },
+            "owners": [
+                {
+                	"tenantId": "ch.chandigarh",
+                    "name": "AAA",
+                    "email": "aaa@mail.com",
+                    "phone": "9999999999",
+                    "gender": "male",
+                    "dateOfBirth": "18-03-1994",
+                    "aadhaarNumber": "9999999999999",
+                    "allotmentStartdate": "18-03-2018",
+                    "allotmentEnddate": "18-03-2023",
+                    "posessionStartdate": "18-03-2018",
+                    "posessionEnddate": "18-03-2023",
+                    "allotmenNumber": "allot123458",
+                    "applicationStatus": "",
+                    "activeState": "true",
+                    "isPrimaryOwner": "true",
+                    "monthlyRent": "300",
+                    "revisionPeriod": "1",
+                    "revisionPercentage": "5",
+                    "payment": [
+                        {
+                        	"tenantId": "ch.chandigarh",
+                            "amountDue": "300",
+                            "amountPaid": "300",
+                            "receiptNumber": "rec123",
+                            "paymentDate": "18-03-2020",
+                            "paymentMode": "off-line"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
