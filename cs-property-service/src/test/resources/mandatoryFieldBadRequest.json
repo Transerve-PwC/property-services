@@ -11,51 +11,52 @@
     },
     "Properties": [
         {
-            "transitNumber": "tran000",
-            "tenantId": null,
-            "colony": null,
-            "masterDataState": "",
-            "masterDataAction": "INITIATE",
-            "propertyDetails": {
-            	"tenantId": "ch.chandigarh",
-                "area": "",
-                "rentPerSqyd": "2",
-                "currentOwner": "AAA",
-                "floors": "1",
-                "additionalDetails": ""
-            },
-            "owners": [
-                {
-                	"tenantId": "ch.chandigarh",
-                    "name": "AAA",
-                    "email": "aaa@mail.com",
-                    "phone": "9999999999",
-                    "gender": "male",
-                    "dateOfBirth": "18-03-1994",
-                    "aadhaarNumber": "9999999999999",
-                    "allotmentStartdate": "18-03-2018",
-                    "allotmentEnddate": "18-03-2023",
-                    "posessionStartdate": "18-03-2018",
-                    "posessionEnddate": "18-03-2023",
-                    "allotmenNumber": "allot123458",
-                    "applicationStatus": "",
-                    "activeState": "true",
-                    "isPrimaryOwner": "true",
-                    "monthlyRent": "300",
-                    "revisionPeriod": "1",
-                    "revisionPercentage": "5",
-                    "payment": [
-                        {
-                        	"tenantId": "ch.chandigarh",
-                            "amountDue": "300",
-                            "amountPaid": "300",
-                            "receiptNumber": "rec123",
-                            "paymentDate": "18-03-2020",
-                            "paymentMode": "off-line"
-                        }
-                    ]
-                }
-            ]
-        }
+    "propertyDetails": {
+      "rentPerSqyd": 4,
+      "area": "AREA.125",
+      "address": {
+        "area": "Some Area",
+        "district": "Some district",
+        "state": "Some State",
+        "country": "India",
+        "pincode": "500012",
+        "landmark": "Behind Postoffice"
+      },
+      "floors": "",
+      "additionalDetails": ""
+    },
+    "colony": "COLONY.KUMHAR",
+    "transitNumber": "TestTransit001",
+    "owners": [
+      {
+        "allotmentStartdate": 1444501799000,
+        "allotmenNumber": "TestAllotment001",
+        "posessionStartdate": 1444588199000,
+        "name": "TestOwner",
+        "phone": "9550259567",
+        "dateOfBirth": 631218599000,
+        "gender": "MALE",
+        "email": "test@egov.org.in",
+        "aadhaarNumber": "2345678901",
+        "monthlyRent": "2000",
+        "revisionPeriod": "3",
+        "revisionPercentage": "5",
+        "payment": [
+          {
+            "amountPaid": "10000",
+            "paymentDate": 1577903399000,
+            "paymentMode": "Online"
+          }
+        ],
+        "allotmentEnddate": 1602354599000,
+        "posessionEnddate": 1602440999000,
+        "applicationStatus": "",
+        "activeState": true,
+        "isPrimaryOwner": true
+      }
+    ],
+    "tenantId": "ch.chandigarh",
+    "masterDataAction": "INITIATE"
+  }
     ]
 }
