@@ -155,7 +155,8 @@ public class WorkflowIntegrator {
 			});
 
 			// setting the status back to Property object from wf response
-			request.getProperties().forEach(property -> property.setMasterDataState(idStatusMap.get(property.getTransitNumber())));
+			request.getProperties()
+					.forEach(property -> property.setMasterDataState(idStatusMap.get(property.getTransitNumber())));
 		}
 	}
 }

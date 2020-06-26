@@ -32,12 +32,12 @@ public class PropertyQueryBuilder {
 			+ " ptdl.tenantid as pdtenantid, ptdl.area, ptdl.rent_per_sqyd, ptdl.current_owner, ptdl.floors, ptdl.additional_details,"
 
 			+ " ownership.id as oid, ownership.property_id as oproperty_id, ownership.owner_id,"
-			+ " ownership.tenantid as otenantid, ownership.name, ownership.email, ownership.phone,"
-			+ " ownership.gender, ownership.date_of_birth, ownership.aadhaar_number,"
-			+ " ownership.allotment_startdate, ownership.allotment_enddate,"
-			+ " ownership.posession_startdate, ownership.posession_enddate, ownership.allotmen_number,"
-			+ " ownership.application_status, ownership.active_state, ownership.is_primary_owner,"
-			+ " ownership.monthly_rent, ownership.revision_period, ownership.revision_percentage,"
+//			+ " ownership.tenantid as otenantid, ownership.name, ownership.email, ownership.phone,"
+//			+ " ownership.gender, ownership.date_of_birth, ownership.aadhaar_number,"
+//			+ " ownership.allotment_startdate, ownership.allotment_enddate,"
+//			+ " ownership.posession_startdate, ownership.posession_enddate, ownership.allotmen_number,"
+//			+ " ownership.application_status, ownership.active_state, ownership.is_primary_owner,"
+//			+ " ownership.monthly_rent, ownership.revision_period, ownership.revision_percentage,"
 
 			+ " address.id as aid, address.property_id as aproperty_id, address.transit_number as atransit_number,"
 			+ " address.tenantid as atenantid, address.colony, address.area as addressArea, address.district,"

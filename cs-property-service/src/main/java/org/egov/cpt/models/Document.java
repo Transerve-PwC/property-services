@@ -1,8 +1,6 @@
 package org.egov.cpt.models;
 
-import java.util.List;
-
-import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -11,15 +9,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
- * A Object holds the basic data for a Property
+ * A Object holds the basic data for a Trade License
  */
-@ApiModel(description = "A Object holds the basic data for a Property")
+@ApiModel(description = "A Object holds the basic data for a Trade License")
 @Validated
 @javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-09-18T17:06:11.263+05:30")
 
@@ -27,10 +25,11 @@ import lombok.ToString;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Builder
-public class PropertyDetails {
+@EqualsAndHashCode
+public class Document {
 
+	@Size(max = 64)
 	@JsonProperty("id")
 	private String id;
 
@@ -40,30 +39,24 @@ public class PropertyDetails {
 	@JsonProperty("transitNumber")
 	private String transitNumber;
 
+	@Size(max = 64)
 	@JsonProperty("tenantId")
-	private String tenantId;
+	private String tenantId = null;
 
-	@JsonProperty("area")
-	private String area;
+	@JsonProperty("active")
+	private Boolean active;
 
-	@JsonProperty("rentPerSqyd")
-	private String rentPerSqyd;
+	@Size(max = 64)
+	@JsonProperty("documentType")
+	private String documentType = null;
 
-	@JsonProperty("currentOwner")
-	private String currentOwner;
+	@Size(max = 64)
+	@JsonProperty("fileStoreId")
+	private String fileStoreId = null;
 
-	@JsonProperty("floors")
-	private String floors;
-
-	@JsonProperty("additionalDetails")
-	private String additionalDetails;
-
-	@JsonProperty("address")
-	private Address address;
-
-	@Valid
-	@JsonProperty("applicationDocuments")
-	private List<Document> applicationDocuments;
+	@Size(max = 64)
+	@JsonProperty("documentUid")
+	private String documentUid;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;

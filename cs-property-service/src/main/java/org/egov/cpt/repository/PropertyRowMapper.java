@@ -142,22 +142,22 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		String ownerId = rs.getString("owner_id");
 		Owner currentOwner = ownerMap.get(ownerId);
 
-		if (null == currentOwner) {
-			currentOwner = Owner.builder().id(rs.getString("oid")).propertyId(rs.getString("oproperty_id"))
-					.tenantId(rs.getString("otenantid")).ownerId(rs.getString("owner_id")).name(rs.getString("name"))
-					.email(rs.getString("email")).phone(rs.getString("phone")).gender(rs.getString("gender"))
-					.dateOfBirth(rs.getString("date_of_birth")).aadhaarNumber(rs.getString("aadhaar_number"))
-					.allotmentStartdate(rs.getString("allotment_startdate"))
-					.allotmentEnddate(rs.getString("allotment_enddate"))
-					.posessionStartdate(rs.getString("posession_startdate"))
-					.posessionEnddate(rs.getString("posession_enddate")).allotmenNumber(rs.getString("allotmen_number"))
-					.applicationStatus(rs.getString("application_status")).activeState(rs.getBoolean("active_state"))
-					.isPrimaryOwner(rs.getString("is_primary_owner")).monthlyRent(rs.getString("monthly_rent"))
-					.revisionPeriod(rs.getString("revision_period"))
-					.revisionPercentage(rs.getString("revision_percentage")).auditDetails(auditdetails).payment(null)
-					.build();
-			ownerMap.put(ownerId, currentOwner);
-		}
+//		if (null == currentOwner) {
+//			currentOwner = Owner.builder().id(rs.getString("oid")).propertyId(rs.getString("oproperty_id"))
+//					.tenantId(rs.getString("otenantid")).ownerId(rs.getString("owner_id")).name(rs.getString("name"))
+//					.email(rs.getString("email")).phone(rs.getString("phone")).gender(rs.getString("gender"))
+//					.dateOfBirth(rs.getString("date_of_birth")).aadhaarNumber(rs.getString("aadhaar_number"))
+//					.allotmentStartdate(rs.getString("allotment_startdate"))
+//					.allotmentEnddate(rs.getString("allotment_enddate"))
+//					.posessionStartdate(rs.getString("posession_startdate"))
+//					.posessionEnddate(rs.getString("posession_enddate")).allotmenNumber(rs.getString("allotmen_number"))
+//					.applicationStatus(rs.getString("application_status")).activeState(rs.getBoolean("active_state"))
+//					.isPrimaryOwner(rs.getString("is_primary_owner")).monthlyRent(rs.getString("monthly_rent"))
+//					.revisionPeriod(rs.getString("revision_period"))
+//					.revisionPercentage(rs.getString("revision_percentage")).auditDetails(auditdetails).payment(null)
+//					.build();
+//			ownerMap.put(ownerId, currentOwner);
+//		}
 		return new ArrayList<>(ownerMap.values());
 	}
 

@@ -8,7 +8,10 @@ import java.util.UUID;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
+import org.egov.cpt.models.CorrespondenceAddress;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.UserDetailResponse;
@@ -45,44 +48,56 @@ public class EnrichmentService {
 						String gen_owner_id = UUID.randomUUID().toString();
 						owner.setId(gen_owner_id);
 						owner.setPropertyId(gen_property_id);
-						owner.setOwnerId(request.getRequestInfo().getUserInfo().getId().toString());
 						owner.setTenantId(property.getTenantId());
 						owner.setAuditDetails(propertyAuditDetails);
+						OwnerDetails ownerDetails = getOwnerShipDetails(owner, property, requestInfo, gen_property_id);
+						owner.setOwnerDetails(ownerDetails);
 
-						if (!CollectionUtils.isEmpty(owner.getPayment())) {
-							owner.getPayment().forEach(payment -> {
-								String gen_payment_id = UUID.randomUUID().toString();
-								payment.setId(gen_payment_id);
-								payment.setTenantId(property.getTenantId());
-								payment.setAuditDetails(propertyAuditDetails);
-							});
-						}
+//						if (!CollectionUtils.isEmpty(owner.getPayment())) {
+//							owner.getPayment().forEach(payment -> {
+//								String gen_payment_id = UUID.randomUUID().toString();
+//								payment.setId(gen_payment_id);
+//								payment.setTenantId(property.getTenantId());
+//								payment.setAuditDetails(propertyAuditDetails);
+//							});
+//						}
 					});
 				}
 			});
 		}
 
-//		property.getAddress().setTenantId(property.getTenantId());
-//		property.getAddress().setId(UUID.randomUUID().toString());
-//
-//		property.getOwners().forEach(owner -> {
-//
-//			if (!CollectionUtils.isEmpty(owner.getDocuments()))
-//				owner.getDocuments().forEach(doc -> {
-//					doc.setId(UUID.randomUUID().toString());
-//					doc.setStatus(Status.ACTIVE);
-//				});
-//
-//			owner.setStatus(Status.ACTIVE);
-//		});
-//
-//		if (!CollectionUtils.isEmpty(property.getInstitution()))
-//			property.getInstitution().forEach(institute -> institute.setId(UUID.randomUUID().toString()));
-//
-//		property.setAuditDetails(propertyAuditDetails);
-//
 //		setIdgenIds(request);
 //		enrichBoundary(request);
+	}
+
+	private OwnerDetails getOwnerShipDetails(Owner owner, Property property, RequestInfo requestInfo,
+			String gen_property_id) {
+		OwnerDetails ownerDetails = owner.getOwnerDetails();
+		String gen_owner_details_id = UUID.randomUUID().toString();
+		AuditDetails ownerAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		CorrespondenceAddress correspondenceAddress = getCorrespondenceAddress(owner, property, requestInfo,
+				gen_property_id);
+		ownerDetails.setId(gen_owner_details_id);
+		ownerDetails.setPropertyId(property.getId());
+		ownerDetails.setOwnerId(owner.getId());
+		ownerDetails.setTenantId(property.getTenantId());
+		ownerDetails.setCorrespondenceAddress(correspondenceAddress);
+		ownerDetails.setAuditDetails(ownerAuditDetails);
+		return ownerDetails;
+	}
+
+	private CorrespondenceAddress getCorrespondenceAddress(Owner owner, Property property, RequestInfo requestInfo,
+			String gen_property_id) {
+		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		CorrespondenceAddress address = owner.getOwnerDetails().getCorrespondenceAddress();
+		String gen_address_id = UUID.randomUUID().toString();
+		address.setId(gen_address_id);
+		address.setPropertyId(gen_property_id);
+		address.setTransitNumber(property.getTransitNumber());
+		address.setTenantId(property.getTenantId());
+		address.setColony(property.getColony());
+		address.setAuditDetails(propertyAuditDetails);
+		return address;
 	}
 
 	public void enrichUpdateRequest(PropertyRequest request, List<Property> propertyFromDb) {
@@ -101,10 +116,11 @@ public class EnrichmentService {
 					property.getOwners().forEach(owner -> {
 						owner.setAuditDetails(propertyAuditDetails);
 
-						if (!CollectionUtils.isEmpty(owner.getPayment()))
-							owner.getPayment().forEach(payment -> {
-								payment.setAuditDetails(propertyAuditDetails);
-							});
+//						if (!CollectionUtils.isEmpty(owner.getPayment())) {
+//							owner.getPayment().forEach(payment -> {
+//								payment.setAuditDetails(propertyAuditDetails);
+//							});
+//						}
 					});
 				}
 			});
@@ -123,12 +139,17 @@ public class EnrichmentService {
 		Address address = getAddress(property, requestInfo, gen_property_id);
 		propertyDetail.setAddress(address);
 
-		if (!CollectionUtils.isEmpty(property.getOwners()))
+		List<Document> applicationDocuments = getApplicationDocs(propertyDetail, property, requestInfo,
+				gen_property_id);
+		propertyDetail.setApplicationDocuments(applicationDocuments);
+
+		if (!CollectionUtils.isEmpty(property.getOwners())) {
 			property.getOwners().forEach(owner -> {
 				if (owner.getActiveState()) {
-					propertyDetail.setCurrentOwner(owner.getName());
+					propertyDetail.setCurrentOwner(owner.getOwnerDetails().getName());
 				}
 			});
+		}
 
 //		propertyDetail.setAdditionalDetails(property.getPropertyDetails().getAdditionalDetails());
 //		JsonNode addtionalDetails = propertyDetail.getAdditionalDetails();
@@ -141,6 +162,23 @@ public class EnrichmentService {
 //		propertyDetail.setAdditionalDetails(jsonObject);
 		propertyDetail.setAuditDetails(propertyAuditDetails);
 		return propertyDetail;
+	}
+
+	private List<Document> getApplicationDocs(PropertyDetails propertyDetails, Property property,
+			RequestInfo requestInfo, String gen_property_id) {
+		List<Document> applicationDocuments = propertyDetails.getApplicationDocuments();
+		if (!CollectionUtils.isEmpty(applicationDocuments)) {
+			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+			applicationDocuments.forEach(document -> {
+				String gen_doc_id = UUID.randomUUID().toString();
+				document.setId(gen_doc_id);
+				document.setPropertyId(gen_property_id);
+				document.setTransitNumber(property.getTransitNumber());
+				document.setTenantId(property.getTenantId());
+				document.setAuditDetails(docAuditDetails);
+			});
+		}
+		return applicationDocuments;
 	}
 
 	public Address getAddress(Property property, RequestInfo requestInfo, String gen_property_id) {
