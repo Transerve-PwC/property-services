@@ -1,0 +1,77 @@
+{
+    "ResponseInfo": {
+        "apiId": "Rainmaker",
+        "ver": ".01",
+        "ts": null,
+        "resMsgId": "uief87324",
+        "msgId": "20170310130900|en_IN",
+        "status": "successful"
+    },
+    "Properties": [
+        {
+            "transitNumber": "tran000",
+            "tenantId": "ch.chandigarh",
+            "colony": "Milk",
+            "masterDataState": "INITIATED",
+            "masterDataAction": "INITIATE",
+            "auditDetails": {
+                "createdBy": "2743bf22-6499-4029-bd26-79e5d0ce6427",
+                "lastModifiedBy": "2743bf22-6499-4029-bd26-79e5d0ce6427"
+            },
+            "propertyDetails": {
+                "transitNumber": "tran000",
+                "tenantId": "ch.chandigarh",
+                "area": "150sq",
+                "rentPerSqyd": "2",
+                "currentOwner": "AAA",
+                "floors": "1",
+                "additionalDetails": "",
+                "auditDetails": {
+                    "createdBy": "2743bf22-6499-4029-bd26-79e5d0ce6427",
+                    "lastModifiedBy": "2743bf22-6499-4029-bd26-79e5d0ce6427"
+                }
+            },
+            "owners": [
+                {
+                    "ownerId": "7",
+                    "tenantId": "ch.chandigarh",
+                    "name": "AAA",
+                    "email": "aaa@mail.com",
+                    "phone": "9999999999",
+                    "gender": "male",
+                    "dateOfBirth": "18-03-1994",
+                    "aadhaarNumber": "9999999999999",
+                    "allotmentStartdate": "18-03-2018",
+                    "allotmentEnddate": "18-03-2023",
+                    "posessionStartdate": "18-03-2018",
+                    "posessionEnddate": "18-03-2023",
+                    "allotmenNumber": "allot123458",
+                    "applicationStatus": "",
+                    "activeState": true,
+                    "isPrimaryOwner": "true",
+                    "monthlyRent": "300",
+                    "revisionPeriod": "1",
+                    "revisionPercentage": "5",
+                    "auditDetails": {
+                        "createdBy": "2743bf22-6499-4029-bd26-79e5d0ce6427",
+                        "lastModifiedBy": "2743bf22-6499-4029-bd26-79e5d0ce6427"
+                    },
+                    "payment": [
+                        {
+                            "amountDue": "300",
+                            "amountPaid": "300",
+                            "receiptNumber": "rec123",
+                            "paymentDate": "18-03-2020",
+                            "paymentMode": "off-line",
+                            "auditDetails": {
+                                "createdBy": "2743bf22-6499-4029-bd26-79e5d0ce6427",
+                                "lastModifiedBy": "2743bf22-6499-4029-bd26-79e5d0ce6427"
+                                
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
