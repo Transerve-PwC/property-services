@@ -104,7 +104,7 @@ public class WorkflowIntegrator {
 			}
 			obj.put(TENANTIDKEY, wfTenantId);
 			obj.put(BUSINESSSERVICEKEY, config.getCSPBusinessServiceValue());
-			obj.put(BUSINESSIDKEY, property.getId()); // TODO doubt
+			obj.put(BUSINESSIDKEY, property.getTransitNumber());
 			obj.put(ACTIONKEY, property.getMasterDataAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(AUDITDETAILSKEY, property.getAuditDetails());
@@ -155,7 +155,8 @@ public class WorkflowIntegrator {
 			});
 
 			// setting the status back to Property object from wf response
-			request.getProperties().forEach(property -> property.setMasterDataState(idStatusMap.get(property.getId())));
+			request.getProperties()
+					.forEach(property -> property.setMasterDataState(idStatusMap.get(property.getTransitNumber())));
 		}
 	}
 }

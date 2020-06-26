@@ -46,22 +46,22 @@ public class Owner {
 	private String gender;
 
 	@JsonProperty("dateOfBirth")
-	private String dateOfBirth;
+	private Long dateOfBirth;
 
 	@JsonProperty("aadhaarNumber")
 	private String aadhaarNumber;
 
 	@JsonProperty("allotmentStartdate")
-	private String allotmentStartdate;
+	private Long allotmentStartdate;
 
 	@JsonProperty("allotmentEnddate")
-	private String allotmentEnddate;
+	private Long allotmentEnddate;
 
 	@JsonProperty("posessionStartdate")
-	private String posessionStartdate;
+	private Long posessionStartdate;
 
 	@JsonProperty("posessionEnddate")
-	private String posessionEnddate;
+	private Long posessionEnddate;
 
 	@JsonProperty("allotmenNumber")
 	private String allotmenNumber;
