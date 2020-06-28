@@ -73,7 +73,7 @@ public class OwnerDetails {
 	private String revisionPercentage;
 
 	@JsonProperty("correspondenceAddress")
-	private CorrespondenceAddress correspondenceAddress;
+	private Address correspondenceAddress;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;

@@ -36,9 +36,6 @@ public class Document {
 	@JsonProperty("propertyId")
 	private String propertyId;
 
-	@JsonProperty("transitNumber")
-	private String transitNumber;
-
 	@Size(max = 64)
 	@JsonProperty("tenantId")
 	private String tenantId = null;

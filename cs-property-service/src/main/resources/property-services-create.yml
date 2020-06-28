@@ -207,15 +207,13 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.auditDetails.lastModifiedTime
       
       
-    - query: INSERT INTO cs_pt_application_documents_v1 (id, property_id, transit_number, tenantid, is_active, document_type, fileStore_id, document_uid, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_application_documents_v1 (id, property_id, tenantid, is_active, document_type, fileStore_id, document_uid, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.propertyDetails.applicationDocuments.*
       jsonMaps:
 
       - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.id
 
       - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.propertyId
-
-      - jsonPath: $.Properties.*.transitNumber
 
       - jsonPath: $.Properties.*.tenantId
 

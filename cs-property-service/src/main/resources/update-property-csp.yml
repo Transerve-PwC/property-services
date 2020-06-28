@@ -55,33 +55,11 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.transitNumber
 
 
-    - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, owner_id=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, allotmen_number=?, application_status=?, active_state=?, is_primary_owner=?, monthly_rent=?, revision_period=?, revision_percentage=?, modified_by=?, modified_date=? where id=? AND property_id=?;
+    - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, allotmen_number=?, application_status=?, active_state=?, is_primary_owner=?, modified_by=?, modified_date=? where id=? AND property_id=?;
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
       - jsonPath: $.Properties.*.tenantId
-
-      - jsonPath: $.Properties.*.owners.*.ownerId
-      
-      - jsonPath: $.Properties.*.owners.*.name
-
-      - jsonPath: $.Properties.*.owners.*.email
-
-      - jsonPath: $.Properties.*.owners.*.phone
-      
-      - jsonPath: $.Properties.*.owners.*.gender
-
-      - jsonPath: $.Properties.*.owners.*.dateOfBirth
-
-      - jsonPath: $.Properties.*.owners.*.aadhaarNumber
-
-      - jsonPath: $.Properties.*.owners.*.allotmentStartdate
-
-      - jsonPath: $.Properties.*.owners.*.allotmentEnddate
-
-      - jsonPath: $.Properties.*.owners.*.posessionStartdate
-
-      - jsonPath: $.Properties.*.owners.*.posessionEnddate
       
       - jsonPath: $.Properties.*.owners.*.allotmenNumber
 
@@ -91,18 +69,55 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.owners.*.isPrimaryOwner
 
-      - jsonPath: $.Properties.*.owners.*.monthlyRent
+      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.owners.*.revisionPeriod
-
-      - jsonPath: $.Properties.*.owners.*.revisionPercentage
-
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
-
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
+      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
             
       - jsonPath: $.Properties.*.owners.*.id
 
       - jsonPath: $.Properties.*.owners.*.propertyId
 
-    
+ 
+    - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, modified_by=?, modified_date=? where id=? AND property_id=?;
+      basePath: $.Properties.*.owners.*
+      jsonMaps:
+
+      - jsonPath: $.Properties.*.owners.*.id
+      
+      - jsonPath: $.Properties.*.tenantId
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.name
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.email
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.phone
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.gender
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfBirth
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.aadhaarNumber
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentStartdate
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentEnddate
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionStartdate
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionEnddate
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.monthlyRent
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
+            
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.id
+
+      - jsonPath: $.Properties.*.owners.*.propertyId
+
+        

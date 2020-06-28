@@ -154,7 +154,6 @@ CREATE TABLE cs_pt_correspondence_address_v1 (
 CREATE TABLE cs_pt_application_documents_v1 (
    id           		CHARACTER VARYING (256) NOT NULL,
    property_id       	CHARACTER VARYING (256) NOT NULL,
-   transit_number       CHARACTER VARYING (256),
    tenantid			    CHARACTER VARYING (256),
    is_active   			CHARACTER VARYING (256),
    document_type   		CHARACTER VARYING (256),
