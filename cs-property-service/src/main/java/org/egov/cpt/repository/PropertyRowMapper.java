@@ -196,12 +196,11 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 	private Address getCorrespondenceAddress(ResultSet rs) throws SQLException {
 		AuditDetails auditdetails = getAuditDetail(rs, "property");
-		Address address = Address.builder().id(rs.getString("caid")).propertyId(rs.getString("caproperty_id"))
-				.transitNumber(rs.getString("catransit_number")).tenantId(rs.getString("catenantid"))
-				.colony(rs.getString("cacolony")).area(rs.getString("caddressArea"))
-				.district(rs.getString("cadistrict")).state(rs.getString("castate")).country(rs.getString("cacountry"))
-				.pincode(rs.getString("capincode")).landmark(rs.getString("calandmark")).auditDetails(auditdetails)
-				.build();
+		Address address = Address.builder().id(rs.getString("aid")).propertyId(rs.getString("aproperty_id"))
+				.transitNumber(rs.getString("atransit_number")).tenantId(rs.getString("atenantid"))
+				.colony(rs.getString("colony")).area(rs.getString("addressArea")).district(rs.getString("district"))
+				.state(rs.getString("state")).country(rs.getString("country")).pincode(rs.getString("pincode"))
+				.landmark(rs.getString("landmark")).auditDetails(auditdetails).build();
 		return address;
 	}
 

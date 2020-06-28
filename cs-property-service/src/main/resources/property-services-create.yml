@@ -172,7 +172,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.lastModifiedTime
       
       
-    - query: INSERT INTO cs_pt_correspondence_address_v1 (id, property_id, transit_number, tenantid, colony, area, district, state, country, pincode, landmark, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_address_v1 (id, property_id, transit_number, tenantid, colony, area, district, state, country, pincode, landmark, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress
       jsonMaps:
 

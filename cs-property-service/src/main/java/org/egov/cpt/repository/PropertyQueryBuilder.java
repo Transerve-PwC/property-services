@@ -24,7 +24,7 @@ public class PropertyQueryBuilder {
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
-	private static final String SEARCH_QUERY = SELECT + "pt.*,ptdl.*,ownership.*,od.*,address.*,caddress.*,doc.*,"
+	private static final String SEARCH_QUERY = SELECT + "pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,"
 
 			+ " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,"
 
@@ -44,10 +44,6 @@ public class PropertyQueryBuilder {
 			+ " address.tenantid as atenantid, address.colony, address.area as addressArea, address.district,"
 			+ " address.state, address.country, address.pincode, address.landmark,"
 
-			+ " caddress.id as caid, caddress.property_id as caproperty_id, caddress.transit_number as catransit_number,"
-			+ " caddress.tenantid as catenantid, caddress.colony as cacolony, caddress.area as caddressArea, caddress.district as cadistrict,"
-			+ " caddress.state as castate, caddress.country as cacountry, caddress.pincode as capincode, caddress.landmark as calandmark,"
-
 			+ " doc.id as docid, doc.property_id as docproperty_id, doc.tenantid as doctenantid,"
 			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id, doc.document_uid"
 
@@ -55,7 +51,6 @@ public class PropertyQueryBuilder {
 			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + INNER_JOIN
 			+ " cs_pt_ownershipdetails_v1 od ON pt.id=od.property_id " + INNER_JOIN
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + INNER_JOIN
-			+ " cs_pt_correspondence_address_v1 caddress ON pt.id=caddress.property_id " + INNER_JOIN
 			+ " cs_pt_application_documents_v1 doc ON pt.id=doc.property_id "
 //			+ " WHERE "
 	;
