@@ -1,5 +1,9 @@
 package org.egov.cpt.models;
 
+import java.util.List;
+
+import javax.validation.Valid;
+
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -57,19 +61,11 @@ public class PropertyDetails {
 	@JsonProperty("address")
 	private Address address;
 
+	@Valid
+	@JsonProperty("applicationDocuments")
+	private List<Document> applicationDocuments;
+
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
-//	@Builder
-//	public PropertyDetails(String id, String propertyId, String transitNumber, String area, String rentPerSqyd,
-//			String currentOwner, String floors, String additionalDetails) {
-//		this.id = id;
-//		this.propertyId = propertyId;
-//		this.transitNumber = transitNumber;
-//		this.area = area;
-//		this.rentPerSqyd = rentPerSqyd;
-//		this.currentOwner = currentOwner;
-//		this.floors = floors;
-//		this.additionalDetails = additionalDetails;
-//	}
 }

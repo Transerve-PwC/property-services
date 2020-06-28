@@ -23,6 +23,8 @@ public class PropertyCriteria {
 
 	private String name;
 
+	private String state;
+
 	private Long offset;
 
 	private Long limit;

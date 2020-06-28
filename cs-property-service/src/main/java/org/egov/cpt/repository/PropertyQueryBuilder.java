@@ -24,28 +24,34 @@ public class PropertyQueryBuilder {
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
-	private static final String SEARCH_QUERY = SELECT + "pt.*,ptdl.*,ownership.*,address.*,"
+	private static final String SEARCH_QUERY = SELECT + "pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,"
 
 			+ " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,"
 
 			+ " ptdl.id as pdid, ptdl.property_id as pdproperty_id, ptdl.transit_number as pdtransit_number,"
 			+ " ptdl.tenantid as pdtenantid, ptdl.area, ptdl.rent_per_sqyd, ptdl.current_owner, ptdl.floors, ptdl.additional_details,"
 
-			+ " ownership.id as oid, ownership.property_id as oproperty_id, ownership.owner_id,"
-			+ " ownership.tenantid as otenantid, ownership.name, ownership.email, ownership.phone,"
-			+ " ownership.gender, ownership.date_of_birth, ownership.aadhaar_number,"
-			+ " ownership.allotment_startdate, ownership.allotment_enddate,"
-			+ " ownership.posession_startdate, ownership.posession_enddate, ownership.allotmen_number,"
+			+ " ownership.id as oid, ownership.property_id as oproperty_id,"
+			+ " ownership.tenantid as otenantid, ownership.allotmen_number,"
 			+ " ownership.application_status, ownership.active_state, ownership.is_primary_owner,"
-			+ " ownership.monthly_rent, ownership.revision_period, ownership.revision_percentage,"
+
+			+ " od.id as odid, od.property_id as odproperty_id," + " od.owner_id odowner_id, od.tenantid as odtenantid,"
+			+ " od.name, od.email, od.phone," + " od.gender, od.date_of_birth, od.aadhaar_number,"
+			+ " od.allotment_startdate, od.allotment_enddate," + " od.posession_startdate, od.posession_enddate,"
+			+ " od.monthly_rent, od.revision_period, od.revision_percentage,"
 
 			+ " address.id as aid, address.property_id as aproperty_id, address.transit_number as atransit_number,"
 			+ " address.tenantid as atenantid, address.colony, address.area as addressArea, address.district,"
-			+ " address.state, address.country, address.pincode, address.landmark"
+			+ " address.state, address.country, address.pincode, address.landmark,"
+
+			+ " doc.id as docid, doc.property_id as docproperty_id, doc.tenantid as doctenantid,"
+			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id, doc.document_uid"
 
 			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id "
-			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON ptdl.property_id=ownership.property_id " + INNER_JOIN
-			+ " cs_pt_address_v1 address ON ptdl.property_id=address.property_id "
+			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + INNER_JOIN
+			+ " cs_pt_ownershipdetails_v1 od ON pt.id=od.property_id " + INNER_JOIN
+			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + INNER_JOIN
+			+ " cs_pt_application_documents_v1 doc ON pt.id=doc.property_id "
 //			+ " WHERE "
 	;
 
@@ -105,6 +111,12 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("ownership.phone = ?");
 			preparedStmtList.add(criteria.getPhone());
+		}
+
+		if (null != criteria.getState()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("pt.master_data_state = ?");
+			preparedStmtList.add(criteria.getState());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
