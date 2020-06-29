@@ -188,6 +188,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					.posessionEnddate(rs.getLong("posession_enddate")).monthlyRent(rs.getString("monthly_rent"))
 					.revisionPeriod(rs.getString("revision_period"))
 					.revisionPercentage(rs.getString("revision_percentage"))
+					.fatherOrHusband(rs.getString("father_or_husband")).relation(rs.getString("relation"))
 					.correspondenceAddress(correspondenceAddress).auditDetails(auditdetails).payment(null).build();
 		default:
 			return null;
