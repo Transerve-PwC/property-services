@@ -38,7 +38,7 @@ public class PropertyQueryBuilder {
 			+ " od.id as odid, od.property_id as odproperty_id," + " od.owner_id odowner_id, od.tenantid as odtenantid,"
 			+ " od.name, od.email, od.phone," + " od.gender, od.date_of_birth, od.aadhaar_number,"
 			+ " od.allotment_startdate, od.allotment_enddate," + " od.posession_startdate, od.posession_enddate,"
-			+ " od.monthly_rent, od.revision_period, od.revision_percentage,"
+			+ " od.monthly_rent, od.revision_period, od.revision_percentage, od.father_or_husband, od.relation,"
 
 			+ " address.id as aid, address.property_id as aproperty_id, address.transit_number as atransit_number,"
 			+ " address.tenantid as atenantid, address.colony, address.area as addressArea, address.district,"
@@ -50,7 +50,7 @@ public class PropertyQueryBuilder {
 			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id "
 			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + INNER_JOIN
 			+ " cs_pt_ownershipdetails_v1 od ON pt.id=od.property_id " + INNER_JOIN
-			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + INNER_JOIN
+			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
 			+ " cs_pt_application_documents_v1 doc ON pt.id=doc.property_id "
 //			+ " WHERE "
 	;
@@ -103,13 +103,13 @@ public class PropertyQueryBuilder {
 
 		if (null != criteria.getName()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("ownership.name = ?");
+			builder.append("od.name = ?");
 			preparedStmtList.add(criteria.getName());
 		}
 
 		if (null != criteria.getPhone()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("ownership.phone = ?");
+			builder.append("od.phone = ?");
 			preparedStmtList.add(criteria.getPhone());
 		}
 

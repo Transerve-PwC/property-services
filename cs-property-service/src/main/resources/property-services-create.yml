@@ -90,7 +90,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
   
   
-    - query: INSERT INTO cs_pt_ownershipdetails_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownershipdetails_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.owners.*.ownerDetails
       jsonMaps:
 
@@ -127,6 +127,10 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdBy
 
@@ -319,7 +323,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
   
   
-    - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.owners.*.ownerDetails
       jsonMaps:
 
@@ -356,6 +360,10 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdBy
 
@@ -364,5 +372,4 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdTime
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
-
     

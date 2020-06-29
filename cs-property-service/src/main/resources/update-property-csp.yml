@@ -78,7 +78,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.propertyId
 
  
-    - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, modified_by=?, modified_date=? where id=? AND property_id=?;
+    - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, modified_by=?, modified_date=? where id=? AND property_id=?;
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
@@ -111,6 +111,10 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
 
