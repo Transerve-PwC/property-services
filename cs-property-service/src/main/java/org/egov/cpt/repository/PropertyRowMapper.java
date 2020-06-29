@@ -9,7 +9,9 @@ import java.util.Map;
 
 import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +74,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		Address address = getAddress(rs);
 		String propertyId = rs.getString("pdid");
 		AuditDetails auditdetails = getAuditDetail(rs, "property");
-//		PGobject pgObj = (PGobject) rs.getObject("additional_details");
-//		JsonNode additionalDetail = null;
+		List<Document> applicationDocuments = getApplicationDocuments(rs);
 		switch (source) {
 		case "property":
 //			if (pgObj != null) {
@@ -90,8 +91,25 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 				.area(rs.getString("area")).rentPerSqyd(rs.getString("rent_per_sqyd"))
 				.currentOwner(rs.getString("current_owner")).floors(rs.getString("floors"))
 				.additionalDetails(rs.getString("additional_details")).address(address).auditDetails(auditdetails)
-				.build();
+				.applicationDocuments(applicationDocuments).build();
 
+	}
+
+	private List<Document> getApplicationDocuments(ResultSet rs) throws SQLException {
+
+		Map<String, Document> documentMap = new HashMap<>();
+		AuditDetails auditdetails = getAuditDetail(rs, "property");
+		String docId = rs.getString("docid");
+		Document currentDocument = documentMap.get(docId);
+
+		if (null == currentDocument) {
+			currentDocument = Document.builder().id(rs.getString("docid")).propertyId(rs.getString("docproperty_id"))
+					.tenantId(rs.getString("doctenantid")).active(rs.getBoolean("docis_active"))
+					.documentType(rs.getString("document_type")).fileStoreId(rs.getString("fileStore_id"))
+					.documentUid(rs.getString("document_uid")).auditDetails(auditdetails).build();
+			documentMap.put(docId, currentDocument);
+		}
+		return new ArrayList<>(documentMap.values());
 	}
 
 	/**
@@ -143,22 +161,47 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		Owner currentOwner = ownerMap.get(ownerId);
 
 		if (null == currentOwner) {
+			OwnerDetails ownerDetails = getOwnerDetails(rs, "property");
 			currentOwner = Owner.builder().id(rs.getString("oid")).propertyId(rs.getString("oproperty_id"))
-					.tenantId(rs.getString("otenantid")).ownerId(rs.getString("owner_id")).name(rs.getString("name"))
+					.tenantId(rs.getString("otenantid")).allotmenNumber(rs.getString("allotmen_number"))
+					.applicationStatus(rs.getString("application_status")).activeState(rs.getBoolean("active_state"))
+					.isPrimaryOwner(rs.getString("is_primary_owner")).ownerDetails(ownerDetails)
+					.auditDetails(auditdetails).build();
+
+			ownerMap.put(ownerId, currentOwner);
+		}
+		return new ArrayList<>(ownerMap.values());
+	}
+
+	private OwnerDetails getOwnerDetails(ResultSet rs, String source) throws SQLException {
+		switch (source) {
+		case "property":
+			Address correspondenceAddress = getCorrespondenceAddress(rs);
+			AuditDetails auditdetails = getAuditDetail(rs, "property");
+			return OwnerDetails.builder().id(rs.getString("odid")).propertyId(rs.getString("oproperty_id"))
+					.ownerId(rs.getString("owner_id")).tenantId(rs.getString("otenantid")).name(rs.getString("name"))
 					.email(rs.getString("email")).phone(rs.getString("phone")).gender(rs.getString("gender"))
 					.dateOfBirth(rs.getLong("date_of_birth")).aadhaarNumber(rs.getString("aadhaar_number"))
 					.allotmentStartdate(rs.getLong("allotment_startdate"))
 					.allotmentEnddate(rs.getLong("allotment_enddate"))
 					.posessionStartdate(rs.getLong("posession_startdate"))
-					.posessionEnddate(rs.getLong("posession_enddate")).allotmenNumber(rs.getString("allotmen_number"))
-					.applicationStatus(rs.getString("application_status")).activeState(rs.getBoolean("active_state"))
-					.isPrimaryOwner(rs.getString("is_primary_owner")).monthlyRent(rs.getString("monthly_rent"))
+					.posessionEnddate(rs.getLong("posession_enddate")).monthlyRent(rs.getString("monthly_rent"))
 					.revisionPeriod(rs.getString("revision_period"))
-					.revisionPercentage(rs.getString("revision_percentage")).auditDetails(auditdetails).payment(null)
-					.build();
-			ownerMap.put(ownerId, currentOwner);
+					.revisionPercentage(rs.getString("revision_percentage"))
+					.correspondenceAddress(correspondenceAddress).auditDetails(auditdetails).payment(null).build();
+		default:
+			return null;
 		}
-		return new ArrayList<>(ownerMap.values());
+	}
+
+	private Address getCorrespondenceAddress(ResultSet rs) throws SQLException {
+		AuditDetails auditdetails = getAuditDetail(rs, "property");
+		Address address = Address.builder().id(rs.getString("aid")).propertyId(rs.getString("aproperty_id"))
+				.transitNumber(rs.getString("atransit_number")).tenantId(rs.getString("atenantid"))
+				.colony(rs.getString("colony")).area(rs.getString("addressArea")).district(rs.getString("district"))
+				.state(rs.getString("state")).country(rs.getString("country")).pincode(rs.getString("pincode"))
+				.landmark(rs.getString("landmark")).auditDetails(auditdetails).build();
+		return address;
 	}
 
 	/**
