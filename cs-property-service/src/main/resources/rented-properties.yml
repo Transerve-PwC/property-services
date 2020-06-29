@@ -371,3 +371,130 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
     
+
+    
+    
+  - version: 1.0
+    description: Persists Properties details in cs_pt_property_v1 table
+    fromTopic: update-property-csp
+    isTransaction: true
+    queryMaps:
+
+    - query: UPDATE cs_pt_property_v1 SET tenantid=?, colony=?, master_data_state=?, master_data_action=?, modified_by=?, modified_date=? where id=? AND transit_number=?;
+      basePath: Properties.*
+      jsonMaps:
+
+      - jsonPath: $.Properties.*.tenantId
+
+      - jsonPath: $.Properties.*.colony
+
+      - jsonPath: $.Properties.*.masterDataState
+
+      - jsonPath: $.Properties.*.masterDataAction 
+      
+      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.Properties.*.id
+
+      - jsonPath: $.Properties.*.transitNumber
+
+
+    - query: UPDATE cs_pt_propertydetails_v1 SET tenantid=?, area=?, rent_per_sqyd=?, current_owner=?, floors=?, additional_details=?, modified_by=?, modified_date=? where id=? AND property_id=? AND transit_number=?;
+      basePath: Properties.*
+      jsonMaps:
+
+      - jsonPath: $.Properties.*.tenantId
+
+      - jsonPath: $.Properties.*.propertyDetails.area
+
+      - jsonPath: $.Properties.*.propertyDetails.rentPerSqyd
+
+      - jsonPath: $.Properties.*.propertyDetails.currentOwner
+
+      - jsonPath: $.Properties.*.propertyDetails.floors
+
+      - jsonPath: $.Properties.*.propertyDetails.additionalDetails
+
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.Properties.*.propertyDetails.id
+
+      - jsonPath: $.Properties.*.propertyDetails.propertyId
+
+      - jsonPath: $.Properties.*.propertyDetails.transitNumber
+
+
+    - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, allotmen_number=?, application_status=?, active_state=?, is_primary_owner=?, modified_by=?, modified_date=? where id=? AND property_id=?;
+      basePath: $.Properties.*.owners.*
+      jsonMaps:
+
+      - jsonPath: $.Properties.*.tenantId
+      
+      - jsonPath: $.Properties.*.owners.*.allotmenNumber
+
+      - jsonPath: $.Properties.*.owners.*.applicationStatus
+
+      - jsonPath: $.Properties.*.owners.*.activeState
+
+      - jsonPath: $.Properties.*.owners.*.isPrimaryOwner
+
+      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
+            
+      - jsonPath: $.Properties.*.owners.*.id
+
+      - jsonPath: $.Properties.*.owners.*.propertyId
+
+ 
+    - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, modified_by=?, modified_date=? where id=? AND property_id=?;
+      basePath: $.Properties.*.owners.*
+      jsonMaps:
+
+      - jsonPath: $.Properties.*.owners.*.id
+      
+      - jsonPath: $.Properties.*.tenantId
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.name
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.email
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.phone
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.gender
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfBirth
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.aadhaarNumber
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentStartdate
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentEnddate
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionStartdate
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionEnddate
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.monthlyRent
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
+            
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.id
+
+      - jsonPath: $.Properties.*.owners.*.propertyId
+
+    
