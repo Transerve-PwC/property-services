@@ -82,4 +82,10 @@ public class OwnerDetails {
 	@JsonProperty("payment")
 	private List<Payment> payment;
 
+	@JsonProperty("fatherOrHusband")
+	private String fatherOrHusband;
+
+	@JsonProperty("relation")
+	private String relation;
+
 }
