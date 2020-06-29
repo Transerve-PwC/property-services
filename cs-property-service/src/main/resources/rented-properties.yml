@@ -496,5 +496,33 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.ownerDetails.id
 
       - jsonPath: $.Properties.*.owners.*.propertyId
+      
+      
+    - query: INSERT INTO cs_pt_application_documents_v1 (id, property_id, tenantid, is_active, document_type, fileStore_id, document_uid, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.Properties.*.propertyDetails.applicationDocuments.*
+      jsonMaps:
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.id
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.propertyId
+
+      - jsonPath: $.Properties.*.tenantId
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.active
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentType
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.fileStoreId
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentUid
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdBy
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdTime
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime      
+    
 
     
