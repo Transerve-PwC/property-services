@@ -98,6 +98,9 @@ public class EnrichmentService {
 				property.setAuditDetails(modifyAuditDetails);
 				property.getPropertyDetails().setAuditDetails(modifyAuditDetails);
 
+				PropertyDetails propertyDetail = updatePropertyDetail(property, requestInfo);
+				property.setPropertyDetails(propertyDetail);
+
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
 					property.getOwners().forEach(owner -> {
 						owner.setAuditDetails(modifyAuditDetails);
@@ -106,6 +109,29 @@ public class EnrichmentService {
 				}
 			});
 		}
+	}
+
+	public PropertyDetails updatePropertyDetail(Property property, RequestInfo requestInfo) {
+		PropertyDetails propertyDetail = property.getPropertyDetails();
+		List<Document> applicationDocuments = updateApplicationDocs(propertyDetail, property, requestInfo);
+		propertyDetail.setApplicationDocuments(applicationDocuments);
+		return propertyDetail;
+	}
+
+	private List<Document> updateApplicationDocs(PropertyDetails propertyDetails, Property property,
+			RequestInfo requestInfo) {
+		List<Document> applicationDocuments = propertyDetails.getApplicationDocuments();
+		if (!CollectionUtils.isEmpty(applicationDocuments)) {
+			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+			applicationDocuments.forEach(document -> {
+				String gen_doc_id = UUID.randomUUID().toString();
+				document.setId(gen_doc_id);
+				document.setPropertyId(property.getId());
+				document.setTenantId(property.getTenantId());
+				document.setAuditDetails(docAuditDetails);
+			});
+		}
+		return applicationDocuments;
 	}
 
 	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
