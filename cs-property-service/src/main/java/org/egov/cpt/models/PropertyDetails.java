@@ -1,5 +1,6 @@
 package org.egov.cpt.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -67,5 +68,14 @@ public class PropertyDetails {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
+
+	public PropertyDetails addApplicationDocumentsItem(Document applicationDocumentsItem) {
+		if (this.applicationDocuments == null) {
+			this.applicationDocuments = new ArrayList<>();
+		}
+		if (!this.applicationDocuments.contains(applicationDocumentsItem))
+			this.applicationDocuments.add(applicationDocumentsItem);
+		return this;
+	}
 
 }
