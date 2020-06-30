@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS cs_pt_duplicate_ownership_application;
 DROP TABLE IF EXISTS cs_pt_duplicatecopy_applicant;
-DROP TABLE IF EXISTS cs_pt_duplicate_ownership_application;
+DROP TABLE IF EXISTS cs_pt_duplicatecopy_document;
 DROP TABLE IF EXISTS cs_pt_duplicate_ownership_application_audit;
 DROP TABLE IF EXISTS cs_pt_duplicatecopy_applicant_audit;
 
@@ -33,6 +33,7 @@ CREATE TABLE cs_pt_duplicatecopy_applicant (
    guardian				CHARACTER VARYING (256),
    relationship			CHARACTER VARYING (256),
    address				CHARACTER VARYING (256),
+   aadhaar_number       CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    created_time         bigint,
@@ -86,6 +87,7 @@ CREATE TABLE cs_pt_duplicatecopy_applicant_audit (
    guardian				CHARACTER VARYING (256),
    relationship			CHARACTER VARYING (256),
    address				CHARACTER VARYING (256),
+   aadhaar_number       CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    created_time         bigint,
