@@ -47,6 +47,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.propertyDetails(propertyDetails).owners(owners).build();
 				propertyMap.put(propertyId, currentProperty);
 			}
+			getApplicationDocuments(rs, currentProperty);
 		}
 		return new ArrayList<>(propertyMap.values());
 	}
@@ -74,7 +75,6 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		Address address = getAddress(rs);
 		String propertyId = rs.getString("pdid");
 		AuditDetails auditdetails = getAuditDetail(rs, "property");
-		List<Document> applicationDocuments = getApplicationDocuments(rs);
 		switch (source) {
 		case "property":
 //			if (pgObj != null) {
@@ -91,25 +91,19 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 				.area(rs.getString("area")).rentPerSqyd(rs.getString("rent_per_sqyd"))
 				.currentOwner(rs.getString("current_owner")).floors(rs.getString("floors"))
 				.additionalDetails(rs.getString("additional_details")).address(address).auditDetails(auditdetails)
-				.applicationDocuments(applicationDocuments).build();
+				.build();
 
 	}
 
-	private List<Document> getApplicationDocuments(ResultSet rs) throws SQLException {
-
-		Map<String, Document> documentMap = new HashMap<>();
-		AuditDetails auditdetails = getAuditDetail(rs, "property");
-		String docId = rs.getString("docid");
-		Document currentDocument = documentMap.get(docId);
-
-		if (null == currentDocument) {
-			currentDocument = Document.builder().id(rs.getString("docid")).propertyId(rs.getString("docproperty_id"))
-					.tenantId(rs.getString("doctenantid")).active(rs.getBoolean("docis_active"))
-					.documentType(rs.getString("document_type")).fileStoreId(rs.getString("fileStore_id"))
-					.documentUid(rs.getString("document_uid")).auditDetails(auditdetails).build();
-			documentMap.put(docId, currentDocument);
+	private void getApplicationDocuments(ResultSet rs, Property property) throws SQLException {
+		String entityId = rs.getString("docproperty_id");
+		if (rs.getString("docid") != null && rs.getBoolean("docis_active") && entityId.equals(property.getId())) {
+			Document applicationDocument = Document.builder().id(rs.getString("docid"))
+					.propertyId(rs.getString("docproperty_id")).tenantId(rs.getString("doctenantid"))
+					.active(rs.getBoolean("docis_active")).documentType(rs.getString("document_type"))
+					.fileStoreId(rs.getString("fileStore_id")).documentUid(rs.getString("document_uid")).build();
+			property.getPropertyDetails().addApplicationDocumentsItem(applicationDocument);
 		}
-		return new ArrayList<>(documentMap.values());
 	}
 
 	/**
@@ -205,30 +199,4 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		return address;
 	}
 
-	/**
-	 * method parses the PGobject and returns the JSON node
-	 * 
-	 * @param rs
-	 * @param key
-	 * @return
-	 * @throws SQLException
-	 */
-//	private Object getadditionalDetail(ResultSet rs, String key) throws SQLException {
-//
-//		JsonNode propertyAdditionalDetails = null;
-//
-//		try {
-//
-//			PGobject obj = (PGobject) rs.getObject(key);
-//			if (obj != null) {
-//				propertyAdditionalDetails = mapper.readTree(obj.getValue());
-//			}
-//
-//		} catch (IOException e) {
-//			throw new CustomException("PARSING ERROR", "The propertyAdditionalDetail json cannot be parsed");
-//		}
-//
-//		return propertyAdditionalDetails;
-//
-//	}
 }
