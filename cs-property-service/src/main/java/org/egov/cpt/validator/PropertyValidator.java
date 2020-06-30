@@ -56,9 +56,9 @@ public class PropertyValidator {
 	public void validateCreateRequest(PropertyRequest request) {
 
 		Map<String, String> errorMap = new HashMap<>();
-		
+
 		validateTransitNumber(request, errorMap);
-		
+
 		validateEmail(request, errorMap);
 		validAadharNumber(request, errorMap);
 		validateMobileNumber(request, errorMap);
@@ -109,7 +109,7 @@ public class PropertyValidator {
 			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
 			return JsonPath.read(result, jsonpath);
 		} catch (Exception e) {
-			log.error("Error while fetvhing MDMS data", e);
+//			log.error("Error while fetvhing MDMS data", e);
 			throw new CustomException("INVALID TENANT ID ", "No data found for this tenentID");
 		}
 
@@ -120,9 +120,9 @@ public class PropertyValidator {
 		List<Property> property = request.getProperties();
 		property.forEach(properties -> {
 			properties.getOwners().forEach(owner -> {
-				System.out.println(isEmailValid(owner.getEmail()));
-				if (!isEmailValid(owner.getEmail())) {
-					errorMap.put("INVALID EMAIL", "Email is not valid for user : " + owner.getName());
+				System.out.println(isEmailValid(owner.getOwnerDetails().getEmail()));
+				if (!isEmailValid(owner.getOwnerDetails().getEmail())) {
+					errorMap.put("INVALID EMAIL", "Email is not valid for user : " + owner.getOwnerDetails().getName());
 				}
 			});
 		});
@@ -134,8 +134,9 @@ public class PropertyValidator {
 		List<Property> property = request.getProperties();
 		property.forEach(properties -> {
 			properties.getOwners().forEach(owner -> {
-				if (!isAadharNumberValid(owner.getAadhaarNumber())) {
-					errorMap.put("INVALID AADHARNUMBER", "Aadhar Number is not valid for user : " + owner.getName());
+				if (!isAadharNumberValid(owner.getOwnerDetails().getAadhaarNumber())) {
+					errorMap.put("INVALID AADHARNUMBER",
+							"Aadhar Number is not valid for user : " + owner.getOwnerDetails().getName());
 				}
 			});
 		});
@@ -165,8 +166,9 @@ public class PropertyValidator {
 		List<Property> property = request.getProperties();
 		property.forEach(properties -> {
 			properties.getOwners().forEach(owner -> {
-				if (!isMobileNumberValid(owner.getPhone())) {
-					errorMap.put("INVALID MOBILE NUMBER", "MobileNumber is not valid for user : " + owner.getName());
+				if (!isMobileNumberValid(owner.getOwnerDetails().getPhone())) {
+					errorMap.put("INVALID MOBILE NUMBER",
+							"MobileNumber is not valid for user : " + owner.getOwnerDetails().getName());
 				}
 			});
 		});
@@ -241,7 +243,7 @@ public class PropertyValidator {
 	 */
 	private Boolean isMobileNumberValid(String mobileNumber) {
 
-		if (mobileNumber == null)
+		if (mobileNumber == null || mobileNumber == "")
 			return false;
 		else if (mobileNumber.length() != 10)
 			return false;
