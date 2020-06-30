@@ -2,10 +2,13 @@ package org.egov.cpt.service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Document;
@@ -14,6 +17,8 @@ import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.UserDetailResponse;
+import org.egov.cpt.models.Idgen.IdResponse;
+import org.egov.cpt.repository.IdGenRepository;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
@@ -26,6 +31,12 @@ public class EnrichmentService {
 
 	@Autowired
 	PropertyUtil propertyutil;
+
+	@Autowired
+	IdGenRepository idGenRepository;
+
+	@Autowired
+	private PropertyConfiguration config;
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
@@ -215,5 +226,94 @@ public class EnrichmentService {
 							"The owner of the propertyDetail " + property.getId() + " is not coming in user search");
 			});
 		});
+	}
+
+	/*
+	 * Ownership Transfer
+	 */
+	public void enrichCreateOwnershipTransfer(PropertyRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+		if (!CollectionUtils.isEmpty(request.getProperties())) {
+			request.getProperties().forEach(property -> {
+
+				String gen_property_id = UUID.randomUUID().toString();
+				PropertyDetails propertyDetail = getPropertyDetail(property, requestInfo, gen_property_id);
+
+				property.setId(gen_property_id);
+				property.setAuditDetails(propertyAuditDetails);
+				property.setPropertyDetails(propertyDetail);
+
+				if (!CollectionUtils.isEmpty(property.getOwners())) {
+					property.getOwners().forEach(owner -> {
+						String gen_owner_id = UUID.randomUUID().toString();
+						owner.setId(gen_owner_id);
+						owner.setPropertyId(gen_property_id);
+						owner.setTenantId(property.getTenantId());
+						owner.setAuditDetails(propertyAuditDetails);
+						OwnerDetails ownerDetails = getOwnerShipDetails(owner, property, requestInfo, gen_property_id);
+						owner.setOwnerDetails(ownerDetails);
+					});
+				}
+			});
+			setIdgenIds(request);
+		}
+	}
+
+	/**
+	 * Returns a list of numbers generated from idgen
+	 *
+	 * @param requestInfo RequestInfo from the request
+	 * @param tenantId    tenantId of the city
+	 * @param idKey       code of the field defined in application properties for
+	 *                    which ids are generated for
+	 * @param idformat    format in which ids are to be generated
+	 * @param count       Number of ids to be generated
+	 * @return List of ids generated using idGen service
+	 */
+	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
+		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idformat, count)
+				.getIdResponses();
+
+		if (CollectionUtils.isEmpty(idResponses))
+			throw new CustomException("IDGEN ERROR", "No ids returned from idgen Service");
+
+		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
+	}
+
+	/**
+	 * Sets the ApplicationNumber for given TradeLicenseRequest
+	 *
+	 * @param request TradeLicenseRequest which is to be created
+	 */
+	private void setIdgenIds(PropertyRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		String tenantId = request.getProperties().get(0).getTenantId();
+		List<Property> properties = request.getProperties();
+
+		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNumberIdgenNameRP(),
+				config.getApplicationNumberIdgenFormatRP(), request.getProperties().size());
+
+		ListIterator<String> itr = applicationNumbers.listIterator();
+
+		Map<String, String> errorMap = new HashMap<>();
+		if (applicationNumbers.size() != request.getProperties().size()) {
+			errorMap.put("IDGEN ERROR ",
+					"The number of LicenseNumber returned by idgen is not equal to number of TradeLicenses");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+
+		if (!CollectionUtils.isEmpty(properties)) {
+			properties.forEach(property -> {
+				if (!CollectionUtils.isEmpty(property.getOwners())) {
+					property.getOwners().forEach(owner -> {
+						owner.getOwnerDetails().setApplicationNumber(itr.next());
+					});
+				}
+			});
+		}
 	}
 }

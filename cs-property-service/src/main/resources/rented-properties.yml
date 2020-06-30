@@ -90,7 +90,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
   
   
-    - query: INSERT INTO cs_pt_ownershipdetails_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownershipdetails_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.owners.*.ownerDetails
       jsonMaps:
 
@@ -131,6 +131,14 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.relationWithDeceasedAllottee
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationNumber
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdBy
 
@@ -321,7 +329,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
   
   
-    - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.owners.*.ownerDetails
       jsonMaps:
 
@@ -362,6 +370,14 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.relationWithDeceasedAllottee
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationNumber
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdBy
 
