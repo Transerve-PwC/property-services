@@ -88,7 +88,7 @@ public class WorkflowIntegrator {
 	 *
 	 * @param request
 	 */
-	public void callWorkFlow(PropertyRequest request) {
+	public void callWorkFlow(PropertyRequest request, String from) {
 
 		String wfTenantId = request.getProperties().get(0).getTenantId();
 		JSONArray array = new JSONArray();
@@ -103,7 +103,14 @@ public class WorkflowIntegrator {
 				});
 			}
 			obj.put(TENANTIDKEY, wfTenantId);
-			obj.put(BUSINESSSERVICEKEY, config.getCSPBusinessServiceValue());
+			switch (from) {
+			case "ME":
+				obj.put(BUSINESSSERVICEKEY, config.getCSPBusinessServiceValue());
+				break;
+			case "OT":
+				obj.put(BUSINESSSERVICEKEY, config.getOwnershipTransferBusinessServiceValue());
+				break;
+			}
 			obj.put(BUSINESSIDKEY, property.getTransitNumber());
 			obj.put(ACTIONKEY, property.getMasterDataAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);

@@ -46,7 +46,7 @@ public class PropertyService {
 		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request); // TODO create user as owner of the property if does not exists
 		if (config.getIsWorkflowEnabled()) {
-			wfIntegrator.callWorkFlow(request);
+			wfIntegrator.callWorkFlow(request, "ME");
 		}
 		producer.push(config.getSavePropertyTopic(), request);
 		return request.getProperties();
@@ -63,7 +63,7 @@ public class PropertyService {
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		userService.createUser(request);
 		if (config.getIsWorkflowEnabled()) {
-			wfIntegrator.callWorkFlow(request);
+			wfIntegrator.callWorkFlow(request, "ME");
 		}
 		producer.push(config.getUpdatePropertyTopic(), request);
 		return request.getProperties();

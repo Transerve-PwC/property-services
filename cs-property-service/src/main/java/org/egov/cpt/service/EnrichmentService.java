@@ -217,7 +217,7 @@ public class EnrichmentService {
 	/*
 	 * Ownership Transfer
 	 */
-	public void enrichCreateOwnershipTransfer(PropertyRequest request) {
+	public void enrichCreateOwnershipTransfer(PropertyRequest request, List<Property> propertyFromDb) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
@@ -225,11 +225,6 @@ public class EnrichmentService {
 			request.getProperties().forEach(property -> {
 
 				String gen_property_id = UUID.randomUUID().toString();
-				PropertyDetails propertyDetail = getPropertyDetail(property, requestInfo, gen_property_id);
-
-				property.setId(gen_property_id);
-				property.setAuditDetails(propertyAuditDetails);
-				property.setPropertyDetails(propertyDetail);
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
 					property.getOwners().forEach(owner -> {
