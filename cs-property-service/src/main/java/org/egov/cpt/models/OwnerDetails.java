@@ -74,9 +74,6 @@ public class OwnerDetails {
 	@JsonProperty("revisionPercentage")
 	private String revisionPercentage;
 
-	@JsonProperty("correspondenceAddress")
-	private Address correspondenceAddress;
-
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 

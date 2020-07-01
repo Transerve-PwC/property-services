@@ -73,28 +73,12 @@ public class EnrichmentService {
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
 		String gen_owner_details_id = UUID.randomUUID().toString();
 		AuditDetails ownerAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-		Address correspondenceAddress = getCorrespondenceAddress(owner, property, requestInfo, gen_property_id);
 		ownerDetails.setId(gen_owner_details_id);
 		ownerDetails.setPropertyId(property.getId());
 		ownerDetails.setOwnerId(owner.getId());
 		ownerDetails.setTenantId(property.getTenantId());
-		ownerDetails.setCorrespondenceAddress(correspondenceAddress);
 		ownerDetails.setAuditDetails(ownerAuditDetails);
 		return ownerDetails;
-	}
-
-	private Address getCorrespondenceAddress(Owner owner, Property property, RequestInfo requestInfo,
-			String gen_property_id) {
-		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-		Address address = owner.getOwnerDetails().getCorrespondenceAddress();
-		String gen_address_id = UUID.randomUUID().toString();
-		address.setId(gen_address_id);
-		address.setPropertyId(gen_property_id);
-		address.setTransitNumber(property.getTransitNumber());
-		address.setTenantId(property.getTenantId());
-		address.setColony(property.getColony());
-		address.setAuditDetails(propertyAuditDetails);
-		return address;
 	}
 
 	public void enrichUpdateRequest(PropertyRequest request, List<Property> propertyFromDb) {
@@ -135,10 +119,12 @@ public class EnrichmentService {
 		if (!CollectionUtils.isEmpty(applicationDocuments)) {
 			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 			applicationDocuments.forEach(document -> {
-				String gen_doc_id = UUID.randomUUID().toString();
-				document.setId(gen_doc_id);
-				document.setPropertyId(property.getId());
-				document.setTenantId(property.getTenantId());
+				if (document.getId() == null) {
+					String gen_doc_id = UUID.randomUUID().toString();
+					document.setId(gen_doc_id);
+					document.setPropertyId(property.getId());
+					document.setTenantId(property.getTenantId());
+				}
 				document.setAuditDetails(docAuditDetails);
 			});
 		}
@@ -291,9 +277,10 @@ public class EnrichmentService {
 		RequestInfo requestInfo = request.getRequestInfo();
 		String tenantId = request.getProperties().get(0).getTenantId();
 		List<Property> properties = request.getProperties();
+		int peopertiesSize = request.getProperties().size();
 
 		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNumberIdgenNameRP(),
-				config.getApplicationNumberIdgenFormatRP(), request.getProperties().size());
+				config.getApplicationNumberIdgenFormatRP(), peopertiesSize);
 
 		ListIterator<String> itr = applicationNumbers.listIterator();
 

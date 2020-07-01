@@ -184,41 +184,6 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_pt_address_v1 (id, property_id, transit_number, tenantid, colony, area, district, state, country, pincode, landmark, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress
-      jsonMaps:
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.id
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.propertyId
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.transitNumber
-
-      - jsonPath: $.Properties.*.tenantId
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.colony
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.area
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.district
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.state
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.country
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.pincode
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.landmark
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.auditDetails.createdBy
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.auditDetails.lastModifiedBy
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.auditDetails.createdTime
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.correspondenceAddress.auditDetails.lastModifiedTime
-
-
     - query: INSERT INTO cs_pt_application_documents_v1 (id, property_id, tenantid, is_active, document_type, fileStore_id, document_uid, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.propertyDetails.applicationDocuments.*
       jsonMaps:
@@ -467,7 +432,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.propertyId
 
  
-    - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, modified_by=?, modified_date=? where id=? AND property_id=?;
+    - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, relation_with_deceased_allottee=?, date_of_death_allottee=?, application_number=?, application_type=?, modified_by=?, modified_date=? where id=? AND property_id=?;
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
@@ -504,6 +469,14 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.relationWithDeceasedAllottee
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
+
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationNumber
+      
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
 
@@ -514,7 +487,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.propertyId
       
       
-    - query: INSERT INTO cs_pt_application_documents_v1 (id, property_id, tenantid, is_active, document_type, fileStore_id, document_uid, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_application_documents_v1 (id, property_id, tenantid, is_active, document_type, fileStore_id, document_uid, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, fileStore_id =?, document_uid =?, modified_by =?, modified_date =?;
       basePath: $.Properties.*.propertyDetails.applicationDocuments.*
       jsonMaps:
 
@@ -538,7 +511,17 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime      
-    
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime   
+      
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.active
 
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentType
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.fileStoreId
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentUid
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime      
     
