@@ -170,7 +170,6 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 	private OwnerDetails getOwnerDetails(ResultSet rs, String source) throws SQLException {
 		switch (source) {
 		case "property":
-			Address correspondenceAddress = getCorrespondenceAddress(rs);
 			AuditDetails auditdetails = getAuditDetail(rs, "property");
 			return OwnerDetails.builder().id(rs.getString("odid")).propertyId(rs.getString("oproperty_id"))
 					.ownerId(rs.getString("owner_id")).tenantId(rs.getString("otenantid")).name(rs.getString("name"))
@@ -183,20 +182,14 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					.revisionPeriod(rs.getString("revision_period"))
 					.revisionPercentage(rs.getString("revision_percentage"))
 					.fatherOrHusband(rs.getString("father_or_husband")).relation(rs.getString("relation"))
-					.correspondenceAddress(correspondenceAddress).auditDetails(auditdetails).payment(null).build();
+					.applicationType(OwnerDetails.ApplicationTypeEnum.fromValue(rs.getString("application_type")))
+					.applicationNumber(rs.getString("application_number"))
+					.dateOfDeathAllottee(rs.getLong("date_of_death_allottee"))
+					.relationWithDeceasedAllottee(rs.getString("relation_with_deceased_allottee"))
+					.auditDetails(auditdetails).payment(null).build();
 		default:
 			return null;
 		}
-	}
-
-	private Address getCorrespondenceAddress(ResultSet rs) throws SQLException {
-		AuditDetails auditdetails = getAuditDetail(rs, "property");
-		Address address = Address.builder().id(rs.getString("aid")).propertyId(rs.getString("aproperty_id"))
-				.transitNumber(rs.getString("atransit_number")).tenantId(rs.getString("atenantid"))
-				.colony(rs.getString("colony")).area(rs.getString("addressArea")).district(rs.getString("district"))
-				.state(rs.getString("state")).country(rs.getString("country")).pincode(rs.getString("pincode"))
-				.landmark(rs.getString("landmark")).auditDetails(auditdetails).build();
-		return address;
 	}
 
 }
