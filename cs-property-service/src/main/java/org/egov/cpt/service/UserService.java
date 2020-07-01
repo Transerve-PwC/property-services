@@ -133,7 +133,7 @@ public class UserService {
 		else if (uri.toString().contains(userCreateEndpoint))
 			dobFormat = "dd/MM/yyyy";
 		try {
-			Optional<Object> response = serviceRequestRepository.fetchResult(uri, userRequest);
+			Optional<Object> response = (Optional<Object>) serviceRequestRepository.fetchResult(uri, userRequest);
 
 			if (response.isPresent()) {
 				LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.get();
