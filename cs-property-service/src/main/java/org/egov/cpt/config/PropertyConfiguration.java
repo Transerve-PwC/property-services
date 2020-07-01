@@ -67,23 +67,23 @@ public class PropertyConfiguration {
 	private String userSearchEndpoint;
 
 	// IDGEN
-//	@Value("${egov.idgen.ack.name}")
-//	private String acknowldgementIdGenName;
-//
-//	@Value("${egov.idgen.ack.format}")
-//	private String acknowldgementIdGenFormat;
-//
-//	@Value("${egov.idgen.assm.name}")
-//	private String assessmentIdGenName;
-//
-//	@Value("${egov.idgen.assm.format}")
-//	private String assessmentIdGenFormat;
-//
-//	@Value("${egov.idgen.ptid.name}")
-//	private String propertyIdGenName;
-//
-//	@Value("${egov.idgen.ptid.format}")
-//	private String propertyIdGenFormat;
+	@Value("${egov.idgen.ack.name}")
+	private String acknowldgementIdGenName;
+
+	@Value("${egov.idgen.ack.format}")
+	private String acknowldgementIdGenFormat;
+
+	@Value("${egov.idgen.assm.name}")
+	private String assessmentIdGenName;
+
+	@Value("${egov.idgen.assm.format}")
+	private String assessmentIdGenFormat;
+
+	@Value("${egov.idgen.ptid.name}")
+	private String propertyIdGenName;
+
+	@Value("${egov.idgen.ptid.format}")
+	private String propertyIdGenFormat;
 
 	// NOTIFICATION TOPICS
 	@Value("${kafka.topics.notification.sms}")
@@ -197,19 +197,5 @@ public class PropertyConfiguration {
 
 	@Value("${property.module.name}")
 	private String propertyModuleName;
-
-//	ID Generation
-
-	@Value("${egov.idgen.host}")
-	private String idGenHost;
-
-	@Value("${egov.idgen.path}")
-	private String idGenPath;
-
-	@Value("${egov.idgen.rp.applicationNum.name}")
-	private String applicationNumberIdgenNameRP;
-
-	@Value("${egov.idgen.rp.applicationNum.format}")
-	private String applicationNumberIdgenFormatRP;
 
 }

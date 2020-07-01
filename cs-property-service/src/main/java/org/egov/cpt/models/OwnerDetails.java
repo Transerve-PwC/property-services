@@ -4,9 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -74,6 +72,9 @@ public class OwnerDetails {
 	@JsonProperty("revisionPercentage")
 	private String revisionPercentage;
 
+	@JsonProperty("correspondenceAddress")
+	private Address correspondenceAddress;
+
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
@@ -87,43 +88,4 @@ public class OwnerDetails {
 	@JsonProperty("relation")
 	private String relation;
 
-	public enum ApplicationTypeEnum {
-		NEW("MasterEntry"),
-
-		RENEW("CitizenApplication");
-
-		private String value;
-
-		ApplicationTypeEnum(String value) {
-			this.value = value;
-		}
-
-		@Override
-		@JsonValue
-		public String toString() {
-			return String.valueOf(value);
-		}
-
-		@JsonCreator
-		public static ApplicationTypeEnum fromValue(String text) {
-			for (ApplicationTypeEnum b : ApplicationTypeEnum.values()) {
-				if (String.valueOf(b.value).equalsIgnoreCase(text)) {
-					return b;
-				}
-			}
-			return null;
-		}
-	}
-
-	@JsonProperty("applicationType")
-	private ApplicationTypeEnum applicationType = null;
-
-	@JsonProperty("relationWithDeceasedAllottee")
-	private String relationWithDeceasedAllottee;
-
-	@JsonProperty("dateOfDeathAllottee")
-	private Long dateOfDeathAllottee;
-
-	@JsonProperty("applicationNumber")
-	private String applicationNumber;
 }
