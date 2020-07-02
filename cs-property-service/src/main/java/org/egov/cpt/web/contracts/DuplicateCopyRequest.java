@@ -24,7 +24,7 @@ public class DuplicateCopyRequest {
 	@JsonProperty("RequestInfo")
 	private RequestInfo requestInfo;
 
-	@JsonProperty("Properties")
+	@JsonProperty("DuplicateCopyApplications")
 	@Valid
-	private List<DuplicateCopy> properties;
+	private List<DuplicateCopy> duplicateCopyApplications;
 }

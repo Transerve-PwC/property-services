@@ -25,15 +25,15 @@ public class DuplicateCopyResponse {
 	@JsonProperty("ResponseInfo")
 	private ResponseInfo responseInfo;
 
-	@JsonProperty("Properties")
+	@JsonProperty("DuplicateCopyApplications")
 	@Valid
-	private List<DuplicateCopy> properties;
+	private List<DuplicateCopy> duplicateCopyApplications;
 
-	public DuplicateCopyResponse addPropertiesItem(DuplicateCopy propertiesItem) {
-		if (this.properties == null) {
-			this.properties = new ArrayList<>();
+	public DuplicateCopyResponse addPropertiesItem(DuplicateCopy applicationItem) {
+		if (this.duplicateCopyApplications == null) {
+			this.duplicateCopyApplications = new ArrayList<>();
 		}
-		this.properties.add(propertiesItem);
+		this.duplicateCopyApplications.add(applicationItem);
 		return this;
 	}
 

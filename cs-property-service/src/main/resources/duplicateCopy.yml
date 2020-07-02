@@ -2,181 +2,181 @@ serviceMaps:
  serviceName: csp
  mappings:
  - version: 1.0
-   description: Persists Properties details in cs_pt_duplicate_ownership_application table
+   description: Persists DuplicateCopyApplications details in cs_pt_duplicate_ownership_application table
    fromTopic: save-rp-duplicateCopy
    isTransaction: true
    queryMaps:
 
-    - query: INSERT INTO cs_pt_duplicate_ownership_application (id, transit_number, tenantid, state, action, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: Properties.*
+    - query: INSERT INTO cs_pt_duplicate_ownership_application (id, property_id, tenantid, state, action, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: DuplicateCopyApplications.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.id
+      - jsonPath: $.DuplicateCopyApplications.*.id
 
-      - jsonPath: $.Properties.*.transitNumber
+      - jsonPath: $.DuplicateCopyApplications.*.propertyId
       
-      - jsonPath: $.Properties.*.tenantId
+      - jsonPath: $.DuplicateCopyApplications.*.tenantId
 
-      - jsonPath: $.Properties.*.state
+      - jsonPath: $.DuplicateCopyApplications.*.state
 
-      - jsonPath: $.Properties.*.action 
+      - jsonPath: $.DuplicateCopyApplications.*.action 
       
-      - jsonPath: $.Properties.*.auditDetails.createdBy
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.auditDetails.createdTime
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime
     
     
-    - query: INSERT INTO cs_pt_duplicatecopy_applicant (id, property_id, tenantid, name, email, mobileno, guardian, relationship,aadhaar_number, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: Properties.*.applicant.*
+    - query: INSERT INTO cs_pt_duplicatecopy_applicant (id, application_id, tenantid, name, email, mobileno, guardian, relationship,aadhaar_number, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: DuplicateCopyApplications.*.applicant.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.applicant.*.id
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.id
 
-      - jsonPath: $.Properties.*.applicant.*.propertyId 
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.applicationId 
       
-      - jsonPath: $.Properties.*.applicant.*.tenantId 
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.tenantId 
 
-      - jsonPath: $.Properties.*.applicant.*.name
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.name
 
-      - jsonPath: $.Properties.*.applicant.*.email
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.email
       
-      - jsonPath: $.Properties.*.applicant.*.phone
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.phone
       
-      - jsonPath: $.Properties.*.applicant.*.guardian
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.guardian
 
-      - jsonPath: $.Properties.*.applicant.*.relationship
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.relationship
 
-      - jsonPath: $.Properties.*.applicant.*.adhaarNumber 
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.adhaarNumber 
       
-      - jsonPath: $.Properties.*.auditDetails.createdBy
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy 
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy 
       
-      - jsonPath: $.Properties.*.auditDetails.createdTime
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime
       
     
          
-    - query: INSERT INTO cs_pt_duplicatecopy_document (id, tenantid, documenttype, filestoreid, property_id, active, createdBy, lastModifiedBy, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: Properties.*.propertyDetails.applicationDocuments.*
+    - query: INSERT INTO cs_pt_duplicatecopy_document (id, tenantid, documenttype, filestoreid, application_id, active, createdBy, lastModifiedBy, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: DuplicateCopyApplications.*.applicationDocuments.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.id
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.id
       
-      - jsonPath: $.Properties.*.tenantId 
+      - jsonPath: $.DuplicateCopyApplications.*.tenantId 
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentType 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.documentType 
       
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.fileStoreId 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.fileStoreId 
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.propertyId 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.applicationId 
       
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.active 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.active 
       
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdBy
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedBy 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.auditDetails.lastModifiedBy 
       
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdTime
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.auditDetails.lastModifiedTime
       
       
       
       
  - version: 1.0
-   description: Persists Properties details in cs_pt_duplicate_ownership_application table
+   description: Persists DuplicateCopyApplications details in cs_pt_duplicate_ownership_application table
    fromTopic: update-rp-duplicateCopy
    isTransaction: true
    queryMaps:
     
     - query: INSERT INTO cs_pt_duplicate_ownership_application_audit SELECT * FROM cs_pt_duplicate_ownership_application WHERE id = ?;
-      basePath: Properties.*
+      basePath: DuplicateCopyApplications.*
       jsonMaps:
-      - jsonPath: $.Properties.*.id
+      - jsonPath: $.DuplicateCopyApplications.*.id
 
     - query: UPDATE cs_pt_duplicate_ownership_application SET  state=?, action=?, modified_by=?, modified_time=? WHERE id=?;
-      basePath: Properties.*
+      basePath: DuplicateCopyApplications.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.state
+      - jsonPath: $.DuplicateCopyApplications.*.state
 
-      - jsonPath: $.Properties.*.action 
+      - jsonPath: $.DuplicateCopyApplications.*.action 
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime
       
-      - jsonPath: $.Properties.*.id
+      - jsonPath: $.DuplicateCopyApplications.*.id
     
     
     - query: INSERT INTO cs_pt_duplicatecopy_applicant_audit SELECT * FROM cs_pt_duplicatecopy_applicant WHERE id = ?;
-      basePath: Properties.*.applicant.*
+      basePath: DuplicateCopyApplications.*.applicant.*
       jsonMaps:
-      - jsonPath: $.Properties.*.applicant.*.id
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.id
     
     
     - query: UPDATE cs_pt_duplicatecopy_applicant SET name=?, email=?, mobileno=?, guardian=?, relationship=?,aadhaar_number=?, modified_by=?, modified_time=? WHERE id=?;
-      basePath: Properties.*.applicant.*
+      basePath: DuplicateCopyApplications.*.applicant.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.applicant.*.name
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.name
 
-      - jsonPath: $.Properties.*.applicant.*.email
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.email
       
-      - jsonPath: $.Properties.*.applicant.*.phone
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.phone
       
-      - jsonPath: $.Properties.*.applicant.*.guardian
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.guardian
 
-      - jsonPath: $.Properties.*.applicant.*.relationship
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.relationship
 
-      - jsonPath: $.Properties.*.applicant.*.adhaarNumber
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.adhaarNumber
       
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy 
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy 
       
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime
       
-      - jsonPath: $.Properties.*.applicant.*.id
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.id
         
       
-    - query: INSERT INTO cs_pt_duplicatecopy_document (id, tenantid, documenttype, filestoreid, property_id, active, createdBy, lastModifiedBy, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, lastModifiedBy =?, modified_time =?;
-      basePath: Properties.*.propertyDetails.applicationDocuments.*
+    - query: INSERT INTO cs_pt_duplicatecopy_document (id, tenantid, documenttype, filestoreid, application_id, active, createdBy, lastModifiedBy, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, lastModifiedBy =?, modified_time =?;
+      basePath: DuplicateCopyApplications.*.applicationDocuments.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.id
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.id
       
-      - jsonPath: $.Properties.*.tenantId 
+      - jsonPath: $.DuplicateCopyApplications.*.tenantId 
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentType 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.documentType 
       
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.fileStoreId 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.fileStoreId 
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.propertyId 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.applicationId 
       
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.active 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.active 
       
-      - jsonPath: $.Properties.*.auditDetails.createdBy
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy 
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy 
       
-      - jsonPath: $.Properties.*.auditDetails.createdTime
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime
       
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.active 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.active 
       
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentType 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.documentType 
       
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.fileStoreId 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.fileStoreId 
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy 
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy 
       
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime  
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime  
       
           
  

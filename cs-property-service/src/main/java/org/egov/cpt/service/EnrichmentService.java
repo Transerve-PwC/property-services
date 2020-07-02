@@ -224,11 +224,11 @@ public class EnrichmentService {
 		RequestInfo requestInfo = duplicateCopyRequest.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
-		if (!CollectionUtils.isEmpty(duplicateCopyRequest.getProperties())) {
-			duplicateCopyRequest.getProperties().forEach(property -> {
-				String gen_property_id = UUID.randomUUID().toString();
-				property.setId(gen_property_id);
-				property.setAuditDetails(propertyAuditDetails);
+		if (!CollectionUtils.isEmpty(duplicateCopyRequest.getDuplicateCopyApplications())) {
+			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
+				String gen_application_id = UUID.randomUUID().toString();
+				application.setId(gen_application_id);
+				application.setAuditDetails(propertyAuditDetails);
 
 				/*if (property.getPropertyDetails().getAddress()!=null){
 					Address address = property.getPropertyDetails().getAddress();
@@ -249,11 +249,11 @@ public class EnrichmentService {
 				property.setPropertyDetails(propertyDetail);*/
 
 
-				if (!CollectionUtils.isEmpty(property.getApplicant())) {
-					property.getApplicant().forEach(applicant -> {
+				if (!CollectionUtils.isEmpty(application.getApplicant())) {
+					application.getApplicant().forEach(applicant -> {
 						applicant.setId(UUID.randomUUID().toString());
-						applicant.setPropertyId(gen_property_id);
-						applicant.setTenantId(property.getTenantId());
+						applicant.setApplicationId(gen_application_id);
+						applicant.setTenantId(application.getTenantId());
 						applicant.setAuditDetails(propertyAuditDetails);
 					});
 				}
@@ -266,24 +266,24 @@ public class EnrichmentService {
 		RequestInfo requestInfo = duplicateCopyRequest.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 		//		String propertyDtlId = searchedProperty.get(0).getPropertyDetails().getId();
-		if (!CollectionUtils.isEmpty(duplicateCopyRequest.getProperties())) {
-			duplicateCopyRequest.getProperties().forEach(property -> {
-				property.setAuditDetails(propertyAuditDetails);
-				if (!CollectionUtils.isEmpty(property.getPropertyDetails().getApplicationDocuments())){
-					property.getPropertyDetails().getApplicationDocuments().forEach(document -> {
+		if (!CollectionUtils.isEmpty(duplicateCopyRequest.getDuplicateCopyApplications())) {
+			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
+				application.setAuditDetails(propertyAuditDetails);
+				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())){
+					application.getApplicationDocuments().forEach(document -> {
 						if(document.getId()==null){
 							AuditDetails documentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 							document.setId(UUID.randomUUID().toString());
 							document.setActive(true);
-							document.setPropertyId(duplicateCopyRequest.getProperties().get(0).getId());
+							document.setApplicationId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId());
 							document.setAuditDetails(documentAuditDetails);
 						}
 					});
 
 				}
 
-				if (!CollectionUtils.isEmpty(property.getApplicant())) {
-					property.getApplicant().forEach(applicant -> {
+				if (!CollectionUtils.isEmpty(application.getApplicant())) {
+					application.getApplicant().forEach(applicant -> {
 						applicant.setAuditDetails(propertyAuditDetails);
 					});
 				}

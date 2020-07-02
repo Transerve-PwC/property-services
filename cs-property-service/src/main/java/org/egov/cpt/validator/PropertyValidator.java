@@ -109,9 +109,10 @@ public class PropertyValidator {
 		validateIds(duplicateCopyRequest);
 
 		// validateIds(duplicateCopyRequest, errorMap);
-		String transitNo = duplicateCopyRequest.getProperties().get(0).getTransitNumber();
-		PropertyCriteria criteria = PropertyCriteria.builder().transitNumber(transitNo)
-				.propertyId(duplicateCopyRequest.getProperties().get(0).getId()).build();
+		String propertyId = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getPropertyId();
+		PropertyCriteria criteria = PropertyCriteria.builder()
+				.id(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId())
+				.propertyId(propertyId).build();
 		List<DuplicateCopy> searchedProperties = propertyRepository.getDuplicateCopyProperties(criteria);
 		if (searchedProperties.size() < 1) {
 			errorMap.put("PROPERTY NOT FOUND", "The property to be updated does not exist");
@@ -128,18 +129,18 @@ public class PropertyValidator {
 
 	private void validateIds(DuplicateCopyRequest request) {
 		Map<String,String> errorMap = new HashMap<>();
-        request.getProperties().forEach(property -> {
+        request.getDuplicateCopyApplications().forEach(application -> {
 
-            if((!property.getState().equalsIgnoreCase(PTConstants.STATUS_INITIATED)))
+            if((!application.getState().equalsIgnoreCase(PTConstants.STATUS_INITIATED)))
             {
-                    if (property.getId() == null)
+                    if (application.getId() == null)
                         errorMap.put("INVALID UPDATE", "Id of property cannot be null");
-                    if(property.getPropertyDetails().getId()==null)
-                        errorMap.put("INVALID UPDATE", "Id of propertyDetail cannot be null");
                     /*if(property.getPropertyDetails().getAddress().getId()==null)
                         errorMap.put("INVALID UPDATE", "Id of address cannot be null");*/
-                    if(property.getApplicant().get(0).getId()==null)
+                    if(application.getApplicant().get(0).getId()==null)
                     	errorMap.put("INVALID UPDATE", "Id of Applicant cannot be null");
+                    if(application.getPropertyId()==null)
+                    	errorMap.put("INVALID UPDATE", "Property Id cannot be null");
             }
         });
         if(!errorMap.isEmpty())
@@ -154,7 +155,7 @@ public class PropertyValidator {
 	private void validateDocument(DuplicateCopyRequest duplicateCopyRequest) {
 		Map<String, String> errorMap = new HashMap<>();
 
-		duplicateCopyRequest.getProperties().forEach(property -> {
+		duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
 
 			/*
 			 * if
@@ -164,8 +165,8 @@ public class PropertyValidator {
 			 * "Action should be APPLY when application document are provided");
 			 * }
 			 */
-			if (PTConstants.ACTION_SUBMIT.equalsIgnoreCase(property.getAction())) {
-				if (property.getPropertyDetails().getApplicationDocuments() == null)
+			if (PTConstants.ACTION_SUBMIT.equalsIgnoreCase(application.getAction())) {
+				if (application.getApplicationDocuments() == null)
 					errorMap.put("INVALID ACTION",
 							"Action cannot be changed to SUBMIT. Application document are not provided");
 			}
@@ -194,10 +195,9 @@ public class PropertyValidator {
 
 	private void validateDuplicateDocuments(DuplicateCopyRequest request) {
 		List<String> documentFileStoreIds = new LinkedList();
-		request.getProperties().forEach(property -> {
-			if(property.getPropertyDetails()!=null){
-				if (property.getPropertyDetails().getApplicationDocuments() != null) {
-					property.getPropertyDetails().getApplicationDocuments().forEach(document -> {
+		request.getDuplicateCopyApplications().forEach(application -> {
+				if (application.getApplicationDocuments() != null) {
+					application.getApplicationDocuments().forEach(document -> {
 						if (documentFileStoreIds.contains(document.getFileStoreId()))
 							throw new CustomException("DUPLICATE_DOCUMENT ERROR",
 									"Same document cannot be used multiple times");
@@ -205,7 +205,6 @@ public class PropertyValidator {
 							documentFileStoreIds.add(document.getFileStoreId());
 					});
 				}
-			}
 		});
 	}
 

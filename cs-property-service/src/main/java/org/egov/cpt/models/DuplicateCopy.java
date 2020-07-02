@@ -1,5 +1,6 @@
 package org.egov.cpt.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -34,8 +35,8 @@ public class DuplicateCopy {
 	@JsonProperty("id")
 	private String id;
 
-	@JsonProperty("transitNumber")
-	private String transitNumber;
+	@JsonProperty("propertyId")
+	private String propertyId;
 
 	@JsonProperty("tenantId")
 	private String tenantId;
@@ -49,11 +50,21 @@ public class DuplicateCopy {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 	
-	@JsonProperty("propertyDetails")
-	private PropertyDetails propertyDetails;
+	@Valid
+	@JsonProperty("applicationDocuments")
+	private List<DuplicateCopyDocument> applicationDocuments=null;
 
 	@Valid
 	@JsonProperty("applicant")
 	private List<Applicant> applicant;
+	
+	public DuplicateCopy addApplicationDocumentsItem(DuplicateCopyDocument applicationDocumentsItem) {
+	    if (this.applicationDocuments == null) {
+	    this.applicationDocuments = new ArrayList<>();
+	    }
+	    if(!this.applicationDocuments.contains(applicationDocumentsItem))
+	        this.applicationDocuments.add(applicationDocumentsItem);
+	    return this;
+	}
 	
 }

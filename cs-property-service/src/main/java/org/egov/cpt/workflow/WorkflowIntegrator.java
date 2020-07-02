@@ -164,13 +164,13 @@ public class WorkflowIntegrator {
 	
 	public void callDuplicateCopyWorkFlow(DuplicateCopyRequest request) {
 
-		String wfTenantId = request.getProperties().get(0).getTenantId();
+		String wfTenantId = request.getDuplicateCopyApplications().get(0).getTenantId();
 		JSONArray array = new JSONArray();
-		for (DuplicateCopy property : request.getProperties()) {
+		for (DuplicateCopy application : request.getDuplicateCopyApplications()) {
 			JSONObject obj = new JSONObject();
 			List<Map<String, String>> uuidmaps = new LinkedList<>();
-			if (!CollectionUtils.isEmpty(property.getApplicant())) {
-				property.getApplicant().forEach(owners -> {
+			if (!CollectionUtils.isEmpty(application.getApplicant())) {
+				application.getApplicant().forEach(owners -> {
 					Map<String, String> uuidMap = new HashMap<>();
 					uuidMap.put(UUIDKEY, owners.getId());
 					uuidmaps.add(uuidMap);
@@ -178,10 +178,10 @@ public class WorkflowIntegrator {
 			}
 			obj.put(TENANTIDKEY, wfTenantId);
 			obj.put(BUSINESSSERVICEKEY, config.getDuplicateCopyBusinessServiceValue());
-			obj.put(BUSINESSIDKEY, property.getId());
-			obj.put(ACTIONKEY, property.getAction());
+			obj.put(BUSINESSIDKEY, application.getId());
+			obj.put(ACTIONKEY, application.getAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
-			obj.put(AUDITDETAILSKEY, property.getAuditDetails());
+			obj.put(AUDITDETAILSKEY, application.getAuditDetails());
 			obj.put(COMMENTKEY, "");
 
 			array.add(obj);
@@ -229,8 +229,8 @@ public class WorkflowIntegrator {
 			});
 
 			// setting the status back to Property object from wf response
-			request.getProperties()
-					.forEach(property -> property.setState(idStatusMap.get(property.getTransitNumber())));
+			request.getDuplicateCopyApplications()
+					.forEach(application -> application.setState(idStatusMap.get(application.getId())));
 		}
 	}
 }

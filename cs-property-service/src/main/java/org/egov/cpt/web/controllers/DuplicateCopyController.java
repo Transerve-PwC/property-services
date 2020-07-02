@@ -48,7 +48,7 @@ public class DuplicateCopyController {
 		List<DuplicateCopy> property = duplicateCopyService.createProperty(duplicateCopyRequest);
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(duplicateCopyRequest.getRequestInfo(),
 				true);
-		DuplicateCopyResponse response = DuplicateCopyResponse.builder().properties(property).responseInfo(resInfo).build();
+		DuplicateCopyResponse response = DuplicateCopyResponse.builder().duplicateCopyApplications(property).responseInfo(resInfo).build();
 		logger.debug("property created sucessfuly");
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
@@ -64,7 +64,7 @@ public class DuplicateCopyController {
 			@Valid @ModelAttribute PropertyCriteria propertyCriteria) {
 
 		List<DuplicateCopy> properties = duplicateCopyService.searchProperty(propertyCriteria,requestInfoWrapper.getRequestInfo());
-		DuplicateCopyResponse response = DuplicateCopyResponse.builder().properties(properties).responseInfo(
+		DuplicateCopyResponse response = DuplicateCopyResponse.builder().duplicateCopyApplications(properties).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true)).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
@@ -79,7 +79,7 @@ public class DuplicateCopyController {
 		List<DuplicateCopy> properties = duplicateCopyService.updateProperty(duplicateCopyRequest);
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(duplicateCopyRequest.getRequestInfo(),
 				true);
-		DuplicateCopyResponse response = DuplicateCopyResponse.builder().properties(properties).responseInfo(resInfo).build();
+		DuplicateCopyResponse response = DuplicateCopyResponse.builder().duplicateCopyApplications(properties).responseInfo(resInfo).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 

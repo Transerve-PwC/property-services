@@ -44,7 +44,7 @@ public class DuplicateCopyService {
 			wfIntegrator.callDuplicateCopyWorkFlow(duplicateCopyRequest);
 		}
 		producer.push(config.getSaveDuplicateCopyTopic(), duplicateCopyRequest);
-		return duplicateCopyRequest.getProperties();
+		return duplicateCopyRequest.getDuplicateCopyApplications();
 	}
 
 	public List<DuplicateCopy> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
@@ -70,7 +70,7 @@ public class DuplicateCopyService {
             wfIntegrator.callDuplicateCopyWorkFlow(duplicateCopyRequest);
         } 
 		producer.push(config.getUpdateDuplicateCopyTopic(), duplicateCopyRequest);
-		return duplicateCopyRequest.getProperties();
+		return duplicateCopyRequest.getDuplicateCopyApplications();
 	}
 
 }

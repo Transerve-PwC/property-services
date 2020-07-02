@@ -24,8 +24,8 @@ public class Applicant {
 	@JsonProperty("id")
 	private String id;
 
-	@JsonProperty("propertyId")
-	private String propertyId;
+	@JsonProperty("applicationId")
+	private String applicationId;
 
 	@JsonProperty("tenantId")
 	private String tenantId;

@@ -30,5 +30,7 @@ public class PropertyCriteria {
 	private Long limit;
 	
 	private String propertyId;
+	
+	private String id;
 
 }

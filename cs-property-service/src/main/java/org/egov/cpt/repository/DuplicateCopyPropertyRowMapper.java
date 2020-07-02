@@ -11,6 +11,7 @@ import org.egov.cpt.models.Applicant;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.DuplicateCopyDocument;
 import org.egov.cpt.models.PropertyDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -28,12 +29,12 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 	@Override
 	public List<DuplicateCopy> extractData(ResultSet rs) throws SQLException, DataAccessException {
 
-		Map<String, DuplicateCopy> propertyMap = new HashMap<>();
+		Map<String, DuplicateCopy> applicationMap = new HashMap<>();
 		while (rs.next()) {
-			String propertyId = rs.getString("pid");
-			DuplicateCopy currentProperty = propertyMap.get(propertyId);
+			String applicationId = rs.getString("appid");
+			DuplicateCopy currentapplication = applicationMap.get(applicationId);
 
-			if (null == currentProperty) {
+			if (null == currentapplication) {
 				AuditDetails auditdetails = AuditDetails.builder().
 						createdBy(rs.getString("created_by"))
 						.createdTime(rs.getLong("created_time"))
@@ -42,47 +43,36 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 
 				//				List<Owner> owners = addOwnersToProperty(rs, currentProperty);
 
-				currentProperty = DuplicateCopy.builder()
-						.id(propertyId)
-						.transitNumber(rs.getString("transit_number"))
+				currentapplication = DuplicateCopy.builder()
+						.id(applicationId)
+						.propertyId(rs.getString("property_id"))
 						.tenantId(rs.getString("tenantid"))
 						.state(rs.getString("state"))
 						.action(rs.getString("action"))
-						.propertyDetails(null)
 						.auditDetails(auditdetails).build();
-				propertyMap.put(propertyId, currentProperty);
+				applicationMap.put(applicationId, currentapplication);
 			}
-			addChildrenToProperty(rs, currentProperty);
+			addChildrenToProperty(rs, currentapplication);
 		}
-		return new ArrayList<>(propertyMap.values());
+		return new ArrayList<>(applicationMap.values());
 	}
 
-	private void addChildrenToProperty(ResultSet rs, DuplicateCopy currentProperty) throws SQLException {
+	private void addChildrenToProperty(ResultSet rs, DuplicateCopy currentapplication) throws SQLException {
 		Map<String, Applicant> applicantMap = new HashMap<>();
-		Map<String, Document> documentMap = new HashMap<>();
 		Applicant applicant = null;
-		if(currentProperty.getPropertyDetails()==null){
-			if(rs.getString("ptdl_id")!=null){
-				PropertyDetails propertyDetails = PropertyDetails.builder()
-						.id(rs.getString("ptdl_id"))
-						.transitNumber(rs.getString("ptdl_tra_number"))
-						.build();
-				currentProperty.setPropertyDetails(propertyDetails);
-			}
-		}
 
 		AuditDetails auditDetails = AuditDetails.builder()
 				.createdBy(rs.getString("created_by"))
-				.createdTime(rs.getLong("created_date"))
+				.createdTime(rs.getLong("created_time"))
 				.lastModifiedBy(rs.getString("modified_by"))
-				.lastModifiedTime(rs.getLong("modified_date")).build();
+				.lastModifiedTime(rs.getLong("created_time")).build();
 
-		if(currentProperty.getApplicant()==null){
+		if(currentapplication.getApplicant()==null){
 			if(rs.getString("aid")!=null ){ 
 				applicant = Applicant.builder()
 						.id(rs.getString("aid"))
 						.tenantId(rs.getString("aptenantid"))
-						.propertyId(rs.getString("approperty_id"))
+						.applicationId(rs.getString("app_id"))
 						.name(rs.getString("name"))
 						.email(rs.getString("email"))
 						.phone(rs.getString("mobileno"))
@@ -92,13 +82,13 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 						.auditDetails(auditDetails)
 						.build();
 				applicantMap.put(rs.getString("aid"), applicant);
-				currentProperty.setApplicant(new ArrayList<>(applicantMap.values()));
+				currentapplication.setApplicant(new ArrayList<>(applicantMap.values()));
 			}
 		}
 
 
 		if(rs.getString("docId")!=null && rs.getBoolean("doc_active")) {
-			Document applicationDocument = Document.builder()
+			DuplicateCopyDocument applicationDocument = DuplicateCopyDocument.builder()
 					.documentType(rs.getString("doctype"))
 					.fileStoreId(rs.getString("doc_filestoreid"))
 					.id(rs.getString("docId"))
@@ -106,7 +96,7 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 					.active(rs.getBoolean("doc_active"))
 					.auditDetails(auditDetails)
 					.build();
-			currentProperty.getPropertyDetails().addApplicationDocumentsItem(applicationDocument);
+			currentapplication.addApplicationDocumentsItem(applicationDocument);
 		}
 
 		/*if(rs.getString("adid")!=null) {
