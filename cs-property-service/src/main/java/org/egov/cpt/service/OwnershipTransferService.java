@@ -31,7 +31,7 @@ public class OwnershipTransferService {
 
 	public List<Property> createOwnershipTransfer(PropertyRequest request) {
 //		propertyValidator.validateCreateRequest(request); // TODO add validations as per requirement
-		List<Property> propertyFromSearch = propertyValidator.validateUpdateRequest(request);
+		List<Property> propertyFromSearch = propertyValidator.getPropertyForOT(request);
 		enrichmentService.enrichCreateOwnershipTransfer(request, propertyFromSearch);
 //		userService.createUser(request); // TODO create user as owner of the property if does not exists
 		if (config.getIsWorkflowEnabled()) {
