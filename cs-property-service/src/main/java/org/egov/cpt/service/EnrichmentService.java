@@ -178,13 +178,16 @@ public class EnrichmentService {
 	public Address getAddress(Property property, RequestInfo requestInfo, String gen_property_id) {
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		Address address = property.getPropertyDetails().getAddress();
-		String gen_address_id = UUID.randomUUID().toString();
-		address.setId(gen_address_id);
-		address.setPropertyId(gen_property_id);
-		address.setTransitNumber(property.getTransitNumber());
-		address.setTenantId(property.getTenantId());
-		address.setColony(property.getColony());
-		address.setAuditDetails(propertyAuditDetails);
+		if (address != null) {
+			String gen_address_id = UUID.randomUUID().toString();
+			address.setId(gen_address_id);
+			address.setPropertyId(gen_property_id);
+			address.setTransitNumber(property.getTransitNumber());
+			address.setTenantId(property.getTenantId());
+			address.setColony(property.getColony());
+			address.setAuditDetails(propertyAuditDetails);
+			return address;
+		}
 		return address;
 	}
 

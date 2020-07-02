@@ -11,9 +11,9 @@ public class PTConstants {
 
 	public static final String businessService_csp = "CSP";
 
-	public static final String JSONPATH_CODES = "$.MdmsRes.PropertyTax";
+	public static final String JSONPATH_CODES = "$.MdmsRes.PropertyServices";
 
-	public static final String MDMS_PT_MOD_NAME = "PropertyTax";
+	public static final String MDMS_PT_MOD_NAME = "PropertyServices";
 
 	public static final String MDMS_PT_PROPERTYTYPE = "PropertyType";
 
@@ -42,14 +42,20 @@ public class PTConstants {
 	public static final String MDMS_PT_OWNERTYPE = "OwnerType";
 
 	public static final String MDMS_PT_EGF_MASTER = "egf-master";
+	
+	public static final String MDMS_PT_EGF_PROPERTY_SERVICE = "PropertyServices";
 
 	public static final String MDMS_PT_FINANCIALYEAR = "FinancialYear";
-
+	
+	public static final String MDMS_PT_COLONY = "colonies";
+	
 	public static final String JSONPATH_FINANCIALYEAR = "$.MdmsRes.egf-master";
+	
+	public static final String JSONPATH_COLONY = "$.MdmsRes.PropertyServices";
 
 	public static final String BOUNDARY_HEIRARCHY_CODE = "REVENUE";
 
-	public static final String MODULE = "pt-services-v2";
+	public static final String MODULE = "cs-property-service";
 
 	public static final String NOTIFICATION_LOCALE = "en_IN";
 
