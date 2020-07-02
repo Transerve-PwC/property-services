@@ -220,34 +220,40 @@ public class EnrichmentService {
 	/*
 	 * Ownership Transfer
 	 */
-	public void enrichCreateOwnershipTransfer(PropertyRequest request) {
+	public void enrichCreateOwnershipTransfer(PropertyRequest request, List<Property> propertyFromDb) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-
+		Property foundProperty = propertyFromDb.get(0);
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
-
-				String gen_property_id = UUID.randomUUID().toString();
-				PropertyDetails propertyDetail = getPropertyDetail(property, requestInfo, gen_property_id);
-
-				property.setId(gen_property_id);
-				property.setAuditDetails(propertyAuditDetails);
-				property.setPropertyDetails(propertyDetail);
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
 					property.getOwners().forEach(owner -> {
 						String gen_owner_id = UUID.randomUUID().toString();
 						owner.setId(gen_owner_id);
-						owner.setPropertyId(gen_property_id);
-						owner.setTenantId(property.getTenantId());
+						owner.setPropertyId(foundProperty.getId());
+						owner.setTenantId(foundProperty.getTenantId());
 						owner.setAuditDetails(propertyAuditDetails);
-						OwnerDetails ownerDetails = getOwnerShipDetails(owner, property, requestInfo, gen_property_id);
+						OwnerDetails ownerDetails = updateOwnerShipDetails(owner, property, requestInfo, gen_owner_id);
 						owner.setOwnerDetails(ownerDetails);
 					});
 				}
 			});
 			setIdgenIds(request);
 		}
+	}
+
+	private OwnerDetails updateOwnerShipDetails(Owner owner, Property foundProperty, RequestInfo requestInfo,
+			String gen_owner_id) {
+		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		OwnerDetails ownerDetails = owner.getOwnerDetails();
+		String gen_owner_details_id = UUID.randomUUID().toString();
+		ownerDetails.setId(gen_owner_details_id);
+		ownerDetails.setPropertyId(foundProperty.getId());
+		ownerDetails.setOwnerId(gen_owner_id);
+		ownerDetails.setAuditDetails(propertyAuditDetails);
+		owner.setTenantId(foundProperty.getTenantId());
+		return ownerDetails;
 	}
 
 	/**

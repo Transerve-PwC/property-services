@@ -1,0 +1,40 @@
+{
+	"info": {
+		"_postman_id": "905dc287-8018-4399-b15d-403cf5a555c9",
+		"name": "RPOwnershipTransferLatest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8083/csp/ownership-transfer/_create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"RequestInfo\": {\n        \"apiId\": \"Rainmaker\",\n        \"ver\": \".01\",\n        \"ts\": \"\",\n        \"action\": \"_create\",\n        \"did\": \"1\",\n        \"key\": \"\",\n        \"msgId\": \"20170310130900|en_IN\",\n        \"authToken\": \"9be34e66-df01-4503-b590-9089aee71ef8\"\n    },\n    \"Properties\": [\n        {\n            \"transitNumber\": \"vinil515\",\n            \"tenantId\": \"ch.chandigarh\",\n            \"colony\": \"COLONY.MILK\",\n            \"masterDataState\": \"\",\n            \"masterDataAction\": \"INITIATE\",\n            \"owners\": [\n                {\n                    \"allotmenNumber\": \"allot123458\",\n                    \"applicationStatus\": \"\",\n                    \"ownerDetails\": {\n                        \"name\": \"new test2\",\n                        \"email\": \"newtest2@mail.com\",\n                        \"phone\": \"8500123456\",\n                        \"gender\": \"MALE\",\n                        \"dateOfBirth\": 1592979124548,\n                        \"aadhaarNumber\": \"368036722470\",\n                        \"fatherOrHusband\": \"kumar\",\n                        \"relation\": \"RELATION.HUSBAND\",\n                        \"applicationType\": \"CitizenApplication\",\n                        \"relationWithDeceasedAllottee\": \"Father\",\n                        \"dateOfDeathAllottee\": 1592979124548,\n                        \"payment\": [\n                            {\n                                \"amountDue\": \"300\",\n                                \"amountPaid\": \"300\",\n                                \"receiptNumber\": \"rec123\",\n                                \"paymentDate\": 1592979124548,\n                                \"paymentMode\": \"off-line\"\n                            }\n                        ]\n                    }\n                }\n            ]\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/csp/ownership-transfer/_create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"csp",
+						"ownership-transfer",
+						"_create"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

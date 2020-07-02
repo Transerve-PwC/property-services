@@ -258,10 +258,10 @@ public class PropertyValidator {
 
 		validateColony(request, errorMap);
 		validateArea(request, errorMap);
-		
+
 		// TODO Commenting for temporary. Uncomment for payment validations
 //		validatePayment(request, errorMap);
-		
+
 		List<Property> prop = request.getProperties();
 		prop.forEach(properties -> {
 			if (properties.getTransitNumber().length() < 4 || properties.getTransitNumber().length() > 25) {
@@ -311,6 +311,26 @@ public class PropertyValidator {
 		return propertiesFromSearchResponse;
 	}
 
+	/*
+	 * ownership transfer get properties
+	 */
+	public List<Property> getPropertyForOT(PropertyRequest request) {
+
+		Map<String, String> errorMap = new HashMap<>();
+
+		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
+		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
+		boolean ifPropertyExists = PropertyExists(propertiesFromSearchResponse);
+		if (!ifPropertyExists) {
+			throw new CustomException("PROPERTY NOT FOUND", "The property to be updated does not exist");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+
+		return propertiesFromSearchResponse;
+	}
+
 	private void compareIds(String searchId, String updateId, Map<String, String> errorMap) {
 
 		if (!(searchId.equals(updateId))) {
@@ -326,8 +346,7 @@ public class PropertyValidator {
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
 				if (!(property.getId() != null))
-					errorMap.put("INVALID PROPERTY",
-							"Property cannot be updated without propertyId or acknowledgement number");
+					errorMap.put("INVALID PROPERTY", "Property cannot be updated without propertyId");
 				if (!errorMap.isEmpty())
 					throw new CustomException(errorMap);
 			});

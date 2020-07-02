@@ -53,6 +53,9 @@ public class PropertyConfiguration {
 	@Value("${persister.update.property.topic}")
 	private String updatePropertyTopic;
 
+	@Value("${ownership.transfer.save.topic}")
+	private String ownershipTransferSaveTopic;
+
 	@Value("${persister.cancel.property.topic}")
 	private String cancelPropertyTopic;
 
@@ -178,6 +181,9 @@ public class PropertyConfiguration {
 
 	@Value("${create.csp.workflow.name}")
 	private String cSPBusinessServiceValue;
+
+	@Value("${ownershipTransfer.worlflow.name}")
+	private String ownershipTransferBusinessServiceValue;
 
 	// ##### mdms
 

@@ -1,5 +1,6 @@
 package org.egov.cpt.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -58,5 +59,14 @@ public class Property {
 	@Valid
 	@JsonProperty("owners")
 	private List<Owner> owners;
+
+	public Property addOwnerItem(Owner ownersItem) {
+		if (this.owners == null) {
+			this.owners = new ArrayList<>();
+		}
+		if (!this.owners.contains(ownersItem))
+			this.owners.add(ownersItem);
+		return this;
+	}
 
 }
