@@ -54,6 +54,24 @@ public class PropertyQueryBuilder {
 			+ " cs_pt_application_documents_v1 doc ON pt.id=doc.property_id "
 //			+ " WHERE "
 	;
+	
+	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,ptdl.*,"
+			+ " dca.id as pid, dca.transit_number, dca.tenantid as pttenantid, dca.state, dca.action,"
+			+ " ptdl.id as ptdl_id,ptdl.property_id as ptdl_pt_id,ptdl.transit_number as ptdl_tra_number,"
+			
+			+ " ap.id as aid, ap.property_id as approperty_id,ap.tenantid as aptenantid,"
+			+ " ap.name,ap.email,ap.mobileno,ap.guardian,ap.relationship,ap.aadhaar_number as adhaarnumber,"
+			
+			+ " doc.id as docId, doc.tenantId as doctenantid,doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
+			+ " doc.property_id as doc_propertydlid , doc.active as doc_active"
+			
+			/*+ " address.id as adid, address.property_id as aproperty_id, address.transit_number as atransit_number,"
+			+ " address.tenantid as atenantid, address.area as addressArea,address.pincode"*/
+			
+			+ " FROM cs_pt_duplicate_ownership_application dca " + INNER_JOIN + " cs_pt_duplicatecopy_applicant ap ON dca.id =ap.property_id "
+			+ INNER_JOIN + " cs_pt_propertydetails_v1 ptdl ON dca.transit_number =ptdl.transit_number " 
+//			INNER_JOIN + " cs_pt_address_v1 address ON dco.id=address.property_id " 
+	        + LEFT_JOIN +" cs_pt_duplicatecopy_document doc ON doc.property_id =  dca.id";
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
 
@@ -128,5 +146,23 @@ public class PropertyQueryBuilder {
 		else {
 			queryString.append(" AND ");
 		}
+	}
+	
+	public String getDuplicateCopyPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
+
+		StringBuilder builder = new StringBuilder(DUPLICATE_COPY_SEARCH_QUERY);
+
+		if (!ObjectUtils.isEmpty(criteria.getTransitNumber())) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("dca.transit_number=?");
+			preparedStmtList.add(criteria.getTransitNumber());
+		}
+		if (null != criteria.getPropertyId()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("dca.id=?");
+			preparedStmtList.add(criteria.getPropertyId());
+		}
+
+		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
 }

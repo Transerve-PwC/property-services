@@ -52,7 +52,7 @@ CREATE TABLE cs_pt_duplicatecopy_document(
     tenantId 			CHARACTER VARYING(64),
     documentType 		CHARACTER VARYING(64),
     filestoreid 		CHARACTER VARYING(64),
-    propertydetailid 	CHARACTER VARYING(64),
+    property_id 			CHARACTER VARYING(64),
     active 				BOOLEAN,
     
     createdBy 			CHARACTER VARYING(64),
@@ -61,7 +61,7 @@ CREATE TABLE cs_pt_duplicatecopy_document(
     modified_time 		bigint,
 
     CONSTRAINT uk_cs_pt_duplicatecopy_document PRIMARY KEY (id),
-    CONSTRAINT fk_cs_pt_duplicatecopy_document FOREIGN KEY (propertydetailid) REFERENCES cs_pt_propertydetails_v1 (id)
+    CONSTRAINT fk_cs_pt_duplicatecopy_document FOREIGN KEY (property_id) REFERENCES cs_pt_duplicate_ownership_application (id)
 );
 
 CREATE TABLE cs_pt_duplicate_ownership_application_audit(

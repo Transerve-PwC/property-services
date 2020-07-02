@@ -1,6 +1,5 @@
 package org.egov.cpt.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -30,13 +29,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Builder
-public class PropertyDetails {
+public class DuplicateCopy {
 
 	@JsonProperty("id")
 	private String id;
-
-	@JsonProperty("propertyId")
-	private String propertyId;
 
 	@JsonProperty("transitNumber")
 	private String transitNumber;
@@ -44,40 +40,20 @@ public class PropertyDetails {
 	@JsonProperty("tenantId")
 	private String tenantId;
 
-	@JsonProperty("area")
-	private String area;
+	@JsonProperty("state")
+	private String state;
 
-	@JsonProperty("rentPerSqyd")
-	private String rentPerSqyd;
-
-	@JsonProperty("currentOwner")
-	private String currentOwner;
-
-	@JsonProperty("floors")
-	private String floors;
-
-	@JsonProperty("additionalDetails")
-	private String additionalDetails;
-
-	@JsonProperty("address")
-	private Address address;
-
-	@Valid
-	@JsonProperty("applicationDocuments")
-	private List<Document> applicationDocuments=null;
+	@JsonProperty("action")
+	private String action;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
+	
+	@JsonProperty("propertyDetails")
+	private PropertyDetails propertyDetails;
 
-
-
-	public PropertyDetails addApplicationDocumentsItem(Document applicationDocumentsItem) {
-	    if (this.applicationDocuments == null) {
-	    this.applicationDocuments = new ArrayList<>();
-	    }
-	    if(!this.applicationDocuments.contains(applicationDocumentsItem))
-	        this.applicationDocuments.add(applicationDocumentsItem);
-	    return this;
-	}
-
+	@Valid
+	@JsonProperty("applicant")
+	private List<Applicant> applicant;
+	
 }

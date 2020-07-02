@@ -58,6 +58,12 @@ public class PropertyConfiguration {
 
 	@Value("${persister.cancel.property.assessment.topic}")
 	private String cancelPropertyAssessmentTopic;
+	
+	@Value("${persister.save.duplicateCopy.topic}")
+	private String saveDuplicateCopyTopic;
+	
+	@Value("${persister.update.duplicateCopy.topic}")
+	private String UpdateDuplicateCopyTopic;
 
 	// USER
 	@Value("${egov.user.host}")
@@ -178,6 +184,9 @@ public class PropertyConfiguration {
 
 	@Value("${create.csp.workflow.name}")
 	private String cSPBusinessServiceValue;
+	
+	@Value("${duplicateCopy.workflow.name}")
+	private String duplicateCopyBusinessServiceValue;
 
 	// ##### mdms
 
