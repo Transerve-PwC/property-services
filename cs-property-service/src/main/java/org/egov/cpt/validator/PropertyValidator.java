@@ -44,7 +44,7 @@ public class PropertyValidator {
 
 		Map<String, String> errorMap = new HashMap<>();
 
-		validateIds(request, errorMap);
+//		validateIds(request, errorMap);
 //		validateMobileNumber(request, errorMap);
 
 		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
@@ -64,8 +64,7 @@ public class PropertyValidator {
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
 				if (!(property.getId() != null))
-					errorMap.put("INVALID PROPERTY",
-							"Property cannot be updated without propertyId or acknowledgement number");
+					errorMap.put("INVALID PROPERTY", "Property cannot be updated without propertyId");
 				if (!errorMap.isEmpty())
 					throw new CustomException(errorMap);
 			});

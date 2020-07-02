@@ -93,6 +93,7 @@ public class WorkflowIntegrator {
 		String wfTenantId = request.getProperties().get(0).getTenantId();
 		JSONArray array = new JSONArray();
 		for (Property property : request.getProperties()) {
+			String applicationNumber = "";
 			JSONObject obj = new JSONObject();
 			List<Map<String, String>> uuidmaps = new LinkedList<>();
 			if (!CollectionUtils.isEmpty(property.getOwners())) {
@@ -101,17 +102,20 @@ public class WorkflowIntegrator {
 					uuidMap.put(UUIDKEY, owners.getId());
 					uuidmaps.add(uuidMap);
 				});
+				applicationNumber = property.getOwners().get(0).getOwnerDetails().getApplicationNumber();
 			}
 			obj.put(TENANTIDKEY, wfTenantId);
 			switch (from) {
 			case "ME":
 				obj.put(BUSINESSSERVICEKEY, config.getCSPBusinessServiceValue());
+				obj.put(BUSINESSIDKEY, property.getTransitNumber());
 				break;
 			case "OT":
 				obj.put(BUSINESSSERVICEKEY, config.getOwnershipTransferBusinessServiceValue());
+				obj.put(BUSINESSIDKEY, applicationNumber);
 				break;
 			}
-			obj.put(BUSINESSIDKEY, property.getTransitNumber());
+
 			obj.put(ACTIONKEY, property.getMasterDataAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(AUDITDETAILSKEY, property.getAuditDetails());
