@@ -54,6 +54,18 @@ public class PropertyQueryBuilder {
 			+ " cs_pt_application_documents_v1 doc ON pt.id=doc.property_id "
 //			+ " WHERE "
 	;
+	
+	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,"
+			+ " dca.id as appid, dca.property_id, dca.tenantid as pttenantid, dca.state, dca.action,"
+			
+			+ " ap.id as aid, ap.application_id as app_id,ap.tenantid as aptenantid,"
+			+ " ap.name,ap.email,ap.mobileno,ap.guardian,ap.relationship,ap.aadhaar_number as adhaarnumber,"
+			
+			+ " doc.id as docId, doc.tenantId as doctenantid,doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
+			+ " doc.application_id as doc_applid , doc.active as doc_active"
+			
+			+ " FROM cs_pt_duplicate_ownership_application dca " + INNER_JOIN + " cs_pt_duplicatecopy_applicant ap ON dca.id =ap.application_id "
+	        + LEFT_JOIN +" cs_pt_duplicatecopy_document doc ON doc.application_id =  dca.id";
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
 
@@ -128,5 +140,23 @@ public class PropertyQueryBuilder {
 		else {
 			queryString.append(" AND ");
 		}
+	}
+	
+	public String getDuplicateCopyPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
+
+		StringBuilder builder = new StringBuilder(DUPLICATE_COPY_SEARCH_QUERY);
+
+		if (!ObjectUtils.isEmpty(criteria.getPropertyId())) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("dca.property_id=?");
+			preparedStmtList.add(criteria.getPropertyId());
+		}
+		if (null != criteria.getId()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("dca.id=?");
+			preparedStmtList.add(criteria.getId());
+		}
+
+		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
 }

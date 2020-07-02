@@ -12,6 +12,7 @@ import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Document;
+import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.Property;
@@ -20,6 +21,7 @@ import org.egov.cpt.models.UserDetailResponse;
 import org.egov.cpt.models.Idgen.IdResponse;
 import org.egov.cpt.repository.IdGenRepository;
 import org.egov.cpt.util.PropertyUtil;
+import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -311,5 +313,77 @@ public class EnrichmentService {
 				}
 			});
 		}
+	}
+	
+	public void enrichDuplicateCopyCreateRequest(DuplicateCopyRequest duplicateCopyRequest) {
+		RequestInfo requestInfo = duplicateCopyRequest.getRequestInfo();
+		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+		if (!CollectionUtils.isEmpty(duplicateCopyRequest.getDuplicateCopyApplications())) {
+			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
+				String gen_application_id = UUID.randomUUID().toString();
+				application.setId(gen_application_id);
+				application.setAuditDetails(propertyAuditDetails);
+
+				/*if (property.getPropertyDetails().getAddress()!=null){
+					Address address = property.getPropertyDetails().getAddress();
+					address.setId(UUID.randomUUID().toString());
+					address.setTransitNumber(property.getTransitNumber());
+					address.setPropertyId(gen_property_id);
+					address.setTenantId(property.getTenantId());
+					//					address.setColony(property.getColony());
+					//					address.setAuditDetails(propertyAuditDetails);
+
+				}*/
+
+				/*PropertyDetails propertyDetail = new PropertyDetails();
+				String gen_property_details_id = UUID.randomUUID().toString();
+				propertyDetail.setId(gen_property_details_id);
+				propertyDetail.setPropertyId(gen_property_id);
+
+				property.setPropertyDetails(propertyDetail);*/
+
+
+				if (!CollectionUtils.isEmpty(application.getApplicant())) {
+					application.getApplicant().forEach(applicant -> {
+						applicant.setId(UUID.randomUUID().toString());
+						applicant.setApplicationId(gen_application_id);
+						applicant.setTenantId(application.getTenantId());
+						applicant.setAuditDetails(propertyAuditDetails);
+					});
+				}
+			});
+		}
+
+	}
+
+	public void enrichDuplicateCopyUpdateRequest(DuplicateCopyRequest duplicateCopyRequest, List<DuplicateCopy> searchedProperty) {
+		RequestInfo requestInfo = duplicateCopyRequest.getRequestInfo();
+		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
+		//		String propertyDtlId = searchedProperty.get(0).getPropertyDetails().getId();
+		if (!CollectionUtils.isEmpty(duplicateCopyRequest.getDuplicateCopyApplications())) {
+			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
+				application.setAuditDetails(propertyAuditDetails);
+				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())){
+					application.getApplicationDocuments().forEach(document -> {
+						if(document.getId()==null){
+							AuditDetails documentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							document.setId(UUID.randomUUID().toString());
+							document.setActive(true);
+							document.setApplicationId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId());
+							document.setAuditDetails(documentAuditDetails);
+						}
+					});
+
+				}
+
+				if (!CollectionUtils.isEmpty(application.getApplicant())) {
+					application.getApplicant().forEach(applicant -> {
+						applicant.setAuditDetails(propertyAuditDetails);
+					});
+				}
+			});
+		}
+
 	}
 }

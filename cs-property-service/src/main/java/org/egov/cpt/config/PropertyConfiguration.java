@@ -52,6 +52,12 @@ public class PropertyConfiguration {
 
 	@Value("${persister.update.property.topic}")
 	private String updatePropertyTopic;
+	
+	@Value("${persister.save.duplicateCopy.topic}")
+	private String saveDuplicateCopyTopic;
+	
+	@Value("${persister.update.duplicateCopy.topic}")
+	private String UpdateDuplicateCopyTopic;
 
 	@Value("${ownership.transfer.save.topic}")
 	private String ownershipTransferSaveTopic;
@@ -184,6 +190,9 @@ public class PropertyConfiguration {
 
 	@Value("${ownershipTransfer.worlflow.name}")
 	private String ownershipTransferBusinessServiceValue;
+	
+	@Value("${duplicateCopy.workflow.name}")
+	private String duplicateCopyBusinessServiceValue;
 
 	// ##### mdms
 
