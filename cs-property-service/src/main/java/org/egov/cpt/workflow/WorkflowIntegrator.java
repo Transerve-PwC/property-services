@@ -98,6 +98,19 @@ public class WorkflowIntegrator {
 			String applicationNumber = "";
 			JSONObject obj = new JSONObject();
 			List<Map<String, String>> uuidmaps = new LinkedList<>();
+			List<Map<String, String>> assigneeUuidmaps = new LinkedList<>();
+			
+			if(!CollectionUtils.isEmpty(property.getAssignee())){
+
+				// Adding assignees to processInstance
+				property.getAssignee().forEach(assignee -> {
+					Map<String, String> uuidMap = new HashMap<>();
+					uuidMap.put(UUIDKEY, assignee);
+					assigneeUuidmaps.add(uuidMap);
+				});
+
+			}
+			
 			if (!CollectionUtils.isEmpty(property.getOwners())) {
 				property.getOwners().forEach(owners -> {
 					Map<String, String> uuidMap = new HashMap<>();
@@ -121,7 +134,14 @@ public class WorkflowIntegrator {
 			obj.put(ACTIONKEY, property.getMasterDataAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(AUDITDETAILSKEY, property.getAuditDetails());
-			obj.put(COMMENTKEY, "");
+			obj.put(COMMENTKEY, property.getComment());
+			if (!CollectionUtils.isEmpty(property.getAssignee())) {
+				if (uuidmaps.size() == 1) {
+					obj.put(ASSIGNEEKEY, assigneeUuidmaps.get(0));
+				} else {
+					obj.put(ASSIGNEEKEY, assigneeUuidmaps);
+				}
+			}
 
 			array.add(obj);
 		}
@@ -143,8 +163,8 @@ public class WorkflowIntegrator {
 				try {
 					errros = responseContext.read("$.Errors");
 				} catch (PathNotFoundException pnfe) {
-					log.error("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
-							" Unable to read the json path in error object : " + pnfe.getMessage());
+//					log.error("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
+//							" Unable to read the json path in error object : " + pnfe.getMessage());
 					throw new CustomException("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
 							" Unable to read the json path in error object : " + pnfe.getMessage());
 				}
@@ -169,7 +189,9 @@ public class WorkflowIntegrator {
 
 			// setting the status back to Property object from wf response
 			request.getProperties()
-					.forEach(property -> property.setMasterDataState(idStatusMap.get(property.getTransitNumber())));
+					.forEach(property -> {
+						property.setMasterDataState(idStatusMap.get(property.getTransitNumber()));
+					});
 		}
 	}
 	
