@@ -9,25 +9,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Repository
-@Slf4j
-public class PropertyRepository {
+public class OwnershipTransferRepository {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	private PropertyQueryBuilder queryBuilder;
+	private OwnershipTransferQueryBuilder queryBuilder;
 
 	@Autowired
-	private PropertyRowMapper rowMapper;
+	private OwnershipTransferRowMapper rowMapper;
 
 	public List<Property> getProperties(PropertyCriteria criteria) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
-		log.info(query);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 }
