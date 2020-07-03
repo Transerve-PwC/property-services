@@ -2,17 +2,22 @@ package org.egov.cpt.validator;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.repository.ServiceRequestRepository;
+import org.egov.cpt.util.DuplicateCopyConstants;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
+import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
@@ -437,6 +442,154 @@ public class PropertyValidator {
 			return false;
 		}
 		return true;
+	}
+	
+	
+	public void validateDuplicateCopySearch(RequestInfo requestInfo, DuplicateCopySearchCriteria criteria) {
+		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria == null)
+			throw new CustomException("INVALID SEARCH", "Search without any paramters is not allowed");
+		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.getTransitNumber() == null)
+			throw new CustomException("INVALID SEARCH", "Transit number is mandatory in search");
+	}
+
+	public List<DuplicateCopy> validateDuplicateCopyUpdateRequest(DuplicateCopyRequest duplicateCopyRequest) {
+		Map<String, String> errorMap = new HashMap<>();
+
+		validateDocument(duplicateCopyRequest);
+		validateIds(duplicateCopyRequest);
+
+		// validateIds(duplicateCopyRequest, errorMap);
+		String propertyId = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getPropertyId();
+		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
+				.appId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId())
+				.propertyId(propertyId).build();
+		List<DuplicateCopy> searchedProperties = repository.getDuplicateCopyProperties(criteria);
+		if (searchedProperties.size() < 1) {
+			errorMap.put("PROPERTY NOT FOUND", "The property to be updated does not exist");
+		}
+		if (searchedProperties.size() > 1) {
+			errorMap.put("INVALID PROPERTY", "Multiple property found");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+
+		return searchedProperties;
+	}
+
+	private void validateIds(DuplicateCopyRequest request) {
+		Map<String,String> errorMap = new HashMap<>();
+        request.getDuplicateCopyApplications().forEach(application -> {
+
+            if((!application.getState().equalsIgnoreCase(DuplicateCopyConstants.STATUS_INITIATED)))
+            {
+                    if (application.getId() == null)
+                        errorMap.put("INVALID UPDATE", "Id of property cannot be null");
+                    /*if(property.getPropertyDetails().getAddress().getId()==null)
+                        errorMap.put("INVALID UPDATE", "Id of address cannot be null");*/
+                    if(application.getApplicant().get(0).getId()==null)
+                    	errorMap.put("INVALID UPDATE", "Id of Applicant cannot be null");
+                    if(application.getPropertyId()==null)
+                    	errorMap.put("INVALID UPDATE", "Property Id cannot be null");
+            }
+        });
+        if(!errorMap.isEmpty())
+            throw new CustomException(errorMap);
+	}
+
+	public void validateDuplicateCopyCreateRequest(DuplicateCopyRequest duplicateCopyRequest) {
+		validateDocument(duplicateCopyRequest);
+
+	}
+
+	private void validateDocument(DuplicateCopyRequest duplicateCopyRequest) {
+		Map<String, String> errorMap = new HashMap<>();
+
+		duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
+
+			/*
+			 * if
+			 * (PTConstants.ACTION_INITIATE.equalsIgnoreCase(property.getAction(
+			 * ))) { if (property.getPropertyDetails().getApplicationDocuments()
+			 * != null) errorMap.put("INVALID ACTION",
+			 * "Action should be APPLY when application document are provided");
+			 * }
+			 */
+			if (DuplicateCopyConstants.ACTION_SUBMIT.equalsIgnoreCase(application.getAction())) {
+				if (application.getApplicationDocuments() == null)
+					errorMap.put("INVALID ACTION",
+							"Action cannot be changed to SUBMIT. Application document are not provided");
+			}
+			/*if (!PTConstants.ACTION_SUBMIT.equalsIgnoreCase(property.getAction())
+					&& !PTConstants.ACTION_INITIATE.equalsIgnoreCase(property.getAction())) {
+				errorMap.put("INVALID ACTION", "Action can only be SUBMIT or INITIATE during create");
+			}*/
+
+		});
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+	}
+
+	public void validateDuplicateCreate(DuplicateCopyRequest duplicateCopyRequest) {
+		// valideDates(request, mdmsData);
+		// propertyValidator.validateProperty(request);
+		// validatePTSpecificNotNullFields(duplicateCopyRequest);
+		validateDuplicateDocuments(duplicateCopyRequest);
+
+	}
+
+	private void validateTLSpecificNotNullFields(DuplicateCopyRequest duplicateCopyRequest) {
+
+	}
+
+	private void validateDuplicateDocuments(DuplicateCopyRequest request) {
+		List<String> documentFileStoreIds = new LinkedList();
+		request.getDuplicateCopyApplications().forEach(application -> {
+				if (application.getApplicationDocuments() != null) {
+					application.getApplicationDocuments().forEach(document -> {
+						if (documentFileStoreIds.contains(document.getFileStoreId()))
+							throw new CustomException("DUPLICATE_DOCUMENT ERROR",
+									"Same document cannot be used multiple times");
+						else
+							documentFileStoreIds.add(document.getFileStoreId());
+					});
+				}
+		});
+	}
+
+	public void validateDuplicateUpdate(DuplicateCopyRequest duplicateCopyRequest) {
+		validateDuplicateDocuments(duplicateCopyRequest);
+//		validatePTSpecificNotNullFields(duplicateCopyRequest);
+	}
+
+	public List<Property> isPropertyExist(DuplicateCopyRequest duplicateCopyRequest) {
+
+		PropertyCriteria criteria = getPropertyCriteriaForSearch(duplicateCopyRequest);
+		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
+		boolean ifPropertyExists = PropertyExists(propertiesFromSearchResponse);
+		if (!ifPropertyExists) {
+			throw new CustomException("PROPERTY NOT FOUND", "Please provide valid property details");
+		}
+
+		return propertiesFromSearchResponse;
+	}
+
+	private PropertyCriteria getPropertyCriteriaForSearch(DuplicateCopyRequest request) {
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		if (!CollectionUtils.isEmpty(request.getDuplicateCopyApplications())) {
+			request.getDuplicateCopyApplications().forEach(application -> {
+				if (application.getTransitNumber() != null)
+					propertyCriteria.setTransitNumber(application.getTransitNumber());
+				if (application.getColony() != null)
+					propertyCriteria.setColony(application.getColony());
+				if(application.getPropertyId()!=null){
+					propertyCriteria.setPropertyId(application.getPropertyId());
+				}
+			});
+		}
+		return propertyCriteria;
+		
 	}
 
 }

@@ -1,0 +1,182 @@
+serviceMaps:
+ serviceName: csp
+ mappings:
+ - version: 1.0
+   description: Persists DuplicateCopyApplications details in cs_pt_duplicate_ownership_application table
+   fromTopic: save-rp-duplicateCopy
+   isTransaction: true
+   queryMaps:
+
+    - query: INSERT INTO cs_pt_duplicate_ownership_application (id, property_id, tenantid, state, action, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: DuplicateCopyApplications.*
+      jsonMaps:
+
+      - jsonPath: $.DuplicateCopyApplications.*.id
+
+      - jsonPath: $.DuplicateCopyApplications.*.propertyId
+      
+      - jsonPath: $.DuplicateCopyApplications.*.tenantId
+
+      - jsonPath: $.DuplicateCopyApplications.*.state
+
+      - jsonPath: $.DuplicateCopyApplications.*.action 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdBy
+
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdTime
+
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime
+    
+    
+    - query: INSERT INTO cs_pt_duplicatecopy_applicant (id, application_id, tenantid, name, email, mobileno, guardian, relationship,aadhaar_number, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: DuplicateCopyApplications.*.applicant.*
+      jsonMaps:
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.id
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.applicationId 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.tenantId 
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.name
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.email
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.phone
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.guardian
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.relationship
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.adhaarNumber 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdBy
+
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdTime
+
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime
+      
+    
+         
+    - query: INSERT INTO cs_pt_duplicatecopy_document (id, tenantid, documenttype, filestoreid, application_id, active, createdBy, lastModifiedBy, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: DuplicateCopyApplications.*.applicationDocuments.*
+      jsonMaps:
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.DuplicateCopyApplications.*.tenantId 
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.documentType 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.fileStoreId 
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.applicationId 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.active 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.auditDetails.createdBy
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.auditDetails.createdTime
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.auditDetails.lastModifiedTime
+      
+      
+      
+      
+ - version: 1.0
+   description: Persists DuplicateCopyApplications details in cs_pt_duplicate_ownership_application table
+   fromTopic: update-rp-duplicateCopy
+   isTransaction: true
+   queryMaps:
+    
+    - query: INSERT INTO cs_pt_duplicate_ownership_application_audit SELECT * FROM cs_pt_duplicate_ownership_application WHERE id = ?;
+      basePath: DuplicateCopyApplications.*
+      jsonMaps:
+      - jsonPath: $.DuplicateCopyApplications.*.id
+
+    - query: UPDATE cs_pt_duplicate_ownership_application SET  state=?, action=?, modified_by=?, modified_time=? WHERE id=?;
+      basePath: DuplicateCopyApplications.*
+      jsonMaps:
+
+      - jsonPath: $.DuplicateCopyApplications.*.state
+
+      - jsonPath: $.DuplicateCopyApplications.*.action 
+
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.DuplicateCopyApplications.*.id
+    
+    
+    - query: INSERT INTO cs_pt_duplicatecopy_applicant_audit SELECT * FROM cs_pt_duplicatecopy_applicant WHERE id = ?;
+      basePath: DuplicateCopyApplications.*.applicant.*
+      jsonMaps:
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.id
+    
+    
+    - query: UPDATE cs_pt_duplicatecopy_applicant SET name=?, email=?, mobileno=?, guardian=?, relationship=?,aadhaar_number=?, modified_by=?, modified_time=? WHERE id=?;
+      basePath: DuplicateCopyApplications.*.applicant.*
+      jsonMaps:
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.name
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.email
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.phone
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.guardian
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.relationship
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.adhaarNumber
+      
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.id
+        
+      
+    - query: INSERT INTO cs_pt_duplicatecopy_document (id, tenantid, documenttype, filestoreid, application_id, active, createdBy, lastModifiedBy, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, lastModifiedBy =?, modified_time =?;
+      basePath: DuplicateCopyApplications.*.applicationDocuments.*
+      jsonMaps:
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.DuplicateCopyApplications.*.tenantId 
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.documentType 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.fileStoreId 
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.applicationId 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.active 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdBy
+
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdTime
+
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.active 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.documentType 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.fileStoreId 
+
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime  
+      
+          
+ 

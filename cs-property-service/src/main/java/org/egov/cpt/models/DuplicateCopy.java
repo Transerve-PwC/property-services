@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -31,54 +30,51 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Builder
-public class Property {
+public class DuplicateCopy {
 
 	@JsonProperty("id")
 	private String id;
-
+	
 	@JsonProperty("transitNumber")
 	private String transitNumber;
+	
+	@JsonProperty("colony")
+	private String colony;
+
+	@JsonProperty("propertyId")
+	private String propertyId;
 
 	@JsonProperty("tenantId")
 	private String tenantId;
 
-	@JsonProperty("colony")
-	private String colony;
+	@JsonProperty("state")
+	private String state;
 
-	@JsonProperty("masterDataState")
-	private String masterDataState;
-
-	@JsonProperty("masterDataAction")
-	private String masterDataAction;
+	@JsonProperty("action")
+	private String action;
 	
-	@JsonProperty("assignee")
-    private List<String> assignee = null;
-	
-	@Size(max=128)
-	@JsonProperty("comment")
-    private String comment;
+	@JsonProperty("applicationNumber")
+	private String applicationNumber;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
-
-	@JsonProperty("propertyDetails")
-	private PropertyDetails propertyDetails;
+	
+	@Valid
+	@JsonProperty("applicationDocuments")
+	private List<DuplicateCopyDocument> applicationDocuments=null;
 
 	@Valid
-	@JsonProperty("owners")
-	private List<Owner> owners;
-
-	public Property addOwnerItem(Owner newOwnerItem) {
-		if (this.owners == null) {
-			this.owners = new ArrayList<>();
-		}
-		for (Owner owner : owners) {
-			if (owner.getId().equalsIgnoreCase(newOwnerItem.getId())) {
-				return this;
-			}
-		}
-		this.owners.add(newOwnerItem);
-		return this;
+	@JsonProperty("applicant")
+	private List<Applicant> applicant;
+	
+	public DuplicateCopy addApplicationDocumentsItem(DuplicateCopyDocument applicationDocumentsItem) {
+	    if (this.applicationDocuments == null) {
+	    this.applicationDocuments = new ArrayList<>();
+	    }
+	    if(!this.applicationDocuments.contains(applicationDocumentsItem))
+	        this.applicationDocuments.add(applicationDocumentsItem);
+	    return this;
 	}
 
+	
 }
