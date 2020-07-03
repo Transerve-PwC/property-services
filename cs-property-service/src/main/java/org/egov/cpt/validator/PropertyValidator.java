@@ -578,11 +578,14 @@ public class PropertyValidator {
 	private PropertyCriteria getPropertyCriteriaForSearch(DuplicateCopyRequest request) {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		if (!CollectionUtils.isEmpty(request.getDuplicateCopyApplications())) {
-			request.getDuplicateCopyApplications().forEach(property -> {
-				if (property.getTransitNumber() != null)
-					propertyCriteria.setTransitNumber(property.getTransitNumber());
-				if (property.getColony() != null)
-					propertyCriteria.setColony(property.getColony());
+			request.getDuplicateCopyApplications().forEach(application -> {
+				if (application.getTransitNumber() != null)
+					propertyCriteria.setTransitNumber(application.getTransitNumber());
+				if (application.getColony() != null)
+					propertyCriteria.setColony(application.getColony());
+				if(application.getPropertyId()!=null){
+					propertyCriteria.setPropertyId(application.getPropertyId());
+				}
 			});
 		}
 		return propertyCriteria;

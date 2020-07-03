@@ -38,9 +38,9 @@ public class DuplicateCopyService {
 	private WorkflowIntegrator wfIntegrator;
 	
 
-	public List<DuplicateCopy> createProperty(DuplicateCopyRequest duplicateCopyRequest) {
+	public List<DuplicateCopy> createApplication(DuplicateCopyRequest duplicateCopyRequest) {
 		propertyValidator.validateDuplicateCopyCreateRequest(duplicateCopyRequest); 
-//		propertyValidator.isPropertyExist(duplicateCopyRequest);
+		propertyValidator.isPropertyExist(duplicateCopyRequest);
 		enrichmentService.enrichDuplicateCopyCreateRequest(duplicateCopyRequest);
 		propertyValidator.validateDuplicateCreate(duplicateCopyRequest);
 		if (config.getIsWorkflowEnabled()) {
@@ -50,21 +50,21 @@ public class DuplicateCopyService {
 		return duplicateCopyRequest.getDuplicateCopyApplications();
 	}
 
-	public List<DuplicateCopy> searchProperty(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
+	public List<DuplicateCopy> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
 		propertyValidator.validateDuplicateCopySearch(requestInfo,criteria);
 //	    enrichmentService.enrichSearchCriteria(requestInfo,criteria);
-		List<DuplicateCopy> properties = getProperties(criteria, requestInfo);
+		List<DuplicateCopy> properties = getApplication(criteria, requestInfo);
 		return properties;
 	}
 
-	private List<DuplicateCopy> getProperties(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
+	private List<DuplicateCopy> getApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
 		 List<DuplicateCopy> properties = repository.getDuplicateCopyProperties(criteria);
 	        if(properties.isEmpty())
 	            return Collections.emptyList();
 	        return properties;
 	}
 
-	public List<DuplicateCopy> updateProperty(DuplicateCopyRequest duplicateCopyRequest) {
+	public List<DuplicateCopy> updateApplication(DuplicateCopyRequest duplicateCopyRequest) {
 		
 		List<DuplicateCopy> searchedProperty = propertyValidator.validateDuplicateCopyUpdateRequest(duplicateCopyRequest); 
 		enrichmentService.enrichDuplicateCopyUpdateRequest(duplicateCopyRequest,searchedProperty);

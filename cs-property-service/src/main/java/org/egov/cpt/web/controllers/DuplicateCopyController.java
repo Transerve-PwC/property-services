@@ -46,7 +46,7 @@ public class DuplicateCopyController {
 	@PostMapping("/_create")
 	public ResponseEntity<DuplicateCopyResponse> create(@Valid @RequestBody DuplicateCopyRequest duplicateCopyRequest) {
 
-		List<DuplicateCopy> property = duplicateCopyService.createProperty(duplicateCopyRequest);
+		List<DuplicateCopy> property = duplicateCopyService.createApplication(duplicateCopyRequest);
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(duplicateCopyRequest.getRequestInfo(),
 				true);
 		DuplicateCopyResponse response = DuplicateCopyResponse.builder().duplicateCopyApplications(property).responseInfo(resInfo).build();
@@ -64,7 +64,7 @@ public class DuplicateCopyController {
 	public ResponseEntity<DuplicateCopyResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute DuplicateCopySearchCriteria searchCriteria) {
 
-		List<DuplicateCopy> properties = duplicateCopyService.searchProperty(searchCriteria,requestInfoWrapper.getRequestInfo());
+		List<DuplicateCopy> properties = duplicateCopyService.searchApplication(searchCriteria,requestInfoWrapper.getRequestInfo());
 		DuplicateCopyResponse response = DuplicateCopyResponse.builder().duplicateCopyApplications(properties).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true)).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -77,7 +77,7 @@ public class DuplicateCopyController {
 	 */
 	@PostMapping("/_update")
 	public ResponseEntity<DuplicateCopyResponse> update(@Valid @RequestBody DuplicateCopyRequest duplicateCopyRequest) {
-		List<DuplicateCopy> properties = duplicateCopyService.updateProperty(duplicateCopyRequest);
+		List<DuplicateCopy> properties = duplicateCopyService.updateApplication(duplicateCopyRequest);
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(duplicateCopyRequest.getRequestInfo(),
 				true);
 		DuplicateCopyResponse response = DuplicateCopyResponse.builder().duplicateCopyApplications(properties).responseInfo(resInfo).build();
