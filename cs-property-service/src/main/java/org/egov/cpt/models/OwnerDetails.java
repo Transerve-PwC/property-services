@@ -126,4 +126,7 @@ public class OwnerDetails {
 
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
+
+	@JsonProperty("permanent")
+	private Boolean permanent;
 }
