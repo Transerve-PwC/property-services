@@ -60,12 +60,16 @@ public class Property {
 	@JsonProperty("owners")
 	private List<Owner> owners;
 
-	public Property addOwnerItem(Owner ownersItem) {
+	public Property addOwnerItem(Owner newOwnerItem) {
 		if (this.owners == null) {
 			this.owners = new ArrayList<>();
 		}
-		if (!this.owners.contains(ownersItem))
-			this.owners.add(ownersItem);
+		for (Owner owner : owners) {
+			if (owner.getId().equalsIgnoreCase(newOwnerItem.getId())) {
+				return this;
+			}
+		}
+		this.owners.add(newOwnerItem);
 		return this;
 	}
 
