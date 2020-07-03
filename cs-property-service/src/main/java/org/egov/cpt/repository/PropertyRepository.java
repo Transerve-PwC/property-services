@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class PropertyRepository {
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 	
-	public List<DuplicateCopy> getDuplicateCopyProperties(PropertyCriteria criteria) {
+	public List<DuplicateCopy> getDuplicateCopyProperties(DuplicateCopySearchCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getDuplicateCopyPropertySearchQuery(criteria, preparedStmtList);
 		log.info("SearchQuery:"+query);

@@ -49,6 +49,7 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 						.tenantId(rs.getString("tenantid"))
 						.state(rs.getString("state"))
 						.action(rs.getString("action"))
+						.applicationNumber(rs.getString("app_number"))
 						.auditDetails(auditdetails).build();
 				applicationMap.put(applicationId, currentapplication);
 			}

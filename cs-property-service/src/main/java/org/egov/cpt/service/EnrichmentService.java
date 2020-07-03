@@ -354,7 +354,29 @@ public class EnrichmentService {
 				}
 			});
 		}
+		setDCIdgenIds(duplicateCopyRequest);
+	}
 
+	private void setDCIdgenIds(DuplicateCopyRequest request) {
+	        RequestInfo requestInfo = request.getRequestInfo();
+	        String tenantId = request.getDuplicateCopyApplications().get(0).getTenantId();
+	        List<DuplicateCopy> applications = request.getDuplicateCopyApplications();
+	        List<String> applicationNumbers = null;
+	        applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNumberIdgenNameDC(), config.getApplicationNumberIdgenFormatDC(), request.getDuplicateCopyApplications().size());
+	        ListIterator<String> itr = applicationNumbers.listIterator();
+
+	        Map<String, String> errorMap = new HashMap<>();
+	        if (applicationNumbers.size() != request.getDuplicateCopyApplications().size()) {
+	            errorMap.put("IDGEN ERROR ", "The number of LicenseNumber returned by idgen is not equal to number of TradeLicenses");
+	        }
+
+	        if (!errorMap.isEmpty())
+	            throw new CustomException(errorMap);
+
+	        applications.forEach(application -> {
+	        	application.setApplicationNumber(itr.next());
+	        });
+		
 	}
 
 	public void enrichDuplicateCopyUpdateRequest(DuplicateCopyRequest duplicateCopyRequest, List<DuplicateCopy> searchedProperty) {

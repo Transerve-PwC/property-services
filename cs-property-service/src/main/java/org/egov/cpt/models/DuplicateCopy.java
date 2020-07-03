@@ -34,6 +34,12 @@ public class DuplicateCopy {
 
 	@JsonProperty("id")
 	private String id;
+	
+	@JsonProperty("transitNumber")
+	private String transitNumber;
+	
+	@JsonProperty("colony")
+	private String colony;
 
 	@JsonProperty("propertyId")
 	private String propertyId;
@@ -46,6 +52,9 @@ public class DuplicateCopy {
 
 	@JsonProperty("action")
 	private String action;
+	
+	@JsonProperty("applicationNumber")
+	private String applicationNumber;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
@@ -66,5 +75,6 @@ public class DuplicateCopy {
 	        this.applicationDocuments.add(applicationDocumentsItem);
 	    return this;
 	}
+
 	
 }

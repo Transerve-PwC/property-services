@@ -13,21 +13,25 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
-public class PropertyCriteria {
+public class DuplicateCopySearchCriteria {
 
 	private String transitNumber;
 
 	private String colony;
-
-	private String phone;
-
-	private String name;
-
-	private String state;
-
+	
+	private String status;
+	
+	private String applicationNumber;
+	
+	private String applicantMobNo;
+	
+	private String propertyId;
+	
+	private String appId;
+	
 	private Long offset;
 
 	private Long limit;
+
 
 }

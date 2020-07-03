@@ -226,5 +226,11 @@ public class PropertyConfiguration {
 
 	@Value("${egov.idgen.rp.applicationNum.format}")
 	private String applicationNumberIdgenFormatRP;
+	
+	@Value("${egov.idgen.dc.applicationNum.name}")
+	private String applicationNumberIdgenNameDC;
+
+	@Value("${egov.idgen.dc.applicationNum.format}")
+	private String applicationNumberIdgenFormatDC;
 
 }

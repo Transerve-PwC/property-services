@@ -189,7 +189,7 @@ public class WorkflowIntegrator {
 			}
 			obj.put(TENANTIDKEY, wfTenantId);
 			obj.put(BUSINESSSERVICEKEY, config.getDuplicateCopyBusinessServiceValue());
-			obj.put(BUSINESSIDKEY, application.getId());
+			obj.put(BUSINESSIDKEY, application.getApplicationNumber());
 			obj.put(ACTIONKEY, application.getAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(AUDITDETAILSKEY, application.getAuditDetails());
@@ -241,7 +241,7 @@ public class WorkflowIntegrator {
 
 			// setting the status back to Property object from wf response
 			request.getDuplicateCopyApplications()
-					.forEach(application -> application.setState(idStatusMap.get(application.getId())));
+					.forEach(application -> application.setState(idStatusMap.get(application.getApplicationNumber())));
 		}
 	}
 }

@@ -9,6 +9,7 @@ import java.util.Map;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.repository.PropertyRepository;
@@ -444,7 +445,7 @@ public class PropertyValidator {
 	}
 	
 	
-	public void validateDuplicateCopySearch(RequestInfo requestInfo, PropertyCriteria criteria) {
+	public void validateDuplicateCopySearch(RequestInfo requestInfo, DuplicateCopySearchCriteria criteria) {
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria == null)
 			throw new CustomException("INVALID SEARCH", "Search without any paramters is not allowed");
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.getTransitNumber() == null)
@@ -459,8 +460,8 @@ public class PropertyValidator {
 
 		// validateIds(duplicateCopyRequest, errorMap);
 		String propertyId = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getPropertyId();
-		PropertyCriteria criteria = PropertyCriteria.builder()
-				.id(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId())
+		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
+				.appId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId())
 				.propertyId(propertyId).build();
 		List<DuplicateCopy> searchedProperties = repository.getDuplicateCopyProperties(criteria);
 		if (searchedProperties.size() < 1) {
@@ -560,6 +561,32 @@ public class PropertyValidator {
 	public void validateDuplicateUpdate(DuplicateCopyRequest duplicateCopyRequest) {
 		validateDuplicateDocuments(duplicateCopyRequest);
 //		validatePTSpecificNotNullFields(duplicateCopyRequest);
+	}
+
+	public List<Property> isPropertyExist(DuplicateCopyRequest duplicateCopyRequest) {
+
+		PropertyCriteria criteria = getPropertyCriteriaForSearch(duplicateCopyRequest);
+		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
+		boolean ifPropertyExists = PropertyExists(propertiesFromSearchResponse);
+		if (!ifPropertyExists) {
+			throw new CustomException("PROPERTY NOT FOUND", "Please provide valid property details");
+		}
+
+		return propertiesFromSearchResponse;
+	}
+
+	private PropertyCriteria getPropertyCriteriaForSearch(DuplicateCopyRequest request) {
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		if (!CollectionUtils.isEmpty(request.getDuplicateCopyApplications())) {
+			request.getDuplicateCopyApplications().forEach(property -> {
+				if (property.getTransitNumber() != null)
+					propertyCriteria.setTransitNumber(property.getTransitNumber());
+				if (property.getColony() != null)
+					propertyCriteria.setColony(property.getColony());
+			});
+		}
+		return propertyCriteria;
+		
 	}
 
 }

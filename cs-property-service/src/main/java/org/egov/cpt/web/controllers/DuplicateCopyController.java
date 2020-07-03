@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RequestInfoWrapper;
@@ -61,9 +62,9 @@ public class DuplicateCopyController {
 	 */
 	@PostMapping("/_search")
 	public ResponseEntity<DuplicateCopyResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-			@Valid @ModelAttribute PropertyCriteria propertyCriteria) {
+			@Valid @ModelAttribute DuplicateCopySearchCriteria searchCriteria) {
 
-		List<DuplicateCopy> properties = duplicateCopyService.searchProperty(propertyCriteria,requestInfoWrapper.getRequestInfo());
+		List<DuplicateCopy> properties = duplicateCopyService.searchProperty(searchCriteria,requestInfoWrapper.getRequestInfo());
 		DuplicateCopyResponse response = DuplicateCopyResponse.builder().duplicateCopyApplications(properties).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true)).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
