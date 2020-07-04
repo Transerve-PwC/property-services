@@ -22,6 +22,7 @@ import org.egov.cpt.models.Idgen.IdResponse;
 import org.egov.cpt.repository.IdGenRepository;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
+import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -222,24 +223,18 @@ public class EnrichmentService {
 	/*
 	 * Ownership Transfer
 	 */
-	public void enrichCreateOwnershipTransfer(PropertyRequest request, List<Property> propertyFromDb) {
+	public void enrichCreateOwnershipTransfer(OwnershipTransferRequest request, List<Property> propertyFromDb) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		Property foundProperty = propertyFromDb.get(0);
-		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().forEach(property -> {
-
-				if (!CollectionUtils.isEmpty(property.getOwners())) {
-					property.getOwners().forEach(owner -> {
-						String gen_owner_id = UUID.randomUUID().toString();
-						owner.setId(gen_owner_id);
-						owner.setPropertyId(foundProperty.getId());
-						owner.setTenantId(foundProperty.getTenantId());
-						owner.setAuditDetails(propertyAuditDetails);
-						OwnerDetails ownerDetails = updateOwnerShipDetails(owner, property, requestInfo, gen_owner_id);
-						owner.setOwnerDetails(ownerDetails);
-					});
-				}
+		if (!CollectionUtils.isEmpty(request.getOwners())) {
+			request.getOwners().forEach(owner -> {
+				String gen_owner_id = UUID.randomUUID().toString();
+				owner.setId(gen_owner_id);
+				owner.setTenantId(foundProperty.getTenantId());
+				owner.setAuditDetails(propertyAuditDetails);
+				OwnerDetails ownerDetails = updateOwnerShipDetails(owner, foundProperty, requestInfo, gen_owner_id);
+				owner.setOwnerDetails(ownerDetails);
 			});
 			setIdgenIds(request);
 		}
@@ -251,7 +246,7 @@ public class EnrichmentService {
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
 		String gen_owner_details_id = UUID.randomUUID().toString();
 		ownerDetails.setId(gen_owner_details_id);
-		ownerDetails.setPropertyId(foundProperty.getId());
+		ownerDetails.setPropertyId(owner.getPropertyId());
 		ownerDetails.setOwnerId(gen_owner_id);
 		ownerDetails.setAuditDetails(propertyAuditDetails);
 		owner.setTenantId(foundProperty.getTenantId());
@@ -284,11 +279,11 @@ public class EnrichmentService {
 	 *
 	 * @param request TradeLicenseRequest which is to be created
 	 */
-	private void setIdgenIds(PropertyRequest request) {
+	private void setIdgenIds(OwnershipTransferRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
-		String tenantId = request.getProperties().get(0).getTenantId();
-		List<Property> properties = request.getProperties();
-		int peopertiesSize = request.getProperties().size();
+		String tenantId = request.getOwners().get(0).getTenantId();
+		List<Owner> owners = request.getOwners();
+		int peopertiesSize = request.getOwners().size();
 
 		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNumberIdgenNameRP(),
 				config.getApplicationNumberIdgenFormatRP(), peopertiesSize);
@@ -296,7 +291,7 @@ public class EnrichmentService {
 		ListIterator<String> itr = applicationNumbers.listIterator();
 
 		Map<String, String> errorMap = new HashMap<>();
-		if (applicationNumbers.size() != request.getProperties().size()) {
+		if (applicationNumbers.size() != request.getOwners().size()) {
 			errorMap.put("IDGEN ERROR ",
 					"The number of LicenseNumber returned by idgen is not equal to number of TradeLicenses");
 		}
@@ -304,17 +299,13 @@ public class EnrichmentService {
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 
-		if (!CollectionUtils.isEmpty(properties)) {
-			properties.forEach(property -> {
-				if (!CollectionUtils.isEmpty(property.getOwners())) {
-					property.getOwners().forEach(owner -> {
-						owner.getOwnerDetails().setApplicationNumber(itr.next());
-					});
-				}
+		if (!CollectionUtils.isEmpty(owners)) {
+			owners.forEach(owner -> {
+				owner.getOwnerDetails().setApplicationNumber(itr.next());
 			});
 		}
 	}
-	
+
 	public void enrichDuplicateCopyCreateRequest(DuplicateCopyRequest duplicateCopyRequest) {
 		RequestInfo requestInfo = duplicateCopyRequest.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
@@ -325,24 +316,27 @@ public class EnrichmentService {
 				application.setId(gen_application_id);
 				application.setAuditDetails(propertyAuditDetails);
 
-				/*if (property.getPropertyDetails().getAddress()!=null){
-					Address address = property.getPropertyDetails().getAddress();
-					address.setId(UUID.randomUUID().toString());
-					address.setTransitNumber(property.getTransitNumber());
-					address.setPropertyId(gen_property_id);
-					address.setTenantId(property.getTenantId());
-					//					address.setColony(property.getColony());
-					//					address.setAuditDetails(propertyAuditDetails);
+				/*
+				 * if (property.getPropertyDetails().getAddress()!=null){ Address address =
+				 * property.getPropertyDetails().getAddress();
+				 * address.setId(UUID.randomUUID().toString());
+				 * address.setTransitNumber(property.getTransitNumber());
+				 * address.setPropertyId(gen_property_id);
+				 * address.setTenantId(property.getTenantId()); //
+				 * address.setColony(property.getColony()); //
+				 * address.setAuditDetails(propertyAuditDetails);
+				 * 
+				 * }
+				 */
 
-				}*/
-
-				/*PropertyDetails propertyDetail = new PropertyDetails();
-				String gen_property_details_id = UUID.randomUUID().toString();
-				propertyDetail.setId(gen_property_details_id);
-				propertyDetail.setPropertyId(gen_property_id);
-
-				property.setPropertyDetails(propertyDetail);*/
-
+				/*
+				 * PropertyDetails propertyDetail = new PropertyDetails(); String
+				 * gen_property_details_id = UUID.randomUUID().toString();
+				 * propertyDetail.setId(gen_property_details_id);
+				 * propertyDetail.setPropertyId(gen_property_id);
+				 * 
+				 * property.setPropertyDetails(propertyDetail);
+				 */
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {
@@ -358,41 +352,46 @@ public class EnrichmentService {
 	}
 
 	private void setDCIdgenIds(DuplicateCopyRequest request) {
-	        RequestInfo requestInfo = request.getRequestInfo();
-	        String tenantId = request.getDuplicateCopyApplications().get(0).getTenantId();
-	        List<DuplicateCopy> applications = request.getDuplicateCopyApplications();
-	        List<String> applicationNumbers = null;
-	        applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNumberIdgenNameDC(), config.getApplicationNumberIdgenFormatDC(), request.getDuplicateCopyApplications().size());
-	        ListIterator<String> itr = applicationNumbers.listIterator();
+		RequestInfo requestInfo = request.getRequestInfo();
+		String tenantId = request.getDuplicateCopyApplications().get(0).getTenantId();
+		List<DuplicateCopy> applications = request.getDuplicateCopyApplications();
+		List<String> applicationNumbers = null;
+		applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNumberIdgenNameDC(),
+				config.getApplicationNumberIdgenFormatDC(), request.getDuplicateCopyApplications().size());
+		ListIterator<String> itr = applicationNumbers.listIterator();
 
-	        Map<String, String> errorMap = new HashMap<>();
-	        if (applicationNumbers.size() != request.getDuplicateCopyApplications().size()) {
-	            errorMap.put("IDGEN ERROR ", "The number of LicenseNumber returned by idgen is not equal to number of TradeLicenses");
-	        }
+		Map<String, String> errorMap = new HashMap<>();
+		if (applicationNumbers.size() != request.getDuplicateCopyApplications().size()) {
+			errorMap.put("IDGEN ERROR ",
+					"The number of LicenseNumber returned by idgen is not equal to number of TradeLicenses");
+		}
 
-	        if (!errorMap.isEmpty())
-	            throw new CustomException(errorMap);
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
 
-	        applications.forEach(application -> {
-	        	application.setApplicationNumber(itr.next());
-	        });
-		
+		applications.forEach(application -> {
+			application.setApplicationNumber(itr.next());
+		});
+
 	}
 
-	public void enrichDuplicateCopyUpdateRequest(DuplicateCopyRequest duplicateCopyRequest, List<DuplicateCopy> searchedProperty) {
+	public void enrichDuplicateCopyUpdateRequest(DuplicateCopyRequest duplicateCopyRequest,
+			List<DuplicateCopy> searchedProperty) {
 		RequestInfo requestInfo = duplicateCopyRequest.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
-		//		String propertyDtlId = searchedProperty.get(0).getPropertyDetails().getId();
+		// String propertyDtlId = searchedProperty.get(0).getPropertyDetails().getId();
 		if (!CollectionUtils.isEmpty(duplicateCopyRequest.getDuplicateCopyApplications())) {
 			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
 				application.setAuditDetails(propertyAuditDetails);
-				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())){
+				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
 					application.getApplicationDocuments().forEach(document -> {
-						if(document.getId()==null){
-							AuditDetails documentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+						if (document.getId() == null) {
+							AuditDetails documentAuditDetails = propertyutil
+									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 							document.setId(UUID.randomUUID().toString());
 							document.setActive(true);
-							document.setApplicationId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId());
+							document.setApplicationId(
+									duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId());
 							document.setAuditDetails(documentAuditDetails);
 						}
 					});

@@ -7,8 +7,10 @@ import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
+import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,17 +92,16 @@ public class WorkflowIntegrator {
 	 *
 	 * @param request
 	 */
-	public void callWorkFlow(PropertyRequest request, String from) {
+	public void callWorkFlow(PropertyRequest request) {
 
 		String wfTenantId = request.getProperties().get(0).getTenantId();
 		JSONArray array = new JSONArray();
 		for (Property property : request.getProperties()) {
-			String applicationNumber = "";
 			JSONObject obj = new JSONObject();
 			List<Map<String, String>> uuidmaps = new LinkedList<>();
 			List<Map<String, String>> assigneeUuidmaps = new LinkedList<>();
-			
-			if(!CollectionUtils.isEmpty(property.getAssignee())){
+
+			if (!CollectionUtils.isEmpty(property.getAssignee())) {
 
 				// Adding assignees to processInstance
 				property.getAssignee().forEach(assignee -> {
@@ -108,29 +109,18 @@ public class WorkflowIntegrator {
 					uuidMap.put(UUIDKEY, assignee);
 					assigneeUuidmaps.add(uuidMap);
 				});
-
 			}
-			
+
 			if (!CollectionUtils.isEmpty(property.getOwners())) {
 				property.getOwners().forEach(owners -> {
 					Map<String, String> uuidMap = new HashMap<>();
 					uuidMap.put(UUIDKEY, owners.getId());
 					uuidmaps.add(uuidMap);
 				});
-				applicationNumber = property.getOwners().get(0).getOwnerDetails().getApplicationNumber();
 			}
 			obj.put(TENANTIDKEY, wfTenantId);
-			switch (from) {
-			case "ME":
-				obj.put(BUSINESSSERVICEKEY, config.getCSPBusinessServiceValue());
-				obj.put(BUSINESSIDKEY, property.getTransitNumber());
-				break;
-			case "OT":
-				obj.put(BUSINESSSERVICEKEY, config.getOwnershipTransferBusinessServiceValue());
-				obj.put(BUSINESSIDKEY, applicationNumber);
-				break;
-			}
-
+			obj.put(BUSINESSSERVICEKEY, config.getCSPBusinessServiceValue());
+			obj.put(BUSINESSIDKEY, property.getTransitNumber());
 			obj.put(ACTIONKEY, property.getMasterDataAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(AUDITDETAILSKEY, property.getAuditDetails());
@@ -188,13 +178,12 @@ public class WorkflowIntegrator {
 			});
 
 			// setting the status back to Property object from wf response
-			request.getProperties()
-					.forEach(property -> {
-						property.setMasterDataState(idStatusMap.get(property.getTransitNumber()));
-					});
+			request.getProperties().forEach(property -> {
+				property.setMasterDataState(idStatusMap.get(property.getTransitNumber()));
+			});
 		}
 	}
-	
+
 	public void callDuplicateCopyWorkFlow(DuplicateCopyRequest request) {
 
 		String wfTenantId = request.getDuplicateCopyApplications().get(0).getTenantId();
@@ -264,6 +253,72 @@ public class WorkflowIntegrator {
 			// setting the status back to Property object from wf response
 			request.getDuplicateCopyApplications()
 					.forEach(application -> application.setState(idStatusMap.get(application.getApplicationNumber())));
+		}
+	}
+
+	public void callOwnershipTransferWorkFlow(OwnershipTransferRequest request) {
+
+		String wfTenantId = request.getOwners().get(0).getTenantId();
+		JSONArray array = new JSONArray();
+		for (Owner owner : request.getOwners()) {
+			JSONObject obj = new JSONObject();
+
+			obj.put(TENANTIDKEY, wfTenantId);
+			obj.put(BUSINESSSERVICEKEY, config.getOwnershipTransferBusinessServiceValue());
+			obj.put(BUSINESSIDKEY, owner.getOwnerDetails().getApplicationNumber());
+			obj.put(ACTIONKEY, owner.getAction());
+			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
+			obj.put(AUDITDETAILSKEY, owner.getAuditDetails());
+			obj.put(COMMENTKEY, "");
+
+			array.add(obj);
+		}
+		if (!array.isEmpty()) {
+			JSONObject workFlowRequest = new JSONObject();
+			workFlowRequest.put(REQUESTINFOKEY, request.getRequestInfo());
+			workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);
+			String response = null;
+			try {
+				response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest,
+						String.class);
+			} catch (HttpClientErrorException e) {
+
+				/*
+				 * extracting message from client error exception
+				 */
+				DocumentContext responseContext = JsonPath.parse(e.getResponseBodyAsString());
+				List<Object> errros = null;
+				try {
+					errros = responseContext.read("$.Errors");
+				} catch (PathNotFoundException pnfe) {
+//					log.error("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
+//							" Unable to read the json path in error object : " + pnfe.getMessage());
+					throw new CustomException("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
+							" Unable to read the json path in error object : " + pnfe.getMessage());
+				}
+				throw new CustomException("EG_WF_ERROR", errros.toString());
+			} catch (Exception e) {
+				throw new CustomException("EG_WF_ERROR",
+						" Exception occured while integrating with workflow : " + e.getMessage());
+			}
+
+			/*
+			 * on success result from work-flow read the data and set the status back to
+			 * Property object
+			 */
+			DocumentContext responseContext = JsonPath.parse(response);
+			List<Map<String, Object>> responseArray = responseContext.read(PROCESSINSTANCESJOSNKEY);
+			Map<String, String> idStatusMap = new HashMap<>();
+			responseArray.forEach(object -> {
+
+				DocumentContext instanceContext = JsonPath.parse(object);
+				idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
+			});
+
+			// setting the status back to Property object from wf response
+			request.getOwners().forEach(owner -> {
+				owner.setState(idStatusMap.get(owner.getOwnerDetails().getApplicationNumber()));
+			});
 		}
 	}
 }

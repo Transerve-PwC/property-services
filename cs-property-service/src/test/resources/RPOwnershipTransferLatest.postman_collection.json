@@ -6,13 +6,13 @@
 	},
 	"item": [
 		{
-			"name": "http://localhost:8083/csp/ownership-transfer/_create",
+			"name": "ownership-transfer/_create",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"RequestInfo\": {\n        \"apiId\": \"Rainmaker\",\n        \"ver\": \".01\",\n        \"ts\": \"\",\n        \"action\": \"_create\",\n        \"did\": \"1\",\n        \"key\": \"\",\n        \"msgId\": \"20170310130900|en_IN\",\n        \"authToken\": \"9be34e66-df01-4503-b590-9089aee71ef8\"\n    },\n    \"Properties\": [\n        {\n            \"transitNumber\": \"vinil515\",\n            \"tenantId\": \"ch.chandigarh\",\n            \"colony\": \"COLONY.MILK\",\n            \"masterDataState\": \"\",\n            \"masterDataAction\": \"INITIATE\",\n            \"owners\": [\n                {\n                    \"allotmenNumber\": \"allot123458\",\n                    \"applicationStatus\": \"\",\n                    \"ownerDetails\": {\n                        \"name\": \"new test2\",\n                        \"email\": \"newtest2@mail.com\",\n                        \"phone\": \"8500123456\",\n                        \"gender\": \"MALE\",\n                        \"dateOfBirth\": 1592979124548,\n                        \"aadhaarNumber\": \"368036722470\",\n                        \"fatherOrHusband\": \"kumar\",\n                        \"relation\": \"RELATION.HUSBAND\",\n                        \"applicationType\": \"CitizenApplication\",\n                        \"relationWithDeceasedAllottee\": \"Father\",\n                        \"dateOfDeathAllottee\": 1592979124548,\n                        \"payment\": [\n                            {\n                                \"amountDue\": \"300\",\n                                \"amountPaid\": \"300\",\n                                \"receiptNumber\": \"rec123\",\n                                \"paymentDate\": 1592979124548,\n                                \"paymentMode\": \"off-line\"\n                            }\n                        ]\n                    }\n                }\n            ]\n        }\n    ]\n}",
+					"raw": "{\n    \"RequestInfo\": {\n        \"apiId\": \"Rainmaker\",\n        \"ver\": \".01\",\n        \"ts\": \"\",\n        \"action\": \"_create\",\n        \"did\": \"1\",\n        \"key\": \"\",\n        \"msgId\": \"20170310130900|en_IN\",\n        \"authToken\": \"9be34e66-df01-4503-b590-9089aee71ef8\"\n    },\n    \"Owners\": [\n        {\n            \"propertyId\": \"84712230-98e9-4712-9447-73a5bea7ac3e\",\n            \"tenantId\": \"ch.chandigarh\",\n            \"allotmenNumber\": \"allot123458\",\n            \"applicationStatus\": \"\",\n            \"activeState\": true,\n            \"isPrimaryOwner\": \"true\",\n            \"ownerDetails\": {\n                \"tenantId\": \"ch.chandigarh\",\n                \"name\": \"ottest1\",\n                \"email\": \"vinil@mail.com\",\n                \"phone\": \"8500123456\",\n                \"gender\": \"MALE\",\n                \"dateOfBirth\": 1592979124548,\n                \"aadhaarNumber\": \"368036722470\",\n                \"monthlyRent\": \"300\",\n                \"revisionPeriod\": \"1\",\n                \"revisionPercentage\": \"5\",\n                \"applicationType\": \"CitizenApplication\",\n                \"relationWithDeceasedAllottee\": \"Father\",\n                \"dateOfDeathAllottee\": 1592979124548,\n                \"permanent\": false\n            },\n            \"state\": \"\",\n            \"action\": \"INITIATE\"\n        }\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -30,6 +30,83 @@
 						"csp",
 						"ownership-transfer",
 						"_create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ownership-transfer/_create_dev",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"RequestInfo\": {\n        \"apiId\": \"Rainmaker\",\n        \"ver\": \".01\",\n        \"ts\": \"\",\n        \"action\": \"_create\",\n        \"did\": \"1\",\n        \"key\": \"\",\n        \"msgId\": \"20170310130900|en_IN\",\n        \"authToken\": \"4d134770-ddc6-47d6-b86c-c39071bdeaee\"\n    },\n    \"Properties\": [\n        {\n            \"transitNumber\": \"vinil517\",\n            \"tenantId\": \"ch.chandigarh\",\n            \"colony\": \"COLONY.MILK\",\n            \"masterDataState\": \"\",\n            \"masterDataAction\": \"INITIATE\",\n            \"owners\": [\n                {\n                    \"allotmenNumber\": \"allot123458\",\n                    \"applicationStatus\": \"\",\n                    \"ownerDetails\": {\n                        \"name\": \"new test4\",\n                        \"email\": \"newtest4@mail.com\",\n                        \"phone\": \"8500123456\",\n                        \"aadhaarNumber\": \"368036722470\",\n                        \"applicationType\": \"CitizenApplication\",\n                        \"relationWithDeceasedAllottee\": \"Father\",\n                        \"dateOfDeathAllottee\": 1592979124548,\n                        \"permanent\": false\n                    }\n                }\n            ]\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://egov.transerve.com/csp/ownership-transfer/_create",
+					"protocol": "https",
+					"host": [
+						"egov",
+						"transerve",
+						"com"
+					],
+					"path": [
+						"csp",
+						"ownership-transfer",
+						"_create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ownership-transfer/_search",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"RequestInfo\": {\n    \"apiId\": \"Rainmaker\",\n    \"ver\": \".01\",\n    \"ts\": \"\",\n    \"action\": \"_search\",\n    \"did\": \"1\",\n    \"key\": \"\",\n    \"msgId\": \"20170310130900|en_IN\",\n    \"authToken\": \"9f371883-8383-48ae-9b18-34bd00d13ca0\"\n  }\n\t\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/csp/ownership-transfer/_search?applicationNumber=CH-RP-OT-2020-07-02-000017",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"csp",
+						"ownership-transfer",
+						"_search"
+					],
+					"query": [
+						{
+							"key": "applicationNumber",
+							"value": "CH-RP-OT-2020-07-02-000017"
+						},
+						{
+							"key": "applicantMobNo",
+							"value": "8500123456",
+							"disabled": true
+						},
+						{
+							"key": "propertyId",
+							"value": null,
+							"disabled": true
+						}
 					]
 				}
 			},

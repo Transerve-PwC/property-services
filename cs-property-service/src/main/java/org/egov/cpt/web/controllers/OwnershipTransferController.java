@@ -5,13 +5,12 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.cpt.models.Property;
-import org.egov.cpt.models.PropertyCriteria;
-import org.egov.cpt.models.RequestInfoWrapper;
+import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.OwnershipTransferSearchCriteria;
 import org.egov.cpt.service.OwnershipTransferService;
 import org.egov.cpt.util.ResponseInfoFactory;
-import org.egov.cpt.web.contracts.PropertyRequest;
-import org.egov.cpt.web.contracts.PropertyResponse;
+import org.egov.cpt.web.contracts.OwnershipTransferRequest;
+import org.egov.cpt.web.contracts.OwnershipTransferResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,22 +31,25 @@ public class OwnershipTransferController {
 	private ResponseInfoFactory responseInfoFactory;
 
 	@PostMapping("/_create")
-	public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest propertyRequest) {
+	public ResponseEntity<OwnershipTransferResponse> create(
+			@Valid @RequestBody OwnershipTransferRequest ownershipTransferRequest) {
 
-		List<Property> property = ownershipTransferService.createOwnershipTransfer(propertyRequest);
-		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(),
-				true);
-		PropertyResponse response = PropertyResponse.builder().properties(property).responseInfo(resInfo).build();
+		List<Owner> owners = ownershipTransferService.createOwnershipTransfer(ownershipTransferRequest);
+		ResponseInfo resInfo = responseInfoFactory
+				.createResponseInfoFromRequestInfo(ownershipTransferRequest.getRequestInfo(), true);
+		OwnershipTransferResponse response = OwnershipTransferResponse.builder().owners(owners).responseInfo(resInfo)
+				.build();
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@PostMapping("/_search")
-	public ResponseEntity<PropertyResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-			@Valid @ModelAttribute PropertyCriteria propertyCriteria) {
+	public ResponseEntity<OwnershipTransferResponse> search(
+			@Valid @RequestBody OwnershipTransferRequest requestInfoWrapper,
+			@Valid @ModelAttribute OwnershipTransferSearchCriteria searchCriteria) {
 
-		List<Property> properties = ownershipTransferService.searchProperty(propertyCriteria,
+		List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria,
 				requestInfoWrapper.getRequestInfo());
-		PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
+		OwnershipTransferResponse response = OwnershipTransferResponse.builder().owners(owners).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);

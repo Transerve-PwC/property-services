@@ -46,4 +46,10 @@ public class Owner {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
+	@JsonProperty("state")
+	private String state;
+
+	@JsonProperty("action")
+	private String action;
+
 }

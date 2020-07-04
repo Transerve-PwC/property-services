@@ -529,182 +529,182 @@ serviceMaps:
     
     
   - version: 1.0
-    description: Persists Properties details in cs_pt_property_v1 table
+    description: Persists Owners details in cs_pt_ownership_v1 table
     fromTopic: save-ownership-transfer
     isTransaction: true
     queryMaps:
 
     - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, application_status, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.owners.*
+      basePath: $.Owners.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.owners.*.id
+      - jsonPath: $.Owners.*.id
 
-      - jsonPath: $.Properties.*.owners.*.propertyId
+      - jsonPath: $.Owners.*.propertyId
       
-      - jsonPath: $.Properties.*.tenantId
+      - jsonPath: $.Owners.*.tenantId
       
-      - jsonPath: $.Properties.*.owners.*.allotmenNumber
+      - jsonPath: $.Owners.*.allotmenNumber
 
-      - jsonPath: $.Properties.*.owners.*.applicationStatus
+      - jsonPath: $.wners.*.applicationStatus
 
-      - jsonPath: $.Properties.*.owners.*.activeState
+      - jsonPath: $.Owners.*.activeState
 
-      - jsonPath: $.Properties.*.owners.*.isPrimaryOwner
+      - jsonPath: $.Owners.*.isPrimaryOwner
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.createdBy
+      - jsonPath: $.Owners.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedBy
+      - jsonPath: $.Owners.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.createdTime
+      - jsonPath: $.Owners.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
+      - jsonPath: $.Owners.*.auditDetails.lastModifiedTime
   
   
     - query: INSERT INTO cs_pt_ownershipdetails_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, permanent, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.owners.*.ownerDetails
+      basePath: $.Owners.*.ownerDetails
       jsonMaps:
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.id
+      - jsonPath: $.Owners.*.ownerDetails.id
 
-      - jsonPath: $.Properties.*.owners.*.propertyId
+      - jsonPath: $.Owners.*.propertyId
 
-      - jsonPath: $.Properties.*.owners.*.id
+      - jsonPath: $.Owners.*.id
       
-      - jsonPath: $.Properties.*.tenantId
+      - jsonPath: $.Owners.*.tenantId
       
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.name
+      - jsonPath: $.Owners.*.ownerDetails.name
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.email
+      - jsonPath: $.Owners.*.ownerDetails.email
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.phone
+      - jsonPath: $.Owners.*.ownerDetails.phone
       
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.gender
+      - jsonPath: $.Owners.*.ownerDetails.gender
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfBirth
+      - jsonPath: $.Owners.*.ownerDetails.dateOfBirth
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.aadhaarNumber
+      - jsonPath: $.Owners.*.ownerDetails.aadhaarNumber
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentStartdate
+      - jsonPath: $.Owners.*.ownerDetails.allotmentStartdate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentEnddate
+      - jsonPath: $.Owners.*.ownerDetails.allotmentEnddate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionStartdate
+      - jsonPath: $.Owners.*.ownerDetails.posessionStartdate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionEnddate
+      - jsonPath: $.Owners.*.ownerDetails.posessionEnddate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.monthlyRent
+      - jsonPath: $.Owners.*.ownerDetails.monthlyRent
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
+      - jsonPath: $.Owners.*.ownerDetails.revisionPeriod
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
+      - jsonPath: $.Owners.*.ownerDetails.revisionPercentage
       
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
+      - jsonPath: $.Owners.*.ownerDetails.fatherOrHusband
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
+      - jsonPath: $.Owners.*.ownerDetails.relation
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.relationWithDeceasedAllottee
+      - jsonPath: $.Owners.*.ownerDetails.relationWithDeceasedAllottee
       
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
+      - jsonPath: $.Owners.*.ownerDetails.dateOfDeathAllottee
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationNumber
+      - jsonPath: $.Owners.*.ownerDetails.applicationNumber
       
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
+      - jsonPath: $.Owners.*.ownerDetails.applicationType
       
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.permanent
+      - jsonPath: $.Owners.*.ownerDetails.permanent
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdBy
+      - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
+      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdTime
+      - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
+      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
       
       
     - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, application_status, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.owners.*
+      basePath: $.Owners.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.owners.*.id
+      - jsonPath: $.Owners.*.id
 
-      - jsonPath: $.Properties.*.owners.*.propertyId
+      - jsonPath: $.Owners.*.propertyId
+      
+      - jsonPath: $.Owners.*.tenantId
+      
+      - jsonPath: $.Owners.*.allotmenNumber
 
-      - jsonPath: $.Properties.*.tenantId
+      - jsonPath: $.wners.*.applicationStatus
 
-      - jsonPath: $.Properties.*.owners.*.allotmenNumber
+      - jsonPath: $.Owners.*.activeState
 
-      - jsonPath: $.Properties.*.owners.*.applicationStatus
+      - jsonPath: $.Owners.*.isPrimaryOwner
 
-      - jsonPath: $.Properties.*.owners.*.activeState
+      - jsonPath: $.Owners.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.owners.*.isPrimaryOwner
+      - jsonPath: $.Owners.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.createdBy
+      - jsonPath: $.Owners.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedBy
-
-      - jsonPath: $.Properties.*.owners.*.auditDetails.createdTime
-
-      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
+      - jsonPath: $.Owners.*.auditDetails.lastModifiedTime
   
   
     - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, permanent, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.owners.*.ownerDetails
+      basePath: $.Owners.*.ownerDetails
       jsonMaps:
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.id
+      - jsonPath: $.Owners.*.ownerDetails.id
 
-      - jsonPath: $.Properties.*.owners.*.propertyId
+      - jsonPath: $.Owners.*.propertyId
 
-      - jsonPath: $.Properties.*.owners.*.id
-
-      - jsonPath: $.Properties.*.tenantId
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.name
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.email
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.phone
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.gender
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfBirth
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.aadhaarNumber
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentStartdate
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentEnddate
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionStartdate
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionEnddate
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.monthlyRent
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
+      - jsonPath: $.Owners.*.id
       
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
-
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
+      - jsonPath: $.Owners.*.tenantId
       
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.relationWithDeceasedAllottee
+      - jsonPath: $.Owners.*.ownerDetails.name
+
+      - jsonPath: $.Owners.*.ownerDetails.email
+
+      - jsonPath: $.Owners.*.ownerDetails.phone
       
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
+      - jsonPath: $.Owners.*.ownerDetails.gender
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationNumber
+      - jsonPath: $.Owners.*.ownerDetails.dateOfBirth
+
+      - jsonPath: $.Owners.*.ownerDetails.aadhaarNumber
+
+      - jsonPath: $.Owners.*.ownerDetails.allotmentStartdate
+
+      - jsonPath: $.Owners.*.ownerDetails.allotmentEnddate
+
+      - jsonPath: $.Owners.*.ownerDetails.posessionStartdate
+
+      - jsonPath: $.Owners.*.ownerDetails.posessionEnddate
+
+      - jsonPath: $.Owners.*.ownerDetails.monthlyRent
+
+      - jsonPath: $.Owners.*.ownerDetails.revisionPeriod
+
+      - jsonPath: $.Owners.*.ownerDetails.revisionPercentage
       
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
+      - jsonPath: $.Owners.*.ownerDetails.fatherOrHusband
+
+      - jsonPath: $.Owners.*.ownerDetails.relation
+
+      - jsonPath: $.Owners.*.ownerDetails.relationWithDeceasedAllottee
       
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.permanent
+      - jsonPath: $.Owners.*.ownerDetails.dateOfDeathAllottee
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdBy
+      - jsonPath: $.Owners.*.ownerDetails.applicationNumber
+      
+      - jsonPath: $.Owners.*.ownerDetails.applicationType
+      
+      - jsonPath: $.Owners.*.ownerDetails.permanent
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
+      - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdTime
+      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
+      - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdTime
+
+      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
