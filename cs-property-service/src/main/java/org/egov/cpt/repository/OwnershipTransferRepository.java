@@ -3,13 +3,16 @@ package org.egov.cpt.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.egov.cpt.models.Property;
-import org.egov.cpt.models.PropertyCriteria;
+import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.OwnershipTransferSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Repository
+@Slf4j
 public class OwnershipTransferRepository {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -20,10 +23,12 @@ public class OwnershipTransferRepository {
 	@Autowired
 	private OwnershipTransferRowMapper rowMapper;
 
-	public List<Property> getProperties(PropertyCriteria criteria) {
+	public List<Owner> searchOwnershipTransfer(OwnershipTransferSearchCriteria criteria) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
-		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
+		String query = queryBuilder.getOwnershipTransferSearchQuery(criteria, preparedStmtList);
+		log.info("OwnershipTransferSearchQuery: " + query);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
+
 }

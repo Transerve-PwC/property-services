@@ -3,7 +3,7 @@ package org.egov.cpt.repository;
 import java.util.List;
 
 import org.egov.cpt.config.PropertyConfiguration;
-import org.egov.cpt.models.PropertyCriteria;
+import org.egov.cpt.models.OwnershipTransferSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -20,42 +20,28 @@ public class OwnershipTransferQueryBuilder {
 	private static final String AND_QUERY = " AND ";
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pid) offset_ FROM " + "({})" + " result) result_offset "
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY oid) offset_ FROM " + "({})" + " result) result_offset "
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
-	private static final String SEARCH_QUERY = SELECT + "pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,"
-
-			+ " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,"
-
-			+ " ptdl.id as pdid, ptdl.property_id as pdproperty_id, ptdl.transit_number as pdtransit_number,"
-			+ " ptdl.tenantid as pdtenantid, ptdl.area, ptdl.rent_per_sqyd, ptdl.current_owner, ptdl.floors, ptdl.additional_details,"
+	private static final String SEARCH_QUERY = SELECT + "ownership.*,od.*,"
 
 			+ " ownership.id as oid, ownership.property_id as oproperty_id,"
-			+ " ownership.tenantid as otenantid, ownership.allotmen_number,"
-			+ " ownership.application_status, ownership.active_state, ownership.is_primary_owner,"
+			+ " ownership.tenantid as otenantid, ownership.allotmen_number as oallotmen_number,"
+			+ " ownership.application_status as oapplication_status, ownership.active_state as oactive_state, ownership.is_primary_owner as ois_primary_owner,"
+			+ " ownership.created_by as ocreated_by, ownership.created_date as ocreated_date, ownership.modified_by as omodified_by, ownership.modified_date as omodified_date,"
 
 			+ " od.id as odid, od.property_id as odproperty_id," + " od.owner_id odowner_id, od.tenantid as odtenantid,"
 			+ " od.name, od.email, od.phone," + " od.gender, od.date_of_birth, od.aadhaar_number,"
 			+ " od.allotment_startdate, od.allotment_enddate," + " od.posession_startdate, od.posession_enddate,"
 			+ " od.monthly_rent, od.revision_period, od.revision_percentage, od.father_or_husband, od.relation,"
+			+ " od.relation_with_deceased_allottee, od.date_of_death_allottee, od.application_number, od.application_type, od.permanent"
 
-			+ " address.id as aid, address.property_id as aproperty_id, address.transit_number as atransit_number,"
-			+ " address.tenantid as atenantid, address.colony, address.area as addressArea, address.district,"
-			+ " address.state, address.country, address.pincode, address.landmark,"
+			+ " FROM cs_pt_ownership_v1 ownership " + INNER_JOIN
+			+ " cs_pt_ownershipdetails_v1 od ON ownership.id=od.owner_id ";
 
-			+ " doc.id as docid, doc.property_id as docproperty_id, doc.tenantid as doctenantid,"
-			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id, doc.document_uid"
-
-			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id "
-			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + INNER_JOIN
-			+ " cs_pt_ownershipdetails_v1 od ON pt.id=od.property_id " + INNER_JOIN
-			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
-			+ " cs_pt_application_documents_v1 doc ON pt.id=doc.property_id "
-//			+ " WHERE "
-	;
-
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
+	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
+			OwnershipTransferSearchCriteria criteria) {
 
 		if (criteria.getLimit() == null && criteria.getOffset() == null)
 			return query;
@@ -85,38 +71,27 @@ public class OwnershipTransferQueryBuilder {
 	 * @param preparedStmtList
 	 * @return
 	 */
-	public String getPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
+	public String getOwnershipTransferSearchQuery(OwnershipTransferSearchCriteria criteria,
+			List<Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(SEARCH_QUERY);
 
-		if (!ObjectUtils.isEmpty(criteria.getTransitNumber())) {
+		if (!ObjectUtils.isEmpty(criteria.getApplicationNumber())) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.transit_number=?");
-			preparedStmtList.add(criteria.getTransitNumber());
+			builder.append("od.application_number = ?");
+			preparedStmtList.add(criteria.getApplicationNumber());
 		}
 
-		if (null != criteria.getColony()) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.colony = ?");
-			preparedStmtList.add(criteria.getColony());
-		}
-
-		if (null != criteria.getName()) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("od.name = ?");
-			preparedStmtList.add(criteria.getName());
-		}
-
-		if (null != criteria.getPhone()) {
+		if (null != criteria.getApplicantMobNo()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("od.phone = ?");
-			preparedStmtList.add(criteria.getPhone());
+			preparedStmtList.add(criteria.getApplicantMobNo());
 		}
 
-		if (null != criteria.getState()) {
+		if (null != criteria.getPropertyId()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.master_data_state = ?");
-			preparedStmtList.add(criteria.getState());
+			builder.append("od.property_id = ?");
+			preparedStmtList.add(criteria.getPropertyId());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);

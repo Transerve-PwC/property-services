@@ -46,7 +46,7 @@ public class PropertyService {
 		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request); // TODO create user as owner of the property if does not exists
 		if (config.getIsWorkflowEnabled()) {
-			wfIntegrator.callWorkFlow(request, "ME");
+			wfIntegrator.callWorkFlow(request);
 		}
 		producer.push(config.getSavePropertyTopic(), request);
 		return request.getProperties();
@@ -63,63 +63,16 @@ public class PropertyService {
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		userService.createUser(request);
 		if (config.getIsWorkflowEnabled()) {
-			wfIntegrator.callWorkFlow(request, "ME");
+			wfIntegrator.callWorkFlow(request);
 		}
 		producer.push(config.getUpdatePropertyTopic(), request);
 		return request.getProperties();
 	}
 
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
-
-		List<Property> properties = null;
-//		propertyValidator.validatePropertyCriteria(criteria, requestInfo);
-//
-//		if (criteria.getMobileNumber() != null || criteria.getName() != null || criteria.getOwnerIds() != null) {
-//
-//			Boolean shouldReturnEmptyList = enrichCriteriaFromUser(criteria, requestInfo);
-//
-//			if (shouldReturnEmptyList)
-//				return Collections.emptyList();
-//
-//			properties = getPropertiesWithOwnerInfo(criteria, requestInfo);
-//		} else {
-//			properties = getPropertiesWithOwnerInfo(criteria, requestInfo);
-//		}
-
-		properties = getPropertiesWithOwnerInfo(criteria, requestInfo);
-		return properties;
-	}
-
-	List<Property> getPropertiesWithOwnerInfo(PropertyCriteria criteria, RequestInfo requestInfo) {
-
 		List<Property> properties = repository.getProperties(criteria);
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
-
-//		Set<String> ownerIds = properties.stream().map(Property::getOwner).flatMap(List::stream).map(Owner::getId)
-//				.collect(Collectors.toSet());
-//
-//		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTransit_number(),
-//				requestInfo);
-//		userSearchRequest.setId(ownerIds);
-//
-//		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
-//		enrichmentService.enrichOwner(userDetailResponse, properties);
 		return properties;
-	}
-
-	private void updateWorkflow(PropertyRequest request, Boolean isCreate) {
-
-//		Property property = request.getProperty();
-//
-//		ProcessInstanceRequest workflowReq = util.getWfForPropertyRegistry(request, isCreate);
-//		String status = wfService.callWorkFlow(workflowReq);
-//		if (status.equalsIgnoreCase(config.getWfStatusActive()) && property.getPropertyId() == null) {
-//
-//			String pId = enrichmentService.getIdList(request.getRequestInfo(), property.getTenantId(),
-//					config.getPropertyIdGenName(), config.getPropertyIdGenFormat(), 1).get(0);
-//			request.getProperty().setPropertyId(pId);
-//		}
-//		request.getProperty().setStatus(Status.fromValue(status));
 	}
 }
