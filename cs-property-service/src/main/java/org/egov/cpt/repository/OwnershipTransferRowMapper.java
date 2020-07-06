@@ -24,9 +24,11 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 		while (rs.next()) {
 			String ownerId = rs.getString("oid");
 			Boolean permanent = rs.getBoolean("permanent");
+			String applicationType = rs.getString("application_type");
 			Owner currentOwner = ownerMap.get(ownerId);
 
-			if (null == currentOwner && permanent == false) {
+			if (null == currentOwner && applicationType != null
+					&& applicationType.equalsIgnoreCase("CitizenApplication")) {
 
 				AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("ocreated_by"))
 						.createdTime(rs.getLong("ocreated_date")).lastModifiedBy(rs.getString("omodified_by"))
