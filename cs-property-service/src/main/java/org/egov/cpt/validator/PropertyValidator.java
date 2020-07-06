@@ -301,7 +301,7 @@ public class PropertyValidator {
 				propertySearch.getOwners().forEach(searchOwner -> {
 					property.getOwners().forEach(owner -> {
 						compareIds(searchOwner.getId(), owner.getId(), errorMap);
-						compareIds(propertySearch.getId(), owner.getPropertyId(), errorMap);
+						compareIds(propertySearch.getId(), owner.getProperty().getId(), errorMap);
 						compareIds(searchOwner.getOwnerDetails().getId(), owner.getOwnerDetails().getId(), errorMap);
 						compareIds(propertySearch.getId(), owner.getOwnerDetails().getPropertyId(), errorMap);
 						compareIds(searchOwner.getId(), owner.getOwnerDetails().getOwnerId(), errorMap);
@@ -597,8 +597,8 @@ public class PropertyValidator {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		if (!CollectionUtils.isEmpty(request.getOwners())) {
 			request.getOwners().forEach(owner -> {
-				if (owner.getPropertyId() != null)
-					propertyCriteria.setPropertyId(owner.getPropertyId());
+				if (owner.getProperty().getId() != null)
+					propertyCriteria.setPropertyId(owner.getProperty().getId());
 			});
 		}
 		return propertyCriteria;

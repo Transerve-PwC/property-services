@@ -50,13 +50,13 @@ public class Property {
 
 	@JsonProperty("masterDataAction")
 	private String masterDataAction;
-	
+
 	@JsonProperty("assignee")
-    private List<String> assignee = null;
-	
-	@Size(max=128)
+	private List<String> assignee = null;
+
+	@Size(max = 128)
 	@JsonProperty("comment")
-    private String comment;
+	private String comment;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;

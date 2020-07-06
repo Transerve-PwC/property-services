@@ -10,6 +10,7 @@ import java.util.Map;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
+import org.egov.cpt.models.Property;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,6 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 		Map<String, Owner> ownerMap = new HashMap<>();
 		while (rs.next()) {
 			String ownerId = rs.getString("oid");
-			Boolean permanent = rs.getBoolean("permanent");
 			String applicationType = rs.getString("application_type");
 			Owner currentOwner = ownerMap.get(ownerId);
 
@@ -50,13 +50,17 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 						.applicationNumber(rs.getString("application_number"))
 						.dateOfDeathAllottee(rs.getLong("date_of_death_allottee"))
 						.relationWithDeceasedAllottee(rs.getString("relation_with_deceased_allottee"))
-						.auditDetails(auditdetails).payment(null).build();
+						.permanent(rs.getBoolean("permanent")).auditDetails(auditdetails).payment(null).build();
 
-				currentOwner = Owner.builder().id(rs.getString("oid")).propertyId(rs.getString("oproperty_id"))
+				Property property = Property.builder().id(rs.getString("oproperty_id"))
+						.transitNumber(rs.getString("transit_number")).build();
+
+				currentOwner = Owner.builder().id(rs.getString("oid")).property(property)
 						.tenantId(rs.getString("otenantid")).allotmenNumber(rs.getString("oallotmen_number"))
-						.applicationStatus(rs.getString("oapplication_status"))
 						.activeState(rs.getBoolean("oactive_state")).isPrimaryOwner(rs.getString("ois_primary_owner"))
-						.ownerDetails(ownerDetails).auditDetails(auditdetails).build();
+						.applicationState(rs.getString("application_state"))
+						.applicationAction(rs.getString("application_action")).ownerDetails(ownerDetails)
+						.auditDetails(auditdetails).build();
 
 				ownerMap.put(ownerId, currentOwner);
 			}

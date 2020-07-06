@@ -28,7 +28,8 @@ public class OwnershipTransferQueryBuilder {
 
 			+ " ownership.id as oid, ownership.property_id as oproperty_id,"
 			+ " ownership.tenantid as otenantid, ownership.allotmen_number as oallotmen_number,"
-			+ " ownership.application_status as oapplication_status, ownership.active_state as oactive_state, ownership.is_primary_owner as ois_primary_owner,"
+			+ " ownership.active_state as oactive_state, ownership.is_primary_owner as ois_primary_owner,"
+			+ " ownership.application_state, ownership.application_action,"
 			+ " ownership.created_by as ocreated_by, ownership.created_date as ocreated_date, ownership.modified_by as omodified_by, ownership.modified_date as omodified_date,"
 
 			+ " od.id as odid, od.property_id as odproperty_id," + " od.owner_id odowner_id, od.tenantid as odtenantid,"

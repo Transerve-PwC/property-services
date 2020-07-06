@@ -113,11 +113,10 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					.relationWithDeceasedAllottee(rs.getString("relation_with_deceased_allottee"))
 					.auditDetails(auditdetails).payment(null).build();
 
-			Owner owners = Owner.builder().id(rs.getString("oid")).propertyId(rs.getString("oproperty_id"))
+			Owner owners = Owner.builder().id(rs.getString("oid")).property(property)
 					.tenantId(rs.getString("otenantid")).allotmenNumber(rs.getString("oallotmen_number"))
-					.applicationStatus(rs.getString("oapplication_status")).activeState(rs.getBoolean("oactive_state"))
-					.isPrimaryOwner(rs.getString("ois_primary_owner")).ownerDetails(ownerDetails)
-					.auditDetails(auditdetails).build();
+					.activeState(rs.getBoolean("oactive_state")).isPrimaryOwner(rs.getString("ois_primary_owner"))
+					.ownerDetails(ownerDetails).auditDetails(auditdetails).build();
 
 			property.addOwnerItem(owners);
 		}

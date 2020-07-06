@@ -63,7 +63,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, application_status, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
@@ -74,8 +74,6 @@ serviceMaps:
       - jsonPath: $.Properties.*.tenantId
       
       - jsonPath: $.Properties.*.owners.*.allotmenNumber
-
-      - jsonPath: $.Properties.*.owners.*.applicationStatus
 
       - jsonPath: $.Properties.*.owners.*.activeState
 
@@ -267,7 +265,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, application_status, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
@@ -278,8 +276,6 @@ serviceMaps:
       - jsonPath: $.Properties.*.tenantId
 
       - jsonPath: $.Properties.*.owners.*.allotmenNumber
-
-      - jsonPath: $.Properties.*.owners.*.applicationStatus
 
       - jsonPath: $.Properties.*.owners.*.activeState
 
@@ -409,15 +405,13 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.transitNumber
 
 
-    - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, allotmen_number=?, application_status=?, active_state=?, is_primary_owner=?, modified_by=?, modified_date=? where id=? AND property_id=?;
+    - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, allotmen_number=?, active_state=?, is_primary_owner=?, modified_by=?, modified_date=? where id=? AND property_id=?;
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
       - jsonPath: $.Properties.*.tenantId
       
       - jsonPath: $.Properties.*.owners.*.allotmenNumber
-
-      - jsonPath: $.Properties.*.owners.*.applicationStatus
 
       - jsonPath: $.Properties.*.owners.*.activeState
 
@@ -534,7 +528,7 @@ serviceMaps:
     isTransaction: true
     queryMaps:
 
-    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, application_status, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, application_state, application_action, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Owners.*
       jsonMaps:
 
@@ -546,7 +540,9 @@ serviceMaps:
       
       - jsonPath: $.Owners.*.allotmenNumber
 
-      - jsonPath: $.wners.*.applicationStatus
+      - jsonPath: $.wners.*.applicationState
+      
+      - jsonPath: $.wners.*.applicationAction
 
       - jsonPath: $.Owners.*.activeState
 
@@ -622,7 +618,7 @@ serviceMaps:
       - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
       
       
-    - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, application_status, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, application_state, application_action, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Owners.*
       jsonMaps:
 
@@ -634,7 +630,9 @@ serviceMaps:
       
       - jsonPath: $.Owners.*.allotmenNumber
 
-      - jsonPath: $.wners.*.applicationStatus
+      - jsonPath: $.wners.*.applicationState
+      
+      - jsonPath: $.wners.*.applicationAction
 
       - jsonPath: $.Owners.*.activeState
 
