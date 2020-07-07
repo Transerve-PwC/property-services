@@ -249,6 +249,21 @@ public class EnrichmentService {
 		}
 	}
 
+	public void enrichUpdateOwnershipTransfer(OwnershipTransferRequest request, List<Owner> ownerFromDb) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		AuditDetails updateAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
+		if (!CollectionUtils.isEmpty(request.getOwners())) {
+			request.getOwners().forEach(owner -> {
+				AuditDetails modifyAuditDetails = owner.getAuditDetails();
+				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
+				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
+
+				owner.setAuditDetails(modifyAuditDetails);
+				owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
+			});
+		}
+	}
+
 	private OwnerDetails updateOwnerShipDetails(Owner owner, Property foundProperty, RequestInfo requestInfo,
 			String gen_owner_id) {
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);

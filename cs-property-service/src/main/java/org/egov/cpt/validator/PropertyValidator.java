@@ -364,8 +364,8 @@ public class PropertyValidator {
 		OwnershipTransferSearchCriteria searchCriteria = new OwnershipTransferSearchCriteria();
 		if (!CollectionUtils.isEmpty(request.getOwners())) {
 			request.getOwners().forEach(owner -> {
-				if (owner.getAllotmenNumber() != null)
-					searchCriteria.setApplicationNumber(owner.getAllotmenNumber());
+				if (owner.getOwnerDetails().getApplicationNumber() != null)
+					searchCriteria.setApplicationNumber(owner.getOwnerDetails().getApplicationNumber());
 			});
 		}
 		return searchCriteria;

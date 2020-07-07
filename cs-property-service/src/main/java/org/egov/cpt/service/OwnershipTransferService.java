@@ -57,9 +57,9 @@ public class OwnershipTransferService {
 	}
 
 	public List<Owner> updateOwnershipTransfer(OwnershipTransferRequest request) {
-//		List<Owner> owners = repository.searchOwnershipTransfer(criteria);
-//		enrichmentService.enrichCreateOwnershipTransfer(request, propertyFromSearch);
 		List<Owner> ownersFromSearch = propertyValidator.validateUpdateRequest(request);
+		enrichmentService.enrichUpdateOwnershipTransfer(request, ownersFromSearch);
+
 //		if (config.getIsWorkflowEnabled()) {
 //			wfIntegrator.callOwnershipTransferWorkFlow(request);
 //		}

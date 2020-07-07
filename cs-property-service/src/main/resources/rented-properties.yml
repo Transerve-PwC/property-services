@@ -93,7 +93,7 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.id
 
-      - jsonPath: $.Properties.*.owners.*.propertyId
+      - jsonPath: $.Properties.*.owners.*.property.id
 
       - jsonPath: $.Properties.*.owners.*.id
       
@@ -270,7 +270,7 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.owners.*.id
 
-      - jsonPath: $.Properties.*.owners.*.propertyId
+      - jsonPath: $.Properties.*.owners.*.property.id
 
       - jsonPath: $.Properties.*.tenantId
 
@@ -295,7 +295,7 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.owners.*.ownerDetails.id
 
-      - jsonPath: $.Properties.*.owners.*.propertyId
+      - jsonPath: $.Properties.*.owners.*.property.id
 
       - jsonPath: $.Properties.*.owners.*.id
 
@@ -404,7 +404,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.transitNumber
 
 
-    - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, allotmen_number=?, active_state=?, is_primary_owner=?, modified_by=?, modified_date=? where id=? AND property_id=?;
+    - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, allotmen_number=?, active_state=?, is_primary_owner=?, modified_by=?, modified_date=? where id=?;
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
@@ -422,10 +422,8 @@ serviceMaps:
             
       - jsonPath: $.Properties.*.owners.*.id
 
-      - jsonPath: $.Properties.*.owners.*.propertyId
-
  
-    - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, relation_with_deceased_allottee=?, date_of_death_allottee=?, application_number=?, application_type=?, modified_by=?, modified_date=? where id=? AND property_id=?;
+    - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, relation_with_deceased_allottee=?, date_of_death_allottee=?, application_number=?, application_type=?, modified_by=?, modified_date=? where id=?;
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
@@ -476,8 +474,6 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
             
       - jsonPath: $.Properties.*.owners.*.ownerDetails.id
-
-      - jsonPath: $.Properties.*.owners.*.propertyId
       
       
     - query: INSERT INTO cs_pt_application_documents_v1 (id, property_id, tenantid, is_active, document_type, fileStore_id, document_uid, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, fileStore_id =?, document_uid =?, modified_by =?, modified_date =?;
@@ -533,7 +529,7 @@ serviceMaps:
 
       - jsonPath: $.Owners.*.id
 
-      - jsonPath: $.Owners.*.propertyId
+      - jsonPath: $.Owners.*.property.id
       
       - jsonPath: $.Owners.*.tenantId
       
@@ -562,7 +558,7 @@ serviceMaps:
 
       - jsonPath: $.Owners.*.ownerDetails.id
 
-      - jsonPath: $.Owners.*.propertyId
+      - jsonPath: $.Owners.*.property.id
 
       - jsonPath: $.Owners.*.id
       
@@ -623,7 +619,7 @@ serviceMaps:
 
       - jsonPath: $.Owners.*.id
 
-      - jsonPath: $.Owners.*.propertyId
+      - jsonPath: $.Owners.*.property.id
       
       - jsonPath: $.Owners.*.tenantId
       
@@ -652,7 +648,7 @@ serviceMaps:
 
       - jsonPath: $.Owners.*.ownerDetails.id
 
-      - jsonPath: $.Owners.*.propertyId
+      - jsonPath: $.Owners.*.property.id
 
       - jsonPath: $.Owners.*.id
       

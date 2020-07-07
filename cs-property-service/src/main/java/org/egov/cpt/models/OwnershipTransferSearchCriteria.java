@@ -17,7 +17,7 @@ public class OwnershipTransferSearchCriteria {
 
 	private String transitNumber;
 
-	private String colony;
+	private String colony; // TODO doubt
 
 	private String status;
 
@@ -27,7 +27,7 @@ public class OwnershipTransferSearchCriteria {
 
 	private String propertyId;
 
-	private String appId;
+	private String appId; // TODO doubt
 
 	private Long offset;
 
