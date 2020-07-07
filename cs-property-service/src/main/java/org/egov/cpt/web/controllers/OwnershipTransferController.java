@@ -55,4 +55,16 @@ public class OwnershipTransferController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	@PostMapping("/_update")
+	public ResponseEntity<OwnershipTransferResponse> update(
+			@Valid @RequestBody OwnershipTransferRequest ownershipTransferRequest) {
+
+		List<Owner> owners = ownershipTransferService.updateOwnershipTransfer(ownershipTransferRequest);
+		ResponseInfo resInfo = responseInfoFactory
+				.createResponseInfoFromRequestInfo(ownershipTransferRequest.getRequestInfo(), true);
+		OwnershipTransferResponse response = OwnershipTransferResponse.builder().owners(owners).responseInfo(resInfo)
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+
 }
