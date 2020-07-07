@@ -67,7 +67,6 @@ public class EnrichmentService {
 						ownerProperty.setTransitNumber(property.getTransitNumber());
 						String gen_owner_id = UUID.randomUUID().toString();
 						owner.setId(gen_owner_id);
-//						owner.setPropertyId(gen_property_id);
 						owner.setProperty(ownerProperty);
 						owner.setTenantId(property.getTenantId());
 						owner.setAuditDetails(propertyAuditDetails);

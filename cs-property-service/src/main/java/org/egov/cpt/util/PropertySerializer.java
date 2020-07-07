@@ -9,28 +9,32 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-public class CustomListSerializer extends StdSerializer<Property> {
+/**
+ * A serializer class to work around the cyclic reference between Property and Owner classes.
+ */
+public class PropertySerializer extends StdSerializer<Property> {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public CustomListSerializer() {
+	public PropertySerializer() {
 		this(null);
 	}
 
-	public CustomListSerializer(Class<Property> t) {
+	public PropertySerializer(Class<Property> t) {
 		super(t);
 	}
 
 	@Override
 	public void serialize(Property property, JsonGenerator generator, SerializerProvider provider)
 			throws IOException, JsonProcessingException {
-		generator.writeFieldName("property");
 		generator.writeStartObject();
 		generator.writeFieldName("id");
 		generator.writeString(property.getId());
+		generator.writeFieldName("transitNumber");
+		generator.writeString(property.getTransitNumber());
 		generator.writeEndObject();
 	}
 }

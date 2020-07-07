@@ -1,6 +1,6 @@
 package org.egov.cpt.models;
 
-import org.egov.cpt.util.CustomListSerializer;
+import org.egov.cpt.util.PropertySerializer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -23,7 +23,7 @@ public class Owner {
 	@JsonProperty("id")
 	private String id;
 
-	@JsonSerialize(using = CustomListSerializer.class)
+	@JsonSerialize(using = PropertySerializer.class)
 	private Property property;
 
 	@JsonProperty("tenantId")
