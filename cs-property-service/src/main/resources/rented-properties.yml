@@ -535,9 +535,9 @@ serviceMaps:
       
       - jsonPath: $.Owners.*.allotmenNumber
 
-      - jsonPath: $.wners.*.applicationState
+      - jsonPath: $.Owners.*.applicationState
       
-      - jsonPath: $.wners.*.applicationAction
+      - jsonPath: $.Owners.*.applicationAction
 
       - jsonPath: $.Owners.*.activeState
 
@@ -625,9 +625,9 @@ serviceMaps:
       
       - jsonPath: $.Owners.*.allotmenNumber
 
-      - jsonPath: $.wners.*.applicationState
+      - jsonPath: $.Owners.*.applicationState
       
-      - jsonPath: $.wners.*.applicationAction
+      - jsonPath: $.Owners.*.applicationAction
 
       - jsonPath: $.Owners.*.activeState
 
@@ -701,3 +701,92 @@ serviceMaps:
       - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdTime
 
       - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
+
+      
+         
+      
+  - version: 1.0
+    description: Persists Owners details in cs_pt_ownership_v1 table
+    fromTopic: update-rp-ownership-transfer
+    isTransaction: true
+    queryMaps:
+    
+    - query: INSERT INTO cs_pt_ownership_audit_v1 SELECT * FROM cs_pt_ownership_v1 WHERE id = ?;
+      basePath: Owners.*
+      jsonMaps:
+      - jsonPath: $.Owners.*.id
+
+    - query: UPDATE cs_pt_ownership_v1 SET  allotmen_number=?, active_state=?, is_primary_owner=?, application_state=?, application_action=?, modified_by=?, modified_date=? WHERE id=?;
+      basePath: Owners.*
+      jsonMaps:
+
+      - jsonPath: $.Owners.*.allotmenNumber
+
+      - jsonPath: $.Owners.*.activeState
+
+      - jsonPath: $.Owners.*.isPrimaryOwner
+      
+      - jsonPath: $.Owners.*.applicationState
+      
+      - jsonPath: $.Owners.*.applicationAction
+
+      - jsonPath: $.Owners.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Owners.*.auditDetails.lastModifiedTime 
+      
+      - jsonPath: $.Owners.*.id
+    
+        
+    - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 SELECT * FROM cs_pt_ownershipdetails_v1 WHERE id = ?;
+      basePath: Owners.*.ownerDetails
+      jsonMaps:
+      - jsonPath: $.Owners.*.ownerDetails.id
+    
+    
+    - query: UPDATE cs_pt_ownershipdetails_v1 SET name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, relation_with_deceased_allottee=?, date_of_death_allottee=?, application_type=?, modified_by=?, modified_date=? where id=?;
+      basePath: $.Owners.*.ownerDetails
+      jsonMaps:
+            
+      - jsonPath: $.Owners.*.ownerDetails.name
+
+      - jsonPath: $.Owners.*.ownerDetails.email
+
+      - jsonPath: $.Owners.*.ownerDetails.phone
+      
+      - jsonPath: $.Owners.*.ownerDetails.gender
+
+      - jsonPath: $.Owners.*.ownerDetails.dateOfBirth
+
+      - jsonPath: $.Owners.*.ownerDetails.aadhaarNumber
+
+      - jsonPath: $.Owners.*.ownerDetails.allotmentStartdate
+
+      - jsonPath: $.Owners.*.ownerDetails.allotmentEnddate
+
+      - jsonPath: $.Owners.*.ownerDetails.posessionStartdate
+
+      - jsonPath: $.Owners.*.ownerDetails.posessionEnddate
+
+      - jsonPath: $.Owners.*.ownerDetails.monthlyRent
+
+      - jsonPath: $.Owners.*.ownerDetails.revisionPeriod
+
+      - jsonPath: $.Owners.*.ownerDetails.revisionPercentage
+      
+      - jsonPath: $.Owners.*.ownerDetails.fatherOrHusband
+
+      - jsonPath: $.Owners.*.ownerDetails.relation
+      
+      - jsonPath: $.Owners.*.ownerDetails.relationWithDeceasedAllottee
+      
+      - jsonPath: $.Owners.*.ownerDetails.dateOfDeathAllottee
+      
+      - jsonPath: $.Owners.*.ownerDetails.applicationType
+
+      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
+            
+      - jsonPath: $.Owners.*.ownerDetails.id     
+      
+       

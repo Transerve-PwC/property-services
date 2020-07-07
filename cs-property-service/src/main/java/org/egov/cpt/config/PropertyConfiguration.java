@@ -52,15 +52,18 @@ public class PropertyConfiguration {
 
 	@Value("${persister.update.property.topic}")
 	private String updatePropertyTopic;
-	
+
 	@Value("${persister.save.duplicateCopy.topic}")
 	private String saveDuplicateCopyTopic;
-	
+
 	@Value("${persister.update.duplicateCopy.topic}")
 	private String UpdateDuplicateCopyTopic;
 
 	@Value("${ownership.transfer.save.topic}")
 	private String ownershipTransferSaveTopic;
+
+	@Value("${ownership.transfer.update.topic}")
+	private String ownershipTransferUpdateTopic;
 
 	@Value("${persister.cancel.property.topic}")
 	private String cancelPropertyTopic;
@@ -190,7 +193,7 @@ public class PropertyConfiguration {
 
 	@Value("${ownershipTransfer.worlflow.name}")
 	private String ownershipTransferBusinessServiceValue;
-	
+
 	@Value("${duplicateCopy.workflow.name}")
 	private String duplicateCopyBusinessServiceValue;
 
@@ -226,7 +229,7 @@ public class PropertyConfiguration {
 
 	@Value("${egov.idgen.rp.applicationNum.format}")
 	private String applicationNumberIdgenFormatRP;
-	
+
 	@Value("${egov.idgen.dc.applicationNum.name}")
 	private String applicationNumberIdgenNameDC;
 
