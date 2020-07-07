@@ -43,8 +43,8 @@ public class OwnershipTransferQueryBuilder {
 //			+ " FROM cs_pt_ownership_v1 ownership " + INNER_JOIN
 //			+ " cs_pt_ownershipdetails_v1 od ON ownership.id=od.owner_id ";
 
-			+ " FROM cs_pt_property_v1 pt " 
-			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
+			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN
+			+ " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
 			+ " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id ";
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
@@ -97,8 +97,20 @@ public class OwnershipTransferQueryBuilder {
 
 		if (null != criteria.getPropertyId()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("od.property_id = ?");
+			builder.append("pt.id = ?");
 			preparedStmtList.add(criteria.getPropertyId());
+		}
+
+		if (!ObjectUtils.isEmpty(criteria.getTransitNumber())) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("pt.transit_number = ?");
+			preparedStmtList.add(criteria.getTransitNumber());
+		}
+
+		if (!ObjectUtils.isEmpty(criteria.getStatus())) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("ownership.application_state = ?");
+			preparedStmtList.add(criteria.getStatus());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
