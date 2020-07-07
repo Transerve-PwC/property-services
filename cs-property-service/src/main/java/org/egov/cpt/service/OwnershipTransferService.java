@@ -59,11 +59,10 @@ public class OwnershipTransferService {
 	public List<Owner> updateOwnershipTransfer(OwnershipTransferRequest request) {
 		List<Owner> ownersFromSearch = propertyValidator.validateUpdateRequest(request);
 		enrichmentService.enrichUpdateOwnershipTransfer(request, ownersFromSearch);
-
-//		if (config.getIsWorkflowEnabled()) {
-//			wfIntegrator.callOwnershipTransferWorkFlow(request);
-//		}
-//		producer.push(config.getOwnershipTransferSaveTopic(), request);
+		if (config.getIsWorkflowEnabled()) {
+			wfIntegrator.callOwnershipTransferWorkFlow(request);
+		}
+		producer.push(config.getOwnershipTransferUpdateTopic(), request);
 		return request.getOwners();
 	}
 
