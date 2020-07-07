@@ -1,6 +1,9 @@
 package org.egov.cpt.models;
 
+import org.egov.cpt.util.PropertySerializer;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,11 +11,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -22,17 +23,14 @@ public class Owner {
 	@JsonProperty("id")
 	private String id;
 
-	@JsonProperty("propertyId")
-	private String propertyId;
+	@JsonSerialize(using = PropertySerializer.class)
+	private Property property;
 
 	@JsonProperty("tenantId")
 	private String tenantId;
 
 	@JsonProperty("allotmenNumber")
 	private String allotmenNumber;
-
-	@JsonProperty("applicationStatus")
-	private String applicationStatus; // TODO is this same as masterDataState in property
 
 	@JsonProperty("activeState")
 	private Boolean activeState;
@@ -46,10 +44,10 @@ public class Owner {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
-	@JsonProperty("state")
-	private String state;
+	@JsonProperty("applicationState")
+	private String applicationState;
 
-	@JsonProperty("action")
-	private String action;
+	@JsonProperty("applicationAction")
+	private String applicationAction;
 
 }

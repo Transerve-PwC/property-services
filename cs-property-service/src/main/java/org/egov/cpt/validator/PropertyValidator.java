@@ -10,8 +10,11 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
+import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.OwnershipTransferSearchCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
+import org.egov.cpt.repository.OwnershipTransferRepository;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.repository.ServiceRequestRepository;
 import org.egov.cpt.util.DuplicateCopyConstants;
@@ -40,6 +43,9 @@ public class PropertyValidator {
 
 	@Autowired
 	private PropertyRepository repository;
+
+	@Autowired
+	private OwnershipTransferRepository OTRepository;
 
 	@Autowired
 	private PropertyConfiguration propertyConfiguration;
@@ -301,7 +307,7 @@ public class PropertyValidator {
 				propertySearch.getOwners().forEach(searchOwner -> {
 					property.getOwners().forEach(owner -> {
 						compareIds(searchOwner.getId(), owner.getId(), errorMap);
-						compareIds(propertySearch.getId(), owner.getPropertyId(), errorMap);
+						compareIds(propertySearch.getId(), owner.getProperty().getId(), errorMap);
 						compareIds(searchOwner.getOwnerDetails().getId(), owner.getOwnerDetails().getId(), errorMap);
 						compareIds(propertySearch.getId(), owner.getOwnerDetails().getPropertyId(), errorMap);
 						compareIds(searchOwner.getId(), owner.getOwnerDetails().getOwnerId(), errorMap);
@@ -335,6 +341,34 @@ public class PropertyValidator {
 			throw new CustomException(errorMap);
 
 		return propertiesFromSearchResponse;
+	}
+
+	public List<Owner> validateUpdateRequest(OwnershipTransferRequest request) {
+
+		Map<String, String> errorMap = new HashMap<>();
+
+		OwnershipTransferSearchCriteria criteria = getOTSearchCriteria(request);
+		List<Owner> ownersFromSearchResponse = OTRepository.searchOwnershipTransfer(criteria);
+		boolean ifOwnerExists = OwnerExists(ownersFromSearchResponse);
+		if (!ifOwnerExists) {
+			throw new CustomException("OWNER NOT FOUND", "The owner to be updated does not exist");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+
+		return ownersFromSearchResponse;
+	}
+
+	public OwnershipTransferSearchCriteria getOTSearchCriteria(OwnershipTransferRequest request) {
+		OwnershipTransferSearchCriteria searchCriteria = new OwnershipTransferSearchCriteria();
+		if (!CollectionUtils.isEmpty(request.getOwners())) {
+			request.getOwners().forEach(owner -> {
+				if (owner.getAllotmenNumber() != null)
+					searchCriteria.setApplicationNumber(owner.getAllotmenNumber());
+			});
+		}
+		return searchCriteria;
 	}
 
 	private void compareIds(String searchId, String updateId, Map<String, String> errorMap) {
@@ -374,6 +408,10 @@ public class PropertyValidator {
 
 	public boolean PropertyExists(List<Property> responseProperties) {
 		return (!CollectionUtils.isEmpty(responseProperties) && responseProperties.size() == 1);
+	}
+
+	public boolean OwnerExists(List<Owner> responseOwners) {
+		return (!CollectionUtils.isEmpty(responseOwners) && responseOwners.size() == 1);
 	}
 
 	/**
@@ -597,8 +635,8 @@ public class PropertyValidator {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		if (!CollectionUtils.isEmpty(request.getOwners())) {
 			request.getOwners().forEach(owner -> {
-				if (owner.getPropertyId() != null)
-					propertyCriteria.setPropertyId(owner.getPropertyId());
+				if (owner.getProperty().getId() != null)
+					propertyCriteria.setPropertyId(owner.getProperty().getId());
 			});
 		}
 		return propertyCriteria;

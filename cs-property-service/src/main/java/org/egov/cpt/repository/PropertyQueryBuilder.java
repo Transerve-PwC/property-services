@@ -35,7 +35,7 @@ public class PropertyQueryBuilder {
 
 			+ " ownership.id as oid, ownership.property_id as oproperty_id,"
 			+ " ownership.tenantid as otenantid, ownership.allotmen_number as oallotmen_number,"
-			+ " ownership.application_status as oapplication_status, ownership.active_state as oactive_state, ownership.is_primary_owner as ois_primary_owner,"
+			+ " ownership.active_state as oactive_state, ownership.is_primary_owner as ois_primary_owner,"
 			+ " ownership.created_by as ocreated_by, ownership.created_date as ocreated_date, ownership.modified_by as omodified_by, ownership.modified_date as omodified_date,"
 
 			+ " od.id as odid, od.property_id as odproperty_id," + " od.owner_id odowner_id, od.tenantid as odtenantid,"
@@ -57,18 +57,19 @@ public class PropertyQueryBuilder {
 			+ " cs_pt_application_documents_v1 doc ON pt.id=doc.property_id "
 //			+ " WHERE "
 	;
-	
+
 	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,"
 			+ " dca.id as appid, dca.property_id, dca.tenantid as pttenantid, dca.state, dca.action,dca.application_number as app_number,"
-			
+
 			+ " ap.id as aid, ap.application_id as app_id,ap.tenantid as aptenantid,"
 			+ " ap.name,ap.email,ap.mobileno,ap.guardian,ap.relationship,ap.aadhaar_number as adhaarnumber,"
-			
+
 			+ " doc.id as docId, doc.tenantId as doctenantid,doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
 			+ " doc.application_id as doc_applid , doc.active as doc_active"
-			
-			+ " FROM cs_pt_duplicate_ownership_application dca " + INNER_JOIN + " cs_pt_duplicatecopy_applicant ap ON dca.id =ap.application_id "
-	        + LEFT_JOIN +" cs_pt_duplicatecopy_document doc ON doc.application_id =  dca.id";
+
+			+ " FROM cs_pt_duplicate_ownership_application dca " + INNER_JOIN
+			+ " cs_pt_duplicatecopy_applicant ap ON dca.id =ap.application_id " + LEFT_JOIN
+			+ " cs_pt_duplicatecopy_document doc ON doc.application_id =  dca.id";
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
 
@@ -93,8 +94,9 @@ public class PropertyQueryBuilder {
 
 		return finalQuery;
 	}
-	
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList, DuplicateCopySearchCriteria criteria) {
+
+	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
+			DuplicateCopySearchCriteria criteria) {
 
 		if (criteria.getLimit() == null && criteria.getOffset() == null)
 			return query;
@@ -174,8 +176,9 @@ public class PropertyQueryBuilder {
 			queryString.append(" AND ");
 		}
 	}
-	
-	public String getDuplicateCopyPropertySearchQuery(DuplicateCopySearchCriteria criteria, List<Object> preparedStmtList) {
+
+	public String getDuplicateCopyPropertySearchQuery(DuplicateCopySearchCriteria criteria,
+			List<Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(DUPLICATE_COPY_SEARCH_QUERY);
 

@@ -56,4 +56,15 @@ public class OwnershipTransferService {
 		return owners;
 	}
 
+	public List<Owner> updateOwnershipTransfer(OwnershipTransferRequest request) {
+//		List<Owner> owners = repository.searchOwnershipTransfer(criteria);
+//		enrichmentService.enrichCreateOwnershipTransfer(request, propertyFromSearch);
+		List<Owner> ownersFromSearch = propertyValidator.validateUpdateRequest(request);
+//		if (config.getIsWorkflowEnabled()) {
+//			wfIntegrator.callOwnershipTransferWorkFlow(request);
+//		}
+//		producer.push(config.getOwnershipTransferSaveTopic(), request);
+		return request.getOwners();
+	}
+
 }

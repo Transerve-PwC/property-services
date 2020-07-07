@@ -266,7 +266,7 @@ public class WorkflowIntegrator {
 			obj.put(TENANTIDKEY, wfTenantId);
 			obj.put(BUSINESSSERVICEKEY, config.getOwnershipTransferBusinessServiceValue());
 			obj.put(BUSINESSIDKEY, owner.getOwnerDetails().getApplicationNumber());
-			obj.put(ACTIONKEY, owner.getAction());
+			obj.put(ACTIONKEY, owner.getApplicationAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(AUDITDETAILSKEY, owner.getAuditDetails());
 			obj.put(COMMENTKEY, "");
@@ -317,7 +317,7 @@ public class WorkflowIntegrator {
 
 			// setting the status back to Property object from wf response
 			request.getOwners().forEach(owner -> {
-				owner.setState(idStatusMap.get(owner.getOwnerDetails().getApplicationNumber()));
+				owner.setApplicationState(idStatusMap.get(owner.getOwnerDetails().getApplicationNumber()));
 			});
 		}
 	}

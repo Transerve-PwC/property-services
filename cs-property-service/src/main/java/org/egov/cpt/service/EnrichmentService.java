@@ -29,6 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class EnrichmentService {
 
@@ -55,16 +58,21 @@ public class EnrichmentService {
 				property.setId(gen_property_id);
 				property.setAuditDetails(propertyAuditDetails);
 				property.setPropertyDetails(propertyDetail);
+				log.info("property id: " + gen_property_id);
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
 					property.getOwners().forEach(owner -> {
+						Property ownerProperty = property;
+						ownerProperty.setId(gen_property_id);
+						ownerProperty.setTransitNumber(property.getTransitNumber());
 						String gen_owner_id = UUID.randomUUID().toString();
 						owner.setId(gen_owner_id);
-						owner.setPropertyId(gen_property_id);
+						owner.setProperty(ownerProperty);
 						owner.setTenantId(property.getTenantId());
 						owner.setAuditDetails(propertyAuditDetails);
 						OwnerDetails ownerDetails = getOwnerShipDetails(owner, property, requestInfo, gen_property_id);
 						owner.setOwnerDetails(ownerDetails);
+						log.info("owner id: " + gen_owner_id);
 					});
 				}
 			});
@@ -81,6 +89,7 @@ public class EnrichmentService {
 		ownerDetails.setOwnerId(owner.getId());
 		ownerDetails.setTenantId(property.getTenantId());
 		ownerDetails.setAuditDetails(ownerAuditDetails);
+		log.info("owner detail id: " + gen_owner_details_id);
 		return ownerDetails;
 	}
 
@@ -246,7 +255,7 @@ public class EnrichmentService {
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
 		String gen_owner_details_id = UUID.randomUUID().toString();
 		ownerDetails.setId(gen_owner_details_id);
-		ownerDetails.setPropertyId(owner.getPropertyId());
+		ownerDetails.setPropertyId(owner.getProperty().getId());
 		ownerDetails.setOwnerId(gen_owner_id);
 		ownerDetails.setAuditDetails(propertyAuditDetails);
 		owner.setTenantId(foundProperty.getTenantId());

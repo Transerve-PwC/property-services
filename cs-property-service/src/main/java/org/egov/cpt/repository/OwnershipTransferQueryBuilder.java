@@ -24,11 +24,14 @@ public class OwnershipTransferQueryBuilder {
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
-	private static final String SEARCH_QUERY = SELECT + "ownership.*,od.*,"
+	private static final String SEARCH_QUERY = SELECT + "pt.*,ownership.*,od.*,"
+
+			+ " pt.id as pid, pt.transit_number,"
 
 			+ " ownership.id as oid, ownership.property_id as oproperty_id,"
 			+ " ownership.tenantid as otenantid, ownership.allotmen_number as oallotmen_number,"
-			+ " ownership.application_status as oapplication_status, ownership.active_state as oactive_state, ownership.is_primary_owner as ois_primary_owner,"
+			+ " ownership.active_state as oactive_state, ownership.is_primary_owner as ois_primary_owner,"
+			+ " ownership.application_state, ownership.application_action,"
 			+ " ownership.created_by as ocreated_by, ownership.created_date as ocreated_date, ownership.modified_by as omodified_by, ownership.modified_date as omodified_date,"
 
 			+ " od.id as odid, od.property_id as odproperty_id," + " od.owner_id odowner_id, od.tenantid as odtenantid,"
@@ -37,8 +40,12 @@ public class OwnershipTransferQueryBuilder {
 			+ " od.monthly_rent, od.revision_period, od.revision_percentage, od.father_or_husband, od.relation,"
 			+ " od.relation_with_deceased_allottee, od.date_of_death_allottee, od.application_number, od.application_type, od.permanent"
 
-			+ " FROM cs_pt_ownership_v1 ownership " + INNER_JOIN
-			+ " cs_pt_ownershipdetails_v1 od ON ownership.id=od.owner_id ";
+//			+ " FROM cs_pt_ownership_v1 ownership " + INNER_JOIN
+//			+ " cs_pt_ownershipdetails_v1 od ON ownership.id=od.owner_id ";
+
+			+ " FROM cs_pt_property_v1 pt " 
+			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
+			+ " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id ";
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
 			OwnershipTransferSearchCriteria criteria) {

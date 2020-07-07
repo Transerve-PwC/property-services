@@ -63,19 +63,17 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, application_status, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
       - jsonPath: $.Properties.*.owners.*.id
 
-      - jsonPath: $.Properties.*.owners.*.propertyId
-      
-      - jsonPath: $.Properties.*.tenantId
-      
-      - jsonPath: $.Properties.*.owners.*.allotmenNumber
+      - jsonPath: $.Properties.*.owners.*.property.id
 
-      - jsonPath: $.Properties.*.owners.*.applicationStatus
+      - jsonPath: $.Properties.*.tenantId
+
+      - jsonPath: $.Properties.*.owners.*.allotmenNumber
 
       - jsonPath: $.Properties.*.owners.*.activeState
 
@@ -88,7 +86,6 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.auditDetails.createdTime
 
       - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
-  
   
     - query: INSERT INTO cs_pt_ownershipdetails_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.owners.*.ownerDetails
@@ -267,7 +264,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, application_status, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
@@ -278,8 +275,6 @@ serviceMaps:
       - jsonPath: $.Properties.*.tenantId
 
       - jsonPath: $.Properties.*.owners.*.allotmenNumber
-
-      - jsonPath: $.Properties.*.owners.*.applicationStatus
 
       - jsonPath: $.Properties.*.owners.*.activeState
 
@@ -409,15 +404,13 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.transitNumber
 
 
-    - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, allotmen_number=?, application_status=?, active_state=?, is_primary_owner=?, modified_by=?, modified_date=? where id=? AND property_id=?;
+    - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, allotmen_number=?, active_state=?, is_primary_owner=?, modified_by=?, modified_date=? where id=? AND property_id=?;
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
       - jsonPath: $.Properties.*.tenantId
       
       - jsonPath: $.Properties.*.owners.*.allotmenNumber
-
-      - jsonPath: $.Properties.*.owners.*.applicationStatus
 
       - jsonPath: $.Properties.*.owners.*.activeState
 
@@ -534,7 +527,7 @@ serviceMaps:
     isTransaction: true
     queryMaps:
 
-    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, application_status, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, application_state, application_action, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Owners.*
       jsonMaps:
 
@@ -546,7 +539,9 @@ serviceMaps:
       
       - jsonPath: $.Owners.*.allotmenNumber
 
-      - jsonPath: $.wners.*.applicationStatus
+      - jsonPath: $.wners.*.applicationState
+      
+      - jsonPath: $.wners.*.applicationAction
 
       - jsonPath: $.Owners.*.activeState
 
@@ -622,7 +617,7 @@ serviceMaps:
       - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
       
       
-    - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, application_status, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, application_state, application_action, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Owners.*
       jsonMaps:
 
@@ -634,7 +629,9 @@ serviceMaps:
       
       - jsonPath: $.Owners.*.allotmenNumber
 
-      - jsonPath: $.wners.*.applicationStatus
+      - jsonPath: $.wners.*.applicationState
+      
+      - jsonPath: $.wners.*.applicationAction
 
       - jsonPath: $.Owners.*.activeState
 
