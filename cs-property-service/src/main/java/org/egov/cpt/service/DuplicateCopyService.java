@@ -7,8 +7,6 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
-import org.egov.cpt.models.Property;
-import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.validator.PropertyValidator;
@@ -39,8 +37,8 @@ public class DuplicateCopyService {
 	
 
 	public List<DuplicateCopy> createApplication(DuplicateCopyRequest duplicateCopyRequest) {
-		propertyValidator.validateDuplicateCopyCreateRequest(duplicateCopyRequest); 
 		propertyValidator.isPropertyExist(duplicateCopyRequest);
+		propertyValidator.validateDuplicateCopyCreateRequest(duplicateCopyRequest); 
 		enrichmentService.enrichDuplicateCopyCreateRequest(duplicateCopyRequest);
 		propertyValidator.validateDuplicateCreate(duplicateCopyRequest);
 		if (config.getIsWorkflowEnabled()) {
@@ -52,16 +50,16 @@ public class DuplicateCopyService {
 
 	public List<DuplicateCopy> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
 		propertyValidator.validateDuplicateCopySearch(requestInfo,criteria);
-//	    enrichmentService.enrichSearchCriteria(requestInfo,criteria);
+//	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
 		List<DuplicateCopy> properties = getApplication(criteria, requestInfo);
 		return properties;
 	}
 
 	private List<DuplicateCopy> getApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
-		 List<DuplicateCopy> properties = repository.getDuplicateCopyProperties(criteria);
-	        if(properties.isEmpty())
+		 List<DuplicateCopy> application = repository.getDuplicateCopyProperties(criteria);
+	        if(application.isEmpty())
 	            return Collections.emptyList();
-	        return properties;
+	        return application;
 	}
 
 	public List<DuplicateCopy> updateApplication(DuplicateCopyRequest duplicateCopyRequest) {

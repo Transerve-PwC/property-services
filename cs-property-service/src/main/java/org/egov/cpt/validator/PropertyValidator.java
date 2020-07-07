@@ -573,13 +573,28 @@ public class PropertyValidator {
 	public void validateDuplicateCreate(DuplicateCopyRequest duplicateCopyRequest) {
 		// valideDates(request, mdmsData);
 		// propertyValidator.validateProperty(request);
-		// validatePTSpecificNotNullFields(duplicateCopyRequest);
+		validateDCSpecificNotNullFields(duplicateCopyRequest);
 		validateDuplicateDocuments(duplicateCopyRequest);
 
 	}
 
-	private void validateTLSpecificNotNullFields(DuplicateCopyRequest duplicateCopyRequest) {
+	private void validateDCSpecificNotNullFields(DuplicateCopyRequest request) {
+		request.getDuplicateCopyApplications().forEach(application -> {
+            Map<String, String> errorMap = new HashMap<>();
+            if (application.getApplicant().get(0).getName() == null)
+                errorMap.put("NULL_NAME", " Applicant name cannot be null");
+            if (application.getApplicant().get(0).getGuardian() == null)
+                errorMap.put("NULL_GUARDIAN", " Applicant Father/husband name cannot be null");
+            if (application.getApplicant().get(0).getPhone() == null)
+                errorMap.put("NULL_MOBILENUMBER", " Mobile Number cannot be null");
+            if (application.getTenantId()==null)
+                errorMap.put("NULL_TENANT", " Tenant Id cannot be null");
+            if(application.getPropertyId()==null)
+            	errorMap.put("NULL_PROPERTYID", "PropertyId cannot be null");
 
+            if (!errorMap.isEmpty())
+                throw new CustomException(errorMap);
+        });
 	}
 
 	private void validateDuplicateDocuments(DuplicateCopyRequest request) {
@@ -599,7 +614,7 @@ public class PropertyValidator {
 
 	public void validateDuplicateUpdate(DuplicateCopyRequest duplicateCopyRequest) {
 		validateDuplicateDocuments(duplicateCopyRequest);
-//		validatePTSpecificNotNullFields(duplicateCopyRequest);
+		validateDCSpecificNotNullFields(duplicateCopyRequest);
 	}
 
 	public List<Property> isPropertyExist(DuplicateCopyRequest duplicateCopyRequest) {
@@ -622,9 +637,10 @@ public class PropertyValidator {
 					propertyCriteria.setTransitNumber(application.getTransitNumber());
 				if (application.getColony() != null)
 					propertyCriteria.setColony(application.getColony());
-				if (application.getPropertyId() != null) {
+				if (application.getPropertyId() != null) 
 					propertyCriteria.setPropertyId(application.getPropertyId());
-				}
+				if (application.getApplicant().get(0).getName() != null)
+					propertyCriteria.setName(application.getApplicant().get(0).getName());
 			});
 		}
 		return propertyCriteria;
