@@ -58,8 +58,10 @@ public class PropertyQueryBuilder {
 //			+ " WHERE "
 	;
 
-	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,"
+	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,pt.*,"
 			+ " dca.id as appid, dca.property_id, dca.tenantid as pttenantid, dca.state, dca.action,dca.application_number as app_number,"
+			
+			+ " pt.id as pid, pt.transit_number,"
 
 			+ " ap.id as aid, ap.application_id as app_id,ap.tenantid as aptenantid,"
 			+ " ap.name,ap.email,ap.mobileno,ap.guardian,ap.relationship,ap.aadhaar_number as adhaarnumber,"
@@ -68,6 +70,7 @@ public class PropertyQueryBuilder {
 			+ " doc.application_id as doc_applid , doc.active as doc_active"
 
 			+ " FROM cs_pt_duplicate_ownership_application dca " + INNER_JOIN
+			+ " cs_pt_property_v1 pt on dca.property_id=pt.id "+ INNER_JOIN
 			+ " cs_pt_duplicatecopy_applicant ap ON dca.id =ap.application_id " + LEFT_JOIN
 			+ " cs_pt_duplicatecopy_document doc ON doc.application_id =  dca.id";
 
@@ -191,6 +194,11 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("dca.id=?");
 			preparedStmtList.add(criteria.getAppId());
+		}
+		if (null != criteria.getTransitNumber()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("pt.transit_number=?");
+			preparedStmtList.add(criteria.getTransitNumber());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
