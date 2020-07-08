@@ -10,6 +10,7 @@ import java.util.Map;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
+import org.egov.cpt.models.OwnershipTransferDocument;
 import org.egov.cpt.models.Property;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -64,8 +65,20 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 
 				ownerMap.put(ownerId, currentOwner);
 			}
+			addChildrenToProperty(rs, currentOwner);
 		}
 		return new ArrayList<>(ownerMap.values());
+	}
+
+	private void addChildrenToProperty(ResultSet rs, Owner owner) throws SQLException {
+		if (rs.getString("docid") != null && rs.getBoolean("docis_active")) {
+			OwnershipTransferDocument ownershipTransferDocument = OwnershipTransferDocument.builder()
+					.id(rs.getString("docid")).ownerId(rs.getString("docowner_id"))
+					.tenantId(rs.getString("doctenantid")).active(rs.getBoolean("docis_active"))
+					.documentType(rs.getString("document_type")).fileStoreId(rs.getString("fileStore_id"))
+					.documentUid(rs.getString("document_uid")).build();
+			owner.getOwnerDetails().addownershipTransferDocumentsItem(ownershipTransferDocument);
+		}
 	}
 
 }

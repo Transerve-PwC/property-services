@@ -15,6 +15,7 @@ import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
+import org.egov.cpt.models.OwnershipTransferDocument;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.UserDetailResponse;
@@ -254,14 +255,35 @@ public class EnrichmentService {
 		AuditDetails updateAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 		if (!CollectionUtils.isEmpty(request.getOwners())) {
 			request.getOwners().forEach(owner -> {
+				List<OwnershipTransferDocument> ownershipTransferDocuments = updateOwnershipTransferDocs(owner,
+						requestInfo);
 				AuditDetails modifyAuditDetails = owner.getAuditDetails();
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
 				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
 
 				owner.setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
+				owner.getOwnerDetails().setOwnershipTransferDocuments(ownershipTransferDocuments);
 			});
 		}
+	}
+
+	private List<OwnershipTransferDocument> updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
+		List<OwnershipTransferDocument> ownershipTransferDocuments = owner.getOwnerDetails()
+				.getOwnershipTransferDocuments();
+		if (!CollectionUtils.isEmpty(ownershipTransferDocuments)) {
+			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+			ownershipTransferDocuments.forEach(document -> {
+				if (document.getId() == null) {
+					String gen_doc_id = UUID.randomUUID().toString();
+					document.setId(gen_doc_id);
+					document.setOwnerId(owner.getId());
+					document.setTenantId(owner.getTenantId());
+				}
+				document.setAuditDetails(docAuditDetails);
+			});
+		}
+		return ownershipTransferDocuments;
 	}
 
 	private OwnerDetails updateOwnerShipDetails(Owner owner, Property foundProperty, RequestInfo requestInfo,
