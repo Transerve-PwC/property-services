@@ -10,6 +10,7 @@ import org.egov.cpt.models.OwnershipTransferSearchCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.OwnershipTransferRepository;
+import org.egov.cpt.service.notification.PropertyNotificationService;
 import org.egov.cpt.validator.PropertyValidator;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
@@ -37,6 +38,9 @@ public class OwnershipTransferService {
 
 	@Autowired
 	private OwnershipTransferRepository repository;
+	
+	@Autowired
+	private PropertyNotificationService propertyNotificationService;
 
 	public List<Owner> createOwnershipTransfer(OwnershipTransferRequest request) {
 //		propertyValidator.validateCreateRequest(request); // TODO add validations as per requirement
@@ -63,6 +67,7 @@ public class OwnershipTransferService {
 			wfIntegrator.callOwnershipTransferWorkFlow(request);
 		}
 		producer.push(config.getOwnershipTransferUpdateTopic(), request);
+		propertyNotificationService.process(request);
 		return request.getOwners();
 	}
 

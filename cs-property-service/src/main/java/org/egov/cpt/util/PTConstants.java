@@ -108,5 +108,27 @@ public class PTConstants {
 
 	public static final List<String> FIELDS_FOR_PROPERTY_MUTATION = Collections.unmodifiableList(
 			Arrays.asList("propertyType", "usageCategory", "ownershipCategory", "noOfFloors", "landArea"));
+	
+	//OwnershipTransfer ACTION
+	public static final String ACTION_OT_SUBMIT = "SUBMIT";
+	public static final String ACTION_OT_REJECT = "REJECT";
+	public static final String ACTION_OT_SENDBACK = "SENDBACK";
+	public static final String ACTION_OT_APPROVE = "APPROVE";
+	public static final String ACTION_OT_PAY = "PAY";
+	
+	//OwnershipTransfer STATE
+	public static final String STATE_OT_PENDING_CLARIFICATION = "PENDINGCLARIFICATION";
+	public static final String STATE_OT_INITIATED = "INITIATED";
+	public static final String STATE_OT_APPROVED = "APPROVED";
+	
+	//OwnershipTransfer RoleCodes
+	public static final String ROLE_OT_CLERK= "CTL_CLERK";
+	public static final String ROLE_OT_JA= "CTL_JA";
+	
+	//OwnershipTransfer Notifications
+	public static final String NOTIFICATION_OT_CREATE = "Hi {1}, Ownership Transfer request submitted sucessfully with Application Number: {2}";
+	public static final String NOTIFICATION_OT_REJECT = "Hi {1}, Your Ownership Transfer request of Application Number: {2} is been Rejected";
+	public static final String NOTIFICATION_OT_SENDBACK = "Hi {1}, Your Ownership Transfer request of Application Number: {2} is Sent Back for clarification";
+	public static final String NOTIFICATION_OT_APPROVE = "Hi {1}, Your Ownership Transfer request of Application Number: {2} is been Approved";
 
 }
