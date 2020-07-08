@@ -497,7 +497,7 @@ public class PropertyValidator {
 		validateIds(duplicateCopyRequest);
 
 		// validateIds(duplicateCopyRequest, errorMap);
-		String propertyId = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getPropertyId();
+		String propertyId = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
 				.appId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId()).propertyId(propertyId)
 				.build();
@@ -528,7 +528,7 @@ public class PropertyValidator {
 				 */
 				if (application.getApplicant().get(0).getId() == null)
 					errorMap.put("INVALID UPDATE", "Id of Applicant cannot be null");
-				if (application.getPropertyId() == null)
+				if (application.getProperty().getId() == null)
 					errorMap.put("INVALID UPDATE", "Property Id cannot be null");
 			}
 		});
@@ -589,7 +589,7 @@ public class PropertyValidator {
                 errorMap.put("NULL_MOBILENUMBER", " Mobile Number cannot be null");
             if (application.getTenantId()==null)
                 errorMap.put("NULL_TENANT", " Tenant Id cannot be null");
-            if(application.getPropertyId()==null)
+            if(application.getProperty().getId()==null)
             	errorMap.put("NULL_PROPERTYID", "PropertyId cannot be null");
 
             if (!errorMap.isEmpty())
@@ -633,12 +633,12 @@ public class PropertyValidator {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		if (!CollectionUtils.isEmpty(request.getDuplicateCopyApplications())) {
 			request.getDuplicateCopyApplications().forEach(application -> {
-				if (application.getTransitNumber() != null)
-					propertyCriteria.setTransitNumber(application.getTransitNumber());
-				if (application.getColony() != null)
-					propertyCriteria.setColony(application.getColony());
-				if (application.getPropertyId() != null) 
-					propertyCriteria.setPropertyId(application.getPropertyId());
+				if (application.getProperty().getTransitNumber() != null)
+					propertyCriteria.setTransitNumber(application.getProperty().getTransitNumber());
+				if (application.getProperty().getColony() != null)
+					propertyCriteria.setColony(application.getProperty().getColony());
+				if (application.getProperty().getId() != null) 
+					propertyCriteria.setPropertyId(application.getProperty().getId());
 				if (application.getApplicant().get(0).getName() != null)
 					propertyCriteria.setName(application.getApplicant().get(0).getName());
 			});

@@ -22,6 +22,7 @@ import org.egov.cpt.models.Idgen.IdResponse;
 import org.egov.cpt.repository.IdGenRepository;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
+import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
@@ -338,29 +339,8 @@ public class EnrichmentService {
 			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
 				String gen_application_id = UUID.randomUUID().toString();
 				application.setId(gen_application_id);
+				application.setPropertyId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
 				application.setAuditDetails(propertyAuditDetails);
-
-				/*
-				 * if (property.getPropertyDetails().getAddress()!=null){ Address address =
-				 * property.getPropertyDetails().getAddress();
-				 * address.setId(UUID.randomUUID().toString());
-				 * address.setTransitNumber(property.getTransitNumber());
-				 * address.setPropertyId(gen_property_id);
-				 * address.setTenantId(property.getTenantId()); //
-				 * address.setColony(property.getColony()); //
-				 * address.setAuditDetails(propertyAuditDetails);
-				 * 
-				 * }
-				 */
-
-				/*
-				 * PropertyDetails propertyDetail = new PropertyDetails(); String
-				 * gen_property_details_id = UUID.randomUUID().toString();
-				 * propertyDetail.setId(gen_property_details_id);
-				 * propertyDetail.setPropertyId(gen_property_id);
-				 * 
-				 * property.setPropertyDetails(propertyDetail);
-				 */
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {
@@ -431,4 +411,5 @@ public class EnrichmentService {
 		}
 
 	}
+
 }
