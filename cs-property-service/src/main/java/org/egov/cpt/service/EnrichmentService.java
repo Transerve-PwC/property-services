@@ -23,7 +23,6 @@ import org.egov.cpt.models.Idgen.IdResponse;
 import org.egov.cpt.repository.IdGenRepository;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
-import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
