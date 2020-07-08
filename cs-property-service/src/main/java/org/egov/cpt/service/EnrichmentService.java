@@ -15,6 +15,7 @@ import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
+import org.egov.cpt.models.OwnershipTransferDocument;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.UserDetailResponse;
@@ -254,14 +255,35 @@ public class EnrichmentService {
 		AuditDetails updateAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 		if (!CollectionUtils.isEmpty(request.getOwners())) {
 			request.getOwners().forEach(owner -> {
+				List<OwnershipTransferDocument> ownershipTransferDocuments = updateOwnershipTransferDocs(owner,
+						requestInfo);
 				AuditDetails modifyAuditDetails = owner.getAuditDetails();
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
 				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
 
 				owner.setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
+				owner.getOwnerDetails().setOwnershipTransferDocuments(ownershipTransferDocuments);
 			});
 		}
+	}
+
+	private List<OwnershipTransferDocument> updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
+		List<OwnershipTransferDocument> ownershipTransferDocuments = owner.getOwnerDetails()
+				.getOwnershipTransferDocuments();
+		if (!CollectionUtils.isEmpty(ownershipTransferDocuments)) {
+			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+			ownershipTransferDocuments.forEach(document -> {
+				if (document.getId() == null) {
+					String gen_doc_id = UUID.randomUUID().toString();
+					document.setId(gen_doc_id);
+					document.setOwnerId(owner.getId());
+					document.setTenantId(owner.getTenantId());
+				}
+				document.setAuditDetails(docAuditDetails);
+			});
+		}
+		return ownershipTransferDocuments;
 	}
 
 	private OwnerDetails updateOwnerShipDetails(Owner owner, Property foundProperty, RequestInfo requestInfo,
@@ -338,29 +360,8 @@ public class EnrichmentService {
 			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
 				String gen_application_id = UUID.randomUUID().toString();
 				application.setId(gen_application_id);
+				application.setPropertyId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
 				application.setAuditDetails(propertyAuditDetails);
-
-				/*
-				 * if (property.getPropertyDetails().getAddress()!=null){ Address address =
-				 * property.getPropertyDetails().getAddress();
-				 * address.setId(UUID.randomUUID().toString());
-				 * address.setTransitNumber(property.getTransitNumber());
-				 * address.setPropertyId(gen_property_id);
-				 * address.setTenantId(property.getTenantId()); //
-				 * address.setColony(property.getColony()); //
-				 * address.setAuditDetails(propertyAuditDetails);
-				 * 
-				 * }
-				 */
-
-				/*
-				 * PropertyDetails propertyDetail = new PropertyDetails(); String
-				 * gen_property_details_id = UUID.randomUUID().toString();
-				 * propertyDetail.setId(gen_property_details_id);
-				 * propertyDetail.setPropertyId(gen_property_id);
-				 * 
-				 * property.setPropertyDetails(propertyDetail);
-				 */
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {
@@ -431,4 +432,5 @@ public class EnrichmentService {
 		}
 
 	}
+
 }
