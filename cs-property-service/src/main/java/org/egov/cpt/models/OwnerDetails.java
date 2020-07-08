@@ -1,5 +1,6 @@
 package org.egov.cpt.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -129,4 +130,18 @@ public class OwnerDetails {
 
 	@JsonProperty("permanent")
 	private Boolean permanent;
+
+	@Valid
+	@JsonProperty("ownershipTransferDocuments")
+	private List<OwnershipTransferDocument> ownershipTransferDocuments;
+
+	public OwnerDetails addownershipTransferDocumentsItem(OwnershipTransferDocument ownershipTransferDocumentsItem) {
+		if (this.ownershipTransferDocuments == null) {
+			this.ownershipTransferDocuments = new ArrayList<>();
+		}
+		if (!this.ownershipTransferDocuments.contains(ownershipTransferDocumentsItem))
+			this.ownershipTransferDocuments.add(ownershipTransferDocumentsItem);
+		return this;
+	}
+
 }

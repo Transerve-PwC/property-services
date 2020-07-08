@@ -24,7 +24,7 @@ public class OwnershipTransferQueryBuilder {
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
-	private static final String SEARCH_QUERY = SELECT + "pt.*,ownership.*,od.*,"
+	private static final String SEARCH_QUERY = SELECT + "pt.*,ownership.*,od.*,doc.*,"
 
 			+ " pt.id as pid, pt.transit_number,"
 
@@ -38,14 +38,15 @@ public class OwnershipTransferQueryBuilder {
 			+ " od.name, od.email, od.phone," + " od.gender, od.date_of_birth, od.aadhaar_number,"
 			+ " od.allotment_startdate, od.allotment_enddate," + " od.posession_startdate, od.posession_enddate,"
 			+ " od.monthly_rent, od.revision_period, od.revision_percentage, od.father_or_husband, od.relation,"
-			+ " od.relation_with_deceased_allottee, od.date_of_death_allottee, od.application_number, od.application_type, od.permanent"
+			+ " od.relation_with_deceased_allottee, od.date_of_death_allottee, od.application_number, od.application_type, od.permanent,"
 
-//			+ " FROM cs_pt_ownership_v1 ownership " + INNER_JOIN
-//			+ " cs_pt_ownershipdetails_v1 od ON ownership.id=od.owner_id ";
+			+ " doc.id as docid, doc.owner_id as docowner_id, doc.tenantid as doctenantid,"
+			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id, doc.document_uid"
 
 			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN
 			+ " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
-			+ " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id ";
+			+ " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
+			+ " cs_pt_ot_documents_v1 doc ON ownership.id=doc.owner_id ";
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
 			OwnershipTransferSearchCriteria criteria) {
