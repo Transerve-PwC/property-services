@@ -5,11 +5,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
+import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
@@ -320,5 +323,80 @@ public class WorkflowIntegrator {
 				owner.setApplicationState(idStatusMap.get(owner.getOwnerDetails().getApplicationNumber()));
 			});
 		}
+	}
+
+	public void callMortgageWorkFlow(MortgageRequest request) {
+		String wfTenantId = request.getMortgageApplications().get(0).getTenantId();
+		JSONArray array = new JSONArray();
+		for (Mortgage application : request.getMortgageApplications()) {
+			JSONObject obj = new JSONObject();
+			List<Map<String, String>> uuidmaps = new LinkedList<>();
+			if (!CollectionUtils.isEmpty(application.getApplicant())) {
+				application.getApplicant().forEach(owners -> {
+					Map<String, String> uuidMap = new HashMap<>();
+					uuidMap.put(UUIDKEY, owners.getId());
+					uuidmaps.add(uuidMap);
+				});
+			}
+			obj.put(TENANTIDKEY, wfTenantId);
+			obj.put(BUSINESSSERVICEKEY, config.getMortgageBusinessServiceValue());
+			obj.put(BUSINESSIDKEY, application.getApplicationNumber());
+			obj.put(ACTIONKEY, application.getAction());
+			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
+			obj.put(AUDITDETAILSKEY, application.getAuditDetails());
+			obj.put(COMMENTKEY, "");
+
+			array.add(obj);
+		}
+		Map<String, String> idStatusMap = callCommonWorkflow(array,request.getRequestInfo());
+
+		// setting the status back to Property object from wf response
+		request.getMortgageApplications().forEach(application -> 
+		application.setState(idStatusMap.get(application.getApplicationNumber())));
+	}
+
+	private Map<String, String> callCommonWorkflow(JSONArray array,RequestInfo requestInfo) {
+		Map<String, String> idStatusMap = new HashMap<>();
+		if (!array.isEmpty()) {
+			JSONObject workFlowRequest = new JSONObject();
+			workFlowRequest.put(REQUESTINFOKEY, requestInfo);
+			workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);
+			String response = null;
+			try {
+				response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest,
+						String.class);
+			} catch (HttpClientErrorException e) {
+
+				/*
+				 * extracting message from client error exception
+				 */
+				DocumentContext responseContext = JsonPath.parse(e.getResponseBodyAsString());
+				List<Object> errros = null;
+				try {
+					errros = responseContext.read("$.Errors");
+				} catch (PathNotFoundException pnfe) {
+					log.error("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
+							" Unable to read the json path in error object : " + pnfe.getMessage());
+					throw new CustomException("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
+							" Unable to read the json path in error object : " + pnfe.getMessage());
+				}
+				throw new CustomException("EG_WF_ERROR", errros.toString());
+			} catch (Exception e) {
+				throw new CustomException("EG_WF_ERROR",
+						" Exception occured while integrating with workflow : " + e.getMessage());
+			}
+
+			/*
+			 * on success result from work-flow read the data and set the status back to
+			 * Property object
+			 */
+			DocumentContext responseContext = JsonPath.parse(response);
+			List<Map<String, Object>> responseArray = responseContext.read(PROCESSINSTANCESJOSNKEY);
+			responseArray.forEach(object -> {
+				DocumentContext instanceContext = JsonPath.parse(object);
+				idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
+			});
+		}
+		return idStatusMap;
 	}
 }
