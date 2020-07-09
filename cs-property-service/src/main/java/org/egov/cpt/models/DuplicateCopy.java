@@ -35,15 +35,10 @@ public class DuplicateCopy {
 	@JsonProperty("id")
 	private String id;
 	
-	@JsonProperty("transitNumber")
-	private String transitNumber;
+	@Valid
+	@JsonProperty("property")
+	private Property property;
 	
-	@JsonProperty("colony")
-	private String colony;
-
-	@JsonProperty("propertyId")
-	private String propertyId;
-
 	@JsonProperty("tenantId")
 	private String tenantId;
 
@@ -55,6 +50,10 @@ public class DuplicateCopy {
 	
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
+	
+	@Valid
+	@JsonProperty("propertyId")
+	private String propertyId;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;

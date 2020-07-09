@@ -7,7 +7,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-    - query: INSERT INTO cs_pt_duplicate_ownership_application (id, property_id, tenantid, state, action, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_duplicate_ownership_application (id, property_id, tenantid, state, action,application_number, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: DuplicateCopyApplications.*
       jsonMaps:
 
@@ -20,6 +20,8 @@ serviceMaps:
       - jsonPath: $.DuplicateCopyApplications.*.state
 
       - jsonPath: $.DuplicateCopyApplications.*.action 
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationNumber
       
       - jsonPath: $.DuplicateCopyApplications.*.auditDetails.createdBy
 

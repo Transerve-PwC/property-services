@@ -12,6 +12,7 @@ import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopyDocument;
+import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -45,7 +46,6 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 
 				currentapplication = DuplicateCopy.builder()
 						.id(applicationId)
-						.propertyId(rs.getString("property_id"))
 						.tenantId(rs.getString("tenantid"))
 						.state(rs.getString("state"))
 						.action(rs.getString("action"))
@@ -86,6 +86,14 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 				currentapplication.setApplicant(new ArrayList<>(applicantMap.values()));
 			}
 		}
+		
+		if(currentapplication.getProperty()==null){
+			Property property = Property.builder()
+					.id(rs.getString("property_id"))
+					.transitNumber(rs.getString("transit_number"))
+					.build();
+			currentapplication.setProperty(property);
+		}
 
 
 		if(rs.getString("docId")!=null && rs.getBoolean("doc_active")) {
@@ -99,18 +107,6 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 					.build();
 			currentapplication.addApplicationDocumentsItem(applicationDocument);
 		}
-
-		/*if(rs.getString("adid")!=null) {
-			Address address = Address.builder()
-					.id(rs.getString("adid"))
-					.propertyId(rs.getString("aproperty_id"))
-					.transitNumber(rs.getString("atransit_number"))
-					.tenantId(rs.getString("atenantid"))
-					.area(rs.getString("addressArea"))
-					.pincode(rs.getString("pincode"))
-					.auditDetails(auditDetails).build();
-			currentProperty.getPropertyDetails().setAddress(address);
-		}*/
 
 	}
 
