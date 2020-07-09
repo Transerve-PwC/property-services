@@ -31,163 +31,177 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 
-public class User   {
-	
-        @JsonProperty("id")
-        private Long id;
+public class User {
 
-        @Size(max=64)
-        @JsonProperty("uuid")
-        private String uuid;
+	@JsonProperty("id")
+	private Long id;
 
-        @Size(max=64)
-        @JsonProperty("userName")
-        private String userName;
+	@Size(max = 64)
+	@JsonProperty("uuid")
+	private String uuid;
 
-        @Size(max=64)
-        @JsonProperty("password")
-        private String password;
+	@Size(max = 64)
+	@JsonProperty("userName")
+	private String userName;
 
-        @JsonProperty("salutation")
-        private String salutation;
+	@Size(max = 64)
+	@JsonProperty("password")
+	private String password;
 
-        @NotNull
-        @Size(max=100)
-        @Pattern(regexp = "^[a-zA-Z0-9 \\-'`\\.]*$", message = "Invalid name. Only alphabets and special characters -, ',`, .")
-        @JsonProperty("name")
-        private String name;
+	@JsonProperty("salutation")
+	private String salutation;
 
-        @JsonProperty("gender")
-        private String gender;
+	@NotNull
+	@Size(max = 100)
+	@Pattern(regexp = "^[a-zA-Z0-9 \\-'`\\.]*$", message = "Invalid name. Only alphabets and special characters -, ',`, .")
+	@JsonProperty("name")
+	private String name;
 
-        @JsonProperty("mobileNumber")
-        private String mobileNumber;
+	@JsonProperty("gender")
+	private String gender;
 
-        @Size(max=128)
-        @JsonProperty("emailId")
-        private String emailId;
+	@JsonProperty("mobileNumber")
+	private String mobileNumber;
 
-        @Size(max=50)
-        @JsonProperty("altContactNumber")
-        private String altContactNumber;
+	@Size(max = 128)
+	@JsonProperty("emailId")
+	private String emailId;
 
-        @Size(max=10)
-        @JsonProperty("pan")
-        private String pan;
+	@Size(max = 50)
+	@JsonProperty("altContactNumber")
+	private String altContactNumber;
 
-        @Pattern(regexp = "^[0-9]{12}$", message = "AdharNumber should be 12 digit number")
-        @JsonProperty("aadhaarNumber")
-        private String aadhaarNumber;
+	@Size(max = 10)
+	@JsonProperty("pan")
+	private String pan;
 
-        @Size(max=300)
-        @JsonProperty("permanentAddress")
-        private String permanentAddress;
+	@Pattern(regexp = "^[0-9]{12}$", message = "AdharNumber should be 12 digit number")
+	@JsonProperty("aadhaarNumber")
+	private String aadhaarNumber;
 
-        @Size(max=300)
-        @JsonProperty("permanentCity")
-        private String permanentCity;
+	@Size(max = 300)
+	@JsonProperty("permanentAddress")
+	private String permanentAddress;
 
-        @Size(max=10)
-        @JsonProperty("permanentPinCode")
-        private String permanentPincode;
+	@Size(max = 300)
+	@JsonProperty("permanentCity")
+	private String permanentCity;
 
-        @Size(max=300)
-        @JsonProperty("correspondenceCity")
-        private String correspondenceCity;
+	@Size(max = 10)
+	@JsonProperty("permanentPinCode")
+	private String permanentPincode;
 
-        @Size(max=10)
-        @JsonProperty("correspondencePinCode")
-        private String correspondencePincode;
+	@Size(max = 300)
+	@JsonProperty("correspondenceCity")
+	private String correspondenceCity;
 
-        @Size(max=300)
-        @JsonProperty("correspondenceAddress")
-        private String correspondenceAddress;
+	@Size(max = 10)
+	@JsonProperty("correspondencePinCode")
+	private String correspondencePincode;
 
-        @JsonProperty("active")
-        private Boolean active;
+	@Size(max = 300)
+	@JsonProperty("correspondenceAddress")
+	private String correspondenceAddress;
 
-        @JsonProperty("dob")
-        private Long dob;
+	@JsonProperty("active")
+	private Boolean active;
 
-        @JsonProperty("pwdExpiryDate")
-        private Long pwdExpiryDate;
+	@JsonProperty("dob")
+	private Long dob;
 
-        @Size(max=16)
-        @JsonProperty("locale")
-        private String locale;
+	@JsonProperty("pwdExpiryDate")
+	private Long pwdExpiryDate;
 
-        @Size(max=50)
-        @JsonProperty("type")
-        private String type;
+	@Size(max = 16)
+	@JsonProperty("locale")
+	private String locale;
 
-        @Size(max=36)
-        @JsonProperty("signature")
-        private String signature;
+	@Size(max = 50)
+	@JsonProperty("type")
+	private String type;
 
-        @JsonProperty("accountLocked")
-        private Boolean accountLocked;
+	@Size(max = 36)
+	@JsonProperty("signature")
+	private String signature;
 
-        @JsonProperty("roles")
-        @Valid
-        private List<Role> roles;
+	@JsonProperty("accountLocked")
+	private Boolean accountLocked;
 
-        @Size(max=100)
-        @JsonProperty("fatherOrHusbandName")
-        private String fatherOrHusbandName;
+	@JsonProperty("roles")
+	@Valid
+	private List<Role> roles;
 
-        @Size(max=32)
-        @JsonProperty("bloodGroup")
-        private String bloodGroup;
+	@Size(max = 100)
+	@JsonProperty("fatherOrHusbandName")
+	private String fatherOrHusbandName;
 
-        @Size(max=300)
-        @JsonProperty("identificationMark")
-        private String identificationMark;
+	@Size(max = 32)
+	@JsonProperty("bloodGroup")
+	private String bloodGroup;
 
-        @Size(max=36)
-        @JsonProperty("photo")
-        private String photo;
+	@Size(max = 300)
+	@JsonProperty("identificationMark")
+	private String identificationMark;
 
-        @Size(max=64)
-        @JsonProperty("createdBy")
-        private String createdBy;
+	@Size(max = 36)
+	@JsonProperty("photo")
+	private String photo;
 
-        @JsonProperty("createdDate")
-        private Long createdDate;
+	@Size(max = 64)
+	@JsonProperty("createdBy")
+	private String createdBy;
 
-        @Size(max=64)
-        @JsonProperty("lastModifiedBy")
-        private String lastModifiedBy;
+	@JsonProperty("createdDate")
+	private Long createdDate;
 
-        @JsonProperty("lastModifiedDate")
-        private Long lastModifiedDate;
+	@Size(max = 64)
+	@JsonProperty("lastModifiedBy")
+	private String lastModifiedBy;
 
-        @Size(max=256)
-        @JsonProperty("tenantId")
-        private String tenantId;
+	@JsonProperty("lastModifiedDate")
+	private Long lastModifiedDate;
 
+	@Size(max = 256)
+	@JsonProperty("tenantId")
+	private String tenantId;
 
-        public User addRolesItem(Role rolesItem) {
-            if (this.roles == null) {
-            this.roles = new ArrayList<>();
-            }
-        this.roles.add(rolesItem);
-        return this;
-        }
+	public User addRolesItem(Role rolesItem) {
+		if (this.roles == null) {
+			this.roles = new ArrayList<>();
+		}
+		this.roles.add(rolesItem);
+		return this;
+	}
 
-        @Override
-        public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                User user = (User) o;
-                return Objects.equals(uuid, user.uuid) &&
-                        Objects.equals(name, user.name) &&
-                        Objects.equals(mobileNumber, user.mobileNumber);
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		User user = (User) o;
+		return Objects.equals(uuid, user.uuid) && Objects.equals(name, user.name)
+				&& Objects.equals(mobileNumber, user.mobileNumber);
+	}
 
-        @Override
-        public int hashCode() {
+	@Override
+	public int hashCode() {
 
-                return Objects.hash(uuid, name, mobileNumber);
-        }
+		return Objects.hash(uuid, name, mobileNumber);
+	}
+
+	public org.egov.common.contract.request.User toCommonUser() {
+		org.egov.common.contract.request.User commonUser = new org.egov.common.contract.request.User();
+		commonUser.setId(this.getId());
+		commonUser.setUserName(this.getUserName());
+		commonUser.setName(this.getName());
+		commonUser.setType(this.getType());
+		commonUser.setMobileNumber(this.getMobileNumber());
+		commonUser.setEmailId(this.getEmailId());
+		commonUser.setRoles(this.getRoles());
+		commonUser.setTenantId(this.getTenantId());
+		commonUser.setUuid(this.getUuid());
+		return commonUser;
+	}
+
 }
-

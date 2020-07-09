@@ -11,7 +11,6 @@ import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Owner;
-import org.egov.cpt.models.OwnershipTransferSearchCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.repository.OwnershipTransferRepository;
@@ -347,7 +346,7 @@ public class PropertyValidator {
 
 		Map<String, String> errorMap = new HashMap<>();
 
-		OwnershipTransferSearchCriteria criteria = getOTSearchCriteria(request);
+		DuplicateCopySearchCriteria criteria = getOTSearchCriteria(request);
 		List<Owner> ownersFromSearchResponse = OTRepository.searchOwnershipTransfer(criteria);
 		boolean ifOwnerExists = OwnerExists(ownersFromSearchResponse);
 		if (!ifOwnerExists) {
@@ -360,8 +359,8 @@ public class PropertyValidator {
 		return ownersFromSearchResponse;
 	}
 
-	public OwnershipTransferSearchCriteria getOTSearchCriteria(OwnershipTransferRequest request) {
-		OwnershipTransferSearchCriteria searchCriteria = new OwnershipTransferSearchCriteria();
+	public DuplicateCopySearchCriteria getOTSearchCriteria(OwnershipTransferRequest request) {
+		DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
 		if (!CollectionUtils.isEmpty(request.getOwners())) {
 			request.getOwners().forEach(owner -> {
 				if (owner.getOwnerDetails().getApplicationNumber() != null)
@@ -580,21 +579,21 @@ public class PropertyValidator {
 
 	private void validateDCSpecificNotNullFields(DuplicateCopyRequest request) {
 		request.getDuplicateCopyApplications().forEach(application -> {
-            Map<String, String> errorMap = new HashMap<>();
-            if (application.getApplicant().get(0).getName() == null)
-                errorMap.put("NULL_NAME", " Applicant name cannot be null");
-            if (application.getApplicant().get(0).getGuardian() == null)
-                errorMap.put("NULL_GUARDIAN", " Applicant Father/husband name cannot be null");
-            if (application.getApplicant().get(0).getPhone() == null)
-                errorMap.put("NULL_MOBILENUMBER", " Mobile Number cannot be null");
-            if (application.getTenantId()==null)
-                errorMap.put("NULL_TENANT", " Tenant Id cannot be null");
-            if(application.getProperty().getId()==null)
-            	errorMap.put("NULL_PROPERTYID", "PropertyId cannot be null");
+			Map<String, String> errorMap = new HashMap<>();
+			if (application.getApplicant().get(0).getName() == null)
+				errorMap.put("NULL_NAME", " Applicant name cannot be null");
+			if (application.getApplicant().get(0).getGuardian() == null)
+				errorMap.put("NULL_GUARDIAN", " Applicant Father/husband name cannot be null");
+			if (application.getApplicant().get(0).getPhone() == null)
+				errorMap.put("NULL_MOBILENUMBER", " Mobile Number cannot be null");
+			if (application.getTenantId() == null)
+				errorMap.put("NULL_TENANT", " Tenant Id cannot be null");
+			if (application.getProperty().getId() == null)
+				errorMap.put("NULL_PROPERTYID", "PropertyId cannot be null");
 
-            if (!errorMap.isEmpty())
-                throw new CustomException(errorMap);
-        });
+			if (!errorMap.isEmpty())
+				throw new CustomException(errorMap);
+		});
 	}
 
 	private void validateDuplicateDocuments(DuplicateCopyRequest request) {
@@ -637,7 +636,7 @@ public class PropertyValidator {
 					propertyCriteria.setTransitNumber(application.getProperty().getTransitNumber());
 				if (application.getProperty().getColony() != null)
 					propertyCriteria.setColony(application.getProperty().getColony());
-				if (application.getProperty().getId() != null) 
+				if (application.getProperty().getId() != null)
 					propertyCriteria.setPropertyId(application.getProperty().getId());
 				if (application.getApplicant().get(0).getName() != null)
 					propertyCriteria.setName(application.getApplicant().get(0).getName());

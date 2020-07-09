@@ -50,4 +50,6 @@ public class Owner {
 	@JsonProperty("applicationAction")
 	private String applicationAction;
 
+	@JsonProperty("businessService")
+	private String businessService = "CSP"; // TODO change
 }

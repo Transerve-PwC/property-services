@@ -3,7 +3,7 @@ package org.egov.cpt.repository;
 import java.util.List;
 
 import org.egov.cpt.config.PropertyConfiguration;
-import org.egov.cpt.models.OwnershipTransferSearchCriteria;
+import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -49,7 +49,7 @@ public class OwnershipTransferQueryBuilder {
 			+ " cs_pt_ot_documents_v1 doc ON ownership.id=doc.owner_id ";
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
-			OwnershipTransferSearchCriteria criteria) {
+			DuplicateCopySearchCriteria criteria) {
 
 		if (criteria.getLimit() == null && criteria.getOffset() == null)
 			return query;
@@ -79,8 +79,7 @@ public class OwnershipTransferQueryBuilder {
 	 * @param preparedStmtList
 	 * @return
 	 */
-	public String getOwnershipTransferSearchQuery(OwnershipTransferSearchCriteria criteria,
-			List<Object> preparedStmtList) {
+	public String getOwnershipTransferSearchQuery(DuplicateCopySearchCriteria criteria, List<Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(SEARCH_QUERY);
 
