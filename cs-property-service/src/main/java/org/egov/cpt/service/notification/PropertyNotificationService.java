@@ -66,21 +66,21 @@ public class PropertyNotificationService {
 	 * @param smsRequests List of SMSRequets
 	 */
 	private void enrichSMSRequest(OwnershipTransferRequest request, List<SMSRequest> smsRequests) {
+		String tenantId = request.getOwners().get(0).getTenantId();
 		for (Owner owner : request.getOwners()) {
 			String message = null;
-
+			String localizationMessages;
+			
+			localizationMessages = util.getLocalizationMessages(tenantId, request.getRequestInfo());
+			message = util.getCustomizedMsg(request.getRequestInfo(), owner, localizationMessages);
+			
+			if (message == null) continue;
+			
 			Map<String, String> mobileNumberToOwner = new HashMap<>();
 
 			if (owner.getOwnerDetails().getPhone() != null) {
 				mobileNumberToOwner.put(owner.getOwnerDetails().getPhone(), owner.getOwnerDetails().getName());
 			}
-
-			message = util.getCustomizedMsg(request.getRequestInfo(), owner,
-					owner.getOwnerDetails().getApplicationNumber(), owner.getApplicationState(), owner.getApplicationAction());
-
-			if (message == null)
-				continue;
-
 			smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
 		}
 

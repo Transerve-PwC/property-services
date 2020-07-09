@@ -55,7 +55,7 @@ public class PTConstants {
 
 	public static final String BOUNDARY_HEIRARCHY_CODE = "REVENUE";
 
-	public static final String MODULE = "cs-property-service";
+	public static final String MODULE = "rainmaker-tl";
 
 	public static final String NOTIFICATION_LOCALE = "en_IN";
 
@@ -121,14 +121,18 @@ public class PTConstants {
 	public static final String STATE_OT_INITIATED = "INITIATED";
 	public static final String STATE_OT_APPROVED = "APPROVED";
 	
-	//OwnershipTransfer RoleCodes
-	public static final String ROLE_OT_CLERK= "CTL_CLERK";
-	public static final String ROLE_OT_JA= "CTL_JA";
-	
 	//OwnershipTransfer Notifications
-	public static final String NOTIFICATION_OT_CREATE = "Hi {1}, Ownership Transfer request submitted sucessfully with Application Number: {2}";
-	public static final String NOTIFICATION_OT_REJECT = "Hi {1}, Your Ownership Transfer request of Application Number: {2} is been Rejected";
-	public static final String NOTIFICATION_OT_SENDBACK = "Hi {1}, Your Ownership Transfer request of Application Number: {2} is Sent Back for clarification";
-	public static final String NOTIFICATION_OT_APPROVE = "Hi {1}, Your Ownership Transfer request of Application Number: {2} is been Approved";
+	public static final String NOTIFICATION_OT_SUBMIT = "rp.en.counter.submit";
+	public static final String NOTIFICATION_OT_REJECTED = "rp.en.counter.rejected";
+	public static final String NOTIFICATION_OT_SENDBACK = "rp.en.counter.sendback";
+	public static final String NOTIFICATION_OT_APPROVED = "rp.en.counter.approved";
+	
+    // ACTION_STATUS combinations for notification
+
+    public static final String ACTION_STATUS_INITIATED = "INITIATE_INITIATED";
+    public static final String ACTION_STATUS_SUBMIT = "SUBMIT_PENDINGCLVERIFICATION";
+    public static final String ACTION_STATUS_REJECTED = "REJECT_REJECTED";
+    public static final String ACTION_STATUS_SENDBACK = "SENDBACK_PENDINGCLARIFICATION";
+    public static final String ACTION_STATUS_APPROVED = "PAY_APPROVED";
 
 }

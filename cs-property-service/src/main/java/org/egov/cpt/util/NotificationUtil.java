@@ -1,5 +1,6 @@
 package org.egov.cpt.util;
 
+import java.util.ArrayList;
 //import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -18,6 +19,8 @@ import org.egov.cpt.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
@@ -47,8 +50,6 @@ public class NotificationUtil {
 	
 	/**
 	 * Creates customised message based on ownershipTransfer
-	 * @param applicationState 
-	 * @param applicationAction 
 	 * @param application 
 	 * 
 	 * @param license
@@ -57,39 +58,51 @@ public class NotificationUtil {
 	 *            The messages from localisation
 	 * @return customised message based on ownershipTransfer
 	 */
-	public String getCustomizedMsg(RequestInfo requestInfo, Owner owner, String applicationNumber, String applicationState, String applicationAction) {
-		String message = null;
+	public String getCustomizedMsg(RequestInfo requestInfo, Owner owner, String localizationMessage) {
+		String message = null, messageTemplate;
+		String ACTION_STATUS = owner.getApplicationAction() + "_" + owner.getApplicationState();
 		
-		if (applicationState != null && applicationAction != null) {
-			if (applicationAction.equals(PTConstants.ACTION_OT_SUBMIT) && applicationState.equals(PTConstants.STATE_OT_INITIATED)) {
-				message = PTConstants.NOTIFICATION_OT_CREATE;
-				
-				message = message.replace("{1}", owner.getOwnerDetails().getName());
-				message = message.replace("{2}", owner.getOwnerDetails().getApplicationNumber());
-				
-				return message;
-			} else if (applicationAction.contains(PTConstants.ACTION_OT_REJECT)){
-				message = PTConstants.NOTIFICATION_OT_REJECT;
-				
-				message = message.replace("{1}", owner.getOwnerDetails().getName());
-				message = message.replace("{2}", owner.getOwnerDetails().getApplicationNumber());
-				
-				return message;
-			} else if (applicationAction.equals(PTConstants.ACTION_OT_SENDBACK) && applicationState.equals(PTConstants.STATE_OT_PENDING_CLARIFICATION)){ 
-				message = PTConstants.NOTIFICATION_OT_SENDBACK;
-				
-				message = message.replace("{1}", owner.getOwnerDetails().getName());
-				message = message.replace("{2}", owner.getOwnerDetails().getApplicationNumber());
-				
-				return message;
-			} else if (applicationAction.contains(PTConstants.ACTION_OT_PAY) &&applicationState.contains(PTConstants.STATE_OT_APPROVED)){
-				message = PTConstants.NOTIFICATION_OT_APPROVE;
-				
-				message = message.replace("{1}", owner.getOwnerDetails().getName());
-				message = message.replace("{2}", owner.getOwnerDetails().getApplicationNumber());
-				
-				return message;
-			}
+		switch (ACTION_STATUS) {
+		
+		case PTConstants.ACTION_STATUS_SUBMIT:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
+			message = getInitiatedMsg(owner, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_REJECTED:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
+			message = getInitiatedMsg(owner, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_SENDBACK:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
+			message = getInitiatedMsg(owner, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_APPROVED:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
+			message = getInitiatedMsg(owner, messageTemplate);
+			break;
+		}
+		return message;
+	}
+
+	private String getInitiatedMsg(Owner owner, String message) {
+		message = message.replace("<2>", owner.getOwnerDetails().getName());
+		message = message.replace("<3>", owner.getOwnerDetails().getApplicationNumber());
+		return message;
+	}
+
+	private String getMessageTemplate(String notificationCode, String localizationMessage) {
+		String path = "$..messages[?(@.code==\"{}\")].message";
+		path = path.replace("{}", notificationCode);
+		String message = null;
+		try {
+			Object messageObj = JsonPath.parse(localizationMessage).read(path);
+			message = ((ArrayList<String>) messageObj).get(0);
+		} catch (Exception e) {
+//			log.warn("Fetching from localization failed", e);
+			return ""+e;
 		}
 		return message;
 	}
@@ -123,6 +136,29 @@ public class NotificationUtil {
 			}
 		}
 		
+	}
+
+	public String getLocalizationMessages(String tenantId, RequestInfo requestInfo) {
+		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo), requestInfo);
+		String jsonString = new JSONObject(responseMap).toString();
+		return jsonString;
+	}
+
+	private StringBuilder getUri(String tenantId, RequestInfo requestInfo) {
+		
+		tenantId = tenantId.split("\\.")[0];
+		
+		String locale = PTConstants.NOTIFICATION_LOCALE;
+		if (!StringUtils.isEmpty(requestInfo.getMsgId()) && requestInfo.getMsgId().split("|").length >= 2) {
+			locale = requestInfo.getMsgId().split("\\|")[1];
+		}
+		
+		StringBuilder uri = new StringBuilder();
+		uri.append(config.getLocalizationHost()).append(config.getLocalizationContextPath())
+				.append(config.getLocalizationSearchEndpoint()).append("?").append("locale=").append(locale)
+				.append("&tenantId=").append(tenantId).append("&module=").append(PTConstants.MODULE);
+		
+		return uri;
 	}
 
 }
