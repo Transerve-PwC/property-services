@@ -2,7 +2,10 @@ package org.egov.cpt.service;
 
 import java.util.List;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.producer.Producer;
@@ -35,7 +38,7 @@ public class MortgageService {
 
 	public List<Mortgage> createApplication(MortgageRequest mortgageRequest) {
 		List<Property> propertiesFromDb= propertyValidator.isPropertyExist(mortgageRequest);
-//		propertyValidator.validateMortgageCreateRequest(mortgageRequest,propertiesFromDb); 
+		propertyValidator.validateMortgageCreateRequest(mortgageRequest); 
 		enrichmentService.enrichMortgageCreateRequest(mortgageRequest);
 //		propertyValidator.validateMortgageCreate(mortgageRequest);
 		if (config.getIsWorkflowEnabled()) {
@@ -43,5 +46,9 @@ public class MortgageService {
 		}
 //		producer.push(config.getSaveMortgageTopic(), mortgageRequest);
 		return mortgageRequest.getMortgageApplications();
+	}
+
+	public List<DuplicateCopy> searchApplication(DuplicateCopySearchCriteria searchCriteria, RequestInfo requestInfo) {
+		return null;
 	}
 }

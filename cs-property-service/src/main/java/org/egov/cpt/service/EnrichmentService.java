@@ -435,5 +435,58 @@ public class EnrichmentService {
 		}
 
 	}
+	public void enrichMortgageCreateRequest(MortgageRequest mortgageRequest) {
+		RequestInfo requestInfo = mortgageRequest.getRequestInfo();
+		AuditDetails mortgageAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
+		if (!CollectionUtils.isEmpty(mortgageRequest.getMortgageApplications())) {
+			mortgageRequest.getMortgageApplications().forEach(application -> {
+				String gen_mortgage_id = UUID.randomUUID().toString();
+				application.setId(gen_mortgage_id);
+				application.setPropertyId(mortgageRequest.getMortgageApplications().get(0).getProperty().getId());
+				application.setAuditDetails(mortgageAuditDetails);
+
+				if (!CollectionUtils.isEmpty(application.getApplicant())) {
+					application.getApplicant().forEach(applicant -> {
+						applicant.setId(UUID.randomUUID().toString());
+						applicant.setMortgageId(gen_mortgage_id);
+						applicant.setTenantId(application.getTenantId());
+						applicant.setAuditDetails(mortgageAuditDetails);
+					});
+				}
+			});
+		}
+		setMortgageIdgenIds(mortgageRequest);
+
+	}
+
+	private void setMortgageIdgenIds(MortgageRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		String tenantId = request.getMortgageApplications().get(0).getTenantId();
+		List<Mortgage> applications = request.getMortgageApplications();
+		List<String> applicationNumbers=setIdgenIds(requestInfo,tenantId,applications.size(),config.getApplicationNumberIdgenNameMG(),config.getApplicationNumberIdgenFormatMG());
+		ListIterator<String> itr = applicationNumbers.listIterator();
+		applications.forEach(application -> {
+			application.setApplicationNumber(itr.next());
+		});
+
+	}
+
+	private List<String> setIdgenIds(RequestInfo requestInfo, String tenantId,int size, String idGenName,String idGenFormate) {
+		List<String> applicationNumbers = null;
+
+		applicationNumbers = getIdList(requestInfo, tenantId, idGenName,idGenFormate, size);
+
+		Map<String, String> errorMap = new HashMap<>();
+		if (applicationNumbers.size() != size) {
+			errorMap.put("IDGEN ERROR ",
+					"The number of application number returned by idgen is not equal to number of Applications");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+
+		return applicationNumbers;
+
+	}
 }

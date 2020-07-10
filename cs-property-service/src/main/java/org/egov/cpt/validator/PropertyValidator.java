@@ -686,4 +686,8 @@ public class PropertyValidator {
 
 	}
 
+	public void validateMortgageCreateRequest(MortgageRequest mortgageRequest) {
+//			validateDuplicateMortgage();
+	}
+
 }

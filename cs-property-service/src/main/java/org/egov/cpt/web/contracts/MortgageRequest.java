@@ -27,5 +27,5 @@ public class MortgageRequest {
 
 	@JsonProperty("MortgageApplications")
 	@Valid
-	private List<Mortgage> MortgageApplications;
+	private List<Mortgage> mortgageApplications;
 }
