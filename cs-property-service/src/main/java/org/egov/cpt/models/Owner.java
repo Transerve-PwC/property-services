@@ -1,5 +1,8 @@
 package org.egov.cpt.models;
 
+import java.util.List;
+
+import org.egov.cpt.models.calculation.TaxHeadEstimate;
 import org.egov.cpt.util.PropertySerializer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -51,5 +54,14 @@ public class Owner {
 	private String applicationAction;
 
 	@JsonProperty("businessService")
-	private String businessService = "CSP"; // TODO change
+	private String businessService = "CTL.RENTED_PROPERTIES"; // TODO change
+
+	@JsonProperty("taxHeadEstimates")
+	List<TaxHeadEstimate> taxHeadEstimates;
+
+//	@JsonProperty("tradeTypeBillingIds")
+//	FeeAndBillingSlabIds tradeTypeBillingIds;
+//
+//	@JsonProperty("accessoryBillingIds")
+//	FeeAndBillingSlabIds accessoryBillingIds;
 }

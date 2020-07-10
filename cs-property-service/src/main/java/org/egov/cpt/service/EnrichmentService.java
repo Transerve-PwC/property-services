@@ -1,6 +1,8 @@
 package org.egov.cpt.service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -20,6 +22,8 @@ import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.UserDetailResponse;
 import org.egov.cpt.models.Idgen.IdResponse;
+import org.egov.cpt.models.calculation.Category;
+import org.egov.cpt.models.calculation.TaxHeadEstimate;
 import org.egov.cpt.repository.IdGenRepository;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
@@ -234,6 +238,7 @@ public class EnrichmentService {
 	 * Ownership Transfer
 	 */
 	public void enrichCreateOwnershipTransfer(OwnershipTransferRequest request, List<Property> propertyFromDb) {
+
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		Property foundProperty = propertyFromDb.get(0);
@@ -245,9 +250,29 @@ public class EnrichmentService {
 				owner.setAuditDetails(propertyAuditDetails);
 				OwnerDetails ownerDetails = updateOwnerShipDetails(owner, foundProperty, requestInfo, gen_owner_id);
 				owner.setOwnerDetails(ownerDetails);
+
+//				demand generation
+				enrichGenerateDemand(owner);
 			});
 			setIdgenIds(request);
 		}
+	}
+
+	private void enrichGenerateDemand(Owner owner) {
+		List<TaxHeadEstimate> estimates = new LinkedList<>();
+		owner.setBusinessService("CTL.RENTED_PROPERTIES");
+		TaxHeadEstimate estimate = new TaxHeadEstimate();
+		estimate.setEstimateAmount(new BigDecimal(0.1)); // TODO add amount
+		estimate.setCategory(Category.FEE);
+		estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.FEE));
+		if (estimate.getEstimateAmount().compareTo(new BigDecimal(0)) > 0) {
+			estimates.add(estimate);
+		}
+		owner.setTaxHeadEstimates(estimates);
+	}
+
+	private String getTaxHeadCode(String businessService, Category category) {
+		return String.format("%s_%s", businessService, category.toString());
 	}
 
 	public void enrichUpdateOwnershipTransfer(OwnershipTransferRequest request, List<Owner> ownerFromDb) {
@@ -360,7 +385,8 @@ public class EnrichmentService {
 			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
 				String gen_application_id = UUID.randomUUID().toString();
 				application.setId(gen_application_id);
-				application.setPropertyId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
+				application.setPropertyId(
+						duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
 				application.setAuditDetails(propertyAuditDetails);
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {

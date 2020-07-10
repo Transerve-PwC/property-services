@@ -46,8 +46,6 @@ public class OwnershipTransferService {
 //		propertyValidator.validateCreateRequest(request); // TODO add validations as per requirement
 		List<Property> propertyFromSearch = propertyValidator.getPropertyForOT(request);
 		enrichmentService.enrichCreateOwnershipTransfer(request, propertyFromSearch);
-//		calculationService.addCalculation(request);
-		demandService.addCalculation(request);
 		if (config.getIsWorkflowEnabled()) {
 			wfIntegrator.callOwnershipTransferWorkFlow(request);
 		}
@@ -65,6 +63,11 @@ public class OwnershipTransferService {
 	public List<Owner> updateOwnershipTransfer(OwnershipTransferRequest request) {
 		List<Owner> ownersFromSearch = propertyValidator.validateUpdateRequest(request);
 		enrichmentService.enrichUpdateOwnershipTransfer(request, ownersFromSearch);
+		String applicationState = request.getOwners().get(0).getApplicationState();
+		if (applicationState.equalsIgnoreCase("PENDINGSAVERIFICATION") // demand generation
+				|| applicationState.equalsIgnoreCase("PENDINGAPRO")) {
+			demandService.generateDemand(request);
+		}
 		if (config.getIsWorkflowEnabled()) {
 			wfIntegrator.callOwnershipTransferWorkFlow(request);
 		}
