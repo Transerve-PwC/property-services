@@ -11,6 +11,7 @@ import org.egov.cpt.models.Property;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.OwnershipTransferRepository;
 import org.egov.cpt.service.calculation.DemandService;
+import org.egov.cpt.service.notification.PropertyNotificationService;
 import org.egov.cpt.validator.PropertyValidator;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
@@ -38,6 +39,9 @@ public class OwnershipTransferService {
 
 	@Autowired
 	private OwnershipTransferRepository repository;
+	
+	@Autowired
+	private PropertyNotificationService propertyNotificationService;
 
 	@Autowired
 	private DemandService demandService;
@@ -72,6 +76,7 @@ public class OwnershipTransferService {
 			wfIntegrator.callOwnershipTransferWorkFlow(request);
 		}
 		producer.push(config.getOwnershipTransferUpdateTopic(), request);
+		propertyNotificationService.process(request);
 		return request.getOwners();
 	}
 
