@@ -64,4 +64,23 @@ public class PropertyUtil {
 //		return uri;
 //	}
 
+	/**
+	 * Creates demand Search url based on tenanatId,businessService and ConsumerCode
+	 * 
+	 * @return demand search url
+	 */
+	public String getDemandSearchURL() {
+		StringBuilder url = new StringBuilder(config.getBillingHost());
+		url.append(config.getDemandSearchEndpoint());
+		url.append("?");
+		url.append("tenantId=");
+		url.append("{1}");
+		url.append("&");
+		url.append("businessService=");
+		url.append("{2}");
+		url.append("&");
+		url.append("consumerCode=");
+		url.append("{3}");
+		return url.toString();
+	}
 }

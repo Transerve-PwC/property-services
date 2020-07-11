@@ -248,4 +248,10 @@ public class PropertyConfiguration {
 	@Value("${egov.demand.minimum.payable.amount}")
 	private BigDecimal minimumPayableAmount;
 
+	@Value("${egov.demand.search.endpoint}")
+	private String demandSearchEndpoint;
+
+	@Value("${egov.demand.update.endpoint}")
+	private String demandUpdateEndpoint;
+
 }
