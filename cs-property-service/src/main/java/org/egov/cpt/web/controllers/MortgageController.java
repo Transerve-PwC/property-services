@@ -52,11 +52,11 @@ public class MortgageController {
 	}
 	
 	@PostMapping("/_search")
-	public ResponseEntity<DuplicateCopyResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+	public ResponseEntity<MortgageResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute DuplicateCopySearchCriteria searchCriteria) {
 
-		List<DuplicateCopy> applications = mortgageService.searchApplication(searchCriteria,requestInfoWrapper.getRequestInfo());
-		DuplicateCopyResponse response = DuplicateCopyResponse.builder().duplicateCopyApplications(applications).responseInfo(
+		List<Mortgage> applications = mortgageService.searchApplication(searchCriteria,requestInfoWrapper.getRequestInfo());
+		MortgageResponse response = MortgageResponse.builder().mortgageApplications(applications).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true)).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}

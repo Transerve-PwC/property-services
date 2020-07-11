@@ -1,5 +1,6 @@
 package org.egov.cpt.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -48,7 +49,17 @@ public class MortgageService {
 		return mortgageRequest.getMortgageApplications();
 	}
 
-	public List<DuplicateCopy> searchApplication(DuplicateCopySearchCriteria searchCriteria, RequestInfo requestInfo) {
-		return null;
+	public List<Mortgage> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
+		propertyValidator.validateDuplicateCopySearch(requestInfo,criteria);
+//	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
+		List<Mortgage> properties = getApplication(criteria, requestInfo);
+		return properties;
+	}
+
+	private List<Mortgage> getApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
+		List<Mortgage> application = repository.getMortgageProperties(criteria);
+        if(application.isEmpty())
+            return Collections.emptyList();
+        return application;
 	}
 }
