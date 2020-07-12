@@ -59,7 +59,7 @@ public class EnrichmentService {
 				property.setId(gen_property_id);
 				property.setAuditDetails(propertyAuditDetails);
 				property.setPropertyDetails(propertyDetail);
-				log.info("property id: " + gen_property_id);
+//				log.info("property id: " + gen_property_id);
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
 					property.getOwners().forEach(owner -> {
@@ -73,7 +73,7 @@ public class EnrichmentService {
 						owner.setAuditDetails(propertyAuditDetails);
 						OwnerDetails ownerDetails = getOwnerShipDetails(owner, property, requestInfo, gen_property_id);
 						owner.setOwnerDetails(ownerDetails);
-						log.info("owner id: " + gen_owner_id);
+//						log.info("owner id: " + gen_owner_id);
 					});
 				}
 			});
@@ -90,7 +90,7 @@ public class EnrichmentService {
 		ownerDetails.setOwnerId(owner.getId());
 		ownerDetails.setTenantId(property.getTenantId());
 		ownerDetails.setAuditDetails(ownerAuditDetails);
-		log.info("owner detail id: " + gen_owner_details_id);
+//		log.info("owner detail id: " + gen_owner_details_id);
 		return ownerDetails;
 	}
 
@@ -360,8 +360,9 @@ public class EnrichmentService {
 			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
 				String gen_application_id = UUID.randomUUID().toString();
 				application.setId(gen_application_id);
-				application.setPropertyId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
+				application.getProperty().setId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId()); //TODO CHECK BY DEBUG
 				application.setAuditDetails(propertyAuditDetails);
+				System.out.println(propertyAuditDetails.toString() + " audit details here");
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {

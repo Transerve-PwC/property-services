@@ -67,7 +67,7 @@ public class OwnershipTransferService {
 			wfIntegrator.callOwnershipTransferWorkFlow(request);
 		}
 		producer.push(config.getOwnershipTransferUpdateTopic(), request);
-		propertyNotificationService.process(request);
+//		propertyNotificationService.process(request);
 		return request.getOwners();
 	}
 
