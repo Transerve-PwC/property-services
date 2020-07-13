@@ -3,8 +3,10 @@ package org.egov.cpt.service.calculation;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,8 +19,8 @@ import org.egov.cpt.models.calculation.Demand;
 import org.egov.cpt.models.calculation.Demand.StatusEnum;
 import org.egov.cpt.models.calculation.DemandDetail;
 import org.egov.cpt.models.calculation.DemandResponse;
+import org.egov.cpt.models.calculation.TaxHeadEstimate;
 import org.egov.cpt.repository.ServiceRequestRepository;
-import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,8 +72,8 @@ public class DemandService {
 					.build();
 
 			List<DemandDetail> demandDetails = new LinkedList<>();
-			if (CollectionUtils.isEmpty(owner.getTaxHeadEstimates())) {
-				owner.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
+			if (!CollectionUtils.isEmpty(owner.getCalculation().getTaxHeadEstimates())) {
+				owner.getCalculation().getTaxHeadEstimates().forEach(taxHeadEstimate -> {
 					demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
 							.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).collectionAmount(BigDecimal.ZERO)
 							.tenantId(tenantId).build());
@@ -162,21 +164,41 @@ public class DemandService {
 	private List<DemandDetail> getUpdatedDemandDetails(Owner owner, List<DemandDetail> demandDetails) {
 
 		List<DemandDetail> newDemandDetails = new ArrayList<>();
+		Map<String, List<DemandDetail>> taxHeadToDemandDetail = new HashMap<>();
 
 		demandDetails.forEach(demandDetail -> {
-			BigDecimal dueAmount = owner.getOwnerDetails().getDueAmount();
-			BigDecimal aproCharges = owner.getOwnerDetails().getAproCharge();
-			if (owner.getApplicationState().equalsIgnoreCase(PTConstants.STATE_PENDING_SA_VERIFICATION)
-					&& dueAmount != null) {
-				demandDetail.setCollectionAmount(dueAmount);
-			}
-			if (owner.getApplicationState().equalsIgnoreCase(PTConstants.STATE_PENDING_APRO) && aproCharges != null) {
-				demandDetail.setCollectionAmount(aproCharges);
-			}
-			newDemandDetails.addAll(demandDetails);
+			if (!taxHeadToDemandDetail.containsKey(demandDetail.getTaxHeadMasterCode())) {
+				List<DemandDetail> demandDetailList = new LinkedList<>();
+				demandDetailList.add(demandDetail);
+				taxHeadToDemandDetail.put(demandDetail.getTaxHeadMasterCode(), demandDetailList);
+			} else
+				taxHeadToDemandDetail.get(demandDetail.getTaxHeadMasterCode()).add(demandDetail);
 		});
 
-		return newDemandDetails;
+		BigDecimal diffInTaxAmount;
+		List<DemandDetail> demandDetailList;
+		BigDecimal total;
+
+		for (TaxHeadEstimate taxHeadEstimate : owner.getCalculation().getTaxHeadEstimates()) {
+			if (!taxHeadToDemandDetail.containsKey(taxHeadEstimate.getTaxHeadCode()))
+				newDemandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
+						.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).tenantId(owner.getTenantId())
+						.collectionAmount(BigDecimal.ZERO).build());
+			else {
+				demandDetailList = taxHeadToDemandDetail.get(taxHeadEstimate.getTaxHeadCode());
+				total = demandDetailList.stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO,
+						BigDecimal::add);
+				diffInTaxAmount = taxHeadEstimate.getEstimateAmount().subtract(total);
+				if (diffInTaxAmount.compareTo(BigDecimal.ZERO) != 0) {
+					newDemandDetails.add(DemandDetail.builder().taxAmount(diffInTaxAmount)
+							.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).tenantId(owner.getTenantId())
+							.collectionAmount(BigDecimal.ZERO).build());
+				}
+			}
+		}
+		List<DemandDetail> combinedBillDetials = new LinkedList<>(demandDetails);
+		combinedBillDetials.addAll(newDemandDetails);
+		return combinedBillDetials;
 	}
 
 }

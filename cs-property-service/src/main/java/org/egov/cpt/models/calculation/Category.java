@@ -5,41 +5,43 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Category {
 
-    TAX("TAX"),
+	TAX("TAX"),
 
-    FEE("FEE"),
+	FEE("FEE"),
 
-    REBATE("REBATE"),
+	REBATE("REBATE"),
 
-    EXEMPTION("EXEMPTION"),
+	EXEMPTION("EXEMPTION"),
 
-    ADVANCE_COLLECTION("ADVANCE_COLLECTION"),
+	ADVANCE_COLLECTION("ADVANCE_COLLECTION"),
 
-    PENALTY("PENALTY"),
+	PENALTY("PENALTY"),
 
-    FINES("FINES"),
+	FINES("FINES"),
 
-    CHARGES("CHARGES");
+	DUE("DUE"),
 
-    private String value;
+	CHARGES("CHARGES");
 
-    Category(String value) {
-        this.value = value;
-    }
+	private String value;
 
-    @Override
-    @JsonValue
-    public String toString() {
-        return String.valueOf(value);
-    }
+	Category(String value) {
+		this.value = value;
+	}
 
-    @JsonCreator
-    public static Category fromValue(String text) {
-        for (Category b : Category.values()) {
-            if (String.valueOf(b.value).equals(text)) {
-                return b;
-            }
-        }
-        return null;
-    }
+	@Override
+	@JsonValue
+	public String toString() {
+		return String.valueOf(value);
+	}
+
+	@JsonCreator
+	public static Category fromValue(String text) {
+		for (Category b : Category.values()) {
+			if (String.valueOf(b.value).equals(text)) {
+				return b;
+			}
+		}
+		return null;
+	}
 }

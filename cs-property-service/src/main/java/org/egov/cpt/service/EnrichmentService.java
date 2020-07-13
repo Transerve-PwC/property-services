@@ -22,9 +22,11 @@ import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.UserDetailResponse;
 import org.egov.cpt.models.Idgen.IdResponse;
+import org.egov.cpt.models.calculation.Calculation;
 import org.egov.cpt.models.calculation.Category;
 import org.egov.cpt.models.calculation.TaxHeadEstimate;
 import org.egov.cpt.repository.IdGenRepository;
+import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
@@ -258,23 +260,6 @@ public class EnrichmentService {
 		}
 	}
 
-	private void enrichGenerateDemand(Owner owner) {
-		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		owner.setBusinessService("CTL.RENTED_PROPERTIES");
-		TaxHeadEstimate estimate = new TaxHeadEstimate();
-		estimate.setEstimateAmount(new BigDecimal(0.1)); // TODO add amount
-		estimate.setCategory(Category.FEE);
-		estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.FEE));
-		if (estimate.getEstimateAmount().compareTo(new BigDecimal(0)) > 0) {
-			estimates.add(estimate);
-		}
-		owner.setTaxHeadEstimates(estimates);
-	}
-
-	private String getTaxHeadCode(String businessService, Category category) {
-		return String.format("%s_%s", businessService, category.toString());
-	}
-
 	public void enrichUpdateOwnershipTransfer(OwnershipTransferRequest request, List<Owner> ownerFromDb) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails updateAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
@@ -289,8 +274,58 @@ public class EnrichmentService {
 				owner.setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setOwnershipTransferDocuments(ownershipTransferDocuments);
+
+//				demand generation
+				enrichUpdateDemand(owner);
 			});
 		}
+	}
+
+	private void enrichGenerateDemand(Owner owner) {
+		List<TaxHeadEstimate> estimates = new LinkedList<>();
+		owner.setBusinessService("RENTED_PROPERTIES");
+
+		TaxHeadEstimate estimateDue = new TaxHeadEstimate();
+		estimateDue.setEstimateAmount(new BigDecimal(0.0)); // TODO doubt amount
+		estimateDue.setCategory(Category.DUE);
+		estimateDue.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
+		estimates.add(estimateDue);
+
+		TaxHeadEstimate estimateCharges = new TaxHeadEstimate();
+		estimateCharges.setEstimateAmount(new BigDecimal(0.0)); // TODO doubt amount
+		estimateCharges.setCategory(Category.CHARGES);
+		estimateCharges.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.CHARGES));
+		estimates.add(estimateCharges);
+
+		Calculation calculation = Calculation.builder()
+				.applicationNumber(owner.getOwnerDetails().getApplicationNumber()).taxHeadEstimates(estimates)
+				.tenantId(owner.getTenantId()).build();
+		owner.setCalculation(calculation);
+	}
+
+	private void enrichUpdateDemand(Owner owner) {
+		List<TaxHeadEstimate> estimates = new LinkedList<>();
+		owner.setBusinessService("RENTED_PROPERTIES");
+		TaxHeadEstimate estimate = new TaxHeadEstimate();
+		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.STATE_PENDING_SA_VERIFICATION)) {
+			estimate.setEstimateAmount(owner.getOwnerDetails().getDueAmount()); // TODO doubt amount
+			estimate.setCategory(Category.DUE);
+			estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
+		}
+		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.STATE_PENDING_APRO)) {
+			estimate.setEstimateAmount(owner.getOwnerDetails().getAproCharge()); // TODO doubt amount
+			estimate.setCategory(Category.CHARGES);
+			estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.CHARGES));
+		}
+		estimates.add(estimate);
+		Calculation calculation = Calculation.builder()
+				.applicationNumber(owner.getOwnerDetails().getApplicationNumber()).taxHeadEstimates(estimates)
+				.tenantId(owner.getTenantId()).build();
+		owner.setCalculation(calculation);
+	}
+
+	private String getTaxHeadCode(String businessService, Category category) {
+		return String.format("%s_%s", businessService, category.toString());
 	}
 
 	private List<OwnershipTransferDocument> updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
