@@ -7,6 +7,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
+import org.egov.cpt.models.Property;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.validator.PropertyValidator;
@@ -34,6 +35,7 @@ public class DuplicateCopyService {
 
 	@Autowired
 	private WorkflowIntegrator wfIntegrator;
+	
 	
 
 	public List<DuplicateCopy> createApplication(DuplicateCopyRequest duplicateCopyRequest) {

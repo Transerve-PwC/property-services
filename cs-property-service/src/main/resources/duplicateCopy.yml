@@ -13,7 +13,7 @@ serviceMaps:
 
       - jsonPath: $.DuplicateCopyApplications.*.id
 
-      - jsonPath: $.DuplicateCopyApplications.*.propertyId
+      - jsonPath: $.DuplicateCopyApplications.*.property.id
       
       - jsonPath: $.DuplicateCopyApplications.*.tenantId
 

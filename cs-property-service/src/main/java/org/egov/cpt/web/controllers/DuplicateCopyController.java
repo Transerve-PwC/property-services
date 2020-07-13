@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
+import org.egov.cpt.models.Property;
 import org.egov.cpt.models.RequestInfoWrapper;
 import org.egov.cpt.service.DuplicateCopyService;
 import org.egov.cpt.util.ResponseInfoFactory;
