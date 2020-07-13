@@ -34,7 +34,7 @@ public class PropertyConsumer {
 		this.ownershipTransferService = ownershipTransferService;
 	}
 	
-	@KafkaListener(topics = {"${persister.save.property.topic}", "{$persister.update.property.topic}"})
+	@KafkaListener(topics = {"${ownership.transfer.save.topic}", "${ownership.transfer.update.topic}"})
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		ObjectMapper mapper = new ObjectMapper();
 		OwnershipTransferRequest ownershipTransferRequest = new OwnershipTransferRequest();

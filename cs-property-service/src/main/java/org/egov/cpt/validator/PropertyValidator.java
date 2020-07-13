@@ -485,8 +485,8 @@ public class PropertyValidator {
 	public void validateDuplicateCopySearch(RequestInfo requestInfo, DuplicateCopySearchCriteria criteria) {
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria == null)
 			throw new CustomException("INVALID SEARCH", "Search without any paramters is not allowed");
-		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.getTransitNumber() == null)
-			throw new CustomException("INVALID SEARCH", "Transit number is mandatory in search");
+		/*if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.getTransitNumber() == null)
+			throw new CustomException("INVALID SEARCH", "Transit number is mandatory in search");*/
 	}
 
 	public List<DuplicateCopy> validateDuplicateCopyUpdateRequest(DuplicateCopyRequest duplicateCopyRequest) {

@@ -67,6 +67,23 @@ public class Property {
 	@Valid
 	@JsonProperty("owners")
 	private List<Owner> owners;
+	
+	@Valid
+	@JsonProperty
+	private List<DuplicateCopy> duplicateCopys;
+	
+	public Property addDocumentItem(DuplicateCopy newDuplicateCopyItem) {
+		if (this.duplicateCopys == null) {
+			this.duplicateCopys = new ArrayList<>();
+		}
+		for (DuplicateCopy duplicateCopy : duplicateCopys) {
+			if (duplicateCopy.getId().equalsIgnoreCase(newDuplicateCopyItem.getId())) {
+				return this;
+			}
+		}
+		this.duplicateCopys.add(newDuplicateCopyItem);
+		return this;
+	}
 
 	public Property addOwnerItem(Owner newOwnerItem) {
 		if (this.owners == null) {
