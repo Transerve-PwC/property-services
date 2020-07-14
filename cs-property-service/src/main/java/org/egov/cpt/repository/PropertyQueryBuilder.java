@@ -61,7 +61,7 @@ public class PropertyQueryBuilder {
 	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,pt.*,"
 			+ " dca.id as appid, dca.property_id, dca.tenantid as pttenantid, dca.state, dca.action,dca.application_number as app_number,"
 			
-			+ " pt.id as pid, pt.transit_number,"
+			+ " pt.id as pid, pt.transit_number,pt.colony,"
 
 			+ " ap.id as aid, ap.application_id as app_id,ap.tenantid as aptenantid,"
 			+ " ap.name,ap.email,ap.mobileno,ap.guardian,ap.relationship,ap.aadhaar_number as adhaarnumber,"
@@ -199,6 +199,26 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("pt.transit_number=?");
 			preparedStmtList.add(criteria.getTransitNumber());
+		}
+		if (null != criteria.getApplicationNumber()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("dca.application_number=?");
+			preparedStmtList.add(criteria.getApplicationNumber());
+		}
+		if (null != criteria.getColony()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("pt.colony=?");
+			preparedStmtList.add(criteria.getColony());
+		}
+		if (null != criteria.getApplicantMobNo()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("ap.mobileno=?");
+			preparedStmtList.add(criteria.getApplicantMobNo());
+		}
+		if (null != criteria.getStatus()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("dca.state=?");
+			preparedStmtList.add(criteria.getStatus());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
