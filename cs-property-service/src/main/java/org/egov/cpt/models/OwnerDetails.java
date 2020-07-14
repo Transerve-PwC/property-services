@@ -1,5 +1,6 @@
 package org.egov.cpt.models;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,5 +144,11 @@ public class OwnerDetails {
 			this.ownershipTransferDocuments.add(ownershipTransferDocumentsItem);
 		return this;
 	}
+
+	@JsonProperty("dueAmount")
+	private BigDecimal dueAmount;
+
+	@JsonProperty("aproCharge")
+	private BigDecimal aproCharge;
 
 }

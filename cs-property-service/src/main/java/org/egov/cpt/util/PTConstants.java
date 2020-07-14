@@ -42,15 +42,15 @@ public class PTConstants {
 	public static final String MDMS_PT_OWNERTYPE = "OwnerType";
 
 	public static final String MDMS_PT_EGF_MASTER = "egf-master";
-	
+
 	public static final String MDMS_PT_EGF_PROPERTY_SERVICE = "PropertyServices";
 
 	public static final String MDMS_PT_FINANCIALYEAR = "FinancialYear";
-	
+
 	public static final String MDMS_PT_COLONY = "colonies";
-	
+
 	public static final String JSONPATH_FINANCIALYEAR = "$.MdmsRes.egf-master";
-	
+
 	public static final String JSONPATH_COLONY = "$.MdmsRes.PropertyServices";
 
 	public static final String BOUNDARY_HEIRARCHY_CODE = "REVENUE";
@@ -108,31 +108,35 @@ public class PTConstants {
 
 	public static final List<String> FIELDS_FOR_PROPERTY_MUTATION = Collections.unmodifiableList(
 			Arrays.asList("propertyType", "usageCategory", "ownershipCategory", "noOfFloors", "landArea"));
-	
-	//OwnershipTransfer ACTION
+
+	// OwnershipTransfer ACTION
 	public static final String ACTION_OT_SUBMIT = "SUBMIT";
 	public static final String ACTION_OT_REJECT = "REJECT";
 	public static final String ACTION_OT_SENDBACK = "SENDBACK";
 	public static final String ACTION_OT_APPROVE = "APPROVE";
 	public static final String ACTION_OT_PAY = "PAY";
-	
-	//OwnershipTransfer STATE
+
+	// OwnershipTransfer STATE
 	public static final String STATE_OT_PENDING_CLARIFICATION = "PENDINGCLARIFICATION";
 	public static final String STATE_OT_INITIATED = "INITIATED";
 	public static final String STATE_OT_APPROVED = "APPROVED";
-	
-	//OwnershipTransfer Notifications
+
+	// OwnershipTransfer Notifications
 	public static final String NOTIFICATION_OT_SUBMIT = "rp.en.counter.submit";
 	public static final String NOTIFICATION_OT_REJECTED = "rp.en.counter.rejected";
 	public static final String NOTIFICATION_OT_SENDBACK = "rp.en.counter.sendback";
 	public static final String NOTIFICATION_OT_APPROVED = "rp.en.counter.approved";
-	
-    // ACTION_STATUS combinations for notification
 
-    public static final String ACTION_STATUS_INITIATED = "INITIATE_INITIATED";
-    public static final String ACTION_STATUS_SUBMIT = "SUBMIT_PENDINGCLVERIFICATION";
-    public static final String ACTION_STATUS_REJECTED = "REJECT_REJECTED";
-    public static final String ACTION_STATUS_SENDBACK = "SENDBACK_PENDINGCLARIFICATION";
-    public static final String ACTION_STATUS_APPROVED = "PAY_APPROVED";
+	// ACTION_STATUS combinations for notification
+
+	public static final String ACTION_STATUS_INITIATED = "INITIATE_INITIATED";
+	public static final String ACTION_STATUS_SUBMIT = "SUBMIT_PENDINGCLVERIFICATION";
+	public static final String ACTION_STATUS_REJECTED = "REJECT_REJECTED";
+	public static final String ACTION_STATUS_SENDBACK = "SENDBACK_PENDINGCLARIFICATION";
+	public static final String ACTION_STATUS_APPROVED = "PAY_APPROVED";
+
+//    demand generation
+	public static final String STATE_PENDING_SA_VERIFICATION = "PENDINGSAVERIFICATION";
+	public static final String STATE_PENDING_APRO = "PENDINGAPRO";
 
 }

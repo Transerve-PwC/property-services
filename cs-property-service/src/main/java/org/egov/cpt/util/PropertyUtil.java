@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PropertyUtil {
 
-//	@Autowired
-//	private PropertyConfiguration config;
+	@Autowired
+	private PropertyConfiguration config;
 
 	/**
 	 * Method to return auditDetails for create/update flows
@@ -50,65 +52,35 @@ public class PropertyUtil {
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
 
-//	public void addAddressIds(List<Property> responseProperties, Property requestProperty) {
-//
-//		Map<String, String> propIdToAddrId = responseProperties.stream()
-//				.collect(Collectors.toMap(Property::getId, prop -> prop.getAddress().getId()));
-//		requestProperty.getAddress().setId(propIdToAddrId.get(requestProperty.getPropertyId()));
-//	}
-//
-//	/**
-//	 * Returns the uri for the localization call
-//	 * 
-//	 * @param tenantId TenantId of the propertyRequest
-//	 * @return The uri for localization search call
-//	 */
-//	public StringBuilder getUri(String tenantId, RequestInfo requestInfo) {
-//		if (config.getIsStateLevel())
-//			tenantId = tenantId.split("\\.")[0];
-//
-//		String locale = NOTIFICATION_LOCALE;
-//		if (!StringUtils.isEmpty(requestInfo.getMsgId()) && requestInfo.getMsgId().split("\\|").length >= 2)
-//			locale = requestInfo.getMsgId().split("\\|")[1];
-//
+	/**
+	 * Creates url for tl-calculator service
+	 * 
+	 * @return url for tl-calculator service
+	 */
+//	public StringBuilder getCalculationURI(String businessService) {
 //		StringBuilder uri = new StringBuilder();
-//		uri.append(config.getLocalizationHost()).append(config.getLocalizationContextPath())
-//				.append(config.getLocalizationSearchEndpoint());
-//		uri.append("?").append("locale=").append(locale).append("&tenantId=").append(tenantId).append("&module=")
-//				.append(PTConstants.MODULE);
+//		uri.append(config.getCalculatorHost());
+//		uri.append(config.getCalculateEndpointTL());
 //		return uri;
 //	}
-//
-//	public ProcessInstanceRequest getProcessInstanceForPayment(PropertyRequest propertyRequest) {
-//
-//		Property property = propertyRequest.getProperty();
-//
-//		ProcessInstance process = ProcessInstance.builder().businessService(config.getPropertyRegistryWf())
-//				.businessId(property.getAcknowldgementNumber()).comment("Payment for property processed")
-//				.assignee(property.getOwners().get(0)).moduleName("PT").action("PAY").build();
-//
-//		return ProcessInstanceRequest.builder().requestInfo(propertyRequest.getRequestInfo())
-//				.processInstances(Arrays.asList(process)).build();
-//	}
-//
-//	public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request, Boolean isCreate) {
-//
-//		Property property = request.getProperty();
-//		ProcessInstance wf = null != property.getWorkflow() ? property.getWorkflow() : new ProcessInstance();
-//
-//		wf.setBusinessId(property.getAcknowldgementNumber());
-//		wf.setTenantId(property.getTenantId());
-//
-//		if (isCreate) {
-//
-//			wf.setAssignee(property.getOwners().get(0));
-//			wf.setBusinessService(config.getPropertyRegistryWf());
-//			wf.setModuleName(config.getPropertyModuleName());
-//			wf.setAction("OPEN");
-//		}
-//
-//		return ProcessInstanceRequest.builder().processInstances(Arrays.asList(request.getProperty().getWorkflow()))
-//				.requestInfo(request.getRequestInfo()).build();
-//	}
 
+	/**
+	 * Creates demand Search url based on tenanatId,businessService and ConsumerCode
+	 * 
+	 * @return demand search url
+	 */
+	public String getDemandSearchURL() {
+		StringBuilder url = new StringBuilder(config.getBillingHost());
+		url.append(config.getDemandSearchEndpoint());
+		url.append("?");
+		url.append("tenantId=");
+		url.append("{1}");
+		url.append("&");
+		url.append("businessService=");
+		url.append("{2}");
+		url.append("&");
+		url.append("consumerCode=");
+		url.append("{3}");
+		return url.toString();
+	}
 }
