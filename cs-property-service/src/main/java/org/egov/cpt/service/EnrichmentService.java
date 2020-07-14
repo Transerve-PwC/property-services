@@ -1,6 +1,8 @@
 package org.egov.cpt.service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -21,8 +23,12 @@ import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.UserDetailResponse;
 import org.egov.cpt.models.Idgen.IdResponse;
+import org.egov.cpt.models.calculation.Calculation;
+import org.egov.cpt.models.calculation.Category;
+import org.egov.cpt.models.calculation.TaxHeadEstimate;
 import org.egov.cpt.repository.IdGenRepository;
 import org.egov.cpt.util.DuplicateCopyConstants;
+import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.MortgageRequest;
@@ -62,7 +68,7 @@ public class EnrichmentService {
 				property.setId(gen_property_id);
 				property.setAuditDetails(propertyAuditDetails);
 				property.setPropertyDetails(propertyDetail);
-				log.info("property id: " + gen_property_id);
+//				log.info("property id: " + gen_property_id);
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
 					property.getOwners().forEach(owner -> {
@@ -76,7 +82,7 @@ public class EnrichmentService {
 						owner.setAuditDetails(propertyAuditDetails);
 						OwnerDetails ownerDetails = getOwnerShipDetails(owner, property, requestInfo, gen_property_id);
 						owner.setOwnerDetails(ownerDetails);
-						log.info("owner id: " + gen_owner_id);
+//						log.info("owner id: " + gen_owner_id);
 					});
 				}
 			});
@@ -93,7 +99,7 @@ public class EnrichmentService {
 		ownerDetails.setOwnerId(owner.getId());
 		ownerDetails.setTenantId(property.getTenantId());
 		ownerDetails.setAuditDetails(ownerAuditDetails);
-		log.info("owner detail id: " + gen_owner_details_id);
+//		log.info("owner detail id: " + gen_owner_details_id);
 		return ownerDetails;
 	}
 
@@ -237,6 +243,7 @@ public class EnrichmentService {
 	 * Ownership Transfer
 	 */
 	public void enrichCreateOwnershipTransfer(OwnershipTransferRequest request, List<Property> propertyFromDb) {
+
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		Property foundProperty = propertyFromDb.get(0);
@@ -248,6 +255,9 @@ public class EnrichmentService {
 				owner.setAuditDetails(propertyAuditDetails);
 				OwnerDetails ownerDetails = updateOwnerShipDetails(owner, foundProperty, requestInfo, gen_owner_id);
 				owner.setOwnerDetails(ownerDetails);
+
+//				demand generation
+				enrichGenerateDemand(owner);
 			});
 			setIdgenIds(request);
 		}
@@ -267,8 +277,58 @@ public class EnrichmentService {
 				owner.setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setOwnershipTransferDocuments(ownershipTransferDocuments);
+
+//				demand generation
+				enrichUpdateDemand(owner);
 			});
 		}
+	}
+
+	private void enrichGenerateDemand(Owner owner) {
+		List<TaxHeadEstimate> estimates = new LinkedList<>();
+		owner.setBusinessService("RENTED_PROPERTIES");
+
+		TaxHeadEstimate estimateDue = new TaxHeadEstimate();
+		estimateDue.setEstimateAmount(new BigDecimal(0.0)); // TODO doubt amount
+		estimateDue.setCategory(Category.DUE);
+		estimateDue.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
+		estimates.add(estimateDue);
+
+		TaxHeadEstimate estimateCharges = new TaxHeadEstimate();
+		estimateCharges.setEstimateAmount(new BigDecimal(0.0)); // TODO doubt amount
+		estimateCharges.setCategory(Category.CHARGES);
+		estimateCharges.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.CHARGES));
+		estimates.add(estimateCharges);
+
+		Calculation calculation = Calculation.builder()
+				.applicationNumber(owner.getOwnerDetails().getApplicationNumber()).taxHeadEstimates(estimates)
+				.tenantId(owner.getTenantId()).build();
+		owner.setCalculation(calculation);
+	}
+
+	private void enrichUpdateDemand(Owner owner) {
+		List<TaxHeadEstimate> estimates = new LinkedList<>();
+		owner.setBusinessService("RENTED_PROPERTIES");
+		TaxHeadEstimate estimate = new TaxHeadEstimate();
+		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.STATE_PENDING_SA_VERIFICATION)) {
+			estimate.setEstimateAmount(owner.getOwnerDetails().getDueAmount()); // TODO doubt amount
+			estimate.setCategory(Category.DUE);
+			estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
+		}
+		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.STATE_PENDING_APRO)) {
+			estimate.setEstimateAmount(owner.getOwnerDetails().getAproCharge()); // TODO doubt amount
+			estimate.setCategory(Category.CHARGES);
+			estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.CHARGES));
+		}
+		estimates.add(estimate);
+		Calculation calculation = Calculation.builder()
+				.applicationNumber(owner.getOwnerDetails().getApplicationNumber()).taxHeadEstimates(estimates)
+				.tenantId(owner.getTenantId()).build();
+		owner.setCalculation(calculation);
+	}
+
+	private String getTaxHeadCode(String businessService, Category category) {
+		return String.format("%s_%s", businessService, category.toString());
 	}
 
 	private List<OwnershipTransferDocument> updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
@@ -363,8 +423,9 @@ public class EnrichmentService {
 			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
 				String gen_application_id = UUID.randomUUID().toString();
 				application.setId(gen_application_id);
-				application.setPropertyId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
+				application.getProperty().setId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId()); //TODO CHECK BY DEBUG
 				application.setAuditDetails(propertyAuditDetails);
+				System.out.println(propertyAuditDetails.toString() + " audit details here");
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {

@@ -5,9 +5,11 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.cpt.util.PropertySerializer;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -35,8 +37,7 @@ public class DuplicateCopy {
 	@JsonProperty("id")
 	private String id;
 	
-	@Valid
-	@JsonProperty("property")
+	@JsonSerialize(using = PropertySerializer.class)
 	private Property property;
 	
 	@JsonProperty("tenantId")
@@ -50,10 +51,6 @@ public class DuplicateCopy {
 	
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
-	
-	@Valid
-	@JsonProperty("propertyId")
-	private String propertyId;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;

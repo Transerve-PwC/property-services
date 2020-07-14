@@ -39,7 +39,7 @@ public class PropertyRepository {
 	public List<DuplicateCopy> getDuplicateCopyProperties(DuplicateCopySearchCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getDuplicateCopyPropertySearchQuery(criteria, preparedStmtList);
-		log.info("SearchQuery:"+query);
+//		log.info("SearchQuery:"+query);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), duplicateCopyPropertyRowMapper);
 	}
 	

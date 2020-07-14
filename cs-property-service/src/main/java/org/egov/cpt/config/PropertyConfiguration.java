@@ -1,5 +1,6 @@
 package org.egov.cpt.config;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -247,5 +248,22 @@ public class PropertyConfiguration {
 
 	@Value("${egov.idgen.mg.applicationNum.format}")
 	private String applicationNumberIdgenFormatMG;
+
+//	BilllingService generating demand 
+
+	@Value("${egov.billingservice.host}")
+	private String billingHost;
+
+	@Value("${egov.demand.create.endpoint}")
+	private String demandCreateEndpoint;
+
+	@Value("${egov.demand.minimum.payable.amount}")
+	private BigDecimal minimumPayableAmount;
+
+	@Value("${egov.demand.search.endpoint}")
+	private String demandSearchEndpoint;
+
+	@Value("${egov.demand.update.endpoint}")
+	private String demandUpdateEndpoint;
 
 }

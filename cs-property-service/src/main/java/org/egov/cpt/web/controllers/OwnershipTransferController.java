@@ -5,8 +5,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Owner;
-import org.egov.cpt.models.OwnershipTransferSearchCriteria;
 import org.egov.cpt.service.OwnershipTransferService;
 import org.egov.cpt.util.ResponseInfoFactory;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
@@ -45,7 +45,7 @@ public class OwnershipTransferController {
 	@PostMapping("/_search")
 	public ResponseEntity<OwnershipTransferResponse> search(
 			@Valid @RequestBody OwnershipTransferRequest requestInfoWrapper,
-			@Valid @ModelAttribute OwnershipTransferSearchCriteria searchCriteria) {
+			@Valid @ModelAttribute DuplicateCopySearchCriteria searchCriteria) {
 
 		List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria,
 				requestInfoWrapper.getRequestInfo());

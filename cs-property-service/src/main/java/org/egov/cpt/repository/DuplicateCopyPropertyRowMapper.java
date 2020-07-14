@@ -43,9 +43,13 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 						.lastModifiedTime(rs.getLong("modified_time")).build();
 
 				//				List<Owner> owners = addOwnersToProperty(rs, currentProperty);
+				
+				Property property = Property.builder().id(rs.getString("property_id")).build();
+						
 
 				currentapplication = DuplicateCopy.builder()
 						.id(applicationId)
+						.property(property)
 						.tenantId(rs.getString("tenantid"))
 						.state(rs.getString("state"))
 						.action(rs.getString("action"))
