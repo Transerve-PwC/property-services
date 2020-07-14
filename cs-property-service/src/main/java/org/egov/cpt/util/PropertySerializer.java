@@ -10,7 +10,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
- * A serializer class to work around the cyclic reference between Property and Owner classes.
+ * A serializer class to work around the cyclic reference between Property and
+ * Owner classes.
  */
 public class PropertySerializer extends StdSerializer<Property> {
 
@@ -35,6 +36,10 @@ public class PropertySerializer extends StdSerializer<Property> {
 		generator.writeString(property.getId());
 		generator.writeFieldName("transitNumber");
 		generator.writeString(property.getTransitNumber());
+//		generator.writeFieldName("colony");
+//		generator.writeString(property.getColony());
+//		generator.writeFieldName("pincode");
+//		generator.writeString(property.getPropertyDetails().getAddress().getPincode());
 		generator.writeEndObject();
 	}
 }

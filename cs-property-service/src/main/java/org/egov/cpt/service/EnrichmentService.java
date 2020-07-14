@@ -27,7 +27,6 @@ import org.egov.cpt.models.calculation.Calculation;
 import org.egov.cpt.models.calculation.Category;
 import org.egov.cpt.models.calculation.TaxHeadEstimate;
 import org.egov.cpt.repository.IdGenRepository;
-import org.egov.cpt.util.DuplicateCopyConstants;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
@@ -423,7 +422,11 @@ public class EnrichmentService {
 			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
 				String gen_application_id = UUID.randomUUID().toString();
 				application.setId(gen_application_id);
-				application.getProperty().setId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId()); //TODO CHECK BY DEBUG
+				application.getProperty()
+						.setId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId()); // TODO
+																													// CHECK
+																													// BY
+																													// DEBUG
 				application.setAuditDetails(propertyAuditDetails);
 				System.out.println(propertyAuditDetails.toString() + " audit details here");
 
@@ -496,6 +499,7 @@ public class EnrichmentService {
 		}
 
 	}
+
 	public void enrichMortgageCreateRequest(MortgageRequest mortgageRequest) {
 		RequestInfo requestInfo = mortgageRequest.getRequestInfo();
 		AuditDetails mortgageAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
@@ -504,7 +508,7 @@ public class EnrichmentService {
 			mortgageRequest.getMortgageApplications().forEach(application -> {
 				String gen_mortgage_id = UUID.randomUUID().toString();
 				application.setId(gen_mortgage_id);
-				application.setPropertyId(mortgageRequest.getMortgageApplications().get(0).getProperty().getId());
+				application.getProperty().setId(mortgageRequest.getMortgageApplications().get(0).getProperty().getId());
 				application.setAuditDetails(mortgageAuditDetails);
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
@@ -525,7 +529,8 @@ public class EnrichmentService {
 		RequestInfo requestInfo = request.getRequestInfo();
 		String tenantId = request.getMortgageApplications().get(0).getTenantId();
 		List<Mortgage> applications = request.getMortgageApplications();
-		List<String> applicationNumbers=setIdgenIds(requestInfo,tenantId,applications.size(),config.getApplicationNumberIdgenNameMG(),config.getApplicationNumberIdgenFormatMG());
+		List<String> applicationNumbers = setIdgenIds(requestInfo, tenantId, applications.size(),
+				config.getApplicationNumberIdgenNameMG(), config.getApplicationNumberIdgenFormatMG());
 		ListIterator<String> itr = applicationNumbers.listIterator();
 		applications.forEach(application -> {
 			application.setApplicationNumber(itr.next());
@@ -533,10 +538,11 @@ public class EnrichmentService {
 
 	}
 
-	private List<String> setIdgenIds(RequestInfo requestInfo, String tenantId,int size, String idGenName,String idGenFormate) {
+	private List<String> setIdgenIds(RequestInfo requestInfo, String tenantId, int size, String idGenName,
+			String idGenFormate) {
 		List<String> applicationNumbers = null;
 
-		applicationNumbers = getIdList(requestInfo, tenantId, idGenName,idGenFormate, size);
+		applicationNumbers = getIdList(requestInfo, tenantId, idGenName, idGenFormate, size);
 
 		Map<String, String> errorMap = new HashMap<>();
 		if (applicationNumbers.size() != size) {

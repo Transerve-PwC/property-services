@@ -5,9 +5,11 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.cpt.util.PropertySerializer;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -35,7 +37,7 @@ public class Mortgage {
 	@JsonProperty("id")
 	private String id;
 
-	@JsonProperty("property")
+	@JsonSerialize(using = PropertySerializer.class)
 	private Property property;
 
 	@JsonProperty("tenantId")
@@ -46,32 +48,28 @@ public class Mortgage {
 
 	@JsonProperty("action")
 	private String action;
-	
+
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
-	
-	@JsonProperty("propertyId")
-	private String propertyId;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
-	
+
 	@Valid
 	@JsonProperty("applicationDocuments")
-	private List<DuplicateCopyDocument> applicationDocuments=null;
+	private List<DuplicateCopyDocument> applicationDocuments = null;
 
 	@Valid
 	@JsonProperty("applicant")
 	private List<MortgageApplicant> applicant;
-	
+
 	public Mortgage addApplicationDocumentsItem(DuplicateCopyDocument applicationDocumentsItem) {
-	    if (this.applicationDocuments == null) {
-	    this.applicationDocuments = new ArrayList<>();
-	    }
-	    if(!this.applicationDocuments.contains(applicationDocumentsItem))
-	        this.applicationDocuments.add(applicationDocumentsItem);
-	    return this;
+		if (this.applicationDocuments == null) {
+			this.applicationDocuments = new ArrayList<>();
+		}
+		if (!this.applicationDocuments.contains(applicationDocumentsItem))
+			this.applicationDocuments.add(applicationDocumentsItem);
+		return this;
 	}
 
-	
 }

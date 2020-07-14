@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
-import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Property;
@@ -24,10 +23,10 @@ public class MortgageService {
 
 	@Autowired
 	private EnrichmentService enrichmentService;
-	
+
 	@Autowired
 	private PropertyConfiguration config;
-	
+
 	@Autowired
 	private Producer producer;
 
@@ -38,19 +37,19 @@ public class MortgageService {
 	private WorkflowIntegrator wfIntegrator;
 
 	public List<Mortgage> createApplication(MortgageRequest mortgageRequest) {
-		List<Property> propertiesFromDb= propertyValidator.isPropertyExist(mortgageRequest);
-		propertyValidator.validateMortgageCreateRequest(mortgageRequest); 
+		List<Property> propertiesFromDb = propertyValidator.isPropertyExist(mortgageRequest);
+		propertyValidator.validateMortgageCreateRequest(mortgageRequest);
 		enrichmentService.enrichMortgageCreateRequest(mortgageRequest);
 //		propertyValidator.validateMortgageCreate(mortgageRequest);
 		if (config.getIsWorkflowEnabled()) {
 			wfIntegrator.callMortgageWorkFlow(mortgageRequest);
 		}
-//		producer.push(config.getSaveMortgageTopic(), mortgageRequest);
+		producer.push(config.getSaveMortgageTopic(), mortgageRequest);
 		return mortgageRequest.getMortgageApplications();
 	}
 
 	public List<Mortgage> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
-		propertyValidator.validateDuplicateCopySearch(requestInfo,criteria);
+		propertyValidator.validateDuplicateCopySearch(requestInfo, criteria);
 //	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
 		List<Mortgage> properties = getApplication(criteria, requestInfo);
 		return properties;
@@ -58,8 +57,8 @@ public class MortgageService {
 
 	private List<Mortgage> getApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
 		List<Mortgage> application = repository.getMortgageProperties(criteria);
-        if(application.isEmpty())
-            return Collections.emptyList();
-        return application;
+		if (application.isEmpty())
+			return Collections.emptyList();
+		return application;
 	}
 }
