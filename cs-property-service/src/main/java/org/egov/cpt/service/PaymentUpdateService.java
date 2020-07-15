@@ -98,7 +98,7 @@ public class PaymentUpdateService {
 					List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria, requestInfo);
 
 					BusinessService businessService = workflowService.getBusinessService(owners.get(0).getTenantId(),
-							requestInfo, "RENTED_PROPERTIES");
+							requestInfo, "OwnershipTransferRP");
 
 					if (CollectionUtils.isEmpty(owners))
 						throw new CustomException("INVALID RECEIPT",
