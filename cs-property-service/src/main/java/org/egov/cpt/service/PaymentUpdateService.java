@@ -52,7 +52,7 @@ public class PaymentUpdateService {
 	private PropertyUtil util;
 
 	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
-	private Boolean pickWFServiceNameFromTradeTypeOnly;
+	private Boolean pickWFServiceNameFromPropertyTypeOnly;
 
 	@Value("${egov.allowed.businessServices}")
 	private String allowedBusinessServices;
@@ -89,7 +89,6 @@ public class PaymentUpdateService {
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			RequestInfo requestInfo = paymentRequest.getRequestInfo();
 			List<PaymentDetail> paymentDetails = paymentRequest.getPayment().getPaymentDetails();
-			String tenantId = paymentRequest.getPayment().getTenantId();
 			List<String> allowedservices = Arrays.asList(allowedBusinessServices.split(","));
 			for (PaymentDetail paymentDetail : paymentDetails) {
 				if (allowedservices.contains(paymentDetail.getBusinessService())) {
@@ -102,13 +101,13 @@ public class PaymentUpdateService {
 
 					if (CollectionUtils.isEmpty(owners))
 						throw new CustomException("INVALID RECEIPT",
-								"No tradeLicense found for the comsumerCode " + searchCriteria.getApplicationNumber());
+								"No Owner found for the comsumerCode " + searchCriteria.getApplicationNumber());
 
 					owners.forEach(license -> license.setApplicationAction(PTConstants.ACTION_PAY));
 
 					// FIXME check if the update call to repository can be avoided
 					// FIXME check why aniket is not using request info from consumer
-					// REMOVE SYSTEM HARDCODING AFTER ALTERING THE CONFIG IN WF FOR TL
+					// REMOVE SYSTEM HARDCODING AFTER ALTERING THE CONFIG IN WF FOR RP
 
 					Role role = Role.builder().code("SYSTEM_PAYMENT").build();
 					requestInfo.getUserInfo().getRoles().add(role);
@@ -129,7 +128,7 @@ public class PaymentUpdateService {
 					enrichmentService.postStatusEnrichment(updateRequest, endStates);
 
 					/*
-					 * calling repository to update the object in TL tables
+					 * calling repository to update the object in RP tables
 					 */
 					Map<String, Boolean> idToIsStateUpdatableMap = util.getIdToIsStateUpdatableMap(businessService,
 							owners);
