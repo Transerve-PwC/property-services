@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.cpt.models.calculation.Calculation;
 import org.egov.cpt.util.PropertySerializer;
 import org.springframework.validation.annotation.Validated;
 
@@ -62,6 +63,12 @@ public class DuplicateCopy {
 	@Valid
 	@JsonProperty("applicant")
 	private List<Applicant> applicant;
+	
+	@JsonProperty("businessService")
+	private String businessService = "RENTED_PROPERTIES"; // TODO change
+	
+	@JsonProperty("calculation")
+	Calculation calculation;
 	
 	public DuplicateCopy addApplicationDocumentsItem(DuplicateCopyDocument applicationDocumentsItem) {
 	    if (this.applicationDocuments == null) {
