@@ -59,7 +59,7 @@ public class OwnershipTransferRepository {
 		List<Owner> ownersForAdhocChargeUpdate = new LinkedList<>();
 
 		for (Owner owner : owners) {
-			if (idToIsStateUpdatableMap.get(owner.getBusinessService())) {
+			if (idToIsStateUpdatableMap.get(owner.getId())) {
 				ownersForUpdate.add(owner);
 			} else if (owner.getApplicationAction().equalsIgnoreCase(PTConstants.ACTION_ADHOC))
 				ownersForAdhocChargeUpdate.add(owner);
@@ -75,9 +75,9 @@ public class OwnershipTransferRepository {
 		if (!CollectionUtils.isEmpty(ownersForStatusUpdate))
 			workflowIntegrator.callOwnershipTransferWorkFlow(ownershipTransferRequest);
 
-//		if (!licensesForAdhocChargeUpdate.isEmpty())
+//		if (!ownersForAdhocChargeUpdate.isEmpty())
 //			producer.push(config.getUpdateAdhocTopic(),
-//					new OwnershipTransferRequest(requestInfo, licensesForAdhocChargeUpdate));
+//					new OwnershipTransferRequest(requestInfo, ownersForAdhocChargeUpdate));
 
 	}
 
