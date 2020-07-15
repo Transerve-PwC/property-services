@@ -55,6 +55,38 @@ public class PTConstants {
 
 	public static final String BOUNDARY_HEIRARCHY_CODE = "REVENUE";
 
+//	payment
+
+	public static final String ACTION_INITIATE = "INITIATE";
+
+	public static final String ACTION_APPLY = "APPLY";
+
+	public static final String ACTION_APPROVE = "APPROVE";
+
+	public static final String ACTION_REJECT = "REJECT";
+
+	public static final String TRIGGER_NOWORKFLOW = "NOWORKFLOW";
+
+	public static final String ACTION_CANCEL = "CANCEL";
+
+	public static final String ACTION_ADHOC = "ADHOC";
+
+	public static final String STATUS_INITIATED = "INITIATED";
+
+	public static final String STATUS_APPLIED = "APPLIED";
+
+	public static final String STATUS_APPROVED = "APPROVED";
+
+	public static final String STATUS_REJECTED = "REJECTED";
+
+	public static final String STATUS_FIELDINSPECTION = "FIELDINSPECTION";
+
+	public static final String STATUS_CANCELLED = "CANCELLED";
+
+	public static final String STATUS_PAID = "PAID";
+
+	public static final String BILL_AMOUNT_JSONPATH = "$.billResponse.Bill[0].totalAmount";
+
 	public static final String MODULE = "rainmaker-tl";
 
 	public static final String NOTIFICATION_LOCALE = "en_IN";
