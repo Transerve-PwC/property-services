@@ -556,4 +556,18 @@ public class EnrichmentService {
 		return applicationNumbers;
 
 	}
+
+	/**
+	 * Enriches the object after status is assigned
+	 * 
+	 * @param tradeLicenseRequest The update request
+	 */
+	public void postStatusEnrichment(OwnershipTransferRequest tradeLicenseRequest, List<String> endstates) {
+//		setLicenseNumberAndIssueDate(tradeLicenseRequest, endstates);
+		List<Owner> licenses = tradeLicenseRequest.getOwners();
+		for (int i = 0; i < licenses.size(); i++) {
+//			setCTLLicenseValidity(licenses.get(i));
+		}
+	}
+
 }
