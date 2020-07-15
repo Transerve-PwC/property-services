@@ -563,11 +563,16 @@ public class EnrichmentService {
 	 * @param tradeLicenseRequest The update request
 	 */
 	public void postStatusEnrichment(OwnershipTransferRequest tradeLicenseRequest, List<String> endstates) {
-//		setLicenseNumberAndIssueDate(tradeLicenseRequest, endstates);
-		List<Owner> licenses = tradeLicenseRequest.getOwners();
-		for (int i = 0; i < licenses.size(); i++) {
-//			setCTLLicenseValidity(licenses.get(i));
-		}
+		tradeLicenseRequest.getOwners().forEach(owner -> {
+			OwnerDetails ownerDetails = buildOwnerDetails(owner);
+			owner.setOwnerDetails(ownerDetails);
+
+		});
+	}
+
+	private OwnerDetails buildOwnerDetails(Owner owner) {
+		OwnerDetails ownerDetails = OwnerDetails.builder().permanent(true).build();
+		return ownerDetails;
 	}
 
 }
