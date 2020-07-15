@@ -65,6 +65,9 @@ public class PropertyConfiguration {
 
 	@Value("${ownership.transfer.update.topic}")
 	private String ownershipTransferUpdateTopic;
+	
+	@Value("${persister.save.mortgage.topic}")
+	private String saveMortgageTopic;
 
 	@Value("${persister.cancel.property.topic}")
 	private String cancelPropertyTopic;
@@ -197,6 +200,9 @@ public class PropertyConfiguration {
 
 	@Value("${duplicateCopy.workflow.name}")
 	private String duplicateCopyBusinessServiceValue;
+	
+	@Value("${mortgage.workflow.name}")
+	private String mortgageBusinessServiceValue;
 
 	// ##### mdms
 
@@ -236,6 +242,12 @@ public class PropertyConfiguration {
 
 	@Value("${egov.idgen.dc.applicationNum.format}")
 	private String applicationNumberIdgenFormatDC;
+	
+	@Value("${egov.idgen.mg.applicationNum.name}")
+	private String applicationNumberIdgenNameMG;
+
+	@Value("${egov.idgen.mg.applicationNum.format}")
+	private String applicationNumberIdgenFormatMG;
 
 //	BilllingService generating demand 
 

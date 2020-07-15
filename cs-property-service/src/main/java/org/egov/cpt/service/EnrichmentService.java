@@ -15,6 +15,7 @@ import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.OwnershipTransferDocument;
@@ -29,6 +30,7 @@ import org.egov.cpt.repository.IdGenRepository;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
+import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
@@ -547,6 +549,81 @@ public class EnrichmentService {
 			});
 		}
 
+	}
+
+	public void enrichMortgageCreateRequest(MortgageRequest mortgageRequest) {
+		RequestInfo requestInfo = mortgageRequest.getRequestInfo();
+		AuditDetails mortgageAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+		if (!CollectionUtils.isEmpty(mortgageRequest.getMortgageApplications())) {
+			mortgageRequest.getMortgageApplications().forEach(application -> {
+				String gen_mortgage_id = UUID.randomUUID().toString();
+				application.setId(gen_mortgage_id);
+				application.getProperty().setId(mortgageRequest.getMortgageApplications().get(0).getProperty().getId());
+				application.setAuditDetails(mortgageAuditDetails);
+
+				if (!CollectionUtils.isEmpty(application.getApplicant())) {
+					application.getApplicant().forEach(applicant -> {
+						applicant.setId(UUID.randomUUID().toString());
+						applicant.setMortgageId(gen_mortgage_id);
+						applicant.setTenantId(application.getTenantId());
+						applicant.setAuditDetails(mortgageAuditDetails);
+					});
+				}
+			});
+		}
+		setMortgageIdgenIds(mortgageRequest);
+
+	}
+
+	private void setMortgageIdgenIds(MortgageRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		String tenantId = request.getMortgageApplications().get(0).getTenantId();
+		List<Mortgage> applications = request.getMortgageApplications();
+		List<String> applicationNumbers = setIdgenIds(requestInfo, tenantId, applications.size(),
+				config.getApplicationNumberIdgenNameMG(), config.getApplicationNumberIdgenFormatMG());
+		ListIterator<String> itr = applicationNumbers.listIterator();
+		applications.forEach(application -> {
+			application.setApplicationNumber(itr.next());
+		});
+
+	}
+
+	private List<String> setIdgenIds(RequestInfo requestInfo, String tenantId, int size, String idGenName,
+			String idGenFormate) {
+		List<String> applicationNumbers = null;
+
+		applicationNumbers = getIdList(requestInfo, tenantId, idGenName, idGenFormate, size);
+
+		Map<String, String> errorMap = new HashMap<>();
+		if (applicationNumbers.size() != size) {
+			errorMap.put("IDGEN ERROR ",
+					"The number of application number returned by idgen is not equal to number of Applications");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+
+		return applicationNumbers;
+
+	}
+
+	/**
+	 * Enriches the object after status is assigned
+	 * 
+	 * @param ownershipTransferRequest The update request
+	 */
+	public void postStatusEnrichment(OwnershipTransferRequest ownershipTransferRequest, List<String> endstates) {
+		ownershipTransferRequest.getOwners().forEach(owner -> {
+			OwnerDetails ownerDetails = buildOwnerDetails(owner);
+			owner.setOwnerDetails(ownerDetails);
+
+		});
+	}
+
+	private OwnerDetails buildOwnerDetails(Owner owner) {
+		OwnerDetails ownerDetails = OwnerDetails.builder().permanent(true).build();
+		return ownerDetails;
 	}
 
 }

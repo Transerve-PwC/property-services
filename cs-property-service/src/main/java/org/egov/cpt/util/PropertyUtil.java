@@ -1,11 +1,17 @@
 package org.egov.cpt.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.AuditDetails;
+import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.calculation.BusinessService;
+import org.egov.cpt.workflow.WorkflowService;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
@@ -18,6 +24,9 @@ public class PropertyUtil {
 
 	@Autowired
 	private PropertyConfiguration config;
+
+	@Autowired
+	private WorkflowService workflowService;
 
 	/**
 	 * Method to return auditDetails for create/update flows
@@ -82,5 +91,26 @@ public class PropertyUtil {
 		url.append("consumerCode=");
 		url.append("{3}");
 		return url.toString();
+	}
+
+	/**
+	 * Creates a map of id to isStateUpdatable
+	 * 
+	 * @param searchresult    Licenses from DB
+	 * @param businessService The businessService configuration
+	 * @return Map of is to isStateUpdatable
+	 */
+	public Map<String, Boolean> getIdToIsStateUpdatableMap(BusinessService businessService, List<Owner> searchresult) {
+		Map<String, Boolean> idToIsStateUpdatableMap = new HashMap<>();
+		searchresult.forEach(result -> {
+			String nameofBusinessService = result.getBusinessService();
+			if (StringUtils.equals(nameofBusinessService, PTConstants.businessService_OT)
+					&& (result.getApplicationState().equalsIgnoreCase(PTConstants.STATUS_INITIATED))) {
+				idToIsStateUpdatableMap.put(result.getId(), true);
+			} else
+				idToIsStateUpdatableMap.put(result.getId(),
+						workflowService.isStateUpdatable(result.getApplicationState(), businessService));
+		});
+		return idToIsStateUpdatableMap;
 	}
 }

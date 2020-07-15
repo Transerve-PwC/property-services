@@ -20,6 +20,7 @@ import org.egov.cpt.util.DuplicateCopyConstants;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
+import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.mdms.model.MdmsCriteriaReq;
@@ -655,6 +656,37 @@ public class PropertyValidator {
 			});
 		}
 		return propertyCriteria;
+	}
+
+	public List<Property> isPropertyExist(MortgageRequest mortgageRequest) {
+		PropertyCriteria criteria = getPropertyCriteriaForSearch(mortgageRequest);
+		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
+		boolean ifPropertyExists = PropertyExists(propertiesFromSearchResponse);
+		if (!ifPropertyExists) {
+			throw new CustomException("PROPERTY NOT FOUND", "Please provide valid property details");
+		}
+
+		return propertiesFromSearchResponse;
+	}
+
+	private PropertyCriteria getPropertyCriteriaForSearch(MortgageRequest request) {
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		if (!CollectionUtils.isEmpty(request.getMortgageApplications())) {
+			request.getMortgageApplications().forEach(application -> {
+				if (application.getProperty().getTransitNumber() != null)
+					propertyCriteria.setTransitNumber(application.getProperty().getTransitNumber());
+				if (application.getProperty().getColony() != null)
+					propertyCriteria.setColony(application.getProperty().getColony());
+				if (application.getProperty().getId() != null) 
+					propertyCriteria.setPropertyId(application.getProperty().getId());
+			});
+		}
+		return propertyCriteria;
+
+	}
+
+	public void validateMortgageCreateRequest(MortgageRequest mortgageRequest) {
+//			validateDuplicateMortgage();
 	}
 
 }
