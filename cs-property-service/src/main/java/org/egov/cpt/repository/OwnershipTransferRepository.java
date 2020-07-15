@@ -49,30 +49,31 @@ public class OwnershipTransferRepository {
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
-	public void update(OwnershipTransferRequest tradeLicenseRequest, Map<String, Boolean> idToIsStateUpdatableMap) {
-		RequestInfo requestInfo = tradeLicenseRequest.getRequestInfo();
-		List<Owner> licenses = tradeLicenseRequest.getOwners();
+	public void update(OwnershipTransferRequest ownershipTransferRequest,
+			Map<String, Boolean> idToIsStateUpdatableMap) {
+		RequestInfo requestInfo = ownershipTransferRequest.getRequestInfo();
+		List<Owner> owners = ownershipTransferRequest.getOwners();
 
-		List<Owner> licesnsesForStatusUpdate = new LinkedList<>();
-		List<Owner> licensesForUpdate = new LinkedList<>();
-		List<Owner> licensesForAdhocChargeUpdate = new LinkedList<>();
+		List<Owner> ownersForStatusUpdate = new LinkedList<>();
+		List<Owner> ownersForUpdate = new LinkedList<>();
+		List<Owner> ownersForAdhocChargeUpdate = new LinkedList<>();
 
-		for (Owner license : licenses) {
-			if (idToIsStateUpdatableMap.get(license.getId())) {
-				licensesForUpdate.add(license);
-			} else if (license.getApplicationAction().equalsIgnoreCase(PTConstants.ACTION_ADHOC))
-				licensesForAdhocChargeUpdate.add(license);
+		for (Owner owner : owners) {
+			if (idToIsStateUpdatableMap.get(owner.getBusinessService())) {
+				ownersForUpdate.add(owner);
+			} else if (owner.getApplicationAction().equalsIgnoreCase(PTConstants.ACTION_ADHOC))
+				ownersForAdhocChargeUpdate.add(owner);
 			else {
-				licesnsesForStatusUpdate.add(license);
+				ownersForStatusUpdate.add(owner);
 			}
 		}
 
-		if (!CollectionUtils.isEmpty(licensesForUpdate))
+		if (!CollectionUtils.isEmpty(ownersForUpdate))
 			producer.push(config.getOwnershipTransferUpdateTopic(),
-					new OwnershipTransferRequest(requestInfo, licensesForUpdate));
+					new OwnershipTransferRequest(requestInfo, ownersForUpdate));
 
-		if (!CollectionUtils.isEmpty(licesnsesForStatusUpdate))
-			workflowIntegrator.callOwnershipTransferWorkFlow(tradeLicenseRequest);
+		if (!CollectionUtils.isEmpty(ownersForStatusUpdate))
+			workflowIntegrator.callOwnershipTransferWorkFlow(ownershipTransferRequest);
 
 //		if (!licensesForAdhocChargeUpdate.isEmpty())
 //			producer.push(config.getUpdateAdhocTopic(),

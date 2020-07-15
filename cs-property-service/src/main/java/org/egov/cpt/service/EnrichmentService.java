@@ -560,10 +560,10 @@ public class EnrichmentService {
 	/**
 	 * Enriches the object after status is assigned
 	 * 
-	 * @param tradeLicenseRequest The update request
+	 * @param ownershipTransferRequest The update request
 	 */
-	public void postStatusEnrichment(OwnershipTransferRequest tradeLicenseRequest, List<String> endstates) {
-		tradeLicenseRequest.getOwners().forEach(owner -> {
+	public void postStatusEnrichment(OwnershipTransferRequest ownershipTransferRequest, List<String> endstates) {
+		ownershipTransferRequest.getOwners().forEach(owner -> {
 			OwnerDetails ownerDetails = buildOwnerDetails(owner);
 			owner.setOwnerDetails(ownerDetails);
 
