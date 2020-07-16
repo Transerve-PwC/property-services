@@ -348,14 +348,14 @@ public class WorkflowIntegrator {
 
 			array.add(obj);
 		}
-		Map<String, String> idStatusMap = callCommonWorkflow(array,request.getRequestInfo());
+		Map<String, String> idStatusMap = callCommonWorkflow(array, request.getRequestInfo());
 
 		// setting the status back to Property object from wf response
-		request.getMortgageApplications().forEach(application -> 
-		application.setState(idStatusMap.get(application.getApplicationNumber())));
+		request.getMortgageApplications()
+				.forEach(application -> application.setState(idStatusMap.get(application.getApplicationNumber())));
 	}
 
-	private Map<String, String> callCommonWorkflow(JSONArray array,RequestInfo requestInfo) {
+	private Map<String, String> callCommonWorkflow(JSONArray array, RequestInfo requestInfo) {
 		Map<String, String> idStatusMap = new HashMap<>();
 		if (!array.isEmpty()) {
 			JSONObject workFlowRequest = new JSONObject();
