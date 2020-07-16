@@ -10,6 +10,7 @@ import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
+import org.egov.cpt.service.notification.DuplicateCopyNotificationService;
 import org.egov.cpt.validator.PropertyValidator;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
@@ -35,6 +36,9 @@ public class DuplicateCopyService {
 
 	@Autowired
 	private WorkflowIntegrator wfIntegrator;
+	
+	@Autowired
+	private DuplicateCopyNotificationService notificationService;
 	
 	
 
@@ -73,6 +77,7 @@ public class DuplicateCopyService {
             wfIntegrator.callDuplicateCopyWorkFlow(duplicateCopyRequest);
         } 
 		producer.push(config.getUpdateDuplicateCopyTopic(), duplicateCopyRequest);
+		notificationService.process(duplicateCopyRequest);
 		return duplicateCopyRequest.getDuplicateCopyApplications();
 	}
 
