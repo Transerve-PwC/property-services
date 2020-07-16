@@ -571,7 +571,8 @@ public class EnrichmentService {
 	}
 
 	private OwnerDetails buildOwnerDetails(Owner owner) {
-		OwnerDetails ownerDetails = OwnerDetails.builder().permanent(true).build();
+		OwnerDetails ownerDetails = owner.getOwnerDetails();
+		ownerDetails.setPermanent(true);
 		return ownerDetails;
 	}
 

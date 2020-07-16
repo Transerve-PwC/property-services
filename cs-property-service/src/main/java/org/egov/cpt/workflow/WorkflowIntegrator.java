@@ -268,7 +268,6 @@ public class WorkflowIntegrator {
 
 			obj.put(TENANTIDKEY, wfTenantId);
 			obj.put(BUSINESSSERVICEKEY, config.getOwnershipTransferBusinessServiceValue());
-			log.info("BUSINESSIDKEY payment on update workflow: " + owner.getOwnerDetails().getApplicationNumber());
 			obj.put(BUSINESSIDKEY, owner.getOwnerDetails().getApplicationNumber());
 			obj.put(ACTIONKEY, owner.getApplicationAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);

@@ -95,11 +95,7 @@ public class PaymentUpdateService {
 					DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
 					searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
 
-					log.info("BUSINESSIDKEY from bill: " + paymentDetail.getBill().getConsumerCode());
 					List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria, requestInfo);
-					for (Owner owner : owners) {
-						log.info("BUSINESSIDKEY from serach: " + owner.getOwnerDetails().getApplicationNumber());
-					}
 
 					BusinessService businessService = workflowService.getBusinessService(owners.get(0).getTenantId(),
 							requestInfo, "OwnershipTransferRP");
@@ -122,7 +118,7 @@ public class PaymentUpdateService {
 					/*
 					 * calling workflow to update status
 					 */
-					wfIntegrator.callOwnershipTransferWorkFlow(updateRequest);
+//					wfIntegrator.callOwnershipTransferWorkFlow(updateRequest);
 
 					updateRequest.getOwners().forEach(
 							obj -> log.info(" the status of the application is : " + obj.getApplicationState()));
