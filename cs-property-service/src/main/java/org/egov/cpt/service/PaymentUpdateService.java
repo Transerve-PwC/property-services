@@ -94,7 +94,12 @@ public class PaymentUpdateService {
 				if (allowedservices.contains(paymentDetail.getBusinessService())) {
 					DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
 					searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
+
+					log.info("BUSINESSIDKEY from bill: " + paymentDetail.getBill().getConsumerCode());
 					List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria, requestInfo);
+					for (Owner owner : owners) {
+						log.info("BUSINESSIDKEY from serach: " + owner.getOwnerDetails().getApplicationNumber());
+					}
 
 					BusinessService businessService = workflowService.getBusinessService(owners.get(0).getTenantId(),
 							requestInfo, "OwnershipTransferRP");

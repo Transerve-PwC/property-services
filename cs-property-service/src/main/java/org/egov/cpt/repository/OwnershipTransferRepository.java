@@ -73,7 +73,11 @@ public class OwnershipTransferRepository {
 					new OwnershipTransferRequest(requestInfo, ownersForUpdate));
 
 		if (!CollectionUtils.isEmpty(ownersForStatusUpdate))
-			workflowIntegrator.callOwnershipTransferWorkFlow(ownershipTransferRequest);
+			for (Owner owner : ownershipTransferRequest.getOwners()) {
+				log.info("BUSINESSIDKEY payment before update workflow: "
+						+ owner.getOwnerDetails().getApplicationNumber());
+			}
+		workflowIntegrator.callOwnershipTransferWorkFlow(ownershipTransferRequest);
 
 //		if (!ownersForAdhocChargeUpdate.isEmpty())
 //			producer.push(config.getUpdateAdhocTopic(),
