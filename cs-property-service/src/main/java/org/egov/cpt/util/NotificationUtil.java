@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.SMSRequest;
@@ -66,30 +67,31 @@ public class NotificationUtil {
 		
 		case PTConstants.ACTION_STATUS_SUBMIT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
-			message = getInitiatedMsg(owner, messageTemplate);
+			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 			
 		case PTConstants.ACTION_STATUS_REJECTED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
-			message = getInitiatedMsg(owner, messageTemplate);
+			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 			
 		case PTConstants.ACTION_STATUS_SENDBACK:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
-			message = getInitiatedMsg(owner, messageTemplate);
+			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 			
 		case PTConstants.ACTION_STATUS_APPROVED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
-			message = getInitiatedMsg(owner, messageTemplate);
+			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 		}
 		return message;
 	}
 
-	private String getInitiatedMsg(Owner owner, String message) {
+	private String getInitiatedDcMsg(Owner owner, String message) {
 		message = message.replace("<2>", owner.getOwnerDetails().getName());
-		message = message.replace("<3>", owner.getOwnerDetails().getApplicationNumber());
+		message = message.replace("<3>", PTConstants.OWNERSHIP_TRANSFER_APPLICATION);
+		message = message.replace("<4>", owner.getOwnerDetails().getApplicationNumber());
 		return message;
 	}
 
@@ -159,6 +161,45 @@ public class NotificationUtil {
 				.append("&tenantId=").append(tenantId).append("&module=").append(PTConstants.MODULE);
 		
 		return uri;
+	}
+	
+	// Duplicate Copy Notifications
+
+	public String getCustomizedDcMsg(RequestInfo requestInfo, DuplicateCopy copy, String localizationMessage) {
+
+		String message = null, messageTemplate;
+		String ACTION_STATUS = copy.getAction() + "_" + copy.getState();
+		
+		switch (ACTION_STATUS) {
+		
+		case PTConstants.ACTION_STATUS_SUBMIT:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
+			message = getInitiatedDcMsg(copy, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_REJECTED:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
+			message = getInitiatedDcMsg(copy, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_SENDBACK:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
+			message = getInitiatedDcMsg(copy, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_APPROVED:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
+			message = getInitiatedDcMsg(copy, messageTemplate);
+			break;
+		}
+		return message;
+	}
+
+	private String getInitiatedDcMsg(DuplicateCopy copy, String message) {
+		message = message.replace("<2>", copy.getApplicant().get(0).getName());
+		message = message.replace("<3>", PTConstants.DUPLICATE_COPY_APPLICATION);
+		message = message.replace("<4>", copy.getApplicationNumber());
+		return message;
 	}
 
 }
