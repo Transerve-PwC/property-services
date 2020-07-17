@@ -285,7 +285,7 @@ public class EnrichmentService {
 
 	private void enrichGenerateDemand(Owner owner) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		owner.setBusinessService("OwnershipTransferRP");
+		owner.setBusinessService(PTConstants.businessService_OT);
 
 		TaxHeadEstimate estimateDue = new TaxHeadEstimate();
 		estimateDue.setEstimateAmount(new BigDecimal(0.0)); // TODO doubt amount
@@ -307,7 +307,7 @@ public class EnrichmentService {
 
 	private void enrichUpdateDemand(Owner owner) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		owner.setBusinessService("OwnershipTransferRP");
+		owner.setBusinessService(PTConstants.businessService_OT);
 		TaxHeadEstimate estimate = new TaxHeadEstimate();
 		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.STATE_PENDING_SA_VERIFICATION)) {
 			estimate.setEstimateAmount(owner.getOwnerDetails().getDueAmount()); // TODO doubt amount
