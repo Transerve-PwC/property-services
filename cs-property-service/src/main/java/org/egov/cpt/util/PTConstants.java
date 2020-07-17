@@ -57,7 +57,7 @@ public class PTConstants {
 
 //	payment
 
-	public static final String businessService_OT = "RENTED_PROPERTIES";
+	public static final String businessService_OT = "OwnershipTransferRP";
 
 	public static final String ACTION_INITIATE = "INITIATE";
 
@@ -160,6 +160,8 @@ public class PTConstants {
 	public static final String NOTIFICATION_OT_REJECTED = "rp.en.counter.rejected";
 	public static final String NOTIFICATION_OT_SENDBACK = "rp.en.counter.sendback";
 	public static final String NOTIFICATION_OT_APPROVED = "rp.en.counter.approved";
+	public static final String OWNERSHIP_TRANSFER_APPLICATION = "Ownership Transfer request";
+	public static final String DUPLICATE_COPY_APPLICATION = "Duplicate Copy request";
 
 	// ACTION_STATUS combinations for notification
 

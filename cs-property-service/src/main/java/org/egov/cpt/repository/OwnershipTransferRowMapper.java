@@ -73,11 +73,15 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 
 	private void addChildrenToProperty(ResultSet rs, Owner owner) throws SQLException {
 		if (rs.getString("docid") != null && rs.getBoolean("docis_active")) {
+			AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("ocreated_by"))
+					.createdTime(rs.getLong("ocreated_date")).lastModifiedBy(rs.getString("omodified_by"))
+					.lastModifiedTime(rs.getLong("omodified_date")).build();
+
 			OwnershipTransferDocument ownershipTransferDocument = OwnershipTransferDocument.builder()
 					.id(rs.getString("docid")).ownerId(rs.getString("docowner_id"))
 					.tenantId(rs.getString("doctenantid")).active(rs.getBoolean("docis_active"))
 					.documentType(rs.getString("document_type")).fileStoreId(rs.getString("fileStore_id"))
-					.documentUid(rs.getString("document_uid")).build();
+					.documentUid(rs.getString("document_uid")).auditDetails(auditdetails).build();
 			owner.getOwnerDetails().addownershipTransferDocumentsItem(ownershipTransferDocument);
 		}
 	}

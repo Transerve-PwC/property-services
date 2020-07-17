@@ -10,7 +10,6 @@ import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.producer.Producer;
-import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,31 +53,20 @@ public class OwnershipTransferRepository {
 		RequestInfo requestInfo = ownershipTransferRequest.getRequestInfo();
 		List<Owner> owners = ownershipTransferRequest.getOwners();
 
-		List<Owner> ownersForStatusUpdate = new LinkedList<>();
 		List<Owner> ownersForUpdate = new LinkedList<>();
-		List<Owner> ownersForAdhocChargeUpdate = new LinkedList<>();
 
 		for (Owner owner : owners) {
 			if (idToIsStateUpdatableMap.get(owner.getId())) {
 				ownersForUpdate.add(owner);
-			} else if (owner.getApplicationAction().equalsIgnoreCase(PTConstants.ACTION_ADHOC))
-				ownersForAdhocChargeUpdate.add(owner);
-			else {
-				ownersForStatusUpdate.add(owner);
 			}
 		}
 
-		if (!CollectionUtils.isEmpty(ownersForUpdate))
+		if (!CollectionUtils.isEmpty(ownersForUpdate)) {
+			workflowIntegrator
+					.callOwnershipTransferWorkFlow(new OwnershipTransferRequest(requestInfo, ownersForUpdate));
 			producer.push(config.getOwnershipTransferUpdateTopic(),
 					new OwnershipTransferRequest(requestInfo, ownersForUpdate));
-
-		if (!CollectionUtils.isEmpty(ownersForStatusUpdate))
-			workflowIntegrator.callOwnershipTransferWorkFlow(ownershipTransferRequest);
-
-//		if (!ownersForAdhocChargeUpdate.isEmpty())
-//			producer.push(config.getUpdateAdhocTopic(),
-//					new OwnershipTransferRequest(requestInfo, ownersForAdhocChargeUpdate));
-
+		}
 	}
 
 }
