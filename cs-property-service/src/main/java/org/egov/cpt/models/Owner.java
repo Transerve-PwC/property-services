@@ -52,7 +52,7 @@ public class Owner {
 	private String applicationAction;
 
 	@JsonProperty("businessService")
-	private String businessService = "RENTED_PROPERTIES"; // TODO change
+	private String businessService = "OwnershipTransferRP";
 
 	@JsonProperty("calculation")
 	Calculation calculation;

@@ -57,7 +57,7 @@ public class PTConstants {
 
 //	payment
 
-	public static final String businessService_OT = "RENTED_PROPERTIES";
+	public static final String businessService_OT = "OwnershipTransferRP";
 
 	public static final String ACTION_INITIATE = "INITIATE";
 
