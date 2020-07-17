@@ -448,7 +448,7 @@ public class EnrichmentService {
 
 	private void enrichDuplicateCopyGenerateDemand(DuplicateCopy application) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		application.setBusinessService("RENTED_PROPERTIES");
+		application.setBusinessService(PTConstants.BUSINESS_SERVICE_DC);
 		
 		TaxHeadEstimate estimateFee = new TaxHeadEstimate();
 		estimateFee.setEstimateAmount(new BigDecimal(0.0));
@@ -472,7 +472,7 @@ public class EnrichmentService {
 
 	private void enrichDuplicateCopyUpdateDemand(DuplicateCopy application) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		application.setBusinessService("RENTED_PROPERTIES");
+		application.setBusinessService(PTConstants.BUSINESS_SERVICE_DC);
 		
 		TaxHeadEstimate estimate = new TaxHeadEstimate();
 		if (application.getState().equalsIgnoreCase(PTConstants.STATE_PENDING_SA_VERIFICATION)) {

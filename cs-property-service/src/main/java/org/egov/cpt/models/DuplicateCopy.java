@@ -6,6 +6,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.cpt.models.calculation.Calculation;
+import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertySerializer;
 import org.springframework.validation.annotation.Validated;
 
@@ -65,7 +66,7 @@ public class DuplicateCopy {
 	private List<Applicant> applicant;
 	
 	@JsonProperty("businessService")
-	private String businessService = "RENTED_PROPERTIES"; // TODO change
+	private String businessService = PTConstants.BUSINESS_SERVICE_DC; // TODO change
 	
 	@JsonProperty("calculation")
 	Calculation calculation;
