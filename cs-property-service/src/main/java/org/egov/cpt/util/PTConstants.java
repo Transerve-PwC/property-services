@@ -58,6 +58,8 @@ public class PTConstants {
 //	payment
 
 	public static final String businessService_OT = "OwnershipTransferRP";
+	
+	public static final String BUSINESS_SERVICE_DC = "DuplicateCopyOfAllotmentLetterRP";
 
 	public static final String ACTION_INITIATE = "INITIATE";
 

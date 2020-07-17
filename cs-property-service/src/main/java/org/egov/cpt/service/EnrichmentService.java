@@ -438,9 +438,57 @@ public class EnrichmentService {
 						applicant.setAuditDetails(propertyAuditDetails);
 					});
 				}
+				
+//				demand generation
+				enrichDuplicateCopyGenerateDemand(application);
 			});
 		}
 		setDCIdgenIds(duplicateCopyRequest);
+	}
+
+	private void enrichDuplicateCopyGenerateDemand(DuplicateCopy application) {
+		List<TaxHeadEstimate> estimates = new LinkedList<>();
+		application.setBusinessService(PTConstants.BUSINESS_SERVICE_DC);
+		
+		TaxHeadEstimate estimateFee = new TaxHeadEstimate();
+		estimateFee.setEstimateAmount(new BigDecimal(0.0));
+		estimateFee.setCategory(Category.FEE);
+		estimateFee.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.FEE));
+		estimates.add(estimateFee);
+		
+		TaxHeadEstimate estimateCharges = new TaxHeadEstimate();
+		estimateCharges.setEstimateAmount(new BigDecimal(0.0));
+		estimateCharges.setCategory(Category.CHARGES);
+		estimateCharges.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.CHARGES));
+		estimates.add(estimateCharges);
+		
+		Calculation calculation = Calculation.builder()
+				.applicationNumber(application.getApplicationNumber())
+				.taxHeadEstimates(estimates)
+				.tenantId(application.getTenantId()).build();
+		application.setCalculation(calculation);
+		
+	}
+
+	private void enrichDuplicateCopyUpdateDemand(DuplicateCopy application) {
+		List<TaxHeadEstimate> estimates = new LinkedList<>();
+		application.setBusinessService(PTConstants.BUSINESS_SERVICE_DC);
+		
+		TaxHeadEstimate estimate = new TaxHeadEstimate();
+		if (application.getState().equalsIgnoreCase(PTConstants.STATE_PENDING_SA_VERIFICATION)) {
+			estimate.setEstimateAmount(application.getApplicant().get(0).getFeeAmount());
+			estimate.setCategory(Category.FEE);
+			estimate.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.FEE));
+		}
+		if (application.getState().equalsIgnoreCase(PTConstants.STATE_PENDING_APRO)) {
+			estimate.setEstimateAmount(application.getApplicant().get(0).getAproCharge());
+			estimate.setCategory(Category.CHARGES);
+			estimate.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.CHARGES));
+		}
+		estimates.add(estimate);
+		Calculation calculation = Calculation.builder().applicationNumber(application.getApplicationNumber())
+				.taxHeadEstimates(estimates).tenantId(application.getTenantId()).build();
+		application.setCalculation(calculation);
 	}
 
 	private void setDCIdgenIds(DuplicateCopyRequest request) {
@@ -486,6 +534,9 @@ public class EnrichmentService {
 									duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId());
 							document.setAuditDetails(documentAuditDetails);
 						}
+
+//						demand generation
+						enrichDuplicateCopyUpdateDemand(application);
 					});
 
 				}
