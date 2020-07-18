@@ -53,7 +53,7 @@ public class Owner {
 	private String applicationAction;
 
 	@JsonProperty("businessService")
-	private String businessService = PTConstants.businessService_OT;
+	private String businessService = PTConstants.BUSINESS_SERVICE_OT;
 
 	@JsonProperty("calculation")
 	Calculation calculation;
