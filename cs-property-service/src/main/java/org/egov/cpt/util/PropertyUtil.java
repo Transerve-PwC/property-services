@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.AuditDetails;
+import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.workflow.WorkflowService;
@@ -104,7 +105,7 @@ public class PropertyUtil {
 		Map<String, Boolean> idToIsStateUpdatableMap = new HashMap<>();
 		searchresult.forEach(result -> {
 			String nameofBusinessService = result.getBusinessService();
-			if (StringUtils.equals(nameofBusinessService, PTConstants.businessService_OT)
+			if (StringUtils.equals(nameofBusinessService, PTConstants.BUSINESS_SERVICE_OT)
 					&& (result.getApplicationState().equalsIgnoreCase(PTConstants.STATUS_INITIATED))) {
 				idToIsStateUpdatableMap.put(result.getId(), true);
 			} else
@@ -112,5 +113,20 @@ public class PropertyUtil {
 						workflowService.isStateUpdatable(result.getApplicationState(), businessService));
 		});
 		return idToIsStateUpdatableMap;
+	}
+
+	public Map<String, Boolean> getIdToIsStateUpdatableMapDc(BusinessService businessService,
+			List<DuplicateCopy> searchresult) {
+		Map<String, Boolean> idToIsStateUpdatableMapDc = new HashMap<>();
+		searchresult.forEach(result -> {
+			String nameofBusinessService = result.getBusinessService();
+			if (StringUtils.equals(nameofBusinessService, PTConstants.BUSINESS_SERVICE_DC)
+					&& (result.getState().equalsIgnoreCase(PTConstants.STATUS_INITIATED))) {
+				idToIsStateUpdatableMapDc.put(result.getId(), true);
+			} else
+				idToIsStateUpdatableMapDc.put(result.getId(),
+						workflowService.isStateUpdatable(result.getState(), businessService));
+		});
+		return idToIsStateUpdatableMapDc;
 	}
 }

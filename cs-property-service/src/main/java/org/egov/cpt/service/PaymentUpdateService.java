@@ -8,17 +8,18 @@ import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
-import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.PaymentDetail;
 import org.egov.cpt.models.calculation.PaymentRequest;
 import org.egov.cpt.repository.OwnershipTransferRepository;
+import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
+import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
-import org.egov.cpt.workflow.WorkflowIntegrator;
 import org.egov.cpt.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.DocumentContext;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,11 +37,11 @@ public class PaymentUpdateService {
 
 	private OwnershipTransferService ownershipTransferService;
 
-	private PropertyConfiguration config;
+	private OwnershipTransferRepository repositoryOt;
 
-	private OwnershipTransferRepository repository;
+	private DuplicateCopyService duplicateCopyService;
 
-	private WorkflowIntegrator wfIntegrator;
+	private PropertyRepository propertyRepository;
 
 	private EnrichmentService enrichmentService;
 
@@ -58,14 +58,14 @@ public class PaymentUpdateService {
 	private String allowedBusinessServices;
 
 	@Autowired
-	public PaymentUpdateService(OwnershipTransferService ownershipTransferService, PropertyConfiguration config,
-			OwnershipTransferRepository repository, WorkflowIntegrator wfIntegrator,
-			EnrichmentService enrichmentService, ObjectMapper mapper, WorkflowService workflowService,
-			PropertyUtil util) {
+	public PaymentUpdateService(OwnershipTransferService ownershipTransferService,
+			OwnershipTransferRepository repositoryOt, DuplicateCopyService duplicateCopyService,
+			PropertyRepository propertyRepository, EnrichmentService enrichmentService, ObjectMapper mapper,
+			WorkflowService workflowService, PropertyUtil util) {
 		this.ownershipTransferService = ownershipTransferService;
-		this.config = config;
-		this.repository = repository;
-		this.wfIntegrator = wfIntegrator;
+		this.repositoryOt = repositoryOt;
+		this.duplicateCopyService = duplicateCopyService;
+		this.propertyRepository = propertyRepository;
 		this.enrichmentService = enrichmentService;
 		this.mapper = mapper;
 		this.workflowService = workflowService;
@@ -92,75 +92,88 @@ public class PaymentUpdateService {
 			List<String> allowedservices = Arrays.asList(allowedBusinessServices.split(","));
 			for (PaymentDetail paymentDetail : paymentDetails) {
 				if (allowedservices.contains(paymentDetail.getBusinessService())) {
-					DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
-					searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
 
-					List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria, requestInfo);
+					String wfbusinessServiceName = null;
+					switch (paymentDetail.getBusinessService()) {
+					case PTConstants.BUSINESS_SERVICE_OT:
+						wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_OT;
 
-					BusinessService businessService = workflowService.getBusinessService(owners.get(0).getTenantId(),
-							requestInfo, "OwnershipTransferRP");
+						DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
+						searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
 
-					if (CollectionUtils.isEmpty(owners))
-						throw new CustomException("INVALID RECEIPT",
-								"No Owner found for the comsumerCode " + searchCriteria.getApplicationNumber());
+						List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria,
+								requestInfo);
 
-					owners.forEach(license -> license.setApplicationAction(PTConstants.ACTION_PAY));
+						BusinessService otBusinessService = workflowService
+								.getBusinessService(owners.get(0).getTenantId(), requestInfo, wfbusinessServiceName);
 
-					// FIXME check if the update call to repository can be avoided
-					// FIXME check why aniket is not using request info from consumer
-					// REMOVE SYSTEM HARDCODING AFTER ALTERING THE CONFIG IN WF FOR RP
+						if (CollectionUtils.isEmpty(owners))
+							throw new CustomException("INVALID RECEIPT",
+									"No Owner found for the comsumerCode " + searchCriteria.getApplicationNumber());
 
-					Role role = Role.builder().code("SYSTEM_PAYMENT").build();
-					requestInfo.getUserInfo().getRoles().add(role);
-					OwnershipTransferRequest updateRequest = OwnershipTransferRequest.builder().requestInfo(requestInfo)
-							.owners(owners).build();
+						owners.forEach(owner -> owner.setApplicationAction(PTConstants.ACTION_PAY));
 
-					/*
-					 * calling workflow to update status
-					 */
-//					wfIntegrator.callOwnershipTransferWorkFlow(updateRequest);
+						Role role = Role.builder().code("SYSTEM_PAYMENT").build();
+						requestInfo.getUserInfo().getRoles().add(role);
+						OwnershipTransferRequest updateRequest = OwnershipTransferRequest.builder()
+								.requestInfo(requestInfo).owners(owners).build();
 
-					updateRequest.getOwners().forEach(
-							obj -> log.info(" the status of the application is : " + obj.getApplicationState()));
+						updateRequest.getOwners().forEach(
+								obj -> log.info(" the status of the application is : " + obj.getApplicationState()));
 
-					List<String> endStates = Collections.nCopies(updateRequest.getOwners().size(),
-							PTConstants.STATUS_APPROVED);
+						List<String> endStates = Collections.nCopies(updateRequest.getOwners().size(),
+								PTConstants.STATUS_APPROVED);
 
-					enrichmentService.postStatusEnrichment(updateRequest, endStates);
+						enrichmentService.postStatusEnrichment(updateRequest, endStates);
 
-					/*
-					 * calling repository to update the object in RP tables
-					 */
-					Map<String, Boolean> idToIsStateUpdatableMap = util.getIdToIsStateUpdatableMap(businessService,
-							owners);
-					repository.update(updateRequest, idToIsStateUpdatableMap);
+						Map<String, Boolean> idToIsStateUpdatableMap = util
+								.getIdToIsStateUpdatableMap(otBusinessService, owners);
+
+						repositoryOt.update(updateRequest, idToIsStateUpdatableMap);
+						break;
+
+					case PTConstants.BUSINESS_SERVICE_DC:
+						wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_DC;
+
+						DuplicateCopySearchCriteria searchCriteriaDc = new DuplicateCopySearchCriteria();
+						searchCriteriaDc.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
+
+						List<DuplicateCopy> dcApplications = duplicateCopyService.searchApplication(searchCriteriaDc,
+								requestInfo);
+
+						BusinessService dcBusinessService = workflowService.getBusinessService(
+								dcApplications.get(0).getTenantId(), requestInfo, wfbusinessServiceName);
+
+						if (CollectionUtils.isEmpty(dcApplications))
+							throw new CustomException("INVALID RECEIPT",
+									"No Owner found for the comsumerCode " + searchCriteriaDc.getApplicationNumber());
+
+						dcApplications.forEach(dcApplication -> dcApplication.setAction(PTConstants.ACTION_PAY));
+
+						DuplicateCopyRequest updateDCRequest = DuplicateCopyRequest.builder().requestInfo(requestInfo)
+								.duplicateCopyApplications(dcApplications).build();
+
+						updateDCRequest.getDuplicateCopyApplications()
+								.forEach(obj -> log.info(" the status of the application is : " + obj.getState()));
+
+						List<String> dcEndStates = Collections.nCopies(
+								updateDCRequest.getDuplicateCopyApplications().size(), PTConstants.STATUS_APPROVED);
+
+//						TODO: add enrichment
+						enrichmentService.postStatusEnrichmentDC(updateDCRequest, dcEndStates);
+
+						Map<String, Boolean> idToIsStateUpdatableMapDc = util
+								.getIdToIsStateUpdatableMapDc(dcBusinessService, dcApplications);
+
+						propertyRepository.updateDcPayment(updateDCRequest, idToIsStateUpdatableMapDc);
+						break;
+					}
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-	}
-
-	/**
-	 * Extracts the required fields as map
-	 * 
-	 * @param context The documentcontext of the incoming receipt
-	 * @return Map containing values of required fields
-	 */
-	private Map<String, String> enrichValMap(DocumentContext context) {
-		Map<String, String> valMap = new HashMap<>();
-		try {
-			valMap.put(businessService,
-					context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].businessService"));
-			valMap.put(consumerCode,
-					context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.consumerCode"));
-			valMap.put(tenantId, context.read("$.Payments[0].tenantId"));
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new CustomException("PAYMENT ERROR", "Unable to fetch values from payment");
-		}
-		return valMap;
 	}
 
 }
