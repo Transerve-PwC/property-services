@@ -1,5 +1,6 @@
 package org.egov.cpt.util;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 //import java.util.Collection;
 import java.util.Iterator;
@@ -84,14 +85,22 @@ public class NotificationUtil {
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
 			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
+			
+		case PTConstants.ACTION_STATUS_PAYMENT:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
+			message = getInitiatedDcMsg(owner, messageTemplate);
+			break;
 		}
 		return message;
 	}
 
 	private String getInitiatedDcMsg(Owner owner, String message) {
+		BigDecimal due = owner.getOwnerDetails().getDueAmount();
+		BigDecimal charge = owner.getOwnerDetails().getAproCharge();
 		message = message.replace("<2>", owner.getOwnerDetails().getName());
 		message = message.replace("<3>", PTConstants.OWNERSHIP_TRANSFER_APPLICATION);
 		message = message.replace("<4>", owner.getOwnerDetails().getApplicationNumber());
+		message = message.replace("<5>",  (CharSequence) due.add(charge)); //TODO add apro charges
 		return message;
 	}
 
@@ -191,14 +200,24 @@ public class NotificationUtil {
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
 			message = getInitiatedDcMsg(copy, messageTemplate);
 			break;
+			
+		case PTConstants.ACTION_STATUS_PAYMENT:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
+			message = getInitiatedDcMsg(copy, messageTemplate);
+			break;
 		}
 		return message;
 	}
 
 	private String getInitiatedDcMsg(DuplicateCopy copy, String message) {
+		BigDecimal fee = copy.getApplicant().get(0).getFeeAmount();
+		BigDecimal charge = copy.getApplicant().get(0).getAproCharge();
 		message = message.replace("<2>", copy.getApplicant().get(0).getName());
 		message = message.replace("<3>", PTConstants.DUPLICATE_COPY_APPLICATION);
 		message = message.replace("<4>", copy.getApplicationNumber());
+		if (message.contains("<5>")) {
+			message = message.replace("<5>",  (CharSequence) fee.add(charge));
+		}
 		return message;
 	}
 

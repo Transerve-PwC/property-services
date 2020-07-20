@@ -1,6 +1,7 @@
 package org.egov.cpt.models;
 
 import org.egov.cpt.models.calculation.Calculation;
+import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertySerializer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -52,7 +53,7 @@ public class Owner {
 	private String applicationAction;
 
 	@JsonProperty("businessService")
-	private String businessService = "RENTED_PROPERTIES"; // TODO change
+	private String businessService = PTConstants.BUSINESS_SERVICE_OT;
 
 	@JsonProperty("calculation")
 	Calculation calculation;

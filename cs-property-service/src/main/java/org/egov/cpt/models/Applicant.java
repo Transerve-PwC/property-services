@@ -1,5 +1,6 @@
 package org.egov.cpt.models;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -50,6 +51,12 @@ public class Applicant {
 	
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
+	
+	@JsonProperty("feeAmount")
+	private BigDecimal feeAmount;
+
+	@JsonProperty("aproCharge")
+	private BigDecimal aproCharge;
 
 
 }

@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.cpt.models.calculation.Calculation;
+import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertySerializer;
 import org.springframework.validation.annotation.Validated;
 
@@ -36,10 +38,10 @@ public class DuplicateCopy {
 
 	@JsonProperty("id")
 	private String id;
-	
+
 	@JsonSerialize(using = PropertySerializer.class)
 	private Property property;
-	
+
 	@JsonProperty("tenantId")
 	private String tenantId;
 
@@ -48,29 +50,34 @@ public class DuplicateCopy {
 
 	@JsonProperty("action")
 	private String action;
-	
+
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
-	
+
 	@Valid
 	@JsonProperty("applicationDocuments")
-	private List<DuplicateCopyDocument> applicationDocuments=null;
+	private List<DuplicateCopyDocument> applicationDocuments = null;
 
 	@Valid
 	@JsonProperty("applicant")
 	private List<Applicant> applicant;
-	
+
+	@JsonProperty("businessService")
+	private String businessService = PTConstants.BUSINESS_SERVICE_DC;
+
+	@JsonProperty("calculation")
+	Calculation calculation;
+
 	public DuplicateCopy addApplicationDocumentsItem(DuplicateCopyDocument applicationDocumentsItem) {
-	    if (this.applicationDocuments == null) {
-	    this.applicationDocuments = new ArrayList<>();
-	    }
-	    if(!this.applicationDocuments.contains(applicationDocumentsItem))
-	        this.applicationDocuments.add(applicationDocumentsItem);
-	    return this;
+		if (this.applicationDocuments == null) {
+			this.applicationDocuments = new ArrayList<>();
+		}
+		if (!this.applicationDocuments.contains(applicationDocumentsItem))
+			this.applicationDocuments.add(applicationDocumentsItem);
+		return this;
 	}
 
-	
 }
