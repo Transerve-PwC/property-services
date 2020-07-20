@@ -1,6 +1,6 @@
 package org.egov.cpt.service.notification;
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,12 +8,10 @@ import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.Owner;
-import org.egov.cpt.models.Property;
 import org.egov.cpt.models.SMSRequest;
 import org.egov.cpt.repository.ServiceRequestRepository;
 import org.egov.cpt.util.NotificationUtil;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
-import org.egov.cpt.web.contracts.PropertyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;

@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.SMSRequest;
@@ -237,6 +238,47 @@ public class NotificationUtil {
 		 messageTemplate = messageTemplate.replace("<3>", getMessageTemplate(PTConstants.DUPLICATE_COPY_APPLICATION, localizationMessages));
 		 
 		return messageTemplate;
+	}
+	
+	
+	//Mortgage Notifications
+
+	public String getCustomizedMGMsg(RequestInfo requestInfo, Mortgage mortgage, String localizationMessage) {
+		String message = null, messageTemplate;
+		String ACTION_STATUS = mortgage.getAction() + "_" + mortgage.getState();
+		
+switch (ACTION_STATUS) {
+		
+		case PTConstants.ACTION_STATUS_SUBMIT:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
+			message = getInitiatedMGMsg(mortgage, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_REJECTED:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
+			message = getInitiatedMGMsg(mortgage, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_SENDBACK:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
+			message = getInitiatedMGMsg(mortgage, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_MORTGAGE_APPROVED:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
+			message = getInitiatedMGMsg(mortgage, messageTemplate);
+			break;
+			
+		}
+		return message;
+	}
+
+	private String getInitiatedMGMsg(Mortgage mortgage, String message) {
+		message = message.replace("<2>", mortgage.getApplicant().get(0).getName());
+		message = message.replace("<3>", PTConstants.MORTGAGE_APPLICATION);
+		message = message.replace("<4>", mortgage.getApplicationNumber());
+		
+		return message;
 	}
 
 }

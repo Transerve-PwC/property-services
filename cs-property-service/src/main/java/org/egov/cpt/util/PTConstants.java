@@ -166,6 +166,7 @@ public class PTConstants {
 	public static final String NOTIFICATION_OT_APPROVED = "rp.en.counter.approved";
 	public static final String OWNERSHIP_TRANSFER_APPLICATION = "Ownership Transfer request";
 	public static final String DUPLICATE_COPY_APPLICATION = "Duplicate Copy request";
+	public static final String MORTGAGE_APPLICATION = "Mortgage request";
 
 	// ACTION_STATUS combinations for notification
 
@@ -176,6 +177,7 @@ public class PTConstants {
 	public static final String ACTION_STATUS_PAYMENT = "APPROVE_PENDINGPAYMENT";
 	public static final String ACTION_STATUS_PAYMENT_SUCCESS = "PAY_APPROVED";
 	public static final String ACTION_STATUS_APPROVED = "PAY_APPROVED";
+	public static final String ACTION_STATUS_MORTGAGE_APPROVED = "APPROVE_APPROVED";
 
 //    demand generation
 	public static final String STATE_PENDING_SA_VERIFICATION = "PENDINGSAVERIFICATION";
