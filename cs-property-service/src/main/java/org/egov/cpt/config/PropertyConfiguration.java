@@ -68,6 +68,9 @@ public class PropertyConfiguration {
 	
 	@Value("${persister.save.mortgage.topic}")
 	private String saveMortgageTopic;
+	
+	@Value("${persister.update.mortgage.topic}")
+	private String updateMortgageTopic;
 
 	@Value("${persister.cancel.property.topic}")
 	private String cancelPropertyTopic;

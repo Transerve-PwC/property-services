@@ -36,6 +36,12 @@ public class PropertyRepository {
 
 	@Autowired
 	private DuplicateCopyPropertyRowMapper duplicateCopyPropertyRowMapper;
+	
+	@Autowired
+	private MortgageRowMapper mortgageRowMapper;
+	
+	@Autowired
+	private MortgageQueryBuilder mortgageQueryBuilder;
 
 	@Autowired
 	private Producer producer;
@@ -61,13 +67,10 @@ public class PropertyRepository {
 	}
 
 	public List<Mortgage> getMortgageProperties(DuplicateCopySearchCriteria criteria) {
-		/*
-		 * List<Object> preparedStmtList = new ArrayList<>(); String query =
-		 * queryBuilder.getDuplicateCopyPropertySearchQuery(criteria, preparedStmtList);
-		 * log.info("SearchQuery:"+query); return jdbcTemplate.query(query,
-		 * preparedStmtList.toArray(), duplicateCopyPropertyRowMapper);
-		 */
-		return null;
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = mortgageQueryBuilder.getMortgageSearchQuery(criteria, preparedStmtList);
+		log.info("SearchQuery:"+query);
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), mortgageRowMapper);
 	}
 
 	public void updateDcPayment(DuplicateCopyRequest duplicateCopyRequest,

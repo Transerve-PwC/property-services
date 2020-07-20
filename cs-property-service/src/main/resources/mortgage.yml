@@ -1,0 +1,175 @@
+serviceMaps:
+ serviceName: csp
+ mappings:
+ - version: 1.0
+   description: Persists Mortgage details in cs_pt_mortgage_application table
+   fromTopic: save-rp-mortgage
+   isTransaction: true
+   queryMaps:
+
+    - query: INSERT INTO cs_pt_mortgage_application (id, propertyid, tenantid, application_number, state, action, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.MortgageApplications.*
+      jsonMaps:
+
+      - jsonPath: $.MortgageApplications.*.id
+
+      - jsonPath: $.MortgageApplications.*.property.id
+      
+      - jsonPath: $.MortgageApplications.*.tenantId
+      
+      - jsonPath: $.MortgageApplications.*.applicationNumber
+
+      - jsonPath: $.MortgageApplications.*.state
+      
+      - jsonPath: $.MortgageApplications.*.action
+
+      - jsonPath: $.MortgageApplications.*.auditDetails.createdBy
+
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.MortgageApplications.*.auditDetails.createdTime
+
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedTime
+      
+      
+    - query: INSERT INTO cs_pt_mortgage_applicant (id, mortgage_id, tenantid, name, guardian, relationship, email, mobileno, aadhaar_number, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.MortgageApplications.*.applicant.*
+      jsonMaps:
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.id
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.mortgageId
+      
+      - jsonPath: $.MortgageApplications.*.applicant.*.tenantId
+      
+      - jsonPath: $.MortgageApplications.*.applicant.*.name
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.guardian
+      
+      - jsonPath: $.MortgageApplications.*.applicant.*.relationship
+      
+      - jsonPath: $.MortgageApplications.*.applicant.*.email
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.phone
+      
+      - jsonPath: $.MortgageApplications.*.applicant.*.adhaarNumber
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.auditDetails.createdBy
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.auditDetails.createdTime
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.auditDetails.lastModifiedTime
+      
+      
+      
+    - query: INSERT INTO cs_pt_mortgage_douments (id, tenantid, documenttype, filestoreid, mortgage_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: MortgageApplications.*.applicationDocuments.*
+      jsonMaps:
+
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.tenantId 
+
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.documentType 
+      
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.fileStoreId 
+
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.applicationId 
+      
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.active 
+      
+      - jsonPath: $.MortgageApplications.*.auditDetails.createdBy
+
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.MortgageApplications.*.auditDetails.createdTime
+
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedTime
+      
+            
+ - version: 1.0
+   description: Persists Mortgage details in cs_pt_mortgage_application table
+   fromTopic: update-rp-mortgage
+   isTransaction: true
+   queryMaps:
+    
+    - query: INSERT INTO cs_pt_mortgage_application_audit SELECT * FROM cs_pt_mortgage_application WHERE id = ?;
+      basePath: MortgageApplications.*
+      jsonMaps:
+      - jsonPath: $.MortgageApplications.*.id
+
+    - query: UPDATE cs_pt_mortgage_application SET  state=?, action=?, modified_by=?, modified_time=? WHERE id=?;
+      basePath: MortgageApplications.*
+      jsonMaps:
+
+      - jsonPath: $.MortgageApplications.*.state
+
+      - jsonPath: $.MortgageApplications.*.action 
+
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.MortgageApplications.*.id
+    
+    
+    - query: UPDATE cs_pt_mortgage_applicant SET name=?, email=?, mobileno=?, guardian=?, relationship=?,aadhaar_number=?, modified_by=?, modified_time=? WHERE id=?;
+      basePath: MortgageApplications.*.applicant.*
+      jsonMaps:
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.name
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.email
+      
+      - jsonPath: $.MortgageApplications.*.applicant.*.phone
+      
+      - jsonPath: $.MortgageApplications.*.applicant.*.guardian
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.relationship
+
+      - jsonPath: $.MortgageApplications.*.applicant.*.adhaarNumber
+      
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.MortgageApplications.*.applicant.*.id
+        
+      
+    - query: INSERT INTO cs_pt_mortgage_douments (id, tenantid, documenttype, filestoreid, mortgage_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, modified_by =?, modified_time =?;
+      basePath: MortgageApplications.*.applicationDocuments.*
+      jsonMaps:
+
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.tenantId 
+
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.documentType 
+      
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.fileStoreId 
+
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.applicationId 
+      
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.active 
+      
+      - jsonPath: $.MortgageApplications.*.auditDetails.createdBy
+
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.MortgageApplications.*.auditDetails.createdTime
+
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.active 
+      
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.documentType 
+      
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.fileStoreId 
+
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedTime  
+      
+          
