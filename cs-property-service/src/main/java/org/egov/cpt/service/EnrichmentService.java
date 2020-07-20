@@ -653,8 +653,8 @@ public class EnrichmentService {
 				}
 			});
 		}
+	}
 
-		
 	public void postStatusEnrichmentDC(DuplicateCopyRequest duplicateCopyRequest, List<String> endstates) {
 		duplicateCopyRequest.getDuplicateCopyApplications().forEach(dcApplication -> {
 //			TODO: add enrichment
