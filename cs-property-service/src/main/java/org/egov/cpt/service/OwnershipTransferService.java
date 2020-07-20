@@ -42,9 +42,6 @@ public class OwnershipTransferService {
 	private OwnershipTransferRepository repository;
 
 	@Autowired
-	private PropertyNotificationService propertyNotificationService;
-
-	@Autowired
 	private DemandService demandService;
 
 	public List<Owner> createOwnershipTransfer(OwnershipTransferRequest request) {
