@@ -11,6 +11,7 @@ import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.RequestInfoWrapper;
 import org.egov.cpt.service.MortgageService;
 import org.egov.cpt.util.ResponseInfoFactory;
+import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.DuplicateCopyResponse;
 import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.MortgageResponse;
@@ -30,10 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class MortgageController {
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
-	
+
 	@Autowired
 	private MortgageService mortgageService;
-	
+
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	/**
 	 * 
@@ -51,13 +52,32 @@ public class MortgageController {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 	
+	/**
+	 * 
+	 * @param requestInfoWrapper
+	 * @param searchCriteria
+	 * @return
+	 */
+
 	@PostMapping("/_search")
 	public ResponseEntity<MortgageResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute DuplicateCopySearchCriteria searchCriteria) {
-
 		List<Mortgage> applications = mortgageService.searchApplication(searchCriteria,requestInfoWrapper.getRequestInfo());
 		MortgageResponse response = MortgageResponse.builder().mortgageApplications(applications).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true)).build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	/**
+	 * 
+	 * @param mortgageRequest
+	 * @return
+	 */
+	@PostMapping("/_update")
+	public ResponseEntity<MortgageResponse> update(@Valid @RequestBody MortgageRequest mortgageRequest) {
+		List<Mortgage> applications = mortgageService.updateApplication(mortgageRequest);
+		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(mortgageRequest.getRequestInfo(),
+				true);
+		MortgageResponse response = MortgageResponse.builder().mortgageApplications(applications).responseInfo(resInfo).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

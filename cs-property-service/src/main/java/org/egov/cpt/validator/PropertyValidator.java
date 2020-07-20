@@ -10,6 +10,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
+import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
@@ -686,7 +687,126 @@ public class PropertyValidator {
 	}
 
 	public void validateMortgageCreateRequest(MortgageRequest mortgageRequest) {
-//			validateDuplicateMortgage();
+			validateDocument(mortgageRequest);
+			validateMGSpecificNotNullFields(mortgageRequest);
+			validateDuplicateMortgage(mortgageRequest);
+	}
+
+	private void validateDuplicateMortgage(MortgageRequest request) {
+		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder().propertyId(request.getMortgageApplications().get(0).getProperty().getId()).build();
+		List<Mortgage> mortgageProperty = repository.getMortgageProperties(criteria);
+		if (!CollectionUtils.isEmpty(mortgageProperty)) {
+			throw new CustomException("MORTGAGE EXIST", "Already applied for mortgage");
+		}
+	}
+
+	public void validateMortgageSearch(RequestInfo requestInfo, DuplicateCopySearchCriteria criteria) {
+		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria == null)
+			throw new CustomException("INVALID SEARCH", "Search without any paramters is not allowed");
+		
+	}
+
+	public List<Mortgage> validateMOrtgageUpdateRequest(MortgageRequest mortgageRequest) {
+		Map<String, String> errorMap = new HashMap<>();
+
+		validateDocument(mortgageRequest);
+		validateIds(mortgageRequest);
+
+		// validateIds(duplicateCopyRequest, errorMap);
+		String propertyId = mortgageRequest.getMortgageApplications().get(0).getProperty().getId();
+		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
+				.appId(mortgageRequest.getMortgageApplications().get(0).getId())
+				.propertyId(propertyId)
+				.build();
+		List<Mortgage> searchedApplications = repository.getMortgageProperties(criteria);
+		if (searchedApplications.size() < 1) {
+			errorMap.put("PROPERTY NOT FOUND", "The property to be updated does not exist");
+		}
+		if (searchedApplications.size() > 1) {
+			errorMap.put("INVALID PROPERTY", "Multiple property found");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+
+		return searchedApplications;
+	}
+
+	private void validateIds(MortgageRequest request) {
+		Map<String, String> errorMap = new HashMap<>();
+		request.getMortgageApplications().forEach(application -> {
+
+			if ((!application.getState().equalsIgnoreCase(DuplicateCopyConstants.STATUS_INITIATED))) {
+				if (application.getId() == null)
+					errorMap.put("INVALID UPDATE", "Id of property cannot be null");
+				if (application.getApplicant().get(0).getId() == null)
+					errorMap.put("INVALID UPDATE", "Id of Applicant cannot be null");
+				if (application.getProperty().getId() == null)
+					errorMap.put("INVALID UPDATE", "Property Id cannot be null");
+			}
+		});
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+		
+	}
+
+	private void validateDocument(MortgageRequest mortgageRequest) {
+		Map<String, String> errorMap = new HashMap<>();
+
+		mortgageRequest.getMortgageApplications().forEach(application -> {
+			if (DuplicateCopyConstants.ACTION_SUBMIT.equalsIgnoreCase(application.getAction())) {
+				if (application.getApplicationDocuments() == null)
+					errorMap.put("INVALID ACTION",
+							"Action cannot be changed to SUBMIT. Application document are not provided");
+			}
+
+		});
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+		
+	}
+
+	public void validateMortgageUpdate(MortgageRequest mortgageRequest) {
+		validateDuplicateDocuments(mortgageRequest);
+		validateMGSpecificNotNullFields(mortgageRequest);
+		
+	}
+
+	private void validateMGSpecificNotNullFields(MortgageRequest request) {
+		request.getMortgageApplications().forEach(application -> {
+			Map<String, String> errorMap = new HashMap<>();
+			if (application.getApplicant().get(0).getName() == null)
+				errorMap.put("NULL_NAME", " Applicant name cannot be null");
+			if (application.getApplicant().get(0).getGuardian() == null)
+				errorMap.put("NULL_GUARDIAN", " Applicant Father/husband name cannot be null");
+			if (application.getApplicant().get(0).getPhone() == null)
+				errorMap.put("NULL_MOBILENUMBER", " Mobile Number cannot be null");
+			if (application.getTenantId() == null)
+				errorMap.put("NULL_TENANT", " Tenant Id cannot be null");
+			if (application.getProperty().getId() == null)
+				errorMap.put("NULL_PROPERTYID", "PropertyId cannot be null");
+
+			if (!errorMap.isEmpty())
+				throw new CustomException(errorMap);
+		});
+		
+	}
+
+	private void validateDuplicateDocuments(MortgageRequest request) {
+		List<String> documentFileStoreIds = new LinkedList();
+		request.getMortgageApplications().forEach(application -> {
+			if (application.getApplicationDocuments() != null) {
+				application.getApplicationDocuments().forEach(document -> {
+					if (documentFileStoreIds.contains(document.getFileStoreId()))
+						throw new CustomException("DUPLICATE_DOCUMENT ERROR",
+								"Same document cannot be used multiple times");
+					else
+						documentFileStoreIds.add(document.getFileStoreId());
+				});
+			}
+		});
+		
 	}
 
 }
