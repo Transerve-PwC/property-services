@@ -576,4 +576,37 @@ public class EnrichmentService {
 		return ownerDetails;
 	}
 
+	public void enrichMortgageUpdateRequest(MortgageRequest mortgageRequest, List<Mortgage> searchedProperty) {
+		RequestInfo requestInfo = mortgageRequest.getRequestInfo();
+		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
+		// String propertyDtlId = searchedProperty.get(0).getPropertyDetails().getId();
+		if (!CollectionUtils.isEmpty(mortgageRequest.getMortgageApplications())) {
+			mortgageRequest.getMortgageApplications().forEach(application -> {
+				application.setAuditDetails(propertyAuditDetails);
+				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
+					application.getApplicationDocuments().forEach(document -> {
+						if (document.getId() == null) {
+							AuditDetails documentAuditDetails = propertyutil
+									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							document.setId(UUID.randomUUID().toString());
+							document.setActive(true);
+							document.setApplicationId(
+									mortgageRequest.getMortgageApplications().get(0).getId());
+							document.setAuditDetails(documentAuditDetails);
+						}
+					});
+
+				}
+
+				if (!CollectionUtils.isEmpty(application.getApplicant())) {
+					application.getApplicant().forEach(applicant -> {
+						applicant.setAuditDetails(propertyAuditDetails);
+					});
+				}
+			});
+		}
+
+		
+	}
+
 }

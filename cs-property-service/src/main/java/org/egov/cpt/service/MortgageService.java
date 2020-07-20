@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Property;
@@ -40,7 +41,6 @@ public class MortgageService {
 		List<Property> propertiesFromDb = propertyValidator.isPropertyExist(mortgageRequest);
 		propertyValidator.validateMortgageCreateRequest(mortgageRequest);
 		enrichmentService.enrichMortgageCreateRequest(mortgageRequest);
-//		propertyValidator.validateMortgageCreate(mortgageRequest);
 		if (config.getIsWorkflowEnabled()) {
 			wfIntegrator.callMortgageWorkFlow(mortgageRequest);
 		}
@@ -49,10 +49,9 @@ public class MortgageService {
 	}
 
 	public List<Mortgage> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
-		propertyValidator.validateDuplicateCopySearch(requestInfo, criteria);
+		propertyValidator.validateMortgageSearch(requestInfo, criteria);
 //	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
-		List<Mortgage> properties = getApplication(criteria, requestInfo);
-		return properties;
+		return getApplication(criteria, requestInfo);
 	}
 
 	private List<Mortgage> getApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
@@ -60,5 +59,17 @@ public class MortgageService {
 		if (application.isEmpty())
 			return Collections.emptyList();
 		return application;
+	}
+
+	public List<Mortgage> updateApplication(MortgageRequest mortgageRequest) {
+		List<Mortgage> searchedProperty = propertyValidator.validateMOrtgageUpdateRequest(mortgageRequest); 
+		enrichmentService.enrichMortgageUpdateRequest(mortgageRequest,searchedProperty);
+		propertyValidator.validateMortgageUpdate(mortgageRequest);
+		if (config.getIsWorkflowEnabled()) {
+            wfIntegrator.callMortgageWorkFlow(mortgageRequest);
+        } 
+		producer.push(config.getUpdateMortgageTopic(), mortgageRequest);
+//		notificationService.process(mortgageRequest);
+		return mortgageRequest.getMortgageApplications();
 	}
 }

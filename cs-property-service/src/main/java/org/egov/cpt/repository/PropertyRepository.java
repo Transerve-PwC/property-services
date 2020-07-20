@@ -28,6 +28,12 @@ public class PropertyRepository {
 	
 	@Autowired
 	private DuplicateCopyPropertyRowMapper duplicateCopyPropertyRowMapper;
+	
+	@Autowired
+	private MortgageRowMapper mortgageRowMapper;
+	
+	@Autowired
+	private MortgageQueryBuilder mortgageQueryBuilder;
 
 	public List<Property> getProperties(PropertyCriteria criteria) {
 
@@ -44,10 +50,9 @@ public class PropertyRepository {
 	}
 	
 	public List<Mortgage> getMortgageProperties(DuplicateCopySearchCriteria criteria) {
-		/*List<Object> preparedStmtList = new ArrayList<>();
-		String query = queryBuilder.getDuplicateCopyPropertySearchQuery(criteria, preparedStmtList);
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = mortgageQueryBuilder.getMortgageSearchQuery(criteria, preparedStmtList);
 		log.info("SearchQuery:"+query);
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), duplicateCopyPropertyRowMapper);*/
-		return null;
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), mortgageRowMapper);
 	}
 }
