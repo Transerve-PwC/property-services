@@ -64,13 +64,13 @@ serviceMaps:
       
       
       
-    - query: INSERT INTO cs_pt_mortgage_douments (id, tenantid, documenttype, filestoreid, application_id, active, createdBy, lastModifiedBy, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_mortgage_douments (id, tenantid, documenttype, filestoreid, mortgage_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: MortgageApplications.*.applicationDocuments.*
       jsonMaps:
 
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.id
       
-      - jsonPath: $.MortgageApplications.*.tenantId 
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.tenantId 
 
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.documentType 
       
@@ -80,13 +80,13 @@ serviceMaps:
       
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.active 
       
-      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.auditDetails.createdBy
+      - jsonPath: $.MortgageApplications.*.auditDetails.createdBy
 
-      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.auditDetails.lastModifiedBy 
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedBy 
       
-      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.auditDetails.createdTime
+      - jsonPath: $.MortgageApplications.*.auditDetails.createdTime
 
-      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.auditDetails.lastModifiedTime
+      - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedTime
       
             
  - version: 1.0
@@ -138,13 +138,13 @@ serviceMaps:
       - jsonPath: $.MortgageApplications.*.applicant.*.id
         
       
-    - query: INSERT INTO cs_pt_mortgage_douments (id, tenantid, documenttype, filestoreid, application_id, active, createdBy, lastModifiedBy, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, lastModifiedBy =?, modified_time =?;
+    - query: INSERT INTO cs_pt_mortgage_douments (id, tenantid, documenttype, filestoreid, mortgage_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, modified_by =?, modified_time =?;
       basePath: MortgageApplications.*.applicationDocuments.*
       jsonMaps:
 
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.id
       
-      - jsonPath: $.MortgageApplications.*.tenantId 
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.tenantId 
 
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.documentType 
       

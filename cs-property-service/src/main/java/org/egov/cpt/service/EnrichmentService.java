@@ -638,9 +638,9 @@ public class EnrichmentService {
 									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 							document.setId(UUID.randomUUID().toString());
 							document.setActive(true);
-							document.setApplicationId(
-									mortgageRequest.getMortgageApplications().get(0).getId());
+							document.setApplicationId(mortgageRequest.getMortgageApplications().get(0).getId());
 							document.setAuditDetails(documentAuditDetails);
+							document.setTenantId(mortgageRequest.getMortgageApplications().get(0).getTenantId());
 						}
 					});
 
