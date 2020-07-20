@@ -162,7 +162,7 @@ public class PTConstants {
 	public static final String NOTIFICATION_OT_REJECTED = "rp.en.counter.rejected";
 	public static final String NOTIFICATION_OT_SENDBACK = "rp.en.counter.sendback";
 	public static final String NOTIFICATION_OT_PAYMENT = "rp.en.counter.payment";
-	public static final String NOTIFICATION_OT_PAYMENT_SUCESS = "rp.en.counter.paymentsuccess";
+	public static final String NOTIFICATION_OT_PAYMENT_SUCCESS = "rp.en.counter.paymentsuccess";
 	public static final String NOTIFICATION_OT_APPROVED = "rp.en.counter.approved";
 	public static final String OWNERSHIP_TRANSFER_APPLICATION = "Ownership Transfer request";
 	public static final String DUPLICATE_COPY_APPLICATION = "Duplicate Copy request";

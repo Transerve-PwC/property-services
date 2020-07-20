@@ -100,7 +100,7 @@ public class NotificationUtil {
 		message = message.replace("<2>", owner.getOwnerDetails().getName());
 		message = message.replace("<3>", PTConstants.OWNERSHIP_TRANSFER_APPLICATION);
 		message = message.replace("<4>", owner.getOwnerDetails().getApplicationNumber());
-		message = message.replace("<5>",  (CharSequence) due.add(charge)); //TODO add apro charges
+		message = message.replace("<5>",  (CharSequence) due.add(charge));
 		return message;
 	}
 
@@ -219,6 +219,24 @@ public class NotificationUtil {
 			message = message.replace("<5>",  (CharSequence) fee.add(charge));
 		}
 		return message;
+	}
+
+	public String getOTPaymentMsg(Owner owner, String localizationMessages) {
+		 String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS, localizationMessages);
+		 messageTemplate = messageTemplate.replace("<2>", getMessageTemplate(owner.getOwnerDetails().getName(), localizationMessages));
+		 messageTemplate = messageTemplate.replace("<4>", getMessageTemplate(owner.getOwnerDetails().getApplicationNumber(), localizationMessages));
+		 messageTemplate = messageTemplate.replace("<3>", getMessageTemplate(PTConstants.OWNERSHIP_TRANSFER_APPLICATION, localizationMessages));
+		 
+		return messageTemplate;
+	}
+
+	public String getDCPaymentMsg(DuplicateCopy copy, String localizationMessages) {
+		 String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS, localizationMessages);
+		 messageTemplate = messageTemplate.replace("<2>", getMessageTemplate(copy.getApplicant().get(0).getName(), localizationMessages));
+		 messageTemplate = messageTemplate.replace("<4>", getMessageTemplate(copy.getApplicationNumber(), localizationMessages));
+		 messageTemplate = messageTemplate.replace("<3>", getMessageTemplate(PTConstants.DUPLICATE_COPY_APPLICATION, localizationMessages));
+		 
+		return messageTemplate;
 	}
 
 }
