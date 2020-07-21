@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.SMSRequest;
@@ -100,7 +101,7 @@ public class NotificationUtil {
 		message = message.replace("<2>", owner.getOwnerDetails().getName());
 		message = message.replace("<3>", PTConstants.OWNERSHIP_TRANSFER_APPLICATION);
 		message = message.replace("<4>", owner.getOwnerDetails().getApplicationNumber());
-		message = message.replace("<5>",  (CharSequence) due.add(charge)); //TODO add apro charges
+		message = message.replace("<5>",  (CharSequence) due.add(charge));
 		return message;
 	}
 
@@ -218,6 +219,65 @@ public class NotificationUtil {
 		if (message.contains("<5>")) {
 			message = message.replace("<5>",  (CharSequence) fee.add(charge));
 		}
+		return message;
+	}
+
+	public String getOTPaymentMsg(Owner owner, String localizationMessages) {
+		 String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS, localizationMessages);
+		 messageTemplate = messageTemplate.replace("<2>", getMessageTemplate(owner.getOwnerDetails().getName(), localizationMessages));
+		 messageTemplate = messageTemplate.replace("<4>", getMessageTemplate(owner.getOwnerDetails().getApplicationNumber(), localizationMessages));
+		 messageTemplate = messageTemplate.replace("<3>", getMessageTemplate(PTConstants.OWNERSHIP_TRANSFER_APPLICATION, localizationMessages));
+		 
+		return messageTemplate;
+	}
+
+	public String getDCPaymentMsg(DuplicateCopy copy, String localizationMessages) {
+		 String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS, localizationMessages);
+		 messageTemplate = messageTemplate.replace("<2>", getMessageTemplate(copy.getApplicant().get(0).getName(), localizationMessages));
+		 messageTemplate = messageTemplate.replace("<4>", getMessageTemplate(copy.getApplicationNumber(), localizationMessages));
+		 messageTemplate = messageTemplate.replace("<3>", getMessageTemplate(PTConstants.DUPLICATE_COPY_APPLICATION, localizationMessages));
+		 
+		return messageTemplate;
+	}
+	
+	
+	//Mortgage Notifications
+
+	public String getCustomizedMGMsg(RequestInfo requestInfo, Mortgage mortgage, String localizationMessage) {
+		String message = null, messageTemplate;
+		String ACTION_STATUS = mortgage.getAction() + "_" + mortgage.getState();
+		
+switch (ACTION_STATUS) {
+		
+		case PTConstants.ACTION_STATUS_SUBMIT:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
+			message = getInitiatedMGMsg(mortgage, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_REJECTED:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
+			message = getInitiatedMGMsg(mortgage, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_SENDBACK:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
+			message = getInitiatedMGMsg(mortgage, messageTemplate);
+			break;
+			
+		case PTConstants.ACTION_STATUS_MORTGAGE_APPROVED:
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
+			message = getInitiatedMGMsg(mortgage, messageTemplate);
+			break;
+			
+		}
+		return message;
+	}
+
+	private String getInitiatedMGMsg(Mortgage mortgage, String message) {
+		message = message.replace("<2>", mortgage.getApplicant().get(0).getName());
+		message = message.replace("<3>", PTConstants.MORTGAGE_APPLICATION);
+		message = message.replace("<4>", mortgage.getApplicationNumber());
+		
 		return message;
 	}
 

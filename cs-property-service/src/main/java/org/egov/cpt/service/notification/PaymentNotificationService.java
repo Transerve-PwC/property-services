@@ -1,270 +1,197 @@
-//package org.egov.cpt.service.notification;
-//
-//import static org.egov.tl.util.BPAConstants.NOTIFICATION_PENDINGDOCVERIFICATION;
-//import static org.egov.tl.util.CTLConstants.businessService_BOOK_SHOP;
-//import static org.egov.tl.util.CTLConstants.businessService_DHOBI_GHAT;
-//import static org.egov.tl.util.CTLConstants.businessService_REHRI_DL;
-//import static org.egov.tl.util.CTLConstants.businessService_REHRI_RC;
-//import static org.egov.tl.util.TLConstants.businessService_BPA;
-//import static org.egov.tl.util.TLConstants.businessService_TL;
-//
-//import java.util.ArrayList;
-//import java.util.Collections;
-//import java.util.HashMap;
-//import java.util.LinkedList;
-//import java.util.List;
-//import java.util.Map;
-//
-//import org.apache.commons.lang.StringUtils;
-//import org.egov.common.contract.request.RequestInfo;
-//import org.egov.cpt.config.PropertyConfiguration;
-//import org.egov.cpt.models.SMSRequest;
-//import org.egov.cpt.util.NotificationUtil;
-//import org.egov.tracer.model.CustomException;
-//import org.json.JSONObject;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//import org.springframework.util.CollectionUtils;
-//
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.jayway.jsonpath.DocumentContext;
-//import com.jayway.jsonpath.JsonPath;
-//
-//@Service
-//public class PaymentNotificationService {
-//
-//	private PropertyConfiguration config;
-//
-//	private TradeLicenseService tradeLicenseService;
-//
-//	private NotificationUtil util;
-//
-//	private ObjectMapper mapper;
-//
-//	private BPANotificationUtil bpaNotificationUtil;
-//
-//	private TLNotificationService tlNotificationService;
-//
-//	@Autowired
-//	public PaymentNotificationService(TLConfiguration config, TradeLicenseService tradeLicenseService,
-//			NotificationUtil util, ObjectMapper mapper, BPANotificationUtil bpaNotificationUtil,
-//			TLNotificationService tlNotificationService) {
-//		this.config = config;
-//		this.tradeLicenseService = tradeLicenseService;
-//		this.util = util;
-//		this.mapper = mapper;
-//		this.bpaNotificationUtil = bpaNotificationUtil;
-//		this.tlNotificationService = tlNotificationService;
-//	}
-//
-//	final String tenantIdKey = "tenantId";
-//
-//	final String businessServiceKey = "businessService";
-//
-//	final String consumerCodeKey = "consumerCode";
-//
-//	final String payerMobileNumberKey = "mobileNumber";
-//
-//	final String paidByKey = "paidBy";
-//
-//	final String amountPaidKey = "amountPaid";
-//
-//	final String receiptNumberKey = "receiptNumber";
-//
-//	/**
-//	 * Generates sms from the input record and Sends smsRequest to SMSService
-//	 * 
-//	 * @param record The kafka message from receipt create topic
-//	 */
-//	public void process(HashMap<String, Object> record) {
-//		processBusinessService(record, businessService_TL);
-//		processBusinessService(record, businessService_BPA);
-//	}
-//
-//	private void processBusinessService(HashMap<String, Object> record, String businessService) {
-//		try {
-//			String jsonString = new JSONObject(record).toString();
-//			DocumentContext documentContext = JsonPath.parse(jsonString);
-//			Map<String, String> valMap = enrichValMap(documentContext, businessService);
-//			if (!StringUtils.equals(businessService, valMap.get(businessServiceKey)))
-//				return;
-//			Map<String, Object> info = documentContext.read("$.RequestInfo");
-//			RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
-//
-//			if (valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessServiceTL())
-//					|| valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessServiceBPA())) {
-//				TradeLicense license = getTradeLicenseFromConsumerCode(valMap.get(tenantIdKey),
-//						valMap.get(consumerCodeKey), requestInfo, valMap.get(businessServiceKey));
-//				switch (valMap.get(businessServiceKey)) {
-//				case businessService_REHRI_RC:
-//				case businessService_REHRI_DL:
-//				case businessService_DHOBI_GHAT:
-//				case businessService_BOOK_SHOP:
-//				case businessService_TL:
-//					String localizationMessages = util.getLocalizationMessages(license.getTenantId(), requestInfo);
-//					List<SMSRequest> smsRequests = getSMSRequests(license, valMap, localizationMessages);
-//					util.sendSMS(smsRequests, config.getIsTLSMSEnabled());
-//					break;
-//
-//				case businessService_BPA:
-//					localizationMessages = bpaNotificationUtil.getLocalizationMessages(license.getTenantId(),
-//							requestInfo);
-//					PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
-//					String totalAmountPaid = paymentRequest.getPayment().getTotalAmountPaid().toString();
-//					Map<String, String> mobileNumberToOwner = new HashMap<>();
-//					String locMessage = bpaNotificationUtil.getMessageTemplate(NOTIFICATION_PENDINGDOCVERIFICATION,
-//							localizationMessages);
-//					String message = bpaNotificationUtil.getPendingDocVerificationMsg(license, locMessage,
-//							localizationMessages, totalAmountPaid);
-//					license.getTradeLicenseDetail().getOwners().forEach(owner -> {
-//						if (owner.getMobileNumber() != null)
-//							mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
-//					});
-//					List<SMSRequest> smsList = new ArrayList<>();
-//					smsList.addAll(util.createSMSRequest(message, mobileNumberToOwner));
-//					util.sendSMS(smsList, config.getIsBPASMSEnabled());
-//
-//					if (null != config.getIsUserEventsNotificationEnabledForBPA()) {
-//						if (config.getIsUserEventsNotificationEnabledForBPA()) {
-//							TradeLicenseRequest tradeLicenseRequest = TradeLicenseRequest.builder()
-//									.requestInfo(requestInfo).licenses(Collections.singletonList(license)).build();
-//							EventRequest eventRequest = tlNotificationService.getEventsForBPA(tradeLicenseRequest, true,
-//									message);
-//							if (null != eventRequest)
-//								util.sendEventNotification(eventRequest);
-//						}
-//					}
-//					break;
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-//
-//	/**
-//	 * Creates the SMSRequest
-//	 * 
-//	 * @param license              The TradeLicense for which the receipt is
-//	 *                             generated
-//	 * @param valMap               The valMap containing the values from receipt
-//	 * @param localizationMessages The localization message to be sent
-//	 * @return
-//	 */
-//	private List<SMSRequest> getSMSRequests(TradeLicense license, Map<String, String> valMap,
-//			String localizationMessages) {
-//		List<SMSRequest> ownersSMSRequest = getOwnerSMSRequest(license, valMap, localizationMessages);
-//		SMSRequest payerSMSRequest = getPayerSMSRequest(license, valMap, localizationMessages);
-//
-//		List<SMSRequest> totalSMS = new LinkedList<>();
-//		totalSMS.addAll(ownersSMSRequest);
-//		totalSMS.add(payerSMSRequest);
-//
-//		return totalSMS;
-//	}
-//
-//	/**
-//	 * Creates SMSRequest for the owners
-//	 * 
-//	 * @param license              The tradeLicense for which the receipt is created
-//	 * @param valMap               The Map containing the values from receipt
-//	 * @param localizationMessages The localization message to be sent
-//	 * @return The list of the SMS Requests
-//	 */
-//	private List<SMSRequest> getOwnerSMSRequest(TradeLicense license, Map<String, String> valMap,
-//			String localizationMessages) {
-//		String message = util.getOwnerPaymentMsg(license, valMap, localizationMessages);
-//
-//		HashMap<String, String> mobileNumberToOwnerName = new HashMap<>();
-//		license.getTradeLicenseDetail().getOwners().forEach(owner -> {
-//			if (owner.getMobileNumber() != null)
-//				mobileNumberToOwnerName.put(owner.getMobileNumber(), owner.getName());
-//		});
-//
-//		List<SMSRequest> smsRequests = new LinkedList<>();
-//
-//		for (Map.Entry<String, String> entrySet : mobileNumberToOwnerName.entrySet()) {
-//			String customizedMsg = message.replace("<1>", entrySet.getValue());
-//			smsRequests.add(new SMSRequest(entrySet.getKey(), customizedMsg));
-//		}
-//		return smsRequests;
-//	}
-//
-//	/**
-//	 * Creates SMSRequest to be send to the payer
-//	 * 
-//	 * @param valMap               The Map containing the values from receipt
-//	 * @param localizationMessages The localization message to be sent
-//	 * @return
-//	 */
-//	private SMSRequest getPayerSMSRequest(TradeLicense license, Map<String, String> valMap,
-//			String localizationMessages) {
-//		String message = util.getPayerPaymentMsg(license, valMap, localizationMessages);
-//		String customizedMsg = message.replace("<1>", valMap.get(paidByKey));
-//		SMSRequest smsRequest = new SMSRequest(valMap.get(payerMobileNumberKey), customizedMsg);
-//		return smsRequest;
-//	}
-//
-//	/**
-//	 * Enriches the map with values from receipt
-//	 * 
-//	 * @param context The documentContext of the receipt
-//	 * @return The map containing required fields from receipt
-//	 */
-//	private Map<String, String> enrichValMap(DocumentContext context, String businessService) {
-//		Map<String, String> valMap = new HashMap<>();
-//		try {
-//
-//			List<String> businessServiceList = context
-//					.read("$.Payment.paymentDetails[?(@.businessService=='" + businessService + "')].businessService");
-//			List<String> consumerCodeList = context.read(
-//					"$.Payment.paymentDetails[?(@.businessService=='" + businessService + "')].bill.consumerCode");
-//			List<String> mobileNumberList = context.read(
-//					"$.Payment.paymentDetails[?(@.businessService=='" + businessService + "')].bill.mobileNumber");
-//			List<Integer> amountPaidList = context
-//					.read("$.Payment.paymentDetails[?(@.businessService=='" + businessService + "')].bill.amountPaid");
-//			List<String> receiptNumberList = context
-//					.read("$.Payment.paymentDetails[?(@.businessService=='" + businessService + "')].receiptNumber");
-//			valMap.put(businessServiceKey, businessServiceList.isEmpty() ? null : businessServiceList.get(0));
-//			valMap.put(consumerCodeKey, consumerCodeList.isEmpty() ? null : consumerCodeList.get(0));
-//			valMap.put(tenantIdKey, context.read("$.Payment.tenantId"));
-//			valMap.put(payerMobileNumberKey, mobileNumberList.isEmpty() ? null : mobileNumberList.get(0));
-//			valMap.put(paidByKey, context.read("$.Payment.paidBy"));
-//			valMap.put(amountPaidKey, amountPaidList.isEmpty() ? null : String.valueOf(amountPaidList.get(0)));
-//			valMap.put(receiptNumberKey, receiptNumberList.isEmpty() ? null : receiptNumberList.get(0));
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			throw new CustomException("RECEIPT ERROR", "Unable to fetch values from receipt");
-//		}
-//		return valMap;
-//	}
-//
-//	/**
-//	 * Searches the tradeLicense based on the consumer code as applicationNumber
-//	 * 
-//	 * @param tenantId     tenantId of the tradeLicense
-//	 * @param consumerCode The consumerCode of the receipt
-//	 * @param requestInfo  The requestInfo of the request
-//	 * @return TradeLicense for the particular consumerCode
-//	 */
-//	private TradeLicense getTradeLicenseFromConsumerCode(String tenantId, String consumerCode, RequestInfo requestInfo,
-//			String businessService) {
-//
-//		TradeLicenseSearchCriteria searchCriteria = new TradeLicenseSearchCriteria();
-//		searchCriteria.setApplicationNumber(consumerCode);
-//		searchCriteria.setTenantId(tenantId);
-//		searchCriteria.setBusinessService(businessService);
-//		List<TradeLicense> licenses = tradeLicenseService.getLicensesWithOwnerInfo(searchCriteria, requestInfo);
-//
-//		if (CollectionUtils.isEmpty(licenses))
-//			throw new CustomException("INVALID RECEIPT",
-//					"No license found for the consumerCode: " + consumerCode + " and tenantId: " + tenantId);
-//
-//		if (licenses.size() != 1)
-//			throw new CustomException("INVALID RECEIPT",
-//					"Multiple license found for the consumerCode: " + consumerCode + " and tenantId: " + tenantId);
-//
-//		return licenses.get(0);
-//
-//	}
-//}
+package org.egov.cpt.service.notification;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
+import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.DuplicateCopySearchCriteria;
+import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.SMSRequest;
+import org.egov.cpt.models.calculation.BusinessService;
+import org.egov.cpt.models.calculation.PaymentDetail;
+import org.egov.cpt.models.calculation.PaymentRequest;
+import org.egov.cpt.repository.OwnershipTransferRepository;
+import org.egov.cpt.repository.PropertyRepository;
+import org.egov.cpt.service.DuplicateCopyService;
+import org.egov.cpt.service.EnrichmentService;
+import org.egov.cpt.service.OwnershipTransferService;
+import org.egov.cpt.util.NotificationUtil;
+import org.egov.cpt.util.PTConstants;
+import org.egov.cpt.util.PropertyUtil;
+import org.egov.cpt.web.contracts.DuplicateCopyRequest;
+import org.egov.cpt.web.contracts.OwnershipTransferRequest;
+import org.egov.cpt.workflow.WorkflowService;
+import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.micrometer.core.instrument.MeterRegistry.Config;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class PaymentNotificationService {
+
+	private OwnershipTransferService ownershipTransferService;
+
+	private OwnershipTransferRepository repositoryOt;
+
+	private DuplicateCopyService duplicateCopyService;
+
+	private PropertyRepository propertyRepository;
+
+	private EnrichmentService enrichmentService;
+
+	private ObjectMapper mapper;
+
+	private WorkflowService workflowService;
+
+	private NotificationUtil util;
+	
+	private PropertyConfiguration config;
+
+	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
+	private Boolean pickWFServiceNameFromPropertyTypeOnly;
+
+	@Value("${egov.allowed.businessServices}")
+	private String allowedBusinessServices;
+
+	@Autowired
+	public PaymentNotificationService(OwnershipTransferService ownershipTransferService,
+			OwnershipTransferRepository repositoryOt, DuplicateCopyService duplicateCopyService,
+			PropertyRepository propertyRepository, EnrichmentService enrichmentService, ObjectMapper mapper,
+			WorkflowService workflowService, NotificationUtil util, PropertyConfiguration config) {
+		this.ownershipTransferService = ownershipTransferService;
+		this.repositoryOt = repositoryOt;
+		this.duplicateCopyService = duplicateCopyService;
+		this.propertyRepository = propertyRepository;
+		this.enrichmentService = enrichmentService;
+		this.mapper = mapper;
+		this.workflowService = workflowService;
+		this.util = util;
+		this.config = config;
+	}
+
+	final String tenantId = "tenantId";
+
+	final String businessService = "businessService";
+
+	final String consumerCode = "consumerCode";
+	
+	final String mobileKey = "mobileKey";
+
+	Map<String, String> valMap = new HashMap<>();
+	
+	/**
+	 * Process the message from kafka and updates the status to paid
+	 * 
+	 * @param record The incoming message from receipt create consumer
+	 */
+	public void process(HashMap<String, Object> record) {
+
+		try {
+			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
+			RequestInfo requestInfo = paymentRequest.getRequestInfo();
+			List<PaymentDetail> paymentDetails = paymentRequest.getPayment().getPaymentDetails();
+			List<String> allowedservices = Arrays.asList(allowedBusinessServices.split(","));
+			for (PaymentDetail paymentDetail : paymentDetails) {
+				if (allowedservices.contains(paymentDetail.getBusinessService())) {
+					
+					valMap.put(mobileKey, paymentDetail.getBill().getMobileNumber());
+
+					String wfbusinessServiceName = null;
+					switch (paymentDetail.getBusinessService()) {
+					case PTConstants.BUSINESS_SERVICE_OT:
+						wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_OT;
+
+						DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
+						searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
+
+						List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria,
+								requestInfo);
+						owners.forEach(owner ->{
+							String localizationMessages = util.getLocalizationMessages(owner.getTenantId(), requestInfo);
+							 List<SMSRequest> smsRequests = getCTLSMSRequests(owner, localizationMessages);
+							 util.sendSMS(smsRequests, config.getIsSMSNotificationEnabled());
+						});
+
+						if (CollectionUtils.isEmpty(owners))
+							throw new CustomException("INVALID RECEIPT",
+									"No Owner found for the comsumerCode " + searchCriteria.getApplicationNumber());
+						
+						break;
+
+					case PTConstants.BUSINESS_SERVICE_DC:
+						wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_DC;
+
+						DuplicateCopySearchCriteria searchCriteriaDc = new DuplicateCopySearchCriteria();
+						searchCriteriaDc.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
+
+						List<DuplicateCopy> dcApplications = duplicateCopyService.searchApplication(searchCriteriaDc,
+								requestInfo);
+
+						dcApplications.forEach(copy -> {
+							String localizationMessages = util.getLocalizationMessages(copy.getTenantId(), requestInfo);
+							 List<SMSRequest> smsRequests = getDCSMSRequests(copy, localizationMessages);
+							 util.sendSMS(smsRequests, config.getIsSMSNotificationEnabled());
+						});
+
+						if (CollectionUtils.isEmpty(dcApplications))
+							throw new CustomException("INVALID RECEIPT",
+									"No Owner found for the comsumerCode " + searchCriteriaDc.getApplicationNumber());
+
+						break;
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private List<SMSRequest> getDCSMSRequests(DuplicateCopy copy, String localizationMessages) {
+		
+		SMSRequest payerSmsRequest = getDCSMSRequest(copy, localizationMessages);
+		 
+        List<SMSRequest> totalSMS = new LinkedList<>();
+        totalSMS.add(payerSmsRequest);
+		 
+		return totalSMS;
+	}
+
+	private SMSRequest getDCSMSRequest(DuplicateCopy copy, String localizationMessages) {
+		String message = util.getDCPaymentMsg(copy, localizationMessages);
+		 SMSRequest smsRequest = new SMSRequest(valMap.get(mobileKey), message);
+		return smsRequest;
+	}
+
+	private List<SMSRequest> getCTLSMSRequests(Owner owner,
+			String localizationMessages) {
+		 SMSRequest payerSmsRequest = getOTSMSRequest(owner, localizationMessages);
+		 
+         List<SMSRequest> totalSMS = new LinkedList<>();
+         totalSMS.add(payerSmsRequest);
+		 
+		return totalSMS;
+	}
+
+	private SMSRequest getOTSMSRequest(Owner owner,
+			String localizationMessages) {
+		 String message = util.getOTPaymentMsg(owner, localizationMessages);
+		 SMSRequest smsRequest = new SMSRequest(valMap.get(mobileKey), message);
+		return smsRequest;
+	}
+
+}

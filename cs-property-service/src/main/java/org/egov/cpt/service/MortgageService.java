@@ -11,6 +11,7 @@ import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
+import org.egov.cpt.service.notification.MortgageNotificationService;
 import org.egov.cpt.validator.PropertyValidator;
 import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
@@ -36,6 +37,9 @@ public class MortgageService {
 
 	@Autowired
 	private WorkflowIntegrator wfIntegrator;
+	
+	@Autowired
+	MortgageNotificationService notificationService;
 
 	public List<Mortgage> createApplication(MortgageRequest mortgageRequest) {
 		List<Property> propertiesFromDb = propertyValidator.isPropertyExist(mortgageRequest);
@@ -69,7 +73,7 @@ public class MortgageService {
             wfIntegrator.callMortgageWorkFlow(mortgageRequest);
         } 
 		producer.push(config.getUpdateMortgageTopic(), mortgageRequest);
-//		notificationService.process(mortgageRequest);
+		notificationService.process(mortgageRequest);
 		return mortgageRequest.getMortgageApplications();
 	}
 }
