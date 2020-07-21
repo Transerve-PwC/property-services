@@ -423,10 +423,7 @@ public class EnrichmentService {
 				String gen_application_id = UUID.randomUUID().toString();
 				application.setId(gen_application_id);
 				application.getProperty()
-						.setId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId()); // TODO
-																													// CHECK
-																													// BY
-																													// DEBUG
+						.setId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
 				application.setAuditDetails(propertyAuditDetails);
 				System.out.println(propertyAuditDetails.toString() + " audit details here");
 
@@ -531,6 +528,8 @@ public class EnrichmentService {
 							document.setApplicationId(
 									duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId());
 							document.setAuditDetails(documentAuditDetails);
+							document.setTenantId(
+									duplicateCopyRequest.getDuplicateCopyApplications().get(0).getTenantId());
 						}
 
 //						demand generation
@@ -651,8 +650,24 @@ public class EnrichmentService {
 						applicant.setAuditDetails(propertyAuditDetails);
 					});
 				}
+
+				if (application.getState().equalsIgnoreCase(PTConstants.STATE_PENDING_GRANTDETAIL)) {
+					if (!CollectionUtils.isEmpty(application.getMortgageApprovedGrantDetails())) {
+						application.getMortgageApprovedGrantDetails().forEach(grantDetails -> {
+							AuditDetails auditDetails = propertyutil
+									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							grantDetails.setId(UUID.randomUUID().toString());
+							grantDetails.setPropertyDetailId(application.getProperty().getId());
+							grantDetails.setOwnerId(requestInfo.getUserInfo().getUuid());
+							grantDetails.setTenentId(application.getTenantId());
+							grantDetails.setAuditDetails(auditDetails);
+
+						});
+					}
+				}
 			});
 		}
+
 	}
 
 	public void postStatusEnrichmentDC(DuplicateCopyRequest duplicateCopyRequest, List<String> endstates) {

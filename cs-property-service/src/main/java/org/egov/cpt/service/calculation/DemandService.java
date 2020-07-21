@@ -265,13 +265,13 @@ public class DemandService {
 			demand.setDemandDetails(updatedDemandDetails);
 			demands.add(demand);
 		}
-		return demands;
+		return demandRepository.updateDemand(requestInfo, demands);
 
 	}
 
 	private List<DemandDetail> getUpdatedDuplicateCopyDemandDetails(DuplicateCopy application,
 			List<DemandDetail> demandDetails) {
-		 
+
 		List<DemandDetail> newDemandDetails = new ArrayList<>();
 		Map<String, List<DemandDetail>> taxHeadToDemandDetail = new HashMap<>();
 
