@@ -9,11 +9,9 @@ import java.util.Map;
 
 import org.egov.cpt.models.Applicant;
 import org.egov.cpt.models.AuditDetails;
-import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopyDocument;
 import org.egov.cpt.models.Property;
-import org.egov.cpt.models.PropertyDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -36,25 +34,18 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 			DuplicateCopy currentapplication = applicationMap.get(applicationId);
 
 			if (null == currentapplication) {
-				AuditDetails auditdetails = AuditDetails.builder().
-						createdBy(rs.getString("created_by"))
-						.createdTime(rs.getLong("created_time"))
-						.lastModifiedBy(rs.getString("modified_by"))
+				AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("created_by"))
+						.createdTime(rs.getLong("created_time")).lastModifiedBy(rs.getString("modified_by"))
 						.lastModifiedTime(rs.getLong("modified_time")).build();
 
-				//				List<Owner> owners = addOwnersToProperty(rs, currentProperty);
-				
-				Property property = Property.builder().id(rs.getString("property_id")).build();
-						
+				// List<Owner> owners = addOwnersToProperty(rs, currentProperty);
 
-				currentapplication = DuplicateCopy.builder()
-						.id(applicationId)
-						.property(property)
-						.tenantId(rs.getString("tenantid"))
-						.state(rs.getString("state"))
-						.action(rs.getString("action"))
-						.applicationNumber(rs.getString("app_number"))
-						.auditDetails(auditdetails).build();
+				Property property = Property.builder().id(rs.getString("property_id"))
+						.transitNumber(rs.getString("transit_number")).build();
+
+				currentapplication = DuplicateCopy.builder().id(applicationId).property(property)
+						.tenantId(rs.getString("tenantid")).state(rs.getString("state")).action(rs.getString("action"))
+						.applicationNumber(rs.getString("app_number")).auditDetails(auditdetails).build();
 				applicationMap.put(applicationId, currentapplication);
 			}
 			addChildrenToProperty(rs, currentapplication);
@@ -66,54 +57,37 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 		Map<String, Applicant> applicantMap = new HashMap<>();
 		Applicant applicant = null;
 
-		AuditDetails auditDetails = AuditDetails.builder()
-				.createdBy(rs.getString("created_by"))
-				.createdTime(rs.getLong("created_time"))
-				.lastModifiedBy(rs.getString("modified_by"))
+		AuditDetails auditDetails = AuditDetails.builder().createdBy(rs.getString("created_by"))
+				.createdTime(rs.getLong("created_time")).lastModifiedBy(rs.getString("modified_by"))
 				.lastModifiedTime(rs.getLong("created_time")).build();
 
-		if(currentapplication.getApplicant()==null){
-			if(rs.getString("aid")!=null ){ 
-				applicant = Applicant.builder()
-						.id(rs.getString("aid"))
-						.tenantId(rs.getString("aptenantid"))
-						.applicationId(rs.getString("app_id"))
-						.name(rs.getString("name"))
-						.email(rs.getString("email"))
-						.phone(rs.getString("mobileno"))
-						.guardian(rs.getString("guardian"))
-						.relationship(rs.getString("relationship"))
-						.adhaarNumber(rs.getString("adhaarnumber"))
-						.feeAmount(rs.getBigDecimal("fee_amount"))
-						.aproCharge(rs.getBigDecimal("apro_charge"))
-						.auditDetails(auditDetails)
-						.build();
+		if (currentapplication.getApplicant() == null) {
+			if (rs.getString("aid") != null) {
+				applicant = Applicant.builder().id(rs.getString("aid")).tenantId(rs.getString("aptenantid"))
+						.applicationId(rs.getString("app_id")).name(rs.getString("name")).email(rs.getString("email"))
+						.phone(rs.getString("mobileno")).guardian(rs.getString("guardian"))
+						.relationship(rs.getString("relationship")).adhaarNumber(rs.getString("adhaarnumber"))
+						.feeAmount(rs.getBigDecimal("fee_amount")).aproCharge(rs.getBigDecimal("apro_charge"))
+						.auditDetails(auditDetails).build();
 				applicantMap.put(rs.getString("aid"), applicant);
 				currentapplication.setApplicant(new ArrayList<>(applicantMap.values()));
 			}
 		}
-		
-		if(currentapplication.getProperty()==null){
-			Property property = Property.builder()
-					.id(rs.getString("property_id"))
-					.transitNumber(rs.getString("transit_number"))
-					.build();
+
+		if (currentapplication.getProperty() == null) {
+			Property property = Property.builder().id(rs.getString("property_id"))
+					.transitNumber(rs.getString("transit_number")).build();
 			currentapplication.setProperty(property);
 		}
 
-
-		if(rs.getString("docId")!=null && rs.getBoolean("doc_active")) {
+		if (rs.getString("docId") != null && rs.getBoolean("doc_active")) {
 			DuplicateCopyDocument applicationDocument = DuplicateCopyDocument.builder()
-					.documentType(rs.getString("doctype"))
-					.fileStoreId(rs.getString("doc_filestoreid"))
-					.id(rs.getString("docId"))
-					.tenantId(rs.getString("doctenantid"))
-					.active(rs.getBoolean("doc_active"))
-					.auditDetails(auditDetails)
-					.build();
+					.documentType(rs.getString("doctype")).fileStoreId(rs.getString("doc_filestoreid"))
+					.id(rs.getString("docId")).tenantId(rs.getString("doctenantid")).active(rs.getBoolean("doc_active"))
+					.auditDetails(auditDetails).applicationId(rs.getString("doc_applid")).build();
 			currentapplication.addApplicationDocumentsItem(applicationDocument);
 		}
 
 	}
 
-	}
+}
