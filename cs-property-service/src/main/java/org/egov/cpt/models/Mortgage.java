@@ -63,6 +63,10 @@ public class Mortgage {
 	@JsonProperty("applicant")
 	private List<MortgageApplicant> applicant;
 
+	@Valid
+	@JsonProperty("mortgageApprovedGrantDetails")
+	private List<MortgageApprovedGrantDetails> mortgageApprovedGrantDetails;
+
 	public Mortgage addApplicationDocumentsItem(DuplicateCopyDocument applicationDocumentsItem) {
 		if (this.applicationDocuments == null) {
 			this.applicationDocuments = new ArrayList<>();
