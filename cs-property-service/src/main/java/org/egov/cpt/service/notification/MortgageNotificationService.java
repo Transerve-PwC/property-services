@@ -28,8 +28,8 @@ public class MortgageNotificationService {
 	private NotificationUtil util;
 
 	@Autowired
-	public MortgageNotificationService(PropertyConfiguration config,
-			ServiceRequestRepository serviceRequestRepository, NotificationUtil util) {
+	public MortgageNotificationService(PropertyConfiguration config, ServiceRequestRepository serviceRequestRepository,
+			NotificationUtil util) {
 		this.config = config;
 		this.serviceRequestRepository = serviceRequestRepository;
 		this.util = util;
@@ -66,7 +66,8 @@ public class MortgageNotificationService {
 			Map<String, String> mobileNumberToOwner = new HashMap<>();
 
 			if (mortgage.getApplicant().get(0).getPhone() != null) {
-				mobileNumberToOwner.put(mortgage.getApplicant().get(0).getPhone(), mortgage.getApplicant().get(0).getName());
+				mobileNumberToOwner.put(mortgage.getApplicant().get(0).getPhone(),
+						mortgage.getApplicant().get(0).getName());
 			}
 			smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
 		}
@@ -74,4 +75,3 @@ public class MortgageNotificationService {
 	}
 
 }
-
