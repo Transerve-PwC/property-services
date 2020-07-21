@@ -58,7 +58,7 @@ public class PTConstants {
 //	payment
 
 	public static final String BUSINESS_SERVICE_OT = "OwnershipTransferRP";
-	
+
 	public static final String BUSINESS_SERVICE_DC = "DuplicateCopyOfAllotmentLetterRP";
 
 	public static final String ACTION_INITIATE = "INITIATE";
@@ -182,5 +182,6 @@ public class PTConstants {
 //    demand generation
 	public static final String STATE_PENDING_SA_VERIFICATION = "PENDINGSAVERIFICATION";
 	public static final String STATE_PENDING_APRO = "PENDINGAPRO";
+	public static final String STATE_PENDING_GRANTDETAIL = "PENDINGGRANTDETAIL";
 
 }

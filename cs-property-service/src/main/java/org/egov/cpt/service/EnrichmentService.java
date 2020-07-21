@@ -650,8 +650,24 @@ public class EnrichmentService {
 						applicant.setAuditDetails(propertyAuditDetails);
 					});
 				}
+
+				if (application.getState().equalsIgnoreCase(PTConstants.STATE_PENDING_GRANTDETAIL)) {
+					if (!CollectionUtils.isEmpty(application.getMortgageApprovedGrantDetails())) {
+						application.getMortgageApprovedGrantDetails().forEach(grantDetails -> {
+							AuditDetails auditDetails = propertyutil
+									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							grantDetails.setId(UUID.randomUUID().toString());
+							grantDetails.setPropertyDetailId(application.getProperty().getId());
+							grantDetails.setOwnerId(requestInfo.getUserInfo().getUuid());
+							grantDetails.setTenentId(application.getTenantId());
+							grantDetails.setAuditDetails(auditDetails);
+
+						});
+					}
+				}
 			});
 		}
+
 	}
 
 	public void postStatusEnrichmentDC(DuplicateCopyRequest duplicateCopyRequest, List<String> endstates) {
