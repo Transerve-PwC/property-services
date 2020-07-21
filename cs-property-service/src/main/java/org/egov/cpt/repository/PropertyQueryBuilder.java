@@ -60,7 +60,7 @@ public class PropertyQueryBuilder {
 
 	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,pt.*,"
 			+ " dca.id as appid, dca.property_id, dca.tenantid as pttenantid, dca.state, dca.action,dca.application_number as app_number,"
-			
+
 			+ " pt.id as pid, pt.transit_number,pt.colony,"
 
 			+ " ap.id as aid, ap.application_id as app_id,ap.tenantid as aptenantid,"
@@ -70,7 +70,7 @@ public class PropertyQueryBuilder {
 			+ " doc.application_id as doc_applid , doc.active as doc_active"
 
 			+ " FROM cs_pt_duplicate_ownership_application dca " + INNER_JOIN
-			+ " cs_pt_property_v1 pt on dca.property_id=pt.id "+ INNER_JOIN
+			+ " cs_pt_property_v1 pt on dca.property_id=pt.id " + INNER_JOIN
 			+ " cs_pt_duplicatecopy_applicant ap ON dca.id =ap.application_id " + LEFT_JOIN
 			+ " cs_pt_duplicatecopy_document doc ON doc.application_id =  dca.id";
 

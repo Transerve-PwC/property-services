@@ -123,7 +123,7 @@ serviceMaps:
       - jsonPath: $.DuplicateCopyApplications.*.applicant.*.id
     
     
-    - query: UPDATE cs_pt_duplicatecopy_applicant SET name=?, email=?, mobileno=?, guardian=?, relationship=?,aadhaar_number=?, modified_by=?, modified_time=? WHERE id=?;
+    - query: UPDATE cs_pt_duplicatecopy_applicant SET name=?, email=?, mobileno=?, guardian=?, relationship=?, aadhaar_number=?, fee_amount=?, apro_charge=?, modified_by=?, modified_time=? WHERE id=?;
       basePath: DuplicateCopyApplications.*.applicant.*
       jsonMaps:
 
@@ -139,6 +139,10 @@ serviceMaps:
 
       - jsonPath: $.DuplicateCopyApplications.*.applicant.*.adhaarNumber
       
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.feeAmount
+
+      - jsonPath: $.DuplicateCopyApplications.*.applicant.*.aproCharge
+      
       - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedBy 
       
       - jsonPath: $.DuplicateCopyApplications.*.auditDetails.lastModifiedTime
@@ -152,7 +156,7 @@ serviceMaps:
 
       - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.id
       
-      - jsonPath: $.DuplicateCopyApplications.*.tenantId 
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.tenantId 
 
       - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.documentType 
       
