@@ -112,7 +112,7 @@ public class OwnershipTransferQueryBuilder {
 			builder.append("ownership.application_state = ?");
 			preparedStmtList.add(criteria.getStatus());
 		}
-
+		
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
 

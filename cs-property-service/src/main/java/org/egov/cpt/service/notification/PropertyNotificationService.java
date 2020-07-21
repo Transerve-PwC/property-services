@@ -1,6 +1,5 @@
 package org.egov.cpt.service.notification;
 
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,12 +67,13 @@ public class PropertyNotificationService {
 		for (Owner owner : request.getOwners()) {
 			String message = null;
 			String localizationMessages;
-			
+
 			localizationMessages = util.getLocalizationMessages(tenantId, request.getRequestInfo());
 			message = util.getCustomizedMsg(request.getRequestInfo(), owner, localizationMessages);
-			
-			if (message == null) continue;
-			
+
+			if (message == null)
+				continue;
+
 			Map<String, String> mobileNumberToOwner = new HashMap<>();
 
 			if (owner.getOwnerDetails().getPhone() != null) {

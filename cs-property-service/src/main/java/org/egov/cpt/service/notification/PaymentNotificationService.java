@@ -58,7 +58,7 @@ public class PaymentNotificationService {
 	private WorkflowService workflowService;
 
 	private NotificationUtil util;
-	
+
 	private PropertyConfiguration config;
 
 	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
@@ -88,11 +88,11 @@ public class PaymentNotificationService {
 	final String businessService = "businessService";
 
 	final String consumerCode = "consumerCode";
-	
+
 	final String mobileKey = "mobileKey";
 
 	Map<String, String> valMap = new HashMap<>();
-	
+
 	/**
 	 * Process the message from kafka and updates the status to paid
 	 * 
@@ -107,7 +107,7 @@ public class PaymentNotificationService {
 			List<String> allowedservices = Arrays.asList(allowedBusinessServices.split(","));
 			for (PaymentDetail paymentDetail : paymentDetails) {
 				if (allowedservices.contains(paymentDetail.getBusinessService())) {
-					
+
 					valMap.put(mobileKey, paymentDetail.getBill().getMobileNumber());
 
 					String wfbusinessServiceName = null;
@@ -120,16 +120,17 @@ public class PaymentNotificationService {
 
 						List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria,
 								requestInfo);
-						owners.forEach(owner ->{
-							String localizationMessages = util.getLocalizationMessages(owner.getTenantId(), requestInfo);
-							 List<SMSRequest> smsRequests = getCTLSMSRequests(owner, localizationMessages);
-							 util.sendSMS(smsRequests, config.getIsSMSNotificationEnabled());
+						owners.forEach(owner -> {
+							String localizationMessages = util.getLocalizationMessages(owner.getTenantId(),
+									requestInfo);
+							List<SMSRequest> smsRequests = getCTLSMSRequests(owner, localizationMessages);
+							util.sendSMS(smsRequests, config.getIsSMSNotificationEnabled());
 						});
 
 						if (CollectionUtils.isEmpty(owners))
 							throw new CustomException("INVALID RECEIPT",
 									"No Owner found for the comsumerCode " + searchCriteria.getApplicationNumber());
-						
+
 						break;
 
 					case PTConstants.BUSINESS_SERVICE_DC:
@@ -143,8 +144,8 @@ public class PaymentNotificationService {
 
 						dcApplications.forEach(copy -> {
 							String localizationMessages = util.getLocalizationMessages(copy.getTenantId(), requestInfo);
-							 List<SMSRequest> smsRequests = getDCSMSRequests(copy, localizationMessages);
-							 util.sendSMS(smsRequests, config.getIsSMSNotificationEnabled());
+							List<SMSRequest> smsRequests = getDCSMSRequests(copy, localizationMessages);
+							util.sendSMS(smsRequests, config.getIsSMSNotificationEnabled());
 						});
 
 						if (CollectionUtils.isEmpty(dcApplications))
@@ -162,35 +163,33 @@ public class PaymentNotificationService {
 	}
 
 	private List<SMSRequest> getDCSMSRequests(DuplicateCopy copy, String localizationMessages) {
-		
+
 		SMSRequest payerSmsRequest = getDCSMSRequest(copy, localizationMessages);
-		 
-        List<SMSRequest> totalSMS = new LinkedList<>();
-        totalSMS.add(payerSmsRequest);
-		 
+
+		List<SMSRequest> totalSMS = new LinkedList<>();
+		totalSMS.add(payerSmsRequest);
+
 		return totalSMS;
 	}
 
 	private SMSRequest getDCSMSRequest(DuplicateCopy copy, String localizationMessages) {
 		String message = util.getDCPaymentMsg(copy, localizationMessages);
-		 SMSRequest smsRequest = new SMSRequest(valMap.get(mobileKey), message);
+		SMSRequest smsRequest = new SMSRequest(valMap.get(mobileKey), message);
 		return smsRequest;
 	}
 
-	private List<SMSRequest> getCTLSMSRequests(Owner owner,
-			String localizationMessages) {
-		 SMSRequest payerSmsRequest = getOTSMSRequest(owner, localizationMessages);
-		 
-         List<SMSRequest> totalSMS = new LinkedList<>();
-         totalSMS.add(payerSmsRequest);
-		 
+	private List<SMSRequest> getCTLSMSRequests(Owner owner, String localizationMessages) {
+		SMSRequest payerSmsRequest = getOTSMSRequest(owner, localizationMessages);
+
+		List<SMSRequest> totalSMS = new LinkedList<>();
+		totalSMS.add(payerSmsRequest);
+
 		return totalSMS;
 	}
 
-	private SMSRequest getOTSMSRequest(Owner owner,
-			String localizationMessages) {
-		 String message = util.getOTPaymentMsg(owner, localizationMessages);
-		 SMSRequest smsRequest = new SMSRequest(valMap.get(mobileKey), message);
+	private SMSRequest getOTSMSRequest(Owner owner, String localizationMessages) {
+		String message = util.getOTPaymentMsg(owner, localizationMessages);
+		SMSRequest smsRequest = new SMSRequest(valMap.get(mobileKey), message);
 		return smsRequest;
 	}
 

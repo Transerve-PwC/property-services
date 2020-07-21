@@ -69,6 +69,7 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 			addChildrenToProperty(rs, currentOwner);
 		}
 		return new ArrayList<>(ownerMap.values());
+
 	}
 
 	private void addChildrenToProperty(ResultSet rs, Owner owner) throws SQLException {

@@ -36,6 +36,7 @@ public class MortgageController {
 	private MortgageService mortgageService;
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	/**
 	 * 
 	 * @param mortgageRequest
@@ -47,11 +48,12 @@ public class MortgageController {
 		List<Mortgage> mortgage = mortgageService.createApplication(mortgageRequest);
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(mortgageRequest.getRequestInfo(),
 				true);
-		MortgageResponse response = MortgageResponse.builder().mortgageApplications(mortgage).responseInfo(resInfo).build();
+		MortgageResponse response = MortgageResponse.builder().mortgageApplications(mortgage).responseInfo(resInfo)
+				.build();
 		logger.debug("property created sucessfuly");
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
-	
+
 	/**
 	 * 
 	 * @param requestInfoWrapper
@@ -62,11 +64,14 @@ public class MortgageController {
 	@PostMapping("/_search")
 	public ResponseEntity<MortgageResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute DuplicateCopySearchCriteria searchCriteria) {
-		List<Mortgage> applications = mortgageService.searchApplication(searchCriteria,requestInfoWrapper.getRequestInfo());
+		List<Mortgage> applications = mortgageService.searchApplication(searchCriteria,
+				requestInfoWrapper.getRequestInfo());
 		MortgageResponse response = MortgageResponse.builder().mortgageApplications(applications).responseInfo(
-				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true)).build();
+				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
+				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+
 	/**
 	 * 
 	 * @param mortgageRequest
@@ -77,7 +82,8 @@ public class MortgageController {
 		List<Mortgage> applications = mortgageService.updateApplication(mortgageRequest);
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(mortgageRequest.getRequestInfo(),
 				true);
-		MortgageResponse response = MortgageResponse.builder().mortgageApplications(applications).responseInfo(resInfo).build();
+		MortgageResponse response = MortgageResponse.builder().mortgageApplications(applications).responseInfo(resInfo)
+				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }
