@@ -41,7 +41,8 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 				// List<Owner> owners = addOwnersToProperty(rs, currentProperty);
 
 				Property property = Property.builder().id(rs.getString("property_id"))
-						.transitNumber(rs.getString("transit_number")).build();
+						.transitNumber(rs.getString("transit_number")).colony(rs.getString("colony"))
+						.pincode(rs.getString("pincode")).build();
 
 				currentapplication = DuplicateCopy.builder().id(applicationId).property(property)
 						.tenantId(rs.getString("tenantid")).state(rs.getString("state")).action(rs.getString("action"))

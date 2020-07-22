@@ -24,9 +24,11 @@ public class OwnershipTransferQueryBuilder {
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
-	private static final String SEARCH_QUERY = SELECT + "pt.*,ownership.*,od.*,doc.*,"
+	private static final String SEARCH_QUERY = SELECT + "pt.*,address.*,ownership.*,od.*,doc.*,"
 
-			+ " pt.id as pid, pt.transit_number,"
+			+ " pt.id as pid, pt.transit_number, pt.colony,"
+
+			+ " address.pincode,"
 
 			+ " ownership.id as oid, ownership.property_id as oproperty_id,"
 			+ " ownership.tenantid as otenantid, ownership.allotmen_number as oallotmen_number,"
@@ -43,8 +45,8 @@ public class OwnershipTransferQueryBuilder {
 			+ " doc.id as docid, doc.owner_id as docowner_id, doc.tenantid as doctenantid,"
 			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id, doc.document_uid"
 
-			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN
-			+ " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
+			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_address_v1 address ON pt.id=address.property_id "
+			+ LEFT_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
 			+ " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
 			+ " cs_pt_ot_documents_v1 doc ON ownership.id=doc.owner_id ";
 

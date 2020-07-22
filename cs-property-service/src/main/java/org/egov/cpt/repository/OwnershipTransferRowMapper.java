@@ -55,7 +55,8 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 						.aproCharge(rs.getBigDecimal("apro_charge")).auditDetails(auditdetails).payment(null).build();
 
 				Property property = Property.builder().id(rs.getString("pid"))
-						.transitNumber(rs.getString("transit_number")).build();
+						.transitNumber(rs.getString("transit_number")).colony(rs.getString("colony"))
+						.pincode(rs.getString("pincode")).build();
 
 				currentOwner = Owner.builder().id(rs.getString("oid")).property(property)
 						.tenantId(rs.getString("otenantid")).allotmenNumber(rs.getString("oallotmen_number"))

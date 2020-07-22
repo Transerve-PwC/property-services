@@ -36,10 +36,10 @@ public class PropertySerializer extends StdSerializer<Property> {
 		generator.writeString(property.getId());
 		generator.writeFieldName("transitNumber");
 		generator.writeString(property.getTransitNumber());
-//		generator.writeFieldName("colony");
-//		generator.writeString(property.getColony());
-//		generator.writeFieldName("pincode");
-//		generator.writeString(property.getPropertyDetails().getAddress().getPincode());
+		generator.writeFieldName("colony");
+		generator.writeString(property.getColony());
+		generator.writeFieldName("pincode");
+		generator.writeString(property.getPincode());
 		generator.writeEndObject();
 	}
 }

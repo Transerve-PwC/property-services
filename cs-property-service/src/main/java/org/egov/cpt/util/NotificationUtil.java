@@ -98,7 +98,11 @@ public class NotificationUtil {
 		message = message.replace("<2>", owner.getOwnerDetails().getName());
 		message = message.replace("<3>", PTConstants.OWNERSHIP_TRANSFER_APPLICATION);
 		message = message.replace("<4>", owner.getOwnerDetails().getApplicationNumber());
-		message = message.replace("<5>", due.add(charge) + "₹");
+		try {
+			message = message.replace("<5>", (CharSequence) due.add(charge));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return message;
 	}
 
@@ -213,7 +217,7 @@ public class NotificationUtil {
 		message = message.replace("<3>", PTConstants.DUPLICATE_COPY_APPLICATION);
 		message = message.replace("<4>", copy.getApplicationNumber());
 		if (message.contains("<5>")) {
-			message = message.replace("<5>", fee.add(charge) + "₹");
+			message = message.replace("<5>", (CharSequence) fee.add(charge));
 		}
 		return message;
 	}

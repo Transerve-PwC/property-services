@@ -76,4 +76,13 @@ public class Mortgage {
 		return this;
 	}
 
+	public Mortgage addMortgageApprovedGrantDetails(MortgageApprovedGrantDetails mortgageApprovedGrantDetails) {
+		if (this.mortgageApprovedGrantDetails == null) {
+			this.mortgageApprovedGrantDetails = new ArrayList<>();
+		}
+		if (!this.mortgageApprovedGrantDetails.contains(mortgageApprovedGrantDetails))
+			this.mortgageApprovedGrantDetails.add(mortgageApprovedGrantDetails);
+		return this;
+	}
+
 }
