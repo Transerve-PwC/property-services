@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
-import org.egov.cpt.models.PropertyCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -24,10 +23,17 @@ public class MortgageQueryBuilder {
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pid) offset_ FROM " + "({})" + " result) result_offset "
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
-	private static final String MORTGAGE_SEARCH_QUERY = SELECT + "mg.*,ap.*,doc.*,pt.*,"
+	private static final String MORTGAGE_SEARCH_QUERY = SELECT + "mg.*,ap.*,doc.*,pt.*,address.*,gd.*,"
 			+ " mg.id as mgid, mg.propertyid, mg.tenantid as mgtenantid, mg.state, mg.action,mg.application_number as app_number,"
-			
-			+ " pt.id as pid, pt.transit_number,"
+
+			+ " pt.id as pid, pt.transit_number, pt.colony,"
+
+			+ " address.pincode,"
+
+			+ " gd.id as gdid, gd.property_detail_id as gdproperty_detail_id, gd.owner_id as gdowner_id, gd.tenantid as gdtenantid,"
+			+ " gd.bank_name as gdbank_name, gd.mortgage_amount as gdmortgage_amount,"
+			+ " gd.sanction_letter_number as gdsanction_letter_number, gd.sanction_date as gdsanction_date, gd.mortgage_end_date as gdmortgage_end_date,"
+			+ " gd.created_by as gdcreated_by, gd.modified_by as gdmodified_by, gd.created_time as gdcreated_time, gd.modified_time as gdmodified_time,"
 
 			+ " ap.id as aid, ap.mortgage_id as mg_id,ap.tenantid as aptenantid,"
 			+ " ap.name,ap.email,ap.mobileno,ap.guardian,ap.relationship,ap.aadhaar_number as adhaarnumber,"
@@ -35,11 +41,13 @@ public class MortgageQueryBuilder {
 			+ " doc.id as docId, doc.tenantId as doctenantid,doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
 			+ " doc.mortgage_id as doc_mgid , doc.active as doc_active"
 
-			+ " FROM cs_pt_mortgage_application mg " + INNER_JOIN
-			+ " cs_pt_property_v1 pt on mg.propertyid=pt.id "+ INNER_JOIN
-			+ " cs_pt_mortgage_applicant ap ON mg.id =ap.mortgage_id " + LEFT_JOIN
-			+ " cs_pt_mortgage_douments doc ON doc.mortgage_id =  mg.id";
+			+ " FROM cs_pt_mortgage_application mg " + INNER_JOIN + " cs_pt_property_v1 pt on mg.propertyid=pt.id "
+			+ INNER_JOIN + " cs_pt_mortgage_applicant ap ON mg.id =ap.mortgage_id " + LEFT_JOIN
+			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + INNER_JOIN
 
+			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_detail_id " + INNER_JOIN
+
+			+ " cs_pt_mortgage_douments doc ON doc.mortgage_id =  mg.id";
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {
@@ -66,7 +74,6 @@ public class MortgageQueryBuilder {
 		return finalQuery;
 	}
 
-
 	private static void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
@@ -75,8 +82,7 @@ public class MortgageQueryBuilder {
 		}
 	}
 
-	public String getMortgageSearchQuery(DuplicateCopySearchCriteria criteria,
-			List<Object> preparedStmtList) {
+	public String getMortgageSearchQuery(DuplicateCopySearchCriteria criteria, List<Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(MORTGAGE_SEARCH_QUERY);
 

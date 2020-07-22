@@ -11,6 +11,7 @@ import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.DuplicateCopyDocument;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.MortgageApplicant;
+import org.egov.cpt.models.MortgageApprovedGrantDetails;
 import org.egov.cpt.models.Property;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -40,7 +41,8 @@ public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
 				// List<Owner> owners = addOwnersToProperty(rs, currentProperty);
 
 				Property property = Property.builder().id(rs.getString("pid"))
-						.transitNumber(rs.getString("transit_number")).build();
+						.transitNumber(rs.getString("transit_number")).colony(rs.getString("colony"))
+						.pincode(rs.getString("pincode")).build();
 
 				currentapplication = Mortgage.builder().id(mortgageId).property(property)
 						.tenantId(rs.getString("tenantid")).state(rs.getString("state")).action(rs.getString("action"))
@@ -77,6 +79,20 @@ public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
 			Property property = Property.builder().id(rs.getString("pid")).transitNumber(rs.getString("transit_number"))
 					.build();
 			currentapplication.setProperty(property);
+		}
+
+		if (currentapplication.getMortgageApprovedGrantDetails() == null) {
+			AuditDetails magdAuditDetails = AuditDetails.builder().createdBy(rs.getString("gdcreated_by"))
+					.createdTime(rs.getLong("gdcreated_time")).lastModifiedBy(rs.getString("gdmodified_by"))
+					.lastModifiedTime(rs.getLong("gdmodified_time")).build();
+			MortgageApprovedGrantDetails mortgageApprovedGrantDetails = MortgageApprovedGrantDetails.builder()
+					.id(rs.getString("gdid")).propertyDetailId(rs.getString("gdproperty_detail_id"))
+					.ownerId(rs.getString("gdowner_id")).tenentId(rs.getString("gdtenantid"))
+					.bankName(rs.getString("gdbank_name")).mortgageAmount(rs.getBigDecimal("gdmortgage_amount"))
+					.sanctionLetterNumber(rs.getString("gdsanction_letter_number"))
+					.sanctionDate(rs.getLong("gdsanction_date")).mortgageEndDate(rs.getLong("gdmortgage_end_date"))
+					.auditDetails(magdAuditDetails).build();
+			currentapplication.addMortgageApprovedGrantDetails(mortgageApprovedGrantDetails);
 		}
 
 		if (rs.getString("docId") != null && rs.getBoolean("doc_active")) {

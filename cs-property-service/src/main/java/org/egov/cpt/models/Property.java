@@ -67,11 +67,11 @@ public class Property {
 	@Valid
 	@JsonProperty("owners")
 	private List<Owner> owners;
-	
+
 	@Valid
 	@JsonProperty
 	private List<DuplicateCopy> duplicateCopys;
-	
+
 	public Property addDocumentItem(DuplicateCopy newDuplicateCopyItem) {
 		if (this.duplicateCopys == null) {
 			this.duplicateCopys = new ArrayList<>();
@@ -97,5 +97,8 @@ public class Property {
 		this.owners.add(newOwnerItem);
 		return this;
 	}
+
+	@JsonProperty("pincode")
+	private String pincode;
 
 }
