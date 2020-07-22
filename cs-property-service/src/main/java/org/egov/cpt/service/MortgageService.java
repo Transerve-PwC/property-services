@@ -54,7 +54,7 @@ public class MortgageService {
 
 	public List<Mortgage> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
 		propertyValidator.validateMortgageSearch(requestInfo, criteria);
-//	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
+	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
 		return getApplication(criteria, requestInfo);
 	}
 
