@@ -57,9 +57,15 @@ public class OwnershipTransferService {
 	}
 
 	public List<Owner> searchOwnershipTransfer(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
+		if (criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN")) {
+			criteria.setApplicantMobNo(requestInfo.getUserInfo().getUserName());
+		}
+
 		List<Owner> owners = repository.searchOwnershipTransfer(criteria);
+
 		if (CollectionUtils.isEmpty(owners))
 			return Collections.emptyList();
+
 		return owners;
 	}
 
