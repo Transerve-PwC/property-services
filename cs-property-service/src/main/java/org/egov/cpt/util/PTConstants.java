@@ -167,19 +167,41 @@ public class PTConstants {
 	public static final String OWNERSHIP_TRANSFER_APPLICATION = "Ownership Transfer request";
 	public static final String DUPLICATE_COPY_APPLICATION = "Duplicate Copy request";
 	public static final String MORTGAGE_APPLICATION = "Mortgage request";
+	
+	//Ownership Transfer ACTION_STATUS combinations for notification
 
-	// ACTION_STATUS combinations for notification
+	public static final String OT_ACTION_STATUS_INITIATED = "INITIATE_OT_DRAFTED";
+	public static final String OT_ACTION_STATUS_SUBMIT = "SUBMIT_OT_PENDINGCLVERIFICATION";
+	public static final String OT_ACTION_STATUS_REJECTED = "REJECT_OT_REJECTED";
+	public static final String OT_ACTION_STATUS_SENDBACK = "SENDBACK_OT_PENDINGCLARIFICATION";
+	public static final String OT_ACTION_STATUS_PAYMENT = "APPROVE_OT_PENDINGPAYMENT";
+	public static final String OT_ACTION_STATUS_PAYMENT_SUCCESS = "PAY_OT_APPROVED";
+	public static final String OT_ACTION_STATUS_APPROVED = "PAY_OT_APPROVED";
+//	public static final String OT_ACTION_STATUS_MORTGAGE_APPROVED = "APPROVE_OT_APPROVED";
+	
+	//Duplicate Copy ACTION_STATUS combinations for notification
 
-	public static final String ACTION_STATUS_INITIATED = "INITIATE_INITIATED";
-	public static final String ACTION_STATUS_SUBMIT = "SUBMIT_PENDINGCLVERIFICATION";
-	public static final String ACTION_STATUS_REJECTED = "REJECT_REJECTED";
-	public static final String ACTION_STATUS_SENDBACK = "SENDBACK_PENDINGCLARIFICATION";
-	public static final String ACTION_STATUS_PAYMENT = "APPROVE_PENDINGPAYMENT";
-	public static final String ACTION_STATUS_PAYMENT_SUCCESS = "PAY_APPROVED";
-	public static final String ACTION_STATUS_APPROVED = "PAY_APPROVED";
-	public static final String ACTION_STATUS_MORTGAGE_APPROVED = "APPROVE_APPROVED";
+	public static final String DC_ACTION_STATUS_INITIATED = "INITIATE_DC_DRAFTED";
+	public static final String DC_ACTION_STATUS_SUBMIT = "SUBMIT_DC_PENDINGCLVERIFICATION";
+	public static final String DC_ACTION_STATUS_REJECTED = "REJECT_DC_REJECTED";
+	public static final String DC_ACTION_STATUS_SENDBACK = "SENDBACK_DC_PENDINGCLARIFICATION";
+	public static final String DC_ACTION_STATUS_PAYMENT = "APPROVE_DC_PENDINGPAYMENT";
+	public static final String DC_ACTION_STATUS_PAYMENT_SUCCESS = "PAY_DC_APPROVED";
+	public static final String DC_ACTION_STATUS_APPROVED = "PAY_DC_APPROVED";
+//	public static final String DC_ACTION_STATUS_MORTGAGE_APPROVED = "APPROVE_DC_APPROVED";
+	
+	//Mortgage ACTION_STATUS combinations for notification
 
-//    demand generation
+	public static final String MG_ACTION_STATUS_INITIATED = "INITIATE_MG_DRAFTED";
+	public static final String MG_ACTION_STATUS_SUBMIT = "SUBMIT_MG_PENDINGCLVERIFICATION";
+	public static final String MG_ACTION_STATUS_REJECTED = "REJECT_MG_REJECTED";
+	public static final String MG_ACTION_STATUS_SENDBACK = "SENDBACK_MG_PENDINGCLARIFICATION";
+//	public static final String MG_ACTION_STATUS_PAYMENT = "APPROVE_MG_PENDINGPAYMENT";
+//	public static final String MG_ACTION_STATUS_PAYMENT_SUCCESS = "PAY_MG_APPROVED";
+//	public static final String MG_ACTION_STATUS_APPROVED = "PAY_MG_APPROVED";
+	public static final String MG_ACTION_STATUS_MORTGAGE_APPROVED = "APPROVE_MG_APPROVED";
+
+//  demand generation
 	public static final String OT_STATE_PENDING_SA_VERIFICATION = "OT_PENDINGSAVERIFICATION";
 	public static final String OT_STATE_PENDING_APRO = "OT_PENDINGAPRO";
 	public static final String DC_STATE_PENDING_SA_VERIFICATION = "DC_PENDINGSAVERIFICATION";
