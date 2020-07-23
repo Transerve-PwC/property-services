@@ -15,6 +15,7 @@ import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
@@ -688,6 +689,13 @@ public class EnrichmentService {
 		duplicateCopyRequest.getDuplicateCopyApplications().forEach(dcApplication -> {
 //			TODO: add enrichment
 		});
+	}
+
+	public void enrichDuplicateCopySearchCriteria(RequestInfo requestInfo, DuplicateCopySearchCriteria criteria) {
+		if (criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN")) {
+			criteria.setApplicantMobNo(requestInfo.getUserInfo().getUserName());
+		}
+		
 	}
 
 }

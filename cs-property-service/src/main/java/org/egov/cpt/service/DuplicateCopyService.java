@@ -59,8 +59,8 @@ public class DuplicateCopyService {
 	}
 
 	public List<DuplicateCopy> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
-		propertyValidator.validateDuplicateCopySearch(requestInfo, criteria);
-//	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
+		propertyValidator.validateDuplicateCopySearch(requestInfo,criteria);
+	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
 		List<DuplicateCopy> properties = getApplication(criteria, requestInfo);
 		return properties;
 	}

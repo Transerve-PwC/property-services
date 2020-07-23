@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 import org.egov.cpt.util.PropertySerializer;
 import org.springframework.validation.annotation.Validated;
@@ -51,6 +52,13 @@ public class Mortgage {
 
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
+	
+	@JsonProperty("assignee")
+	private List<String> assignee = null;
+
+	@Size(max = 128)
+	@JsonProperty("comment")
+	private String comment;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;

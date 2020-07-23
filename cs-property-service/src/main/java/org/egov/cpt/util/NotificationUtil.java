@@ -64,27 +64,27 @@ public class NotificationUtil {
 
 		switch (ACTION_STATUS) {
 
-		case PTConstants.ACTION_STATUS_SUBMIT:
+		case PTConstants.OT_ACTION_STATUS_SUBMIT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
 			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_REJECTED:
+		case PTConstants.OT_ACTION_STATUS_REJECTED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
 			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_SENDBACK:
+		case PTConstants.OT_ACTION_STATUS_SENDBACK:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
 			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_APPROVED:
+		case PTConstants.OT_ACTION_STATUS_APPROVED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
 			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_PAYMENT:
+		case PTConstants.OT_ACTION_STATUS_PAYMENT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
 			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
@@ -99,7 +99,7 @@ public class NotificationUtil {
 		message = message.replace("<3>", PTConstants.OWNERSHIP_TRANSFER_APPLICATION);
 		message = message.replace("<4>", owner.getOwnerDetails().getApplicationNumber());
 		try {
-			message = message.replace("<5>", (CharSequence) due.add(charge));
+			message = message.replace("<5>", due.add(charge) + "");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -182,27 +182,27 @@ public class NotificationUtil {
 
 		switch (ACTION_STATUS) {
 
-		case PTConstants.ACTION_STATUS_SUBMIT:
+		case PTConstants.DC_ACTION_STATUS_SUBMIT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
 			message = getInitiatedDcMsg(copy, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_REJECTED:
+		case PTConstants.DC_ACTION_STATUS_REJECTED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
 			message = getInitiatedDcMsg(copy, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_SENDBACK:
+		case PTConstants.DC_ACTION_STATUS_SENDBACK:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
 			message = getInitiatedDcMsg(copy, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_APPROVED:
+		case PTConstants.DC_ACTION_STATUS_APPROVED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
 			message = getInitiatedDcMsg(copy, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_PAYMENT:
+		case PTConstants.DC_ACTION_STATUS_PAYMENT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
 			message = getInitiatedDcMsg(copy, messageTemplate);
 			break;
@@ -216,9 +216,8 @@ public class NotificationUtil {
 		message = message.replace("<2>", copy.getApplicant().get(0).getName());
 		message = message.replace("<3>", PTConstants.DUPLICATE_COPY_APPLICATION);
 		message = message.replace("<4>", copy.getApplicationNumber());
-		if (message.contains("<5>")) {
-			message = message.replace("<5>", (CharSequence) fee.add(charge));
-		}
+		message = message.replace("<5>", fee.add(charge) + "");
+
 		return message;
 	}
 
@@ -254,22 +253,22 @@ public class NotificationUtil {
 
 		switch (ACTION_STATUS) {
 
-		case PTConstants.ACTION_STATUS_SUBMIT:
+		case PTConstants.MG_ACTION_STATUS_SUBMIT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
 			message = getInitiatedMGMsg(mortgage, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_REJECTED:
+		case PTConstants.MG_ACTION_STATUS_REJECTED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
 			message = getInitiatedMGMsg(mortgage, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_SENDBACK:
+		case PTConstants.MG_ACTION_STATUS_SENDBACK:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
 			message = getInitiatedMGMsg(mortgage, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_MORTGAGE_APPROVED:
+		case PTConstants.MG_ACTION_STATUS_MORTGAGE_APPROVED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
 			message = getInitiatedMGMsg(mortgage, messageTemplate);
 			break;
