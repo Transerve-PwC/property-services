@@ -177,7 +177,6 @@ public class PTConstants {
 	public static final String OT_ACTION_STATUS_PAYMENT = "APPROVE_OT_PENDINGPAYMENT";
 	public static final String OT_ACTION_STATUS_PAYMENT_SUCCESS = "PAY_OT_APPROVED";
 	public static final String OT_ACTION_STATUS_APPROVED = "PAY_OT_APPROVED";
-//	public static final String OT_ACTION_STATUS_MORTGAGE_APPROVED = "APPROVE_OT_APPROVED";
 	
 	//Duplicate Copy ACTION_STATUS combinations for notification
 
@@ -188,7 +187,6 @@ public class PTConstants {
 	public static final String DC_ACTION_STATUS_PAYMENT = "APPROVE_DC_PENDINGPAYMENT";
 	public static final String DC_ACTION_STATUS_PAYMENT_SUCCESS = "PAY_DC_APPROVED";
 	public static final String DC_ACTION_STATUS_APPROVED = "PAY_DC_APPROVED";
-//	public static final String DC_ACTION_STATUS_MORTGAGE_APPROVED = "APPROVE_DC_APPROVED";
 	
 	//Mortgage ACTION_STATUS combinations for notification
 
@@ -196,9 +194,6 @@ public class PTConstants {
 	public static final String MG_ACTION_STATUS_SUBMIT = "SUBMIT_MG_PENDINGCLVERIFICATION";
 	public static final String MG_ACTION_STATUS_REJECTED = "REJECT_MG_REJECTED";
 	public static final String MG_ACTION_STATUS_SENDBACK = "SENDBACK_MG_PENDINGCLARIFICATION";
-//	public static final String MG_ACTION_STATUS_PAYMENT = "APPROVE_MG_PENDINGPAYMENT";
-//	public static final String MG_ACTION_STATUS_PAYMENT_SUCCESS = "PAY_MG_APPROVED";
-//	public static final String MG_ACTION_STATUS_APPROVED = "PAY_MG_APPROVED";
 	public static final String MG_ACTION_STATUS_MORTGAGE_APPROVED = "APPROVE_MG_APPROVED";
 
 //  demand generation
