@@ -309,13 +309,13 @@ public class EnrichmentService {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
 		owner.setBusinessService(PTConstants.BUSINESS_SERVICE_OT);
 		TaxHeadEstimate estimate = new TaxHeadEstimate();
-		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.STATE_PENDING_SA_VERIFICATION)) {
-			estimate.setEstimateAmount(owner.getOwnerDetails().getDueAmount()); // TODO doubt amount
+		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.OT_STATE_PENDING_SA_VERIFICATION)) {
+			estimate.setEstimateAmount(owner.getOwnerDetails().getDueAmount());
 			estimate.setCategory(Category.DUE);
 			estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
 		}
-		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.STATE_PENDING_APRO)) {
-			estimate.setEstimateAmount(owner.getOwnerDetails().getAproCharge()); // TODO doubt amount
+		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.OT_STATE_PENDING_APRO)) {
+			estimate.setEstimateAmount(owner.getOwnerDetails().getAproCharge());
 			estimate.setCategory(Category.CHARGES);
 			estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.CHARGES));
 		}
@@ -470,12 +470,12 @@ public class EnrichmentService {
 		application.setBusinessService(PTConstants.BUSINESS_SERVICE_DC);
 
 		TaxHeadEstimate estimate = new TaxHeadEstimate();
-		if (application.getState().equalsIgnoreCase(PTConstants.STATE_PENDING_SA_VERIFICATION)) {
+		if (application.getState().equalsIgnoreCase(PTConstants.DC_STATE_PENDING_SA_VERIFICATION)) {
 			estimate.setEstimateAmount(application.getApplicant().get(0).getFeeAmount());
 			estimate.setCategory(Category.FEE);
 			estimate.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.FEE));
 		}
-		if (application.getState().equalsIgnoreCase(PTConstants.STATE_PENDING_APRO)) {
+		if (application.getState().equalsIgnoreCase(PTConstants.DC_STATE_PENDING_APRO)) {
 			estimate.setEstimateAmount(application.getApplicant().get(0).getAproCharge());
 			estimate.setCategory(Category.CHARGES);
 			estimate.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.CHARGES));
@@ -651,7 +651,7 @@ public class EnrichmentService {
 					});
 				}
 
-				if (application.getState().equalsIgnoreCase(PTConstants.STATE_PENDING_GRANTDETAIL)) {
+				if (application.getState().equalsIgnoreCase(PTConstants.MG_STATE_PENDING_GRANTDETAIL)) {
 					if (!CollectionUtils.isEmpty(application.getMortgageApprovedGrantDetails())) {
 						application.getMortgageApprovedGrantDetails().forEach(grantDetails -> {
 							AuditDetails auditDetails = propertyutil
