@@ -64,27 +64,27 @@ public class NotificationUtil {
 
 		switch (ACTION_STATUS) {
 
-		case PTConstants.ACTION_STATUS_SUBMIT:
+		case PTConstants.OT_ACTION_STATUS_SUBMIT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
 			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_REJECTED:
+		case PTConstants.OT_ACTION_STATUS_REJECTED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
 			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_SENDBACK:
+		case PTConstants.OT_ACTION_STATUS_SENDBACK:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
 			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_APPROVED:
+		case PTConstants.OT_ACTION_STATUS_APPROVED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
 			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_PAYMENT:
+		case PTConstants.OT_ACTION_STATUS_PAYMENT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
 			message = getInitiatedDcMsg(owner, messageTemplate);
 			break;
@@ -182,27 +182,27 @@ public class NotificationUtil {
 
 		switch (ACTION_STATUS) {
 
-		case PTConstants.ACTION_STATUS_SUBMIT:
+		case PTConstants.DC_ACTION_STATUS_SUBMIT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
 			message = getInitiatedDcMsg(copy, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_REJECTED:
+		case PTConstants.DC_ACTION_STATUS_REJECTED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
 			message = getInitiatedDcMsg(copy, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_SENDBACK:
+		case PTConstants.DC_ACTION_STATUS_SENDBACK:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
 			message = getInitiatedDcMsg(copy, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_APPROVED:
+		case PTConstants.DC_ACTION_STATUS_APPROVED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
 			message = getInitiatedDcMsg(copy, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_PAYMENT:
+		case PTConstants.DC_ACTION_STATUS_PAYMENT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
 			message = getInitiatedDcMsg(copy, messageTemplate);
 			break;
@@ -253,22 +253,22 @@ public class NotificationUtil {
 
 		switch (ACTION_STATUS) {
 
-		case PTConstants.ACTION_STATUS_SUBMIT:
+		case PTConstants.MG_ACTION_STATUS_SUBMIT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
 			message = getInitiatedMGMsg(mortgage, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_REJECTED:
+		case PTConstants.MG_ACTION_STATUS_REJECTED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
 			message = getInitiatedMGMsg(mortgage, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_SENDBACK:
+		case PTConstants.MG_ACTION_STATUS_SENDBACK:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
 			message = getInitiatedMGMsg(mortgage, messageTemplate);
 			break;
 
-		case PTConstants.ACTION_STATUS_MORTGAGE_APPROVED:
+		case PTConstants.MG_ACTION_STATUS_MORTGAGE_APPROVED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
 			message = getInitiatedMGMsg(mortgage, messageTemplate);
 			break;
