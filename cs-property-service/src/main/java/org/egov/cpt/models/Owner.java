@@ -1,5 +1,9 @@
 package org.egov.cpt.models;
 
+import java.util.List;
+
+import javax.validation.constraints.Size;
+
 import org.egov.cpt.models.calculation.Calculation;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertySerializer;
@@ -42,6 +46,13 @@ public class Owner {
 
 	@JsonProperty("ownerDetails")
 	private OwnerDetails ownerDetails;
+	
+	@JsonProperty("assignee")
+	private List<String> assignee = null;
+
+	@Size(max = 128)
+	@JsonProperty("comment")
+	private String comment;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
