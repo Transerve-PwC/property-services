@@ -180,8 +180,11 @@ public class PTConstants {
 	public static final String ACTION_STATUS_MORTGAGE_APPROVED = "APPROVE_APPROVED";
 
 //    demand generation
-	public static final String STATE_PENDING_SA_VERIFICATION = "PENDINGSAVERIFICATION";
-	public static final String STATE_PENDING_APRO = "PENDINGAPRO";
-	public static final String STATE_PENDING_GRANTDETAIL = "PENDINGGRANTDETAIL";
+	public static final String OT_STATE_PENDING_SA_VERIFICATION = "OT_PENDINGSAVERIFICATION";
+	public static final String OT_STATE_PENDING_APRO = "OT_PENDINGAPRO";
+	public static final String DC_STATE_PENDING_SA_VERIFICATION = "DC_PENDINGSAVERIFICATION";
+	public static final String DC_STATE_PENDING_APRO = "DC_PENDINGAPRO";
+
+	public static final String MG_STATE_PENDING_GRANTDETAIL = "MG_PENDINGGRANTDETAIL";
 
 }
