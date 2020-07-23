@@ -43,9 +43,9 @@ public class MortgageQueryBuilder {
 
 			+ " FROM cs_pt_mortgage_application mg " + INNER_JOIN + " cs_pt_property_v1 pt on mg.propertyid=pt.id "
 			+ INNER_JOIN + " cs_pt_mortgage_applicant ap ON mg.id =ap.mortgage_id " + LEFT_JOIN
-			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + INNER_JOIN
+			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
 
-			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_detail_id " + INNER_JOIN
+			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_detail_id " + LEFT_JOIN
 
 			+ " cs_pt_mortgage_douments doc ON doc.mortgage_id =  mg.id";
 
