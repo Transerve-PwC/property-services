@@ -1,5 +1,7 @@
 package org.egov.cpt.models;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,12 +16,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 public class DuplicateCopySearchCriteria {
+	
+	private String tenantId;
 
 	private String transitNumber;
 
 	private String colony;
 
-	private String status;
+	private List<String> status;
 
 	private String applicationNumber;
 

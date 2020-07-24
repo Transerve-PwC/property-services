@@ -1,6 +1,7 @@
 package org.egov.cpt.repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -38,6 +40,9 @@ public class PropertyRepository {
 	private DuplicateCopyPropertyRowMapper duplicateCopyPropertyRowMapper;
 	
 	@Autowired
+	private DuplicateCopyQueryBuilder duplicatecopyQueryBuilder;
+	
+	@Autowired
 	private MortgageRowMapper mortgageRowMapper;
 	
 	@Autowired
@@ -51,26 +56,29 @@ public class PropertyRepository {
 
 	@Autowired
 	WorkflowIntegrator workflowIntegrator;
+	
+	@Autowired
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 	public List<Property> getProperties(PropertyCriteria criteria) {
 
-		List<Object> preparedStmtList = new ArrayList<>();
+		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, rowMapper);
 	}
 
 	public List<DuplicateCopy> getDuplicateCopyProperties(DuplicateCopySearchCriteria criteria) {
-		List<Object> preparedStmtList = new ArrayList<>();
-		String query = queryBuilder.getDuplicateCopyPropertySearchQuery(criteria, preparedStmtList);
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = duplicatecopyQueryBuilder.getDuplicateCopyPropertySearchQuery(criteria, preparedStmtList);
 //		log.info("SearchQuery:"+query);
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), duplicateCopyPropertyRowMapper);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, duplicateCopyPropertyRowMapper);
 	}
 
 	public List<Mortgage> getMortgageProperties(DuplicateCopySearchCriteria criteria) {
-		List<Object> preparedStmtList = new ArrayList<>();
+		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = mortgageQueryBuilder.getMortgageSearchQuery(criteria, preparedStmtList);
-		log.info("SearchQuery:"+query);
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), mortgageRowMapper);
+		log.info("MortgageSearchQuery:"+query);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, mortgageRowMapper);
 	}
 
 	public void updateDcPayment(DuplicateCopyRequest duplicateCopyRequest,

@@ -1,5 +1,6 @@
 package org.egov.cpt.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -7,6 +8,8 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
+import org.egov.cpt.models.calculation.BusinessService;
+import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.service.calculation.DemandService;
@@ -15,9 +18,13 @@ import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.validator.PropertyValidator;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
+import org.egov.cpt.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class DuplicateCopyService {
 	@Autowired
@@ -43,6 +50,9 @@ public class DuplicateCopyService {
 
 	@Autowired
 	private DuplicateCopyNotificationService notificationService;
+	
+	@Autowired
+	private WorkflowService workflowService;
 
 	public List<DuplicateCopy> createApplication(DuplicateCopyRequest duplicateCopyRequest) {
 		propertyValidator.isPropertyExist(duplicateCopyRequest);
@@ -61,6 +71,23 @@ public class DuplicateCopyService {
 	public List<DuplicateCopy> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
 		propertyValidator.validateDuplicateCopySearch(requestInfo,criteria);
 	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
+	    if(requestInfo.getUserInfo().getType().equalsIgnoreCase(PTConstants.ROLE_EMPLOYEE)&& CollectionUtils.isEmpty(criteria.getStatus())){
+			String wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_DC;
+			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, wfbusinessServiceName);
+			List<State> stateList= otBusinessService.getStates();
+			List<String> states = new ArrayList<String>();
+			
+			for(State state: stateList){
+					states.add(state.getState());
+			}
+			states.remove("");
+			states.remove(PTConstants.DC_DRAFTED);
+			
+			log.info("states:"+states);
+		
+			criteria.setStatus(states);
+		}
+	    
 		List<DuplicateCopy> properties = getApplication(criteria, requestInfo);
 		return properties;
 	}

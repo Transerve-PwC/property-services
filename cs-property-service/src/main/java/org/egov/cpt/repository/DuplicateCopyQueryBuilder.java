@@ -1,6 +1,5 @@
 package org.egov.cpt.repository;
 
-import java.util.List;
 import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 @Component
-public class MortgageQueryBuilder {
+public class DuplicateCopyQueryBuilder {
 
 	@Autowired
 	private PropertyConfiguration config;
@@ -21,35 +20,30 @@ public class MortgageQueryBuilder {
 	private static final String AND_QUERY = " AND ";
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY mgModifiedTime desc) offset_ FROM " + "({})" + " result) result_offset "
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY dcModifiedTime desc) offset_ FROM " + "({})" + " result) result_offset "
 			+ "WHERE offset_ > :start AND offset_ <= :end";
 
-	private static final String MORTGAGE_SEARCH_QUERY = SELECT + "mg.*,ap.*,doc.*,pt.*,address.*,gd.*,"
-			+ " mg.id as mgid, mg.propertyid, mg.tenantid as mgtenantid, mg.state, mg.action,mg.application_number as app_number,"
-			+ "mg.modified_time as mgModifiedTime,"
+	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,pt.*,address.*,"
+			+ " dca.id as appid, dca.property_id, dca.tenantid as pttenantid, dca.state, dca.action,"
+			+ " dca.application_number as app_number,dca.modified_time as dcModifiedTime,"
 
-			+ " pt.id as pid, pt.transit_number, pt.colony,"
+			+ " pt.id as pid, pt.transit_number,pt.colony,pt.modified_date as pmodified_date,"
 
 			+ " address.pincode, address.area,"
 
-			+ " gd.id as gdid, gd.property_detail_id as gdproperty_detail_id, gd.owner_id as gdowner_id, gd.tenantid as gdtenantid,"
-			+ " gd.bank_name as gdbank_name, gd.mortgage_amount as gdmortgage_amount,"
-			+ " gd.sanction_letter_number as gdsanction_letter_number, gd.sanction_date as gdsanction_date, gd.mortgage_end_date as gdmortgage_end_date,"
-			+ " gd.created_by as gdcreated_by, gd.modified_by as gdmodified_by, gd.created_time as gdcreated_time, gd.modified_time as gdmodified_time,"
-
-			+ " ap.id as aid, ap.mortgage_id as mg_id,ap.tenantid as aptenantid,"
+			+ " ap.id as aid, ap.application_id as app_id,ap.tenantid as aptenantid,"
 			+ " ap.name,ap.email,ap.mobileno,ap.guardian,ap.relationship,ap.aadhaar_number as adhaarnumber,"
 
 			+ " doc.id as docId, doc.tenantId as doctenantid,doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
-			+ " doc.mortgage_id as doc_mgid , doc.active as doc_active"
+			+ " doc.application_id as doc_applid , doc.active as doc_active"
 
-			+ " FROM cs_pt_mortgage_application mg " + INNER_JOIN + " cs_pt_property_v1 pt on mg.propertyid=pt.id "
-			+ INNER_JOIN + " cs_pt_mortgage_applicant ap ON mg.id =ap.mortgage_id " + LEFT_JOIN
+			+ " FROM cs_pt_duplicate_ownership_application dca " + INNER_JOIN
+			+ " cs_pt_property_v1 pt on dca.property_id=pt.id " + INNER_JOIN
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
-			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_detail_id " + LEFT_JOIN
-			+ " cs_pt_mortgage_douments doc ON doc.mortgage_id =  mg.id";
+			+ " cs_pt_duplicatecopy_applicant ap ON dca.id =ap.application_id " + LEFT_JOIN
+			+ " cs_pt_duplicatecopy_document doc ON doc.application_id =  dca.id";
 
-	private String addPaginationWrapper(String query,  Map<String, Object> preparedStmtList,
+	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {
 
 		/*if (criteria.getLimit() == null && criteria.getOffset() == null)
@@ -73,7 +67,7 @@ public class MortgageQueryBuilder {
 
 		return finalQuery;
 	}
-
+	
 	private static void addClauseIfRequired(Map<String, Object> values, StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
@@ -82,28 +76,29 @@ public class MortgageQueryBuilder {
 		}
 	}
 
-	public String getMortgageSearchQuery(DuplicateCopySearchCriteria criteria, Map<String, Object> preparedStmtList) {
+	public String getDuplicateCopyPropertySearchQuery(DuplicateCopySearchCriteria criteria,
+			Map<String, Object> preparedStmtList) {
 
-		StringBuilder builder = new StringBuilder(MORTGAGE_SEARCH_QUERY);
+		StringBuilder builder = new StringBuilder(DUPLICATE_COPY_SEARCH_QUERY);
 
 		if (!ObjectUtils.isEmpty(criteria.getPropertyId())) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.propertyid=:propId");
-			preparedStmtList.put("propId",criteria.getPropertyId());
+			builder.append("dca.property_id=:prId");
+			preparedStmtList.put("prId",criteria.getPropertyId());
 		}
 		if (null != criteria.getAppId()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.id=:id");
+			builder.append("dca.id=:id");
 			preparedStmtList.put("id",criteria.getAppId());
 		}
 		if (null != criteria.getTransitNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.transit_number=:trnsNumber");
-			preparedStmtList.put("trnsNumber",criteria.getTransitNumber());
+			builder.append("pt.transit_number=:trnNumber");
+			preparedStmtList.put("trnNumber",criteria.getTransitNumber());
 		}
 		if (null != criteria.getApplicationNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.application_number=:appNumber");
+			builder.append("dca.application_number=:appNumber");
 			preparedStmtList.put("appNumber",criteria.getApplicationNumber());
 		}
 		if (null != criteria.getColony()) {
@@ -113,13 +108,13 @@ public class MortgageQueryBuilder {
 		}
 		if (null != criteria.getApplicantMobNo()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("ap.mobileno=:mobNumber");
-			preparedStmtList.put("mobNumber",criteria.getApplicantMobNo());
+			builder.append("ap.mobileno=:mobNo");
+			preparedStmtList.put("mobNo",criteria.getApplicantMobNo());
 		}
 		if (null != criteria.getStatus()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.state IN(:states)");
-			preparedStmtList.put("states",criteria.getStatus());
+			builder.append("dca.state IN (:state)");
+			preparedStmtList.put("state",criteria.getStatus());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);

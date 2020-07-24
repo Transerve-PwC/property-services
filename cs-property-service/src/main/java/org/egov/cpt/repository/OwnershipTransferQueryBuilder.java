@@ -1,6 +1,7 @@
 package org.egov.cpt.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
@@ -20,8 +21,8 @@ public class OwnershipTransferQueryBuilder {
 	private static final String AND_QUERY = " AND ";
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY oid) offset_ FROM " + "({})" + " result) result_offset "
-			+ "WHERE offset_ > ? AND offset_ <= ?";
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY omodified_date desc) offset_ FROM " + "({})" + " result) result_offset "
+			+ "WHERE offset_ > :start AND offset_ <= :end";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
 	private static final String SEARCH_QUERY = SELECT + "pt.*,address.*,ownership.*,od.*,doc.*,"
@@ -50,11 +51,11 @@ public class OwnershipTransferQueryBuilder {
 			+ " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
 			+ " cs_pt_ot_documents_v1 doc ON ownership.id=doc.owner_id ";
 
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
+	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {
 
-		if (criteria.getLimit() == null && criteria.getOffset() == null)
-			return query;
+		/*if (criteria.getLimit() == null && criteria.getOffset() == null)
+			return query;*/
 
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();
@@ -69,8 +70,8 @@ public class OwnershipTransferQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.add(offset);
-		preparedStmtList.add(limit + offset);
+		preparedStmtList.put("start",offset);
+		preparedStmtList.put("end",limit + offset);
 
 		return finalQuery;
 	}
@@ -81,44 +82,46 @@ public class OwnershipTransferQueryBuilder {
 	 * @param preparedStmtList
 	 * @return
 	 */
-	public String getOwnershipTransferSearchQuery(DuplicateCopySearchCriteria criteria, List<Object> preparedStmtList) {
+	public String getOwnershipTransferSearchQuery(DuplicateCopySearchCriteria criteria, Map<String, Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(SEARCH_QUERY);
 
 		if (!ObjectUtils.isEmpty(criteria.getApplicationNumber())) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("od.application_number = ?");
-			preparedStmtList.add(criteria.getApplicationNumber());
+			builder.append("od.application_number = :appNumber");
+//			preparedStmtList.add(criteria.getApplicationNumber());
+			preparedStmtList.put("appNumber",criteria.getApplicationNumber());
 		}
 
 		if (null != criteria.getApplicantMobNo()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("od.phone = ?");
-			preparedStmtList.add(criteria.getApplicantMobNo());
+			builder.append("od.phone = :phone");
+			preparedStmtList.put("phone",criteria.getApplicantMobNo());
 		}
 
 		if (null != criteria.getPropertyId()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.id = ?");
-			preparedStmtList.add(criteria.getPropertyId());
+			builder.append("pt.id = :id");
+			preparedStmtList.put("id",criteria.getPropertyId());
 		}
 
 		if (!ObjectUtils.isEmpty(criteria.getTransitNumber())) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.transit_number = ?");
-			preparedStmtList.add(criteria.getTransitNumber());
+			builder.append("pt.transit_number = :transNumber");
+			preparedStmtList.put("transNumber",criteria.getTransitNumber());
 		}
 
 		if (!ObjectUtils.isEmpty(criteria.getStatus())) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("ownership.application_state = ?");
-			preparedStmtList.add(criteria.getStatus());
+//			builder.append("ownership.application_state = ?");
+			builder.append("ownership.application_state IN (:states)");
+			preparedStmtList.put("states",criteria.getStatus());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
 
-	private static void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
+	private static void addClauseIfRequired(Map<String, Object> values, StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
 		else {
