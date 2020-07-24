@@ -28,7 +28,7 @@ public class MortgageQueryBuilder {
 
 			+ " pt.id as pid, pt.transit_number, pt.colony,"
 
-			+ " address.pincode,"
+			+ " address.pincode, address.area,"
 
 			+ " gd.id as gdid, gd.property_detail_id as gdproperty_detail_id, gd.owner_id as gdowner_id, gd.tenantid as gdtenantid,"
 			+ " gd.bank_name as gdbank_name, gd.mortgage_amount as gdmortgage_amount,"
@@ -41,9 +41,8 @@ public class MortgageQueryBuilder {
 			+ " doc.id as docId, doc.tenantId as doctenantid,doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
 			+ " doc.mortgage_id as doc_mgid , doc.active as doc_active"
 
-			+ " FROM cs_pt_mortgage_application mg " + INNER_JOIN 
-			+ " cs_pt_property_v1 pt on mg.propertyid=pt.id " + INNER_JOIN 
-			+ " cs_pt_mortgage_applicant ap ON mg.id =ap.mortgage_id " + LEFT_JOIN
+			+ " FROM cs_pt_mortgage_application mg " + INNER_JOIN + " cs_pt_property_v1 pt on mg.propertyid=pt.id "
+			+ INNER_JOIN + " cs_pt_mortgage_applicant ap ON mg.id =ap.mortgage_id " + LEFT_JOIN
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
 			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_detail_id " + LEFT_JOIN
 			+ " cs_pt_mortgage_douments doc ON doc.mortgage_id =  mg.id";
