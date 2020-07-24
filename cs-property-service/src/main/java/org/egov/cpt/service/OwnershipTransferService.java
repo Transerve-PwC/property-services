@@ -1,5 +1,6 @@
 package org.egov.cpt.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,6 +9,8 @@ import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
+import org.egov.cpt.models.calculation.BusinessService;
+import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.OwnershipTransferRepository;
 import org.egov.cpt.service.calculation.DemandService;
@@ -16,6 +19,7 @@ import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.validator.PropertyValidator;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
+import org.egov.cpt.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -43,6 +47,9 @@ public class OwnershipTransferService {
 
 	@Autowired
 	private DemandService demandService;
+	
+	@Autowired
+	private WorkflowService workflowService;
 
 	public List<Owner> createOwnershipTransfer(OwnershipTransferRequest request) {
 //		propertyValidator.validateCreateRequest(request); // TODO add validations as per requirement
@@ -60,7 +67,21 @@ public class OwnershipTransferService {
 		if (criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN")) {
 			criteria.setApplicantMobNo(requestInfo.getUserInfo().getUserName());
 		}
-
+		if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE")&& CollectionUtils.isEmpty(criteria.getStatus())){
+			String wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_OT;
+			BusinessService otBusinessService = workflowService.getBusinessService("ch", requestInfo, wfbusinessServiceName);
+			List<State> stateList= otBusinessService.getStates();
+			List<String> states = new ArrayList<String>();
+			
+			for(State state: stateList){
+					states.add(state.getState());
+			}
+			states.remove("");
+			if(states.contains("OT_DRAFTED"))
+				states.remove("OT_DRAFTED");
+			
+			criteria.setStatus(states);
+		}
 		List<Owner> owners = repository.searchOwnershipTransfer(criteria);
 
 		if (CollectionUtils.isEmpty(owners))

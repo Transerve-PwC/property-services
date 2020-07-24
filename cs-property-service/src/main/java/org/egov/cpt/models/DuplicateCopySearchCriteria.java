@@ -1,5 +1,7 @@
 package org.egov.cpt.models;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +21,7 @@ public class DuplicateCopySearchCriteria {
 
 	private String colony;
 
-	private String status;
+	private List<String> status;
 
 	private String applicationNumber;
 

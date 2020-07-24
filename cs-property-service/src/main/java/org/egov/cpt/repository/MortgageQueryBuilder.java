@@ -1,6 +1,7 @@
 package org.egov.cpt.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
@@ -21,7 +22,7 @@ public class MortgageQueryBuilder {
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pid) offset_ FROM " + "({})" + " result) result_offset "
-			+ "WHERE offset_ > ? AND offset_ <= ?";
+			+ "WHERE offset_ > :offset1 AND offset_ <= :offset2";
 
 	private static final String MORTGAGE_SEARCH_QUERY = SELECT + "mg.*,ap.*,doc.*,pt.*,address.*,gd.*,"
 			+ " mg.id as mgid, mg.propertyid, mg.tenantid as mgtenantid, mg.state, mg.action,mg.application_number as app_number,"
@@ -49,7 +50,7 @@ public class MortgageQueryBuilder {
 
 			+ " cs_pt_mortgage_douments doc ON doc.mortgage_id =  mg.id";
 
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
+	private String addPaginationWrapper(String query,  Map<String, Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {
 
 		if (criteria.getLimit() == null && criteria.getOffset() == null)
@@ -68,13 +69,13 @@ public class MortgageQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.add(offset);
-		preparedStmtList.add(limit + offset);
+		preparedStmtList.put("offset1",offset);
+		preparedStmtList.put("offset2",limit + offset);
 
 		return finalQuery;
 	}
 
-	private static void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
+	private static void addClauseIfRequired(Map<String, Object> values, StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
 		else {
@@ -82,44 +83,44 @@ public class MortgageQueryBuilder {
 		}
 	}
 
-	public String getMortgageSearchQuery(DuplicateCopySearchCriteria criteria, List<Object> preparedStmtList) {
+	public String getMortgageSearchQuery(DuplicateCopySearchCriteria criteria, Map<String, Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(MORTGAGE_SEARCH_QUERY);
 
 		if (!ObjectUtils.isEmpty(criteria.getPropertyId())) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.propertyid=?");
-			preparedStmtList.add(criteria.getPropertyId());
+			builder.append("mg.propertyid=:propId");
+			preparedStmtList.put("propId",criteria.getPropertyId());
 		}
 		if (null != criteria.getAppId()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.id=?");
-			preparedStmtList.add(criteria.getAppId());
+			builder.append("mg.id=:id");
+			preparedStmtList.put("id",criteria.getAppId());
 		}
 		if (null != criteria.getTransitNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.transit_number=?");
-			preparedStmtList.add(criteria.getTransitNumber());
+			builder.append("pt.transit_number=:trnsNumber");
+			preparedStmtList.put("trnsNumber",criteria.getTransitNumber());
 		}
 		if (null != criteria.getApplicationNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.application_number=?");
-			preparedStmtList.add(criteria.getApplicationNumber());
+			builder.append("mg.application_number=:appNumber");
+			preparedStmtList.put("appNumber",criteria.getApplicationNumber());
 		}
 		if (null != criteria.getColony()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.colony=?");
-			preparedStmtList.add(criteria.getColony());
+			builder.append("pt.colony=:colony");
+			preparedStmtList.put("colony",criteria.getColony());
 		}
 		if (null != criteria.getApplicantMobNo()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("ap.mobileno=?");
-			preparedStmtList.add(criteria.getApplicantMobNo());
+			builder.append("ap.mobileno=:mobNumber");
+			preparedStmtList.put("mobNumber",criteria.getApplicantMobNo());
 		}
 		if (null != criteria.getStatus()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.state=?");
-			preparedStmtList.add(criteria.getStatus());
+			builder.append("mg.state IN(:states)");
+			preparedStmtList.put("states",criteria.getStatus());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);

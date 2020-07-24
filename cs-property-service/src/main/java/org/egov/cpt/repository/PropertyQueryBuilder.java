@@ -1,6 +1,8 @@
 package org.egov.cpt.repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
@@ -22,7 +24,7 @@ public class PropertyQueryBuilder {
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pid) offset_ FROM " + "({})" + " result) result_offset "
-			+ "WHERE offset_ > ? AND offset_ <= ?";
+			+ "WHERE offset_ > :offset1 AND offset_ <= :offset2";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
 	private static final String SEARCH_QUERY = SELECT + "pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,"
@@ -77,7 +79,7 @@ public class PropertyQueryBuilder {
 			+ " cs_pt_duplicatecopy_applicant ap ON dca.id =ap.application_id " + LEFT_JOIN
 			+ " cs_pt_duplicatecopy_document doc ON doc.application_id =  dca.id";
 
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
+	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList, PropertyCriteria criteria) {
 
 		if (criteria.getLimit() == null && criteria.getOffset() == null)
 			return query;
@@ -95,13 +97,13 @@ public class PropertyQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.add(offset);
-		preparedStmtList.add(limit + offset);
+		preparedStmtList.put(":offset1",offset);
+		preparedStmtList.put("offset2",limit + offset);
 
 		return finalQuery;
 	}
 
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
+	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {
 
 		if (criteria.getLimit() == null && criteria.getOffset() == null)
@@ -120,8 +122,8 @@ public class PropertyQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.add(offset);
-		preparedStmtList.add(limit + offset);
+		preparedStmtList.put("offset1",offset);
+		preparedStmtList.put("offset2",limit + offset);
 
 		return finalQuery;
 	}
@@ -132,50 +134,50 @@ public class PropertyQueryBuilder {
 	 * @param preparedStmtList
 	 * @return
 	 */
-	public String getPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
+	public String getPropertySearchQuery(PropertyCriteria criteria, Map<String, Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(SEARCH_QUERY);
 
 		if (!ObjectUtils.isEmpty(criteria.getTransitNumber())) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.transit_number=?");
-			preparedStmtList.add(criteria.getTransitNumber());
+			builder.append("pt.transit_number=:trnNumber");
+			preparedStmtList.put("trnNumber",criteria.getTransitNumber());
 		}
 
 		if (null != criteria.getColony()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.colony = ?");
-			preparedStmtList.add(criteria.getColony());
+			builder.append("pt.colony = :colony");
+			preparedStmtList.put("colony",criteria.getColony());
 		}
 
 		if (null != criteria.getName()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("od.name = ?");
-			preparedStmtList.add(criteria.getName());
+			builder.append("od.name = :name");
+			preparedStmtList.put("name",criteria.getName());
 		}
 
 		if (null != criteria.getPhone()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("od.phone = ?");
-			preparedStmtList.add(criteria.getPhone());
+			builder.append("od.phone = :phone");
+			preparedStmtList.put("name",criteria.getPhone());
 		}
 
 		if (null != criteria.getState()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.master_data_state = ?");
-			preparedStmtList.add(criteria.getState());
+			builder.append("pt.master_data_state = :state");
+			preparedStmtList.put("state",criteria.getState());
 		}
 
 		if (null != criteria.getPropertyId()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.id = ?");
-			preparedStmtList.add(criteria.getPropertyId());
+			builder.append("pt.id = :id");
+			preparedStmtList.put("id",criteria.getPropertyId());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
-
-	private static void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
+	
+	private static void addClauseIfRequired(Map<String, Object> values, StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
 		else {
@@ -184,44 +186,44 @@ public class PropertyQueryBuilder {
 	}
 
 	public String getDuplicateCopyPropertySearchQuery(DuplicateCopySearchCriteria criteria,
-			List<Object> preparedStmtList) {
+			Map<String, Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(DUPLICATE_COPY_SEARCH_QUERY);
 
 		if (!ObjectUtils.isEmpty(criteria.getPropertyId())) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("dca.property_id=?");
-			preparedStmtList.add(criteria.getPropertyId());
+			builder.append("dca.property_id=:prId");
+			preparedStmtList.put("prId",criteria.getPropertyId());
 		}
 		if (null != criteria.getAppId()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("dca.id=?");
-			preparedStmtList.add(criteria.getAppId());
+			builder.append("dca.id=:id");
+			preparedStmtList.put("id",criteria.getAppId());
 		}
 		if (null != criteria.getTransitNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.transit_number=?");
-			preparedStmtList.add(criteria.getTransitNumber());
+			builder.append("pt.transit_number=:trnNumber");
+			preparedStmtList.put("trnNumber",criteria.getTransitNumber());
 		}
 		if (null != criteria.getApplicationNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("dca.application_number=?");
-			preparedStmtList.add(criteria.getApplicationNumber());
+			builder.append("dca.application_number=:appNumber");
+			preparedStmtList.put("appNumber",criteria.getApplicationNumber());
 		}
 		if (null != criteria.getColony()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.colony=?");
-			preparedStmtList.add(criteria.getColony());
+			builder.append("pt.colony=:colony");
+			preparedStmtList.put("colony",criteria.getColony());
 		}
 		if (null != criteria.getApplicantMobNo()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("ap.mobileno=?");
-			preparedStmtList.add(criteria.getApplicantMobNo());
+			builder.append("ap.mobileno=:mobNo");
+			preparedStmtList.put("mobNo",criteria.getApplicantMobNo());
 		}
 		if (null != criteria.getStatus()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("dca.state=?");
-			preparedStmtList.add(criteria.getStatus());
+			builder.append("dca.state IN (:state)");
+			preparedStmtList.put("state",criteria.getStatus());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
