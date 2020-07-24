@@ -22,7 +22,7 @@ public class OwnershipTransferQueryBuilder {
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY omodified_date desc) offset_ FROM " + "({})" + " result) result_offset "
-			+ "WHERE offset_ > :offset1 AND offset_ <= :offset2";
+			+ "WHERE offset_ > :start AND offset_ <= :end";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
 	private static final String SEARCH_QUERY = SELECT + "pt.*,address.*,ownership.*,od.*,doc.*,"
@@ -70,8 +70,8 @@ public class OwnershipTransferQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.put("offset1",offset);
-		preparedStmtList.put("offset2",limit + offset);
+		preparedStmtList.put("start",offset);
+		preparedStmtList.put("end",limit + offset);
 
 		return finalQuery;
 	}

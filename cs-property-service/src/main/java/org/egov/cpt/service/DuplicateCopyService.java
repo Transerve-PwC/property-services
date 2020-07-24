@@ -71,9 +71,9 @@ public class DuplicateCopyService {
 	public List<DuplicateCopy> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
 		propertyValidator.validateDuplicateCopySearch(requestInfo,criteria);
 	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
-	    if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE")&& CollectionUtils.isEmpty(criteria.getStatus())){
+	    if(requestInfo.getUserInfo().getType().equalsIgnoreCase(PTConstants.ROLE_EMPLOYEE)&& CollectionUtils.isEmpty(criteria.getStatus())){
 			String wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_DC;
-			BusinessService otBusinessService = workflowService.getBusinessService("ch", requestInfo, wfbusinessServiceName);
+			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, wfbusinessServiceName);
 			List<State> stateList= otBusinessService.getStates();
 			List<String> states = new ArrayList<String>();
 			
@@ -81,8 +81,7 @@ public class DuplicateCopyService {
 					states.add(state.getState());
 			}
 			states.remove("");
-			if(states.contains("DC_DRAFTED"))
-				states.remove("DC_DRAFTED");
+			states.remove(PTConstants.DC_DRAFTED);
 			
 			log.info("states:"+states);
 		

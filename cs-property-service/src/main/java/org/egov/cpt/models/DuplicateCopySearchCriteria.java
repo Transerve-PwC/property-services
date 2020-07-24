@@ -16,6 +16,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 public class DuplicateCopySearchCriteria {
+	
+	private String tenantId;
 
 	private String transitNumber;
 

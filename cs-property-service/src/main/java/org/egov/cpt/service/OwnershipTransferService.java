@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class OwnershipTransferService {
 
@@ -64,12 +66,12 @@ public class OwnershipTransferService {
 	}
 
 	public List<Owner> searchOwnershipTransfer(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
-		if (criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN")) {
+		if (criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase(PTConstants.ROLE_CITIZEN)) {
 			criteria.setApplicantMobNo(requestInfo.getUserInfo().getUserName());
 		}
-		if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE")&& CollectionUtils.isEmpty(criteria.getStatus())){
+		if(requestInfo.getUserInfo().getType().equalsIgnoreCase(PTConstants.ROLE_EMPLOYEE)&& CollectionUtils.isEmpty(criteria.getStatus())){
 			String wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_OT;
-			BusinessService otBusinessService = workflowService.getBusinessService("ch", requestInfo, wfbusinessServiceName);
+			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, wfbusinessServiceName);
 			List<State> stateList= otBusinessService.getStates();
 			List<String> states = new ArrayList<String>();
 			
@@ -77,9 +79,8 @@ public class OwnershipTransferService {
 					states.add(state.getState());
 			}
 			states.remove("");
-			if(states.contains("OT_DRAFTED"))
-				states.remove("OT_DRAFTED");
-			
+			states.remove(PTConstants.OT_DRAFTED);
+			log.info("states:"+states);
 			criteria.setStatus(states);
 		}
 		List<Owner> owners = repository.searchOwnershipTransfer(criteria);

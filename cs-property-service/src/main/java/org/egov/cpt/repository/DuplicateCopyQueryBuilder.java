@@ -21,7 +21,7 @@ public class DuplicateCopyQueryBuilder {
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY dcModifiedTime desc) offset_ FROM " + "({})" + " result) result_offset "
-			+ "WHERE offset_ > :offset1 AND offset_ <= :offset2";
+			+ "WHERE offset_ > :start AND offset_ <= :end";
 
 	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,pt.*,address.*,"
 			+ " dca.id as appid, dca.property_id, dca.tenantid as pttenantid, dca.state, dca.action,"
@@ -62,8 +62,8 @@ public class DuplicateCopyQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.put("offset1",offset);
-		preparedStmtList.put("offset2",limit + offset);
+		preparedStmtList.put("start",offset);
+		preparedStmtList.put("end",limit + offset);
 
 		return finalQuery;
 	}

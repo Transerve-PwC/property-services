@@ -67,9 +67,9 @@ public class MortgageService {
 	public List<Mortgage> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
 		propertyValidator.validateMortgageSearch(requestInfo, criteria);
 	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
-	    if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE")&& CollectionUtils.isEmpty(criteria.getStatus())){
+	    if(requestInfo.getUserInfo().getType().equalsIgnoreCase(PTConstants.ROLE_EMPLOYEE)&& CollectionUtils.isEmpty(criteria.getStatus())){
 			String wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_MG;
-			BusinessService otBusinessService = workflowService.getBusinessService("ch", requestInfo, wfbusinessServiceName);
+			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, wfbusinessServiceName);
 			List<State> stateList= otBusinessService.getStates();
 			List<String> states = new ArrayList<String>();
 			
@@ -77,8 +77,7 @@ public class MortgageService {
 					states.add(state.getState());
 			}
 			states.remove("");
-			if(states.contains("MG_DRAFTED"))
-				states.remove("MG_DRAFTED");
+			states.remove(PTConstants.MG_DRAFTED);
 			
 			log.info("states:"+states);
 		

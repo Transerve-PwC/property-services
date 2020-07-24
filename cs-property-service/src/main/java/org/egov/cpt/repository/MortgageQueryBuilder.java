@@ -22,7 +22,7 @@ public class MortgageQueryBuilder {
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY mgModifiedTime desc) offset_ FROM " + "({})" + " result) result_offset "
-			+ "WHERE offset_ > :offset1 AND offset_ <= :offset2";
+			+ "WHERE offset_ > :start AND offset_ <= :end";
 
 	private static final String MORTGAGE_SEARCH_QUERY = SELECT + "mg.*,ap.*,doc.*,pt.*,address.*,gd.*,"
 			+ " mg.id as mgid, mg.propertyid, mg.tenantid as mgtenantid, mg.state, mg.action,mg.application_number as app_number,"
@@ -68,8 +68,8 @@ public class MortgageQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.put("offset1",offset);
-		preparedStmtList.put("offset2",limit + offset);
+		preparedStmtList.put("start",offset);
+		preparedStmtList.put("end",limit + offset);
 
 		return finalQuery;
 	}

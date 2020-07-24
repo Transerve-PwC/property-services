@@ -9,6 +9,10 @@ public class PTConstants {
 	private PTConstants() {
 	}
 
+	public static final String ROLE_EMPLOYEE = "EMPLOYEE";
+	
+	public static final String ROLE_CITIZEN = "CITIZEN";
+	
 	public static final String businessService_csp = "CSP";
 
 	public static final String JSONPATH_CODES = "$.MdmsRes.PropertyServices";
@@ -205,5 +209,10 @@ public class PTConstants {
 	public static final String DC_STATE_PENDING_APRO = "DC_PENDINGAPRO";
 
 	public static final String MG_STATE_PENDING_GRANTDETAIL = "MG_PENDINGGRANTDETAIL";
+	
+//Draft sates
+	public static final String OT_DRAFTED ="OT_DRAFTED";
+	public static final String MG_DRAFTED ="MG_DRAFTED";
+	public static final String DC_DRAFTED ="DC_DRAFTED";
 
 }
