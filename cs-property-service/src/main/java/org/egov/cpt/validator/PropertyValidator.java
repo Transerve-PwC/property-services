@@ -770,7 +770,7 @@ public class PropertyValidator {
 	}
 
 	public void validateMortgageUpdate(MortgageRequest mortgageRequest) {
-//		validateDuplicateDocuments(mortgageRequest); // TODO ask sunitha
+		validateDuplicateDocuments(mortgageRequest);
 		validateMGSpecificNotNullFields(mortgageRequest);
 
 	}

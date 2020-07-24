@@ -81,9 +81,7 @@ public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
 			currentapplication.setProperty(property);
 		}
 
-//		if ((currentapplication.getMortgageApprovedGrantDetails() == null)
-//				&& (rs.getString("state").equalsIgnoreCase(PTConstants.MG_STATE_PENDING_GRANTDETAIL))) {
-		if (currentapplication.getMortgageApprovedGrantDetails() == null) {
+		if (rs.getString("gdid") != null) {
 			AuditDetails magdAuditDetails = AuditDetails.builder().createdBy(rs.getString("gdcreated_by"))
 					.createdTime(rs.getLong("gdcreated_time")).lastModifiedBy(rs.getString("gdmodified_by"))
 					.lastModifiedTime(rs.getLong("gdmodified_time")).build();

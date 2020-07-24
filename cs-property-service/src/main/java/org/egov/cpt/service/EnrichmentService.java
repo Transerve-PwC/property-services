@@ -667,8 +667,8 @@ public class EnrichmentService {
 
 				if (!CollectionUtils.isEmpty(application.getMortgageApprovedGrantDetails())) {
 					application.getMortgageApprovedGrantDetails().forEach(grantDetails -> {
-						if (grantDetails.getBankName() != null || grantDetails.getBankName() != ""
-								|| (!grantDetails.getBankName().isEmpty())) {
+						if (grantDetails.getId() == null || grantDetails.getId() == ""
+								|| (!grantDetails.getId().isEmpty())) {
 							AuditDetails auditDetails = propertyutil
 									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 							grantDetails.setId(UUID.randomUUID().toString());
@@ -695,7 +695,7 @@ public class EnrichmentService {
 		if (criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN")) {
 			criteria.setApplicantMobNo(requestInfo.getUserInfo().getUserName());
 		}
-		
+
 	}
 
 }
