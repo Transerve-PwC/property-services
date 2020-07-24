@@ -40,6 +40,9 @@ public class PropertyRepository {
 	private DuplicateCopyPropertyRowMapper duplicateCopyPropertyRowMapper;
 	
 	@Autowired
+	private DuplicateCopyQueryBuilder duplicatecopyQueryBuilder;
+	
+	@Autowired
 	private MortgageRowMapper mortgageRowMapper;
 	
 	@Autowired
@@ -66,7 +69,7 @@ public class PropertyRepository {
 
 	public List<DuplicateCopy> getDuplicateCopyProperties(DuplicateCopySearchCriteria criteria) {
 		Map<String, Object> preparedStmtList = new HashMap<>();
-		String query = queryBuilder.getDuplicateCopyPropertySearchQuery(criteria, preparedStmtList);
+		String query = duplicatecopyQueryBuilder.getDuplicateCopyPropertySearchQuery(criteria, preparedStmtList);
 //		log.info("SearchQuery:"+query);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, duplicateCopyPropertyRowMapper);
 	}
