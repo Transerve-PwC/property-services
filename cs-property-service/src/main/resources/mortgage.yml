@@ -88,6 +88,37 @@ serviceMaps:
 
       - jsonPath: $.MortgageApplications.*.auditDetails.lastModifiedTime
       
+      
+    - query: INSERT INTO cs_pt_mortgage_approved_grantdetails (id, property_detail_id, owner_id, tenantid, bank_name, mortgage_amount, sanction_letter_number, sanction_date, mortgage_end_date, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: MortgageApplications.*.mortgageApprovedGrantDetails.*
+      jsonMaps:
+
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.id
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.propertyDetailId 
+
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.ownerId 
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.tenentId 
+
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.bankName 
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.mortgageAmount 
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.sanctionLetterNumber 
+
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.sanctionDate 
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.mortgageEndDate
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.auditDetails.createdBy
+
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.auditDetails.createdTime
+
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.auditDetails.lastModifiedTime
+      
             
  - version: 1.0
    description: Persists Mortgage details in cs_pt_mortgage_application table
@@ -174,7 +205,7 @@ serviceMaps:
       
       
       
-    - query: INSERT INTO cs_pt_mortgage_approved_grantdetails (id, property_detail_id, owner_id, tenantid, bank_name, mortgage_amount, sanction_letter_number, sanction_date, mortgage_end_date, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_mortgage_approved_grantdetails (id, property_detail_id, owner_id, tenantid, bank_name, mortgage_amount, sanction_letter_number, sanction_date, mortgage_end_date, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET bank_name = ?, mortgage_amount =?, sanction_letter_number =?, sanction_date =?, mortgage_end_date =?, modified_by =?, modified_time =?; 
       basePath: MortgageApplications.*.mortgageApprovedGrantDetails.*
       jsonMaps:
 
@@ -202,6 +233,20 @@ serviceMaps:
       
       - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.auditDetails.createdTime
 
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.bankName 
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.mortgageAmount 
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.sanctionLetterNumber 
+
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.sanctionDate 
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.mortgageEndDate
+      
+      - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.auditDetails.lastModifiedBy 
+      
       - jsonPath: $.MortgageApplications.*.mortgageApprovedGrantDetails.*.auditDetails.lastModifiedTime
           
           

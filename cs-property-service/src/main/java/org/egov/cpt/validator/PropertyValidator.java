@@ -487,8 +487,11 @@ public class PropertyValidator {
 	public void validateDuplicateCopySearch(RequestInfo requestInfo, DuplicateCopySearchCriteria criteria) {
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria == null)
 			throw new CustomException("INVALID SEARCH", "Search without any paramters is not allowed");
-		/*if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.getTransitNumber() == null)
-			throw new CustomException("INVALID SEARCH", "Transit number is mandatory in search");*/
+		/*
+		 * if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") &&
+		 * criteria.getTransitNumber() == null) throw new
+		 * CustomException("INVALID SEARCH", "Transit number is mandatory in search");
+		 */
 	}
 
 	public List<DuplicateCopy> validateDuplicateCopyUpdateRequest(DuplicateCopyRequest duplicateCopyRequest) {
@@ -678,7 +681,7 @@ public class PropertyValidator {
 					propertyCriteria.setTransitNumber(application.getProperty().getTransitNumber());
 				if (application.getProperty().getColony() != null)
 					propertyCriteria.setColony(application.getProperty().getColony());
-				if (application.getProperty().getId() != null) 
+				if (application.getProperty().getId() != null)
 					propertyCriteria.setPropertyId(application.getProperty().getId());
 			});
 		}
@@ -687,13 +690,14 @@ public class PropertyValidator {
 	}
 
 	public void validateMortgageCreateRequest(MortgageRequest mortgageRequest) {
-			validateDocument(mortgageRequest);
-			validateMGSpecificNotNullFields(mortgageRequest);
-			validateDuplicateMortgage(mortgageRequest);
+		validateDocument(mortgageRequest);
+		validateMGSpecificNotNullFields(mortgageRequest);
+		validateDuplicateMortgage(mortgageRequest);
 	}
 
 	private void validateDuplicateMortgage(MortgageRequest request) {
-		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder().propertyId(request.getMortgageApplications().get(0).getProperty().getId()).build();
+		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
+				.propertyId(request.getMortgageApplications().get(0).getProperty().getId()).build();
 		List<Mortgage> mortgageProperty = repository.getMortgageProperties(criteria);
 		if (!CollectionUtils.isEmpty(mortgageProperty)) {
 			throw new CustomException("MORTGAGE EXIST", "Already applied for mortgage");
@@ -703,7 +707,7 @@ public class PropertyValidator {
 	public void validateMortgageSearch(RequestInfo requestInfo, DuplicateCopySearchCriteria criteria) {
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria == null)
 			throw new CustomException("INVALID SEARCH", "Search without any paramters is not allowed");
-		
+
 	}
 
 	public List<Mortgage> validateMOrtgageUpdateRequest(MortgageRequest mortgageRequest) {
@@ -715,9 +719,7 @@ public class PropertyValidator {
 		// validateIds(duplicateCopyRequest, errorMap);
 		String propertyId = mortgageRequest.getMortgageApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
-				.appId(mortgageRequest.getMortgageApplications().get(0).getId())
-				.propertyId(propertyId)
-				.build();
+				.appId(mortgageRequest.getMortgageApplications().get(0).getId()).propertyId(propertyId).build();
 		List<Mortgage> searchedApplications = repository.getMortgageProperties(criteria);
 		if (searchedApplications.size() < 1) {
 			errorMap.put("PROPERTY NOT FOUND", "The property to be updated does not exist");
@@ -747,7 +749,7 @@ public class PropertyValidator {
 		});
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
-		
+
 	}
 
 	private void validateDocument(MortgageRequest mortgageRequest) {
@@ -764,13 +766,13 @@ public class PropertyValidator {
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
-		
+
 	}
 
 	public void validateMortgageUpdate(MortgageRequest mortgageRequest) {
 		validateDuplicateDocuments(mortgageRequest);
 		validateMGSpecificNotNullFields(mortgageRequest);
-		
+
 	}
 
 	private void validateMGSpecificNotNullFields(MortgageRequest request) {
@@ -790,7 +792,7 @@ public class PropertyValidator {
 			if (!errorMap.isEmpty())
 				throw new CustomException(errorMap);
 		});
-		
+
 	}
 
 	private void validateDuplicateDocuments(MortgageRequest request) {
@@ -806,7 +808,7 @@ public class PropertyValidator {
 				});
 			}
 		});
-		
+
 	}
 
 }
