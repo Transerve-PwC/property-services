@@ -23,7 +23,7 @@ public class PropertyQueryBuilder {
 	private static final String AND_QUERY = " AND ";
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pid) offset_ FROM " + "({})" + " result) result_offset "
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pmodified_date desc) offset_ FROM " + "({})" + " result) result_offset "
 			+ "WHERE offset_ > :offset1 AND offset_ <= :offset2";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
@@ -63,7 +63,7 @@ public class PropertyQueryBuilder {
 	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,pt.*,address.*,"
 			+ " dca.id as appid, dca.property_id, dca.tenantid as pttenantid, dca.state, dca.action,dca.application_number as app_number,"
 
-			+ " pt.id as pid, pt.transit_number,pt.colony,"
+			+ " pt.id as pid, pt.transit_number,pt.colony,pt.modified_date as pmodified_date,"
 
 			+ " address.pincode,"
 
@@ -81,8 +81,8 @@ public class PropertyQueryBuilder {
 
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList, PropertyCriteria criteria) {
 
-		if (criteria.getLimit() == null && criteria.getOffset() == null)
-			return query;
+		/*if (criteria.getLimit() == null && criteria.getOffset() == null)
+			return query;*/
 
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();
@@ -97,7 +97,7 @@ public class PropertyQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.put(":offset1",offset);
+		preparedStmtList.put("offset1",offset);
 		preparedStmtList.put("offset2",limit + offset);
 
 		return finalQuery;
@@ -106,8 +106,8 @@ public class PropertyQueryBuilder {
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {
 
-		if (criteria.getLimit() == null && criteria.getOffset() == null)
-			return query;
+		/*if (criteria.getLimit() == null && criteria.getOffset() == null)
+			return query;*/
 
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();

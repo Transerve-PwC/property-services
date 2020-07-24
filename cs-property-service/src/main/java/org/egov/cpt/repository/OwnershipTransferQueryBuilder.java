@@ -21,8 +21,8 @@ public class OwnershipTransferQueryBuilder {
 	private static final String AND_QUERY = " AND ";
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY omodified_date) offset_ FROM " + "({})" + " result) result_offset "
-			+ "WHERE offset_ > :offset AND offset_ <= :limit";
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY omodified_date desc) offset_ FROM " + "({})" + " result) result_offset "
+			+ "WHERE offset_ > :offset1 AND offset_ <= :offset2";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
 	private static final String SEARCH_QUERY = SELECT + "pt.*,address.*,ownership.*,od.*,doc.*,"
@@ -54,8 +54,8 @@ public class OwnershipTransferQueryBuilder {
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {
 
-		if (criteria.getLimit() == null && criteria.getOffset() == null)
-			return query;
+		/*if (criteria.getLimit() == null && criteria.getOffset() == null)
+			return query;*/
 
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();
@@ -70,8 +70,8 @@ public class OwnershipTransferQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.put(":offset",offset);
-		preparedStmtList.put(":limit",limit + offset);
+		preparedStmtList.put("offset1",offset);
+		preparedStmtList.put("offset2",limit + offset);
 
 		return finalQuery;
 	}

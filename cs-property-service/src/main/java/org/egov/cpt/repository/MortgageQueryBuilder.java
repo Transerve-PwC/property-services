@@ -21,11 +21,12 @@ public class MortgageQueryBuilder {
 	private static final String AND_QUERY = " AND ";
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pid) offset_ FROM " + "({})" + " result) result_offset "
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY mgModifiedTime desc) offset_ FROM " + "({})" + " result) result_offset "
 			+ "WHERE offset_ > :offset1 AND offset_ <= :offset2";
 
 	private static final String MORTGAGE_SEARCH_QUERY = SELECT + "mg.*,ap.*,doc.*,pt.*,address.*,gd.*,"
 			+ " mg.id as mgid, mg.propertyid, mg.tenantid as mgtenantid, mg.state, mg.action,mg.application_number as app_number,"
+			+ "mg.modified_time as mgModifiedTime,"
 
 			+ " pt.id as pid, pt.transit_number, pt.colony,"
 
@@ -53,8 +54,8 @@ public class MortgageQueryBuilder {
 	private String addPaginationWrapper(String query,  Map<String, Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {
 
-		if (criteria.getLimit() == null && criteria.getOffset() == null)
-			return query;
+		/*if (criteria.getLimit() == null && criteria.getOffset() == null)
+			return query;*/
 
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();
