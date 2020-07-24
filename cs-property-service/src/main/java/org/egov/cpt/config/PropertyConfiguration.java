@@ -59,6 +59,12 @@ public class PropertyConfiguration {
 
 	@Value("${persister.update.duplicateCopy.topic}")
 	private String UpdateDuplicateCopyTopic;
+	
+	@Value("${persister.save.propertyImages.topic}")
+	private String savePropertyImagesTopic;
+	
+	@Value("${persister.update.propertyImages.topic}")
+	private String UpdatePropertyImagesTopic;
 
 	@Value("${ownership.transfer.save.topic}")
 	private String ownershipTransferSaveTopic;
@@ -251,6 +257,12 @@ public class PropertyConfiguration {
 
 	@Value("${egov.idgen.mg.applicationNum.format}")
 	private String applicationNumberIdgenFormatMG;
+	
+	@Value("${egov.idgen.pi.applicationNum.name}")
+	private String applicationNumberIdgenNamePI;
+	
+	@Value("${egov.idgen.pi.applicationNum.format}")
+	private String applicationNumberIdgenFormatPI;
 
 //	BilllingService generating demand 
 

@@ -23,6 +23,7 @@ import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
+import org.egov.cpt.web.contracts.PropertyImagesRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
@@ -645,6 +646,35 @@ public class PropertyValidator {
 					propertyCriteria.setPropertyId(application.getProperty().getId());
 				if (application.getApplicant().get(0).getName() != null)
 					propertyCriteria.setName(application.getApplicant().get(0).getName());
+			});
+		}
+		return propertyCriteria;
+
+	}
+	
+	//PI Validation
+	public List<Property> isPropertyPIExist(PropertyImagesRequest propertyImagesRequest) {
+
+		PropertyCriteria criteria = getPropertyCriteriaForSearchPI(propertyImagesRequest);
+		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
+		boolean ifPropertyExists = PropertyExists(propertiesFromSearchResponse);
+		if (!ifPropertyExists) {
+			throw new CustomException("PROPERTY NOT FOUND", "Please provide valid property details");
+		}
+
+		return propertiesFromSearchResponse;
+	}
+	
+	private PropertyCriteria getPropertyCriteriaForSearchPI(PropertyImagesRequest propertyImagesRequest) {
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		if (!CollectionUtils.isEmpty(propertyImagesRequest.getPropertyImagesApplications())) {
+			propertyImagesRequest.getPropertyImagesApplications().forEach(application -> {
+				if (application.getProperty().getTransitNumber() != null)
+					propertyCriteria.setTransitNumber(application.getProperty().getTransitNumber());
+				if (application.getProperty().getColony() != null)
+					propertyCriteria.setColony(application.getProperty().getColony());
+				if (application.getProperty().getId() != null)
+					propertyCriteria.setPropertyId(application.getProperty().getId());
 			});
 		}
 		return propertyCriteria;

@@ -22,6 +22,7 @@ import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.OwnershipTransferDocument;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
+import org.egov.cpt.models.PropertyImages;
 import org.egov.cpt.models.UserDetailResponse;
 import org.egov.cpt.models.Idgen.IdResponse;
 import org.egov.cpt.models.calculation.Calculation;
@@ -33,6 +34,7 @@ import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
+import org.egov.cpt.web.contracts.PropertyImagesRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -443,6 +445,52 @@ public class EnrichmentService {
 		}
 		setDCIdgenIds(duplicateCopyRequest);
 	}
+	
+	//PI Enrich
+	public void enrichpropertyImageCreateRequest(PropertyImagesRequest propertyImagesRequest) {
+		RequestInfo requestInfo = propertyImagesRequest.getRequestInfo();
+		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+		if (!CollectionUtils.isEmpty(propertyImagesRequest.getPropertyImagesApplications())) {
+			propertyImagesRequest.getPropertyImagesApplications().forEach(application -> {
+				String gen_application_id = UUID.randomUUID().toString();
+				application.setId(gen_application_id);
+				application.getProperty()
+						.setId(propertyImagesRequest.getPropertyImagesApplications().get(0).getProperty().getId());
+				application.setAuditDetails(propertyAuditDetails);
+				System.out.println(propertyAuditDetails.toString() + " audit details here");
+
+				//Document details
+				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
+					application.getApplicationDocuments().forEach(document -> {
+						if (document.getId() == null) {
+							AuditDetails documentAuditDetails = propertyutil
+									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							document.setId(UUID.randomUUID().toString());
+							document.setActive(true);
+							document.setApplicationId(
+									propertyImagesRequest.getPropertyImagesApplications().get(0).getId());
+							document.setAuditDetails(documentAuditDetails);
+							document.setTenantId(
+									propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId());
+						}
+					});
+
+				}
+				
+				//TODO Verify and remove
+//				if (!CollectionUtils.isEmpty(application.getApplicant())) {
+//					application.getApplicant().forEach(applicant -> {
+//						applicant.setId(UUID.randomUUID().toString());
+//						applicant.setApplicationId(gen_application_id);
+//						applicant.setTenantId(application.getTenantId());
+//						applicant.setAuditDetails(propertyAuditDetails);
+//					});
+//				}
+			});
+		}
+		setPIIdgenIds(propertyImagesRequest);
+	}
 
 	private void enrichDuplicateCopyGenerateDemand(DuplicateCopy application) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
@@ -498,6 +546,31 @@ public class EnrichmentService {
 
 		Map<String, String> errorMap = new HashMap<>();
 		if (applicationNumbers.size() != request.getDuplicateCopyApplications().size()) {
+			errorMap.put("IDGEN ERROR ",
+					"The number of LicenseNumber returned by idgen is not equal to number of TradeLicenses");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+
+		applications.forEach(application -> {
+			application.setApplicationNumber(itr.next());
+		});
+
+	}
+	
+	//PI IDGen
+	private void setPIIdgenIds(PropertyImagesRequest propertyImagesRequest) {
+		RequestInfo requestInfo = propertyImagesRequest.getRequestInfo();
+		String tenantId = propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId();
+		List<PropertyImages> applications = propertyImagesRequest.getPropertyImagesApplications();
+		List<String> applicationNumbers = null;
+		applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNumberIdgenNamePI(),
+				config.getApplicationNumberIdgenFormatPI(), propertyImagesRequest.getPropertyImagesApplications().size());
+		ListIterator<String> itr = applicationNumbers.listIterator();
+
+		Map<String, String> errorMap = new HashMap<>();
+		if (applicationNumbers.size() != propertyImagesRequest.getPropertyImagesApplications().size()) {
 			errorMap.put("IDGEN ERROR ",
 					"The number of LicenseNumber returned by idgen is not equal to number of TradeLicenses");
 		}
