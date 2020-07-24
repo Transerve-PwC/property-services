@@ -101,4 +101,7 @@ public class Property {
 	@JsonProperty("pincode")
 	private String pincode;
 
+	@JsonProperty("area")
+	private String area;
+
 }

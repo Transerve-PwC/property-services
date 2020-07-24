@@ -42,7 +42,7 @@ public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
 
 				Property property = Property.builder().id(rs.getString("pid"))
 						.transitNumber(rs.getString("transit_number")).colony(rs.getString("colony"))
-						.pincode(rs.getString("pincode")).build();
+						.pincode(rs.getString("pincode")).area(rs.getString("area")).build();
 
 				currentapplication = Mortgage.builder().id(mortgageId).property(property)
 						.tenantId(rs.getString("tenantid")).state(rs.getString("state")).action(rs.getString("action"))
@@ -81,7 +81,7 @@ public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
 			currentapplication.setProperty(property);
 		}
 
-		if (currentapplication.getMortgageApprovedGrantDetails() == null) {
+		if (rs.getString("gdid") != null) {
 			AuditDetails magdAuditDetails = AuditDetails.builder().createdBy(rs.getString("gdcreated_by"))
 					.createdTime(rs.getLong("gdcreated_time")).lastModifiedBy(rs.getString("gdmodified_by"))
 					.lastModifiedTime(rs.getLong("gdmodified_time")).build();

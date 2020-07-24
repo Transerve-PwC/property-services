@@ -568,6 +568,19 @@ public class EnrichmentService {
 						applicant.setAuditDetails(mortgageAuditDetails);
 					});
 				}
+
+				if (!CollectionUtils.isEmpty(application.getMortgageApprovedGrantDetails())) {
+					application.getMortgageApprovedGrantDetails().forEach(grantDetails -> {
+						AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+								true);
+						grantDetails.setId(UUID.randomUUID().toString());
+						grantDetails.setPropertyDetailId(application.getProperty().getId());
+						grantDetails.setOwnerId(requestInfo.getUserInfo().getUuid());
+						grantDetails.setTenentId(application.getTenantId());
+						grantDetails.setAuditDetails(auditDetails);
+
+					});
+				}
 			});
 		}
 		setMortgageIdgenIds(mortgageRequest);
@@ -652,9 +665,10 @@ public class EnrichmentService {
 					});
 				}
 
-				if (application.getState().equalsIgnoreCase(PTConstants.MG_STATE_PENDING_GRANTDETAIL)) {
-					if (!CollectionUtils.isEmpty(application.getMortgageApprovedGrantDetails())) {
-						application.getMortgageApprovedGrantDetails().forEach(grantDetails -> {
+				if (!CollectionUtils.isEmpty(application.getMortgageApprovedGrantDetails())) {
+					application.getMortgageApprovedGrantDetails().forEach(grantDetails -> {
+						if (grantDetails.getId() == null || grantDetails.getId() == ""
+								|| (!grantDetails.getId().isEmpty())) {
 							AuditDetails auditDetails = propertyutil
 									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 							grantDetails.setId(UUID.randomUUID().toString());
@@ -662,10 +676,10 @@ public class EnrichmentService {
 							grantDetails.setOwnerId(requestInfo.getUserInfo().getUuid());
 							grantDetails.setTenentId(application.getTenantId());
 							grantDetails.setAuditDetails(auditDetails);
-
-						});
-					}
+						}
+					});
 				}
+
 			});
 		}
 
@@ -681,7 +695,7 @@ public class EnrichmentService {
 		if (criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN")) {
 			criteria.setApplicantMobNo(requestInfo.getUserInfo().getUserName());
 		}
-		
+
 	}
 
 }
