@@ -63,7 +63,7 @@ public class PropertyQueryBuilder {
 
 			+ " pt.id as pid, pt.transit_number,pt.colony,"
 
-			+ " address.pincode,"
+			+ " address.pincode, address.area,"
 
 			+ " ap.id as aid, ap.application_id as app_id,ap.tenantid as aptenantid,"
 			+ " ap.name,ap.email,ap.mobileno,ap.guardian,ap.relationship,ap.aadhaar_number as adhaarnumber,"

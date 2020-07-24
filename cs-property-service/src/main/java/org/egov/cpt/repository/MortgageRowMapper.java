@@ -42,7 +42,7 @@ public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
 
 				Property property = Property.builder().id(rs.getString("pid"))
 						.transitNumber(rs.getString("transit_number")).colony(rs.getString("colony"))
-						.pincode(rs.getString("pincode")).build();
+						.pincode(rs.getString("pincode")).area(rs.getString("area")).build();
 
 				currentapplication = Mortgage.builder().id(mortgageId).property(property)
 						.tenantId(rs.getString("tenantid")).state(rs.getString("state")).action(rs.getString("action"))

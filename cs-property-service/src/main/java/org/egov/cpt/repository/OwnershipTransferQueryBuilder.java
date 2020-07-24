@@ -28,7 +28,7 @@ public class OwnershipTransferQueryBuilder {
 
 			+ " pt.id as pid, pt.transit_number, pt.colony,"
 
-			+ " address.pincode,"
+			+ " address.pincode, address.area,"
 
 			+ " ownership.id as oid, ownership.property_id as oproperty_id,"
 			+ " ownership.tenantid as otenantid, ownership.allotmen_number as oallotmen_number,"
@@ -114,7 +114,7 @@ public class OwnershipTransferQueryBuilder {
 			builder.append("ownership.application_state = ?");
 			preparedStmtList.add(criteria.getStatus());
 		}
-		
+
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
 
