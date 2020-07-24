@@ -59,8 +59,6 @@ public class PropertyImages {
 	@JsonProperty("applicationDocuments")
 	private List<PropertyImagesDocument> applicationDocuments = null;
 
-	@JsonProperty("businessService")
-	private String businessService = PTConstants.BUSINESS_SERVICE_NG;
 
 	public PropertyImages addApplicationDocumentsItem(PropertyImagesDocument applicationDocumentsItem) {
 		if (this.applicationDocuments == null) {
