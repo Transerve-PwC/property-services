@@ -66,11 +66,20 @@ public class DemandService {
 			String consumerCode = owner.getOwnerDetails().getApplicationNumber();
 
 			User requestUser = requestInfo.getUserInfo(); // user from request information
-			User user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
-					.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
-					.mobileNumber(requestUser.getMobileNumber()).emailId(requestUser.getEmailId())
-					.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
-					.build();
+			User user = null;
+			if (requestUser.getMobileNumber() != null) {
+				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
+						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
+						.mobileNumber(requestUser.getMobileNumber()).emailId(requestUser.getEmailId())
+						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
+						.build();
+			} else {
+				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
+						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
+						.mobileNumber(requestUser.getUserName()).emailId(requestUser.getEmailId())
+						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
+						.build();
+			}
 
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			if (!CollectionUtils.isEmpty(owner.getCalculation().getTaxHeadEstimates())) {
@@ -215,11 +224,20 @@ public class DemandService {
 			String consumerCode = application.getApplicationNumber();
 
 			User requestUser = requestInfo.getUserInfo();
-			User user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
-					.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
-					.mobileNumber(requestUser.getMobileNumber()).emailId(requestUser.getEmailId())
-					.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
-					.build();
+			User user = null;
+			if (requestUser.getMobileNumber() != null) {
+				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
+						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
+						.mobileNumber(requestUser.getMobileNumber()).emailId(requestUser.getEmailId())
+						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
+						.build();
+			} else {
+				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
+						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
+						.mobileNumber(requestUser.getUserName()).emailId(requestUser.getEmailId())
+						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
+						.build();
+			}
 
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			if (!CollectionUtils.isEmpty(application.getCalculation().getTaxHeadEstimates())) {
