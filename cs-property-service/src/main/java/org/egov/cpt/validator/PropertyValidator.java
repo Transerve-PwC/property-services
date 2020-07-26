@@ -14,6 +14,7 @@ import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
+import org.egov.cpt.models.PropertyImages;
 import org.egov.cpt.repository.OwnershipTransferRepository;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.repository.ServiceRequestRepository;
@@ -519,6 +520,32 @@ public class PropertyValidator {
 
 		return searchedProperties;
 	}
+	
+	//PI validate
+	public List<PropertyImages> validatePropertyImagesUpdateRequest(PropertyImagesRequest propertyImagesRequest) {
+		Map<String, String> errorMap = new HashMap<>();
+
+		validatePIDocument(propertyImagesRequest);
+		validatePIIds(propertyImagesRequest);
+
+		// validateIds(duplicateCopyRequest, errorMap);
+		String propertyId = propertyImagesRequest.getPropertyImagesApplications().get(0).getProperty().getId();
+		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
+				.appId(propertyImagesRequest.getPropertyImagesApplications().get(0).getId()).propertyId(propertyId)
+				.build();
+		List<PropertyImages> searchedProperties = repository.getPropertyImagesProperties(criteria);
+		if (searchedProperties.size() < 1) {
+			errorMap.put("PROPERTY NOT FOUND", "The property to be updated does not exist");
+		}
+		if (searchedProperties.size() > 1) {
+			errorMap.put("INVALID PROPERTY", "Multiple property found");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+
+		return searchedProperties;
+	}
 
 	private void validateIds(DuplicateCopyRequest request) {
 		Map<String, String> errorMap = new HashMap<>();
@@ -536,6 +563,30 @@ public class PropertyValidator {
 				if (application.getProperty().getId() == null)
 					errorMap.put("INVALID UPDATE", "Property Id cannot be null");
 			}
+		});
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+	}
+	
+	//PI Ids validate
+	private void validatePIIds(PropertyImagesRequest propertyImagesRequest) {
+		Map<String, String> errorMap = new HashMap<>();
+		propertyImagesRequest.getPropertyImagesApplications().forEach(application -> {
+
+//			if ((!application.getState().equalsIgnoreCase(DuplicateCopyConstants.STATUS_INITIATED))) {
+				if (application.getId() == null)
+					errorMap.put("INVALID UPDATE", "Id of property cannot be null");
+				/*
+				 * if(property.getPropertyDetails().getAddress().getId()==null)
+				 * errorMap.put("INVALID UPDATE", "Id of address cannot be null");
+				 */
+			/*
+			 * if (application.getApplicant().get(0).getId() == null)
+			 * errorMap.put("INVALID UPDATE", "Id of Applicant cannot be null");
+			 */
+				if (application.getProperty().getId() == null)
+					errorMap.put("INVALID UPDATE", "Property Id cannot be null");
+//			}
 		});
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
@@ -562,6 +613,36 @@ public class PropertyValidator {
 					errorMap.put("INVALID ACTION",
 							"Action cannot be changed to SUBMIT. Application document are not provided");
 			}
+			/*
+			 * if (!PTConstants.ACTION_SUBMIT.equalsIgnoreCase(property.getAction()) &&
+			 * !PTConstants.ACTION_INITIATE.equalsIgnoreCase(property.getAction())) {
+			 * errorMap.put("INVALID ACTION",
+			 * "Action can only be SUBMIT or INITIATE during create"); }
+			 */
+
+		});
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+	}
+	
+	//PI documents validate
+	private void validatePIDocument(PropertyImagesRequest propertyImagesRequest) {
+		Map<String, String> errorMap = new HashMap<>();
+
+		propertyImagesRequest.getPropertyImagesApplications().forEach(application -> {
+
+			/*
+			 * if (PTConstants.ACTION_INITIATE.equalsIgnoreCase(property.getAction( ))) { if
+			 * (property.getPropertyDetails().getApplicationDocuments() != null)
+			 * errorMap.put("INVALID ACTION",
+			 * "Action should be APPLY when application document are provided"); }
+			 */
+			
+				if (application.getApplicationDocuments() == null)
+					errorMap.put("INVALID ACTION",
+							"Action cannot be done. Application document are not provided");
+				
 			/*
 			 * if (!PTConstants.ACTION_SUBMIT.equalsIgnoreCase(property.getAction()) &&
 			 * !PTConstants.ACTION_INITIATE.equalsIgnoreCase(property.getAction())) {

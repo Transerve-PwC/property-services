@@ -478,15 +478,6 @@ public class EnrichmentService {
 
 				}
 				
-				//TODO Verify and remove
-//				if (!CollectionUtils.isEmpty(application.getApplicant())) {
-//					application.getApplicant().forEach(applicant -> {
-//						applicant.setId(UUID.randomUUID().toString());
-//						applicant.setApplicationId(gen_application_id);
-//						applicant.setTenantId(application.getTenantId());
-//						applicant.setAuditDetails(propertyAuditDetails);
-//					});
-//				}
 			});
 		}
 		setPIIdgenIds(propertyImagesRequest);
@@ -616,6 +607,37 @@ public class EnrichmentService {
 					application.getApplicant().forEach(applicant -> {
 						applicant.setAuditDetails(propertyAuditDetails);
 					});
+				}
+			});
+		}
+
+	}
+	
+	//PI Update Enrich
+	public void enrichpropertyImagesUpdateRequest(PropertyImagesRequest propertyImagesRequest,
+			List<PropertyImages> searchedProperty) {
+		RequestInfo requestInfo = propertyImagesRequest.getRequestInfo();
+		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
+		// String propertyDtlId = searchedProperty.get(0).getPropertyDetails().getId();
+		if (!CollectionUtils.isEmpty(propertyImagesRequest.getPropertyImagesApplications())) {
+			propertyImagesRequest.getPropertyImagesApplications().forEach(application -> {
+				application.setAuditDetails(propertyAuditDetails);
+				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
+					application.getApplicationDocuments().forEach(document -> {
+						if (document.getId() == null) {
+							AuditDetails documentAuditDetails = propertyutil
+									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							document.setId(UUID.randomUUID().toString());
+							document.setActive(true);
+							document.setApplicationId(
+									propertyImagesRequest.getPropertyImagesApplications().get(0).getId());
+							document.setAuditDetails(documentAuditDetails);
+							document.setTenantId(
+									propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId());
+						}
+
+					});
+
 				}
 			});
 		}

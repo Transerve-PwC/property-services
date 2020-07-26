@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertySerializer;
 import org.springframework.validation.annotation.Validated;
 
@@ -38,8 +37,7 @@ public class PropertyImages {
 	@JsonProperty("id")
 	private String id;
 
-//	@JsonSerialize(using = PropertySerializer.class)
-	@JsonProperty("property")
+	@JsonSerialize(using = PropertySerializer.class)
 	private Property property;
 
 	@JsonProperty("tenantId")
@@ -51,13 +49,13 @@ public class PropertyImages {
 	
 	@JsonProperty("description")
 	private String description;
-
-	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
-
+	
 	@Valid
 	@JsonProperty("applicationDocuments")
 	private List<PropertyImagesDocument> applicationDocuments = null;
+
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails = null;
 
 
 	public PropertyImages addApplicationDocumentsItem(PropertyImagesDocument applicationDocumentsItem) {

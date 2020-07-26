@@ -25,5 +25,5 @@ public class PropertyImagesRequest {
 
 	@JsonProperty("PropertyImagesApplications")
 	@Valid
-	private List<PropertyImages> PropertyImagesApplications;
+	private List<PropertyImages> propertyImagesApplications;
 }

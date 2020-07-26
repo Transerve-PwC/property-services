@@ -10,13 +10,8 @@ import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.PropertyImages;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
-import org.egov.cpt.service.calculation.DemandService;
-import org.egov.cpt.service.notification.DuplicateCopyNotificationService;
-import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.validator.PropertyValidator;
-import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.PropertyImagesRequest;
-import org.egov.cpt.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,25 +34,12 @@ public class PropertyImagesService {
 	@Autowired
 	private PropertyRepository repository;
 
-	@Autowired
-	private WorkflowIntegrator wfIntegrator;
-
-	@Autowired
-	private DemandService demandService;
-
-	@Autowired
-	private DuplicateCopyNotificationService notificationService;
 
 	public List<PropertyImages> createPropertyImages(PropertyImagesRequest propertyImagesRequest) {
 		propertyValidator.isPropertyPIExist(propertyImagesRequest);
 //		propertyValidator.validateDuplicateCopyCreateRequest(propertyImagesRequest);
 		enrichmentService.enrichpropertyImageCreateRequest(propertyImagesRequest);
-//		demandService.createDuplicateCopyDemand(propertyImagesRequest.getRequestInfo(),
-//				propertyImagesRequest.getPropertyImagesApplications());
-//		propertyValidator.validateDuplicateCreate(propertyImagesRequest);
-//		if (config.getIsWorkflowEnabled()) {
-//			wfIntegrator.callDuplicateCopyWorkFlow(propertyImagesRequest);
-//		}
+
 		producer.push(config.getSavePropertyImagesTopic(), propertyImagesRequest);
 		return propertyImagesRequest.getPropertyImagesApplications();
 	}
@@ -76,27 +58,15 @@ public class PropertyImagesService {
 		return application;
 	}
 
-	public List<DuplicateCopy> updatePropertyImages(DuplicateCopyRequest duplicateCopyRequest) {
+	public List<PropertyImages> updatePropertyImages(PropertyImagesRequest propertyImagesRequest) {
 
-		List<DuplicateCopy> searchedProperty = propertyValidator
-				.validateDuplicateCopyUpdateRequest(duplicateCopyRequest);
-		enrichmentService.enrichDuplicateCopyUpdateRequest(duplicateCopyRequest, searchedProperty);
-		String applicationState = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getState();
-		if (applicationState.equalsIgnoreCase(PTConstants.DC_STATE_PENDING_SA_VERIFICATION)) {
-			demandService.updateDuplicateCopyDemand(duplicateCopyRequest.getRequestInfo(),
-					duplicateCopyRequest.getDuplicateCopyApplications());
-		}
-		if (applicationState.equalsIgnoreCase(PTConstants.DC_STATE_PENDING_APRO)) {
-			demandService.updateDuplicateCopyDemand(duplicateCopyRequest.getRequestInfo(),
-					duplicateCopyRequest.getDuplicateCopyApplications());
-		}
-		propertyValidator.validateDuplicateUpdate(duplicateCopyRequest);
-		if (config.getIsWorkflowEnabled()) {
-			wfIntegrator.callDuplicateCopyWorkFlow(duplicateCopyRequest);
-		}
-		producer.push(config.getUpdateDuplicateCopyTopic(), duplicateCopyRequest);
-		notificationService.process(duplicateCopyRequest);
-		return duplicateCopyRequest.getDuplicateCopyApplications();
+		List<PropertyImages> searchedProperty = propertyValidator
+				.validatePropertyImagesUpdateRequest(propertyImagesRequest);
+		enrichmentService.enrichpropertyImagesUpdateRequest(propertyImagesRequest, searchedProperty);
+
+		producer.push(config.getUpdatePropertyImagesTopic(), propertyImagesRequest);
+
+		return propertyImagesRequest.getPropertyImagesApplications();
 	}
 
 }
