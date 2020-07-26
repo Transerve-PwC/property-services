@@ -1,6 +1,10 @@
 package org.egov.cpt.service;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +25,7 @@ import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.OwnershipTransferDocument;
 import org.egov.cpt.models.Property;
+import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.PropertyImages;
 import org.egov.cpt.models.UserDetailResponse;
@@ -28,7 +33,9 @@ import org.egov.cpt.models.Idgen.IdResponse;
 import org.egov.cpt.models.calculation.Calculation;
 import org.egov.cpt.models.calculation.Category;
 import org.egov.cpt.models.calculation.TaxHeadEstimate;
+import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.IdGenRepository;
+import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
@@ -55,6 +62,12 @@ public class EnrichmentService {
 
 	@Autowired
 	private PropertyConfiguration config;
+
+	@Autowired
+	private PropertyRepository propertyRepository;
+
+	@Autowired
+	private Producer producer;
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
@@ -715,21 +728,87 @@ public class EnrichmentService {
 	}
 
 	/**
-	 * Enriches the object after status is assigned
+	 * Enriches the object after status is approved
 	 * 
 	 * @param ownershipTransferRequest The update request
 	 */
+
+//	TODO
+	/**
+	 * 1. property.propertyDetails.currentOwner (how to change this) unnecessary
+	 * column
+	 * 
+	 * for this owner
+	 * 
+	 * 2. owner.activeState (true) // present 3. owner.isPrimaryOwner (?) 4.
+	 * owner.ownerDetails.allotmentStartdate (current) 5.
+	 * owner.ownerDetails.allotmentEnddate (from current) 6.
+	 * owner.ownerDetails.permanent (true) // meu or
+	 * 
+	 * for other owners of this property (how to access this)
+	 * 
+	 * 7. owner.activeState (false) 8. owner.isPrimaryOwner (?) 9.
+	 * owner.ownerDetails.allotmentStartdate (it already exists)
+	 * 10.owner.ownerDetails.allotmentEnddate (current)
+	 * 11.owner.ownerDetails.permanent (true)
+	 * 
+	 * 
+	 * meu or applications separate allotment date
+	 */
 	public void postStatusEnrichment(OwnershipTransferRequest ownershipTransferRequest, List<String> endstates) {
-		ownershipTransferRequest.getOwners().forEach(owner -> {
-			OwnerDetails ownerDetails = buildOwnerDetails(owner);
-			owner.setOwnerDetails(ownerDetails);
+		ownershipTransferRequest.getOwners().forEach(latestOwner -> {
+
+			PropertyCriteria criteria = getPropertyCriteriaForOT(ownershipTransferRequest);
+			List<Property> properties = propertyRepository.getProperties(criteria);
+
+			properties.forEach(property -> {
+				property.getPropertyDetails().setCurrentOwner(latestOwner.getOwnerDetails().getName());
+				property.getOwners().forEach(existingOwner -> {
+					if (existingOwner.getId().contentEquals(latestOwner.getId())) {
+						latestOwner.setActiveState(true);
+						latestOwner.getOwnerDetails().setAllotmentStartdate(getCurrentTimeEpoch());
+						latestOwner.getOwnerDetails().setPermanent(true);
+//						latestOwner.setIsPrimaryOwner("true");
+//						latestOwner.getOwnerDetails().setAllotmentEnddate(allotmentEnddate);
+					} else if (!existingOwner.getId().contentEquals(latestOwner.getId())) {
+						existingOwner.setActiveState(false);
+						existingOwner.getOwnerDetails().setPermanent(false);
+//						existingOwner.setIsPrimaryOwner("false");
+//						existingOwner.getOwnerDetails().setAllotmentEnddate(currentDate);
+					}
+				});
+			});
+			PropertyRequest propertyRequest = new PropertyRequest();
+			propertyRequest.setRequestInfo(ownershipTransferRequest.getRequestInfo());
+			propertyRequest.setProperties(properties);
+			producer.push(config.getUpdatePropertyTopic(), propertyRequest);
 		});
 	}
 
-	private OwnerDetails buildOwnerDetails(Owner owner) {
-		OwnerDetails ownerDetails = owner.getOwnerDetails();
-		ownerDetails.setPermanent(true);
-		return ownerDetails;
+	public Long getCurrentTimeEpoch() {
+		long epochTime = 0;
+		Date today = Calendar.getInstance().getTime();
+		SimpleDateFormat crunchifyFormat = new SimpleDateFormat("MMM dd yyyy HH:mm:ss.SSS zzz");
+		String currentTime = crunchifyFormat.format(today);
+		Date date;
+		try {
+			date = crunchifyFormat.parse(currentTime);
+			epochTime = date.getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return epochTime;
+	}
+
+	public PropertyCriteria getPropertyCriteriaForOT(OwnershipTransferRequest request) {
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		if (!CollectionUtils.isEmpty(request.getOwners())) {
+			request.getOwners().forEach(owner -> {
+				if (owner.getProperty().getId() != null)
+					propertyCriteria.setPropertyId(owner.getProperty().getId());
+			});
+		}
+		return propertyCriteria;
 	}
 
 	public void enrichMortgageUpdateRequest(MortgageRequest mortgageRequest, List<Mortgage> searchedProperty) {
