@@ -66,42 +66,40 @@ public class NotificationUtil {
 
 		case PTConstants.OT_ACTION_STATUS_SUBMIT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
-			message = getInitiatedDcMsg(owner, messageTemplate);
+			message = getInitiatedOtMsg(owner, messageTemplate);
 			break;
 
 		case PTConstants.OT_ACTION_STATUS_REJECTED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
-			message = getInitiatedDcMsg(owner, messageTemplate);
+			message = getInitiatedOtMsg(owner, messageTemplate);
 			break;
 
 		case PTConstants.OT_ACTION_STATUS_SENDBACK:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
-			message = getInitiatedDcMsg(owner, messageTemplate);
+			message = getInitiatedOtMsg(owner, messageTemplate);
 			break;
 
 		case PTConstants.OT_ACTION_STATUS_APPROVED:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
-			message = getInitiatedDcMsg(owner, messageTemplate);
+			message = getInitiatedOtMsg(owner, messageTemplate);
 			break;
 
 		case PTConstants.OT_ACTION_STATUS_PAYMENT:
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
-			message = getInitiatedDcMsg(owner, messageTemplate);
+			message = getInitiatedOtMsg(owner, messageTemplate);
 			break;
 		}
 		return message;
 	}
 
-	private String getInitiatedDcMsg(Owner owner, String message) {
+	private String getInitiatedOtMsg(Owner owner, String message) {
 		BigDecimal due = owner.getOwnerDetails().getDueAmount();
 		BigDecimal charge = owner.getOwnerDetails().getAproCharge();
 		message = message.replace("<2>", owner.getOwnerDetails().getName());
 		message = message.replace("<3>", PTConstants.OWNERSHIP_TRANSFER_APPLICATION);
 		message = message.replace("<4>", owner.getOwnerDetails().getApplicationNumber());
-		try {
+		if (message.contains("<5>")) {
 			message = message.replace("<5>", due.add(charge) + "");
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		return message;
 	}
@@ -216,8 +214,9 @@ public class NotificationUtil {
 		message = message.replace("<2>", copy.getApplicant().get(0).getName());
 		message = message.replace("<3>", PTConstants.DUPLICATE_COPY_APPLICATION);
 		message = message.replace("<4>", copy.getApplicationNumber());
-		message = message.replace("<5>", fee.add(charge) + "");
-
+		if (message.contains("<5>")) {
+			message = message.replace("<5>", fee.add(charge) + "");
+		}
 		return message;
 	}
 
