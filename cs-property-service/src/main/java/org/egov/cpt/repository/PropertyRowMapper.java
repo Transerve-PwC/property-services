@@ -27,6 +27,8 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	
 
 	@Override
 	public List<Property> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -136,18 +138,32 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					.createdTime(rs.getLong("piCreatedTime")).lastModifiedBy(rs.getString("piModifiedBy"))
 					.lastModifiedTime(rs.getLong("piModifiedTime")).build();
 			
+			PropertyImages propertyImages = PropertyImages.builder().id(rs.getString("piid")).property(property).tenantId(rs.getString("pitenantid"))
+					.applicationNumber(rs.getString("piapp_number")).description(rs.getString("pidescription"))
+					.auditDetails(piAuditDetails).build();
+			
+			property.addPropertyImagesItem(propertyImages);
+			
+
+			
 //			if (rs.getString("pidocId") != null && rs.getBoolean("pidoc_active")) {
 				PropertyImagesDocument applicationDocument = PropertyImagesDocument.builder()
 						.documentType(rs.getString("pidoctype")).fileStoreId(rs.getString("pidoc_filestoreid"))
 						.id(rs.getString("pidocId")).tenantId(rs.getString("pidoctenantid")).active(rs.getBoolean("pidoc_active"))
 						.applicationId(rs.getString("pidoc_piid")).auditDetails(piAuditDetails).build();
-				property.addPropertyImagesDocumnetItem(applicationDocument);
+
+
 				
-				PropertyImages propertyImages = PropertyImages.builder().id(rs.getString("piid")).property(property).tenantId(rs.getString("pitenantid"))
-						.applicationNumber(rs.getString("piapp_number")).description(rs.getString("pidescription"))
-						.auditDetails(piAuditDetails).build();
-				
-				property.addPropertyImagesItem(propertyImages);
+				PropertyImages propertyImages1 = property.getPropertyImages().stream().filter(p -> {
+					try {
+						return p.getId().equalsIgnoreCase(rs.getString("pidoc_piid"));
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					return false;
+				}).findFirst().get();
+				propertyImages1.addApplicationDocumentsItem(applicationDocument);
 				
 //				.applicationDocuments(applicationDocument) TODO: add this before build
 //			}
