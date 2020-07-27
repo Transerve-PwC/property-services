@@ -1,5 +1,6 @@
 package org.egov.cpt.validator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,6 +16,8 @@ import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyImages;
+import org.egov.cpt.models.calculation.BusinessService;
+import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.repository.OwnershipTransferRepository;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.repository.ServiceRequestRepository;
@@ -26,6 +29,7 @@ import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyImagesRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
+import org.egov.cpt.workflow.WorkflowService;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +62,9 @@ public class PropertyValidator {
 
 	@Autowired
 	private PropertyConfiguration configs;
+	
+	@Autowired
+	private WorkflowService workflowService;
 
 	@Value("${egov.mdms.host}")
 	private String mdmsHost;
@@ -809,6 +816,19 @@ public class PropertyValidator {
 	private void validateDuplicateMortgage(MortgageRequest request) {
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
 				.propertyId(request.getMortgageApplications().get(0).getProperty().getId()).build();
+		
+		//Except Reject state
+		BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), request.getRequestInfo(), PTConstants.BUSINESS_SERVICE_MG);
+		List<State> stateList= otBusinessService.getStates();
+		List<String> states = new ArrayList<String>();
+		
+		for(State state: stateList){
+				states.add(state.getState());
+		}
+		states.remove(PTConstants.MG_REJECTED);
+		log.info("states:"+states);
+		criteria.setStatus(states);
+		
 		List<Mortgage> mortgageProperty = repository.getMortgageProperties(criteria);
 		if (!CollectionUtils.isEmpty(mortgageProperty)) {
 			throw new CustomException("MORTGAGE EXIST", "Already applied for mortgage");
