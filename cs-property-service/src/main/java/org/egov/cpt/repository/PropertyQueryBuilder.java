@@ -20,8 +20,8 @@ public class PropertyQueryBuilder {
 	private static final String AND_QUERY = " AND ";
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pmodified_date desc) offset_ FROM " + "({})" + " result) result_offset "
-			+ "WHERE offset_ > :start AND offset_ <= :end";
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pmodified_date desc) offset_ FROM " + "({})"
+			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
 	private static final String SEARCH_QUERY = SELECT + "pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,"
@@ -47,7 +47,8 @@ public class PropertyQueryBuilder {
 			+ " address.state, address.country, address.pincode, address.landmark,"
 
 			+ " doc.id as docid, doc.property_id as docproperty_id, doc.tenantid as doctenantid,"
-			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id, doc.document_uid"
+			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id, doc.document_uid,"
+			+ " doc.created_by as dcreated_by, doc.created_date as dcreated_date, doc.modified_by as dmodified_by, doc.modified_date as dmodified_date"
 
 			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id "
 			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
@@ -59,8 +60,10 @@ public class PropertyQueryBuilder {
 
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList, PropertyCriteria criteria) {
 
-		/*if (criteria.getLimit() == null && criteria.getOffset() == null)
-			return query;*/
+		/*
+		 * if (criteria.getLimit() == null && criteria.getOffset() == null) return
+		 * query;
+		 */
 
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();
@@ -75,8 +78,8 @@ public class PropertyQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.put("start",offset);
-		preparedStmtList.put("end",limit + offset);
+		preparedStmtList.put("start", offset);
+		preparedStmtList.put("end", limit + offset);
 
 		return finalQuery;
 	}
@@ -94,42 +97,42 @@ public class PropertyQueryBuilder {
 		if (!ObjectUtils.isEmpty(criteria.getTransitNumber())) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("pt.transit_number=:trnNumber");
-			preparedStmtList.put("trnNumber",criteria.getTransitNumber());
+			preparedStmtList.put("trnNumber", criteria.getTransitNumber());
 		}
 
 		if (null != criteria.getColony()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("pt.colony = :colony");
-			preparedStmtList.put("colony",criteria.getColony());
+			preparedStmtList.put("colony", criteria.getColony());
 		}
 
 		if (null != criteria.getName()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("od.name = :name");
-			preparedStmtList.put("name",criteria.getName());
+			preparedStmtList.put("name", criteria.getName());
 		}
 
 		if (null != criteria.getPhone()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("od.phone = :phone");
-			preparedStmtList.put("name",criteria.getPhone());
+			preparedStmtList.put("name", criteria.getPhone());
 		}
 
 		if (null != criteria.getState()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("pt.master_data_state = :state");
-			preparedStmtList.put("state",criteria.getState());
+			preparedStmtList.put("state", criteria.getState());
 		}
 
 		if (null != criteria.getPropertyId()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("pt.id = :id");
-			preparedStmtList.put("id",criteria.getPropertyId());
+			preparedStmtList.put("id", criteria.getPropertyId());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
-	
+
 	private static void addClauseIfRequired(Map<String, Object> values, StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");

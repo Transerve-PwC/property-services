@@ -81,10 +81,16 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 		String docPropertyId = rs.getString("docproperty_id");
 		if (rs.getString("docid") != null && rs.getBoolean("docis_active") && docPropertyId.equals(property.getId())) {
+
+			AuditDetails docAuditdetails = AuditDetails.builder().createdBy(rs.getString("dcreated_by"))
+					.createdTime(rs.getLong("dcreated_date")).lastModifiedBy(rs.getString("dmodified_by"))
+					.lastModifiedTime(rs.getLong("dmodified_date")).build();
+
 			Document applicationDocument = Document.builder().id(rs.getString("docid"))
 					.propertyId(rs.getString("docproperty_id")).tenantId(rs.getString("doctenantid"))
 					.active(rs.getBoolean("docis_active")).documentType(rs.getString("document_type"))
-					.fileStoreId(rs.getString("fileStore_id")).documentUid(rs.getString("document_uid")).build();
+					.fileStoreId(rs.getString("fileStore_id")).documentUid(rs.getString("document_uid"))
+					.auditDetails(docAuditdetails).build();
 			property.getPropertyDetails().addApplicationDocumentsItem(applicationDocument);
 		}
 
