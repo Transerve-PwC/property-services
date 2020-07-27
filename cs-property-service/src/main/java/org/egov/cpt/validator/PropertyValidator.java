@@ -169,7 +169,7 @@ public class PropertyValidator {
 
 		List<Property> property = request.getProperties();
 		property.forEach(properties -> {
-			if (!isValid(properties.getPropertyDetails().getArea(), 4, 20)) {
+			if (!isValid(properties.getPropertyDetails().getArea(), 2, 20)) {
 				errorMap.put("INVALID AREA", "Area is not valid ");
 			}
 
