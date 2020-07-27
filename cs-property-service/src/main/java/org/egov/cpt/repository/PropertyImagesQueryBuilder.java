@@ -28,12 +28,15 @@ public class PropertyImagesQueryBuilder {
 			+ "pi.modified_time as piModifiedTime,"
 
 			+ " pt.id as pid, pt.transit_number, pt.colony,"
+			
+			+ " address.pincode, address.area,"
 
 			+ " doc.id as docId, doc.tenantId as doctenantid, doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
 			+ " doc.property_images_application_id as doc_piid , doc.active as doc_active"
 
 			+ " FROM cs_pt_property_images_application pi " + INNER_JOIN 
 			+ " cs_pt_property_v1 pt on pi.propertyid=pt.id " + INNER_JOIN 
+			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
 			+ " cs_pt_property_images_document doc ON doc.property_images_application_id =  pi.id";
 
 	private String addPaginationWrapper(String query,  Map<String, Object> preparedStmtList,

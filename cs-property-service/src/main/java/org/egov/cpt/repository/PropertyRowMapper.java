@@ -13,6 +13,8 @@ import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
+import org.egov.cpt.models.PropertyImages;
+import org.egov.cpt.models.PropertyImagesDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -125,6 +127,30 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					.ownerDetails(ownerDetails).auditDetails(auditdetails).build();
 
 			property.addOwnerItem(owners);
+		}
+		
+		String propertyImagesPropertyId = rs.getString("pipropertyid");
+		if (rs.getString("piid") != null &&propertyImagesPropertyId.equals(property.getId())) {
+			
+			AuditDetails piAuditDetails = AuditDetails.builder().createdBy(rs.getString("piCreatedBy"))
+					.createdTime(rs.getLong("piCreatedTime")).lastModifiedBy(rs.getString("piModifiedBy"))
+					.lastModifiedTime(rs.getLong("piModifiedTime")).build();
+			
+//			if (rs.getString("pidocId") != null && rs.getBoolean("pidoc_active")) {
+				PropertyImagesDocument applicationDocument = PropertyImagesDocument.builder()
+						.documentType(rs.getString("pidoctype")).fileStoreId(rs.getString("pidoc_filestoreid"))
+						.id(rs.getString("pidocId")).tenantId(rs.getString("pidoctenantid")).active(rs.getBoolean("pidoc_active"))
+						.applicationId(rs.getString("pidoc_piid")).auditDetails(piAuditDetails).build();
+				property.addPropertyImagesDocumnetItem(applicationDocument);
+				
+				PropertyImages propertyImages = PropertyImages.builder().id(rs.getString("piid")).property(property).tenantId(rs.getString("pitenantid"))
+						.applicationNumber(rs.getString("piapp_number")).description(rs.getString("pidescription"))
+						.auditDetails(piAuditDetails).build();
+				
+				property.addPropertyImagesItem(propertyImages);
+				
+//				.applicationDocuments(applicationDocument) TODO: add this before build
+//			}
 		}
 
 	}

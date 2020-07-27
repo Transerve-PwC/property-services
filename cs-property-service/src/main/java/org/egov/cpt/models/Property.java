@@ -71,6 +71,14 @@ public class Property {
 	@Valid
 	@JsonProperty
 	private List<DuplicateCopy> duplicateCopys;
+	
+	@Valid
+	@JsonProperty
+	private List<PropertyImages> propertyImages;
+	
+	@Valid
+	@JsonProperty
+	private List<PropertyImagesDocument> propertyImageDocuments;
 
 	public Property addDocumentItem(DuplicateCopy newDuplicateCopyItem) {
 		if (this.duplicateCopys == null) {
@@ -98,6 +106,32 @@ public class Property {
 		return this;
 	}
 
+	public Property addPropertyImagesItem(PropertyImages newPropertyImagesItem) {
+		if (this.propertyImages == null) {
+			this.propertyImages = new ArrayList<>();
+		}
+		for (PropertyImages propertyImage : propertyImages) {
+			if (propertyImage.getId().equalsIgnoreCase(newPropertyImagesItem.getId())) {
+				return this;
+			}
+		}
+		this.propertyImages.add(newPropertyImagesItem);
+		return this;
+	}
+	
+	public Property addPropertyImagesDocumnetItem(PropertyImagesDocument newPropertyImagesDocumentItem) {
+		if (this.propertyImageDocuments == null) {
+			this.propertyImageDocuments = new ArrayList<>();
+		}
+		for (PropertyImagesDocument propertyImageDocument : propertyImageDocuments) {
+			if (propertyImageDocument.getId().equalsIgnoreCase(newPropertyImagesDocumentItem.getId())) {
+				return this;
+			}
+		}
+		this.propertyImageDocuments.add(newPropertyImagesDocumentItem);
+		return this;
+	}
+	
 	@JsonProperty("pincode")
 	private String pincode;
 

@@ -41,7 +41,7 @@ public class PropertyImagesRowMapper implements ResultSetExtractor<List<Property
 
 				Property property = Property.builder().id(rs.getString("pid"))
 						.transitNumber(rs.getString("transit_number")).colony(rs.getString("colony"))
-						.build();
+						.pincode(rs.getString("pincode")).area(rs.getString("area")).build();
 
 				currentapplication = PropertyImages.builder().id(propertyImagesId).property(property)
 						.tenantId(rs.getString("tenantid"))

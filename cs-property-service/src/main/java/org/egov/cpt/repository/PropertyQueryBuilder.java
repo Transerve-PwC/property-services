@@ -24,7 +24,7 @@ public class PropertyQueryBuilder {
 			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
-	private static final String SEARCH_QUERY = SELECT + "pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,"
+	private static final String SEARCH_QUERY = SELECT + "pi.*,pidoc.*,pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,"
 
 			+ " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,"
 			+ " pt.created_by as pcreated_by, pt.created_date as pcreated_date, pt.modified_by as pmodified_by, pt.modified_date as pmodified_date,"
@@ -48,13 +48,22 @@ public class PropertyQueryBuilder {
 
 			+ " doc.id as docid, doc.property_id as docproperty_id, doc.tenantid as doctenantid,"
 			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id, doc.document_uid,"
-			+ " doc.created_by as dcreated_by, doc.created_date as dcreated_date, doc.modified_by as dmodified_by, doc.modified_date as dmodified_date"
+			+ " doc.created_by as dcreated_by, doc.created_date as dcreated_date, doc.modified_by as dmodified_by, doc.modified_date as dmodified_date,"
+			
+			+ " pi.id as piid, pi.propertyid as pipropertyid, pi.tenantid as pitenantid, pi.application_number as piapp_number, pi.description as pidescription,"
+			+ "pi.created_by as piCreatedBy, pi.created_time as piCreatedTime, pi.modified_by as piModifiedBy, pi.modified_time as piModifiedTime,"
+			
+			+ " pidoc.id as pidocId, pidoc.tenantId as pidoctenantid, pidoc.documenttype as pidoctype , pidoc.filestoreid as pidoc_filestoreid,"
+			+ " pidoc.property_images_application_id as pidoc_piid , pidoc.active as pidoc_active "
 
-			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id "
-			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
+			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN 
+			+ " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id "+ INNER_JOIN 
+			+ " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
 			+ " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
-			+ " cs_pt_application_documents_v1 doc ON pt.id=doc.property_id "
+			+ " cs_pt_application_documents_v1 doc ON pt.id=doc.property_id " + LEFT_JOIN
+			+ " cs_pt_property_images_application pi ON pi.propertyid = pt.id " + LEFT_JOIN 
+			+ " cs_pt_property_images_document pidoc ON pidoc.property_images_application_id =  pi.id"
 //			+ " WHERE "
 	;
 
