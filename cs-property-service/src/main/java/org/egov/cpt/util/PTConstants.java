@@ -214,5 +214,8 @@ public class PTConstants {
 	public static final String OT_DRAFTED ="OT_DRAFTED";
 	public static final String MG_DRAFTED ="MG_DRAFTED";
 	public static final String DC_DRAFTED ="DC_DRAFTED";
+	
+//Reject State
+	public static final String MG_REJECTED ="MG_REJECTED";
 
 }
