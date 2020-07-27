@@ -146,7 +146,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			
 
 			
-//			if (rs.getString("pidocId") != null && rs.getBoolean("pidoc_active")) {
+			if (rs.getString("pidocId") != null && rs.getBoolean("pidoc_active")) {
 				PropertyImagesDocument applicationDocument = PropertyImagesDocument.builder()
 						.documentType(rs.getString("pidoctype")).fileStoreId(rs.getString("pidoc_filestoreid"))
 						.id(rs.getString("pidocId")).tenantId(rs.getString("pidoctenantid")).active(rs.getBoolean("pidoc_active"))
@@ -165,8 +165,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 				}).findFirst().get();
 				propertyImages1.addApplicationDocumentsItem(applicationDocument);
 				
-//				.applicationDocuments(applicationDocument) TODO: add this before build
-//			}
+			}
 		}
 
 	}
