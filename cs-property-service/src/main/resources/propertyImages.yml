@@ -1,0 +1,118 @@
+serviceMaps:
+ serviceName: csp
+ mappings:
+ - version: 1.0
+   description: Persists Property Image details in cs_pt_property_images_application table
+   fromTopic: save-rp-propertyImages
+   isTransaction: true
+   queryMaps:
+
+    - query: INSERT INTO cs_pt_property_images_application (id, propertyid, tenantid, application_number, description, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.PropertyImagesApplications.*
+      jsonMaps:
+
+      - jsonPath: $.PropertyImagesApplications.*.id
+
+      - jsonPath: $.PropertyImagesApplications.*.property.id
+      
+      - jsonPath: $.PropertyImagesApplications.*.tenantId
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationNumber
+      
+      - jsonPath: $.PropertyImagesApplications.*.description
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.createdBy
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.createdTime
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedTime
+      
+        
+      
+    - query: INSERT INTO cs_pt_property_images_document (id, tenantid, documenttype, filestoreid, property_images_application_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: PropertyImagesApplications.*.applicationDocuments.*
+      jsonMaps:
+
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.tenantId 
+
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.documentType 
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.fileStoreId 
+
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.applicationId 
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.active 
+      
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.createdBy
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.createdTime
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedTime
+      
+    
+            
+ - version: 1.0
+   description: Persists Property Image details in cs_pt_property_images_application table
+   fromTopic: update-rp-propertyImages
+   isTransaction: true
+   queryMaps:
+    
+    - query: INSERT INTO cs_pt_property_images_application_audit SELECT * FROM cs_pt_property_images_application WHERE id = ?;
+      basePath: PropertyImagesApplications.*
+      jsonMaps:
+      - jsonPath: $.PropertyImagesApplications.*.id
+
+    - query: UPDATE cs_pt_property_images_application SET description=?, modified_by=?, modified_time=? WHERE id=?;
+      basePath: PropertyImagesApplications.*
+      jsonMaps:
+
+      - jsonPath: $.PropertyImagesApplications.*.description
+      
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.PropertyImagesApplications.*.id
+    
+        
+      
+    - query: INSERT INTO cs_pt_property_images_document (id, tenantid, documenttype, filestoreid, property_images_application_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, modified_by =?, modified_time =?;
+      basePath: PropertyImagesApplications.*.applicationDocuments.*
+      jsonMaps:
+
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.tenantId 
+
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.documentType 
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.fileStoreId 
+
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.applicationId 
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.active 
+      
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.createdBy
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.createdTime
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.active 
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.documentType 
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.fileStoreId 
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedTime  
+      

@@ -17,7 +17,8 @@ import lombok.ToString;
 @Builder
 public class DuplicateCopySearchCriteria {
 	
-	private String tenantId;
+	@Builder.Default
+	private String tenantId = "ch.chandigarh";
 
 	private String transitNumber;
 

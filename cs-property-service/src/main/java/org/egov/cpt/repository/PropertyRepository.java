@@ -13,6 +13,7 @@ import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
+import org.egov.cpt.models.PropertyImages;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
@@ -47,6 +48,12 @@ public class PropertyRepository {
 	
 	@Autowired
 	private MortgageQueryBuilder mortgageQueryBuilder;
+	
+	@Autowired
+	private PropertyImagesRowMapper propertyImagesRowMapper;
+	
+	@Autowired
+	private PropertyImagesQueryBuilder propertyImagesQueryBuilder;
 
 	@Autowired
 	private Producer producer;
@@ -72,6 +79,14 @@ public class PropertyRepository {
 		String query = duplicatecopyQueryBuilder.getDuplicateCopyPropertySearchQuery(criteria, preparedStmtList);
 //		log.info("SearchQuery:"+query);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, duplicateCopyPropertyRowMapper);
+	}
+	
+	//PI
+	public List<PropertyImages> getPropertyImagesProperties(DuplicateCopySearchCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = propertyImagesQueryBuilder.getPropertyImagesSearchQuery(criteria, preparedStmtList);
+//		log.info("SearchQuery:"+query);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, propertyImagesRowMapper);
 	}
 
 	public List<Mortgage> getMortgageProperties(DuplicateCopySearchCriteria criteria) {
