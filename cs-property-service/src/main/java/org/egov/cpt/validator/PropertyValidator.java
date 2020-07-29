@@ -26,6 +26,7 @@ import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.MortgageRequest;
+import org.egov.cpt.web.contracts.NoticeGenerationRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyImagesRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
@@ -720,6 +721,32 @@ public class PropertyValidator {
 		}
 
 		return propertiesFromSearchResponse;
+	}
+	
+	public List<Property> isPropertyExist(NoticeGenerationRequest noticeGenerationRequest) {
+
+		PropertyCriteria criteria = getPropertyCriteriaForSearch(noticeGenerationRequest);
+		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
+		boolean ifPropertyExists = PropertyExists(propertiesFromSearchResponse);
+		if (!ifPropertyExists) {
+			throw new CustomException("PROPERTY NOT FOUND", "Please provide valid property details");
+		}
+
+		return propertiesFromSearchResponse;
+	}
+	
+	private PropertyCriteria getPropertyCriteriaForSearch(NoticeGenerationRequest noticeGenerationRequest) {
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		if (!CollectionUtils.isEmpty(noticeGenerationRequest.getNoticeApplications())) {
+			noticeGenerationRequest.getNoticeApplications().forEach(application -> {
+				if (application.getProperty().getTransitNumber() != null)
+					propertyCriteria.setTransitNumber(application.getProperty().getTransitNumber());
+				if (application.getProperty().getId() != null)
+					propertyCriteria.setPropertyId(application.getProperty().getId());
+			});
+		}
+		return propertyCriteria;
+
 	}
 
 	private PropertyCriteria getPropertyCriteriaForSearch(DuplicateCopyRequest request) {

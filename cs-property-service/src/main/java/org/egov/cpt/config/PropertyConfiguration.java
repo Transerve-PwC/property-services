@@ -80,6 +80,10 @@ public class PropertyConfiguration {
 
 	@Value("${persister.cancel.property.topic}")
 	private String cancelPropertyTopic;
+	
+	@Value("${persister.save.notice.topic}")
+	private String saveNoticeTopic;
+	
 
 	@Value("${persister.cancel.property.assessment.topic}")
 	private String cancelPropertyAssessmentTopic;

@@ -40,6 +40,7 @@ import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.MortgageRequest;
+import org.egov.cpt.web.contracts.NoticeGenerationRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyImagesRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
@@ -872,4 +873,19 @@ public class EnrichmentService {
 
 	}
 
+	public void enrichNoticeCreateRequest(NoticeGenerationRequest noticeGenerationRequest) {
+		RequestInfo requestInfo = noticeGenerationRequest.getRequestInfo();
+		AuditDetails noticeAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+		if (!CollectionUtils.isEmpty(noticeGenerationRequest.getNoticeApplications())) {
+			noticeGenerationRequest.getNoticeApplications().forEach(notice -> {
+				String gen_notice_id = UUID.randomUUID().toString();
+				notice.setId(gen_notice_id);
+				notice.getProperty().setId(noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
+				notice.setAuditDetails(noticeAuditDetails);
+			});
+		}
+		
+	}
+	
 }
