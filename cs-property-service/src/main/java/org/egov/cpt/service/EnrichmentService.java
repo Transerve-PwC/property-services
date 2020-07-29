@@ -770,13 +770,9 @@ public class EnrichmentService {
 						latestOwner.setActiveState(true);
 						latestOwner.getOwnerDetails().setPermanent(true);
 						latestOwner.getOwnerDetails().setAllotmentStartdate(getCurrentTimeEpoch());
-//						OwnerDetails ownerDetails = updateLtOwnerDetails(latestOwner.getOwnerDetails());
-//						latestOwner.setOwnerDetails(ownerDetails);
 					} else if (!existingOwner.getId().contentEquals(latestOwner.getId())) {
 						existingOwner.setActiveState(false);
 						existingOwner.getOwnerDetails().setPermanent(false);
-//						OwnerDetails ownerDetails = updateExOwnerDetails(existingOwner.getOwnerDetails());
-//						existingOwner.setOwnerDetails(ownerDetails);
 					}
 				});
 			});
@@ -786,19 +782,6 @@ public class EnrichmentService {
 			propertyRequest.setProperties(properties);
 			producer.push(config.getUpdatePropertyTopic(), propertyRequest);
 		});
-	}
-
-	private OwnerDetails updateExOwnerDetails(OwnerDetails ownerDetails) {
-		OwnerDetails updatedOwnerDetails = ownerDetails;
-		updatedOwnerDetails.setPermanent(false);
-		return updatedOwnerDetails;
-	}
-
-	private OwnerDetails updateLtOwnerDetails(OwnerDetails ownerDetails) {
-		OwnerDetails updatedOwnerDetails = ownerDetails;
-		updatedOwnerDetails.setAllotmentStartdate(getCurrentTimeEpoch());
-		updatedOwnerDetails.setPermanent(true);
-		return updatedOwnerDetails;
 	}
 
 	public Long getCurrentTimeEpoch() {
