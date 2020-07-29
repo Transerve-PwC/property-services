@@ -458,8 +458,8 @@ public class EnrichmentService {
 		}
 		setDCIdgenIds(duplicateCopyRequest);
 	}
-	
-	//PI Enrich
+
+	// PI Enrich
 	public void enrichpropertyImageCreateRequest(PropertyImagesRequest propertyImagesRequest) {
 		RequestInfo requestInfo = propertyImagesRequest.getRequestInfo();
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
@@ -473,7 +473,7 @@ public class EnrichmentService {
 				application.setAuditDetails(propertyAuditDetails);
 				System.out.println(propertyAuditDetails.toString() + " audit details here");
 
-				//Document details
+				// Document details
 				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
 					application.getApplicationDocuments().forEach(document -> {
 						if (document.getId() == null) {
@@ -490,7 +490,7 @@ public class EnrichmentService {
 					});
 
 				}
-				
+
 			});
 		}
 		setPIIdgenIds(propertyImagesRequest);
@@ -562,15 +562,16 @@ public class EnrichmentService {
 		});
 
 	}
-	
-	//PI IDGen
+
+	// PI IDGen
 	private void setPIIdgenIds(PropertyImagesRequest propertyImagesRequest) {
 		RequestInfo requestInfo = propertyImagesRequest.getRequestInfo();
 		String tenantId = propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId();
 		List<PropertyImages> applications = propertyImagesRequest.getPropertyImagesApplications();
 		List<String> applicationNumbers = null;
 		applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNumberIdgenNamePI(),
-				config.getApplicationNumberIdgenFormatPI(), propertyImagesRequest.getPropertyImagesApplications().size());
+				config.getApplicationNumberIdgenFormatPI(),
+				propertyImagesRequest.getPropertyImagesApplications().size());
 		ListIterator<String> itr = applicationNumbers.listIterator();
 
 		Map<String, String> errorMap = new HashMap<>();
@@ -625,8 +626,8 @@ public class EnrichmentService {
 		}
 
 	}
-	
-	//PI Update Enrich
+
+	// PI Update Enrich
 	public void enrichpropertyImagesUpdateRequest(PropertyImagesRequest propertyImagesRequest,
 			List<PropertyImages> searchedProperty) {
 		RequestInfo requestInfo = propertyImagesRequest.getRequestInfo();
@@ -763,21 +764,19 @@ public class EnrichmentService {
 
 			properties.forEach(property -> {
 				property.getPropertyDetails().setCurrentOwner(latestOwner.getOwnerDetails().getName());
+
 				property.getOwners().forEach(existingOwner -> {
 					if (existingOwner.getId().contentEquals(latestOwner.getId())) {
 						latestOwner.setActiveState(true);
-						latestOwner.getOwnerDetails().setAllotmentStartdate(getCurrentTimeEpoch());
 						latestOwner.getOwnerDetails().setPermanent(true);
-//						latestOwner.setIsPrimaryOwner("true");
-//						latestOwner.getOwnerDetails().setAllotmentEnddate(allotmentEnddate);
+						latestOwner.getOwnerDetails().setAllotmentStartdate(getCurrentTimeEpoch());
 					} else if (!existingOwner.getId().contentEquals(latestOwner.getId())) {
 						existingOwner.setActiveState(false);
 						existingOwner.getOwnerDetails().setPermanent(false);
-//						existingOwner.setIsPrimaryOwner("false");
-//						existingOwner.getOwnerDetails().setAllotmentEnddate(currentDate);
 					}
 				});
 			});
+
 			PropertyRequest propertyRequest = new PropertyRequest();
 			propertyRequest.setRequestInfo(ownershipTransferRequest.getRequestInfo());
 			propertyRequest.setProperties(properties);
