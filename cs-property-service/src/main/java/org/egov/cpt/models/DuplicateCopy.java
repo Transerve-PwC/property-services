@@ -75,6 +75,10 @@ public class DuplicateCopy {
 
 	@JsonProperty("businessService")
 	private String businessService = PTConstants.BUSINESS_SERVICE_DC;
+	
+	@Valid
+    @JsonProperty("wfDocuments")
+	private List<DuplicateCopyDocument> wfdocuments;
 
 	@JsonProperty("calculation")
 	Calculation calculation;

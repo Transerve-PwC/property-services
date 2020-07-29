@@ -216,6 +216,7 @@ public class WorkflowIntegrator {
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(AUDITDETAILSKEY, application.getAuditDetails());
 			obj.put(COMMENTKEY, application.getComment());
+			obj.put(DOCUMENTSKEY, application.getWfdocuments());
 
 			if (!CollectionUtils.isEmpty(application.getAssignee())) {
 				if (uuidmaps.size() == 1) {
