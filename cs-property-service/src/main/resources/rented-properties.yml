@@ -423,7 +423,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.owners.*.id
 
  
-    - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, relation_with_deceased_allottee=?, date_of_death_allottee=?, application_number=?, application_type=?, modified_by=?, modified_date=? where id=?;
+    - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, relation_with_deceased_allottee=?, date_of_death_allottee=?, permanent=?, application_type=?, modified_by=?, modified_date=? where id=?;
       basePath: $.Properties.*.owners.*
       jsonMaps:
 
@@ -465,7 +465,7 @@ serviceMaps:
       
       - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationNumber
+      - jsonPath: $.Properties.*.owners.*.ownerDetails.permanent
       
       - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
 

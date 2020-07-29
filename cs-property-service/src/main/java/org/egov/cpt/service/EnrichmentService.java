@@ -768,12 +768,15 @@ public class EnrichmentService {
 				property.getOwners().forEach(existingOwner -> {
 					if (existingOwner.getId().contentEquals(latestOwner.getId())) {
 						latestOwner.setActiveState(true);
-						OwnerDetails ownerDetails = updateLtOwnerDetails(latestOwner.getOwnerDetails());
-						latestOwner.setOwnerDetails(ownerDetails);
+						latestOwner.getOwnerDetails().setPermanent(true);
+						latestOwner.getOwnerDetails().setAllotmentStartdate(getCurrentTimeEpoch());
+//						OwnerDetails ownerDetails = updateLtOwnerDetails(latestOwner.getOwnerDetails());
+//						latestOwner.setOwnerDetails(ownerDetails);
 					} else if (!existingOwner.getId().contentEquals(latestOwner.getId())) {
 						existingOwner.setActiveState(false);
-						OwnerDetails ownerDetails = updateExOwnerDetails(existingOwner.getOwnerDetails());
-						existingOwner.setOwnerDetails(ownerDetails);
+						existingOwner.getOwnerDetails().setPermanent(false);
+//						OwnerDetails ownerDetails = updateExOwnerDetails(existingOwner.getOwnerDetails());
+//						existingOwner.setOwnerDetails(ownerDetails);
 					}
 				});
 			});
