@@ -9,6 +9,8 @@ import java.util.List;
 import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Document;
+import org.egov.cpt.models.DuplicateCopyDocument;
+import org.egov.cpt.models.NoticeGeneration;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.Property;
@@ -159,6 +161,54 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					return false;
 				}).findFirst().get();
 				propertyImages1.addApplicationDocumentsItem(applicationDocument);
+
+			}
+		}
+		
+//Notice Generation	
+		if (rs.getString("ngid") != null && rs.getString("ng_propertyid").equals(property.getId())) {
+
+			AuditDetails piAuditDetails = AuditDetails.builder().createdBy(rs.getString("ngCreatedBy"))
+					.createdTime(rs.getLong("ngCreatedTime")).lastModifiedBy(rs.getString("ngModifiedBy"))
+					.lastModifiedTime(rs.getLong("ngModifiedTime")).build();
+
+			NoticeGeneration noticeGeneration = NoticeGeneration.builder().id(rs.getString("ngid"))
+					.property(property)
+					.tenantId(rs.getString("ngtenantid"))
+					.memoNumber(rs.getString("ng_memoNumber"))
+					.memoDate(rs.getLong("ng_memoDate"))
+					.noticeType(rs.getString("ng_noticeType"))
+					.guardian(rs.getString("ng_guardian"))
+					.relationship(rs.getString("ng_relationship"))
+					.violations(rs.getString("ng_violations"))
+					.description(rs.getString("ng_description"))
+					.demandNoticeFrom(rs.getLong("ng_demandNoticeFrom"))
+					.demandNoticeTo(rs.getLong("ng_demandNoticeTo"))
+					.recoveryType(rs.getString("ng_recoveryType"))
+					.amount(rs.getDouble("ng_amount"))
+					.build();
+
+			property.addNoticeItem(noticeGeneration);
+
+			if (rs.getString("ngdoc_id") != null && rs.getBoolean("ngdoc_active")) {
+				DuplicateCopyDocument applicationDocument = DuplicateCopyDocument.builder()
+						.documentType(rs.getString("ngdoc_type"))
+						.fileStoreId(rs.getString("ngdoc_filestoreid"))
+						.id(rs.getString("ngdoc_id"))
+						.tenantId(rs.getString("ngdoc_tenantid"))
+						.active(rs.getBoolean("ngdoc_active"))
+						.applicationId(rs.getString("ngdoc_ngid"))
+						.auditDetails(piAuditDetails).build();
+
+				NoticeGeneration notice = property.getNotices().stream().filter(p -> {
+					try {
+						return p.getId().equalsIgnoreCase(rs.getString("ngdoc_ngid"));
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					return false;
+				}).findFirst().get();
+				notice.addApplicationDocumentsItem(applicationDocument);
 
 			}
 		}

@@ -76,6 +76,10 @@ public class Property {
 	@JsonProperty
 	private List<PropertyImages> propertyImages;
 	
+	@Valid
+	@JsonProperty
+	private List<NoticeGeneration> notices;
+	
 
 	public Property addDocumentItem(DuplicateCopy newDuplicateCopyItem) {
 		if (this.duplicateCopys == null) {
@@ -113,6 +117,19 @@ public class Property {
 			}
 		}
 		this.propertyImages.add(newPropertyImagesItem);
+		return this;
+	}
+	
+	public Property addNoticeItem(NoticeGeneration newNoticeItem) {
+		if (this.notices == null) {
+			this.notices = new ArrayList<>();
+		}
+		for (NoticeGeneration notice : notices) {
+			if (notice.getId().equalsIgnoreCase(newNoticeItem.getId())) {
+				return this;
+			}
+		}
+		this.notices.add(newNoticeItem);
 		return this;
 	}
 	

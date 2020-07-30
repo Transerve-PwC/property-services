@@ -410,10 +410,9 @@ public class PropertyValidator {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
-				if (property.getTransitNumber() != null)
-					propertyCriteria.setTransitNumber(property.getTransitNumber());
-				if (property.getColony() != null)
-					propertyCriteria.setColony(property.getColony());
+				if (property.getId() != null)
+					propertyCriteria.setPropertyId(property.getId());
+				
 			});
 		}
 		return propertyCriteria;
