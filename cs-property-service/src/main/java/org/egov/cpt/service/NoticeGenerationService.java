@@ -46,11 +46,20 @@ public class NoticeGenerationService {
 	@Autowired
 	private WorkflowService workflowService;
 
-	public List<NoticeGeneration> createApplication(NoticeGenerationRequest noticeGenerationRequest) {
+	public List<NoticeGeneration> createNotice(NoticeGenerationRequest noticeGenerationRequest) {
 		List<Property> propertiesFromDb = propertyValidator.isPropertyExist(noticeGenerationRequest);
 //		propertyValidator.validateMortgageCreateRequest(noticeGenerationRequest);
 		enrichmentService.enrichNoticeCreateRequest(noticeGenerationRequest);
 		producer.push(config.getSaveNoticeTopic(), noticeGenerationRequest);
 		return noticeGenerationRequest.getNoticeApplications();
+	}
+
+	public List<NoticeGeneration> updateNotice(NoticeGenerationRequest noticeGenerationRequest) {
+		List<NoticeGeneration> searchedProperty = propertyValidator.validateNoticeUpdateRequest(noticeGenerationRequest); 
+		enrichmentService.enrichNoticeUpdateRequest(noticeGenerationRequest,searchedProperty);
+		propertyValidator.validateNoticeUpdate(noticeGenerationRequest);
+		producer.push(config.getUpdateNoticeTopic(), noticeGenerationRequest);
+		return noticeGenerationRequest.getNoticeApplications();
+				
 	}
 }

@@ -84,6 +84,9 @@ public class PropertyConfiguration {
 	@Value("${persister.save.notice.topic}")
 	private String saveNoticeTopic;
 	
+	@Value("${persister.update.notice.topic}")
+	private String updateNoticeTopic;
+	
 
 	@Value("${persister.cancel.property.assessment.topic}")
 	private String cancelPropertyAssessmentTopic;
@@ -267,6 +270,12 @@ public class PropertyConfiguration {
 	
 	@Value("${egov.idgen.pi.applicationNum.format}")
 	private String applicationNumberIdgenFormatPI;
+	
+	@Value("${egov.idgen.ng.memoNum.name}")
+	private String memoNumberIdgenNameNG;
+
+	@Value("${egov.idgen.ng.memoNum.format}")
+	private String memoNumbeIdgenFormatNG;
 
 //	BilllingService generating demand 
 

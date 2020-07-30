@@ -11,6 +11,8 @@ import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
+import org.egov.cpt.models.NoticeGeneration;
+import org.egov.cpt.models.NoticeSearchCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyImages;
@@ -54,6 +56,12 @@ public class PropertyRepository {
 	
 	@Autowired
 	private PropertyImagesQueryBuilder propertyImagesQueryBuilder;
+	
+	@Autowired
+	private NoticeRowMapper noticeRowMapper;
+	
+	@Autowired
+	private NoticeQueryBuilder noticeQueryBuilder;
 
 	@Autowired
 	private Producer producer;
@@ -94,6 +102,13 @@ public class PropertyRepository {
 		String query = mortgageQueryBuilder.getMortgageSearchQuery(criteria, preparedStmtList);
 		log.info("MortgageSearchQuery:"+query);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, mortgageRowMapper);
+	}
+	
+	public List<NoticeGeneration> getNotices(NoticeSearchCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = noticeQueryBuilder.getNoticeSearchQuery(criteria, preparedStmtList);
+		log.info("noticeSearchQuery:"+query);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, noticeRowMapper);
 	}
 
 	public void updateDcPayment(DuplicateCopyRequest duplicateCopyRequest,

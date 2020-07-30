@@ -35,12 +35,28 @@ public class NoticeGenerationController {
 
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
-
 	
+	/**
+	 * 
+	 * @param noticeGenerationRequest
+	 * @return
+	 */
 	@PostMapping("/_create")
 	public ResponseEntity<NoticeGenerationResponse> create(@Valid @RequestBody NoticeGenerationRequest noticeGenerationRequest) {
 
-		List<NoticeGeneration> noticeGeneration = noticeGenerationService.createApplication(noticeGenerationRequest);
+		List<NoticeGeneration> noticeGeneration = noticeGenerationService.createNotice(noticeGenerationRequest);
+		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(noticeGenerationRequest.getRequestInfo(),
+				true);
+		NoticeGenerationResponse response = NoticeGenerationResponse.builder().noticeApplications(noticeGeneration).responseInfo(resInfo)
+				.build();
+		logger.debug("property created sucessfuly");
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+	
+	@PostMapping("/_update")
+	public ResponseEntity<NoticeGenerationResponse> update(@Valid @RequestBody NoticeGenerationRequest noticeGenerationRequest) {
+
+		List<NoticeGeneration> noticeGeneration = noticeGenerationService.updateNotice(noticeGenerationRequest);
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(noticeGenerationRequest.getRequestInfo(),
 				true);
 		NoticeGenerationResponse response = NoticeGenerationResponse.builder().noticeApplications(noticeGeneration).responseInfo(resInfo)

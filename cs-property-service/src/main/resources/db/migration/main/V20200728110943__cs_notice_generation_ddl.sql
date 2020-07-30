@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS cs_pt_notice_generation_application;
+DROP TABLE IF EXISTS cs_pt_notice_douments;
 DROP TABLE IF EXISTS cs_pt_notice_generation_application_audit;
 
 --> Notice Generation application table
@@ -54,7 +55,8 @@ CREATE TABLE cs_pt_notice_generation_application_audit (
    id           			CHARACTER VARYING (256) NOT NULL,
    propertyid       		CHARACTER VARYING (256) NOT NULL,
    tenantid			    	CHARACTER VARYING (256),
-   application_number		CHARACTER VARYING (64),
+   memo_number		        CHARACTER VARYING (64),
+   memo_date				bigint,
    notice_type				CHARACTER VARYING (64),
    guardian 				CHARACTER VARYING (256),
    relationship 			CHARACTER VARYING (256),

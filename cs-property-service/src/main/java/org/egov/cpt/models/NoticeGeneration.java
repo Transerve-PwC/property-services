@@ -66,10 +66,10 @@ public class NoticeGeneration {
 	private String description;
 	
 	@JsonProperty("demandNoticeFrom")
-	private String demandNoticeFrom;
+	private Long demandNoticeFrom;
 	
 	@JsonProperty("demandNoticeTo")
-	private String demandNoticeTo;
+	private Long demandNoticeTo;
 	
 	@JsonProperty("recoveryType")
 	private String recoveryType;

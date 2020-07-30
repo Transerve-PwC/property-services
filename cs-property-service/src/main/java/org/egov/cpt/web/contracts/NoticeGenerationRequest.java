@@ -28,5 +28,5 @@ public class NoticeGenerationRequest {
 
 	@JsonProperty("NoticeApplications")
 	@Valid
-	private List<NoticeGeneration> NoticeApplications;
+	private List<NoticeGeneration> noticeApplications;
 }

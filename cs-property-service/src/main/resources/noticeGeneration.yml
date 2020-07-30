@@ -2,7 +2,7 @@ serviceMaps:
  serviceName: csp
  mappings:
  - version: 1.0
-   description: Persists Property Image details in cs_pt_property_images_application table
+   description: Persists Notice details in cs_pt_notice_generation_application table
    fromTopic: save-rp-notice
    isTransaction: true
    queryMaps:
@@ -72,4 +72,81 @@ serviceMaps:
       - jsonPath: $.NoticeApplications.*.auditDetails.createdTime
 
       - jsonPath: $.NoticeApplications.*.auditDetails.lastModifiedTime
+      
+ 
+ - version: 1.0
+   description: Persists Notice details in cs_pt_notice_generation_application table
+   fromTopic: update-rp-notice
+   isTransaction: true
+   queryMaps:
+    
+    - query: INSERT INTO cs_pt_notice_generation_application_audit SELECT * FROM cs_pt_notice_generation_application WHERE id = ?;
+      basePath: NoticeApplications.*
+      jsonMaps:
+      - jsonPath: $.NoticeApplications.*.id
+
+    - query: UPDATE cs_pt_notice_generation_application SET memo_date=?,guardian=?,relationship=?,description=?,violations=?,demand_notice_from=?,demand_notice_to=?,recovery_type=?,amount=?, modified_by=?, modified_time=? WHERE id=?;
+      basePath: NoticeApplications.*
+      jsonMaps:
+
+      - jsonPath: $.NoticeApplications.*.memoDate
+      
+      - jsonPath: $.NoticeApplications.*.guardian
+      
+      - jsonPath: $.NoticeApplications.*.relationship
+      
+      - jsonPath: $.NoticeApplications.*.description
+      
+      - jsonPath: $.NoticeApplications.*.violations
+      
+      - jsonPath: $.NoticeApplications.*.demandNoticeFrom
+      
+      - jsonPath: $.NoticeApplications.*.demandNoticeTo
+      
+      - jsonPath: $.NoticeApplications.*.recoveryType
+      
+      - jsonPath: $.NoticeApplications.*.amount
+      
+      - jsonPath: $.NoticeApplications.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.NoticeApplications.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.NoticeApplications.*.id
+    
+        
+      
+    - query: INSERT INTO cs_pt_property_images_document (id, tenantid, documenttype, filestoreid, property_images_application_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, modified_by =?, modified_time =?;
+      basePath: PropertyImagesApplications.*.applicationDocuments.*
+      jsonMaps:
+
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.tenantId 
+
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.documentType 
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.fileStoreId 
+
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.applicationId 
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.active 
+      
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.createdBy
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.createdTime
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.active 
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.documentType 
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.fileStoreId 
+
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedBy 
+      
+      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedTime  
+     
       
