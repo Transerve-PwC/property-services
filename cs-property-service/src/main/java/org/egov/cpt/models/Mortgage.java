@@ -52,7 +52,7 @@ public class Mortgage {
 
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
-	
+
 	@JsonProperty("assignee")
 	private List<String> assignee = null;
 
@@ -75,21 +75,29 @@ public class Mortgage {
 	@JsonProperty("mortgageApprovedGrantDetails")
 	private List<MortgageApprovedGrantDetails> mortgageApprovedGrantDetails;
 
-	public Mortgage addApplicationDocumentsItem(DuplicateCopyDocument applicationDocumentsItem) {
+	public Mortgage addApplicationDocumentsItem(DuplicateCopyDocument newApplicationDocumentsItem) {
 		if (this.applicationDocuments == null) {
 			this.applicationDocuments = new ArrayList<>();
 		}
-		if (!this.applicationDocuments.contains(applicationDocumentsItem))
-			this.applicationDocuments.add(applicationDocumentsItem);
+		for (DuplicateCopyDocument applicationDocument : applicationDocuments) {
+			if (applicationDocument.getId().equalsIgnoreCase(newApplicationDocumentsItem.getId())) {
+				return this;
+			}
+		}
+		this.applicationDocuments.add(newApplicationDocumentsItem);
 		return this;
 	}
 
-	public Mortgage addMortgageApprovedGrantDetails(MortgageApprovedGrantDetails mortgageApprovedGrantDetails) {
+	public Mortgage addMortgageApprovedGrantDetails(MortgageApprovedGrantDetails newMortgageApprovedGrantDetails) {
 		if (this.mortgageApprovedGrantDetails == null) {
 			this.mortgageApprovedGrantDetails = new ArrayList<>();
 		}
-		if (!this.mortgageApprovedGrantDetails.contains(mortgageApprovedGrantDetails))
-			this.mortgageApprovedGrantDetails.add(mortgageApprovedGrantDetails);
+		for (MortgageApprovedGrantDetails mortgageApprovedGrantDetail : mortgageApprovedGrantDetails) {
+			if (mortgageApprovedGrantDetail.getId().equalsIgnoreCase(newMortgageApprovedGrantDetails.getId())) {
+				return this;
+			}
+		}
+		this.mortgageApprovedGrantDetails.add(newMortgageApprovedGrantDetails);
 		return this;
 	}
 
