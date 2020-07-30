@@ -12,6 +12,8 @@ import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
+import org.egov.cpt.models.NoticeGeneration;
+import org.egov.cpt.models.NoticeSearchCriteria;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
@@ -26,6 +28,7 @@ import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.MortgageRequest;
+import org.egov.cpt.web.contracts.NoticeGenerationRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyImagesRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
@@ -721,6 +724,32 @@ public class PropertyValidator {
 
 		return propertiesFromSearchResponse;
 	}
+	
+	public List<Property> isPropertyExist(NoticeGenerationRequest noticeGenerationRequest) {
+
+		PropertyCriteria criteria = getPropertyCriteriaForSearch(noticeGenerationRequest);
+		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
+		boolean ifPropertyExists = PropertyExists(propertiesFromSearchResponse);
+		if (!ifPropertyExists) {
+			throw new CustomException("PROPERTY NOT FOUND", "Please provide valid property details");
+		}
+
+		return propertiesFromSearchResponse;
+	}
+	
+	private PropertyCriteria getPropertyCriteriaForSearch(NoticeGenerationRequest noticeGenerationRequest) {
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		if (!CollectionUtils.isEmpty(noticeGenerationRequest.getNoticeApplications())) {
+			noticeGenerationRequest.getNoticeApplications().forEach(application -> {
+				if (application.getProperty().getTransitNumber() != null)
+					propertyCriteria.setTransitNumber(application.getProperty().getTransitNumber());
+				if (application.getProperty().getId() != null)
+					propertyCriteria.setPropertyId(application.getProperty().getId());
+			});
+		}
+		return propertyCriteria;
+
+	}
 
 	private PropertyCriteria getPropertyCriteriaForSearch(DuplicateCopyRequest request) {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
@@ -940,6 +969,68 @@ public class PropertyValidator {
 			}
 		});
 
+	}
+
+	public List<NoticeGeneration> validateNoticeUpdateRequest(NoticeGenerationRequest noticeGenerationRequest) {
+		Map<String, String> errorMap = new HashMap<>();
+
+//		validateDocument(noticeGenerationRequest);
+//		validateIds(noticeGenerationRequest);
+
+		String propertyId = noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId();
+		NoticeSearchCriteria criteria = NoticeSearchCriteria.builder()
+				.noticeId(noticeGenerationRequest.getNoticeApplications().get(0).getId())
+				.propertyId(propertyId).build();
+		List<NoticeGeneration> searchedApplications = repository.getNotices(criteria);
+		if (searchedApplications.size() < 1) {
+			errorMap.put("NOTICE NOT FOUND", "The notice to be updated does not exist");
+		}
+		if (searchedApplications.size() > 1) {
+			errorMap.put("INVALID NOTICE", "Multiple notice found");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+
+		return searchedApplications;
+	}
+
+	public void validateNoticeUpdate(NoticeGenerationRequest noticeGenerationRequest) {
+		validateDuplicateDocuments(noticeGenerationRequest);
+		validateNoticeSpecificNotNullFields(noticeGenerationRequest);
+		
+	}
+
+	private void validateNoticeSpecificNotNullFields(NoticeGenerationRequest request) {
+		request.getNoticeApplications().forEach(notice -> {
+			Map<String, String> errorMap = new HashMap<>();
+			if (notice.getGuardian() == null)
+				errorMap.put("NULL_GUARDIAN", " Applicant Father/husband name cannot be null");
+			if (notice.getTenantId() == null)
+				errorMap.put("NULL_TENANT", " Tenant Id cannot be null");
+			if (notice.getProperty().getId() == null)
+				errorMap.put("NULL_PROPERTYID", "PropertyId cannot be null");
+
+			if (!errorMap.isEmpty())
+				throw new CustomException(errorMap);
+		});
+		
+	}
+
+	private void validateDuplicateDocuments(NoticeGenerationRequest request) {
+		List<String> documentFileStoreIds = new LinkedList();
+		request.getNoticeApplications().forEach(notice -> {
+			if (notice.getApplicationDocuments() != null) {
+				notice.getApplicationDocuments().forEach(document -> {
+					if (documentFileStoreIds.contains(document.getFileStoreId()))
+						throw new CustomException("DUPLICATE_DOCUMENT ERROR",
+								"Same document cannot be used multiple times");
+					else
+						documentFileStoreIds.add(document.getFileStoreId());
+				});
+			}
+		});
+		
 	}
 
 }

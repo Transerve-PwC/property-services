@@ -21,6 +21,7 @@ import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
+import org.egov.cpt.models.NoticeGeneration;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.OwnershipTransferDocument;
@@ -40,6 +41,7 @@ import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.MortgageRequest;
+import org.egov.cpt.web.contracts.NoticeGenerationRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyImagesRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
@@ -871,4 +873,59 @@ public class EnrichmentService {
 
 	}
 
+	public void enrichNoticeCreateRequest(NoticeGenerationRequest noticeGenerationRequest) {
+		RequestInfo requestInfo = noticeGenerationRequest.getRequestInfo();
+		AuditDetails noticeAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+		if (!CollectionUtils.isEmpty(noticeGenerationRequest.getNoticeApplications())) {
+			noticeGenerationRequest.getNoticeApplications().forEach(notice -> {
+				String gen_notice_id = UUID.randomUUID().toString();
+				notice.setId(gen_notice_id);
+				notice.getProperty().setId(noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
+				notice.setAuditDetails(noticeAuditDetails);
+			});
+		}
+		setNoticeIdgenIds(noticeGenerationRequest);
+	}
+
+	private void setNoticeIdgenIds(NoticeGenerationRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		String tenantId = request.getNoticeApplications().get(0).getTenantId();
+		List<NoticeGeneration> notice = request.getNoticeApplications();
+		List<String> memoNumbers = setIdgenIds(requestInfo, tenantId, notice.size(),
+				config.getMemoNumberIdgenNameNG(), config.getMemoNumbeIdgenFormatNG());
+		ListIterator<String> itr = memoNumbers.listIterator();
+		notice.forEach(application -> {
+			application.setMemoNumber(itr.next());
+		});
+		
+	}
+
+	public void enrichNoticeUpdateRequest(NoticeGenerationRequest noticeGenerationRequest,
+			List<NoticeGeneration> searchedProperty) {
+		RequestInfo requestInfo = noticeGenerationRequest.getRequestInfo();
+		AuditDetails noticeAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
+		// String propertyDtlId = searchedProperty.get(0).getPropertyDetails().getId();
+		if (!CollectionUtils.isEmpty(noticeGenerationRequest.getNoticeApplications())) {
+			noticeGenerationRequest.getNoticeApplications().forEach(application -> {
+				application.setAuditDetails(noticeAuditDetails);
+				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
+					application.getApplicationDocuments().forEach(document -> {
+						if (document.getId() == null) {
+							AuditDetails documentAuditDetails = propertyutil
+									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							document.setId(UUID.randomUUID().toString());
+							document.setActive(true);
+							document.setApplicationId(noticeGenerationRequest.getNoticeApplications().get(0).getId());
+							document.setAuditDetails(documentAuditDetails);
+							document.setTenantId(noticeGenerationRequest.getNoticeApplications().get(0).getTenantId());
+						}
+
+					});
+
+				}
+			});
+		}
+	}
+	
 }
