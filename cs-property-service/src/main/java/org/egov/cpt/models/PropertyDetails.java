@@ -73,9 +73,14 @@ public class PropertyDetails {
 		if (this.applicationDocuments == null) {
 			this.applicationDocuments = new ArrayList<>();
 		}
-		if (!this.applicationDocuments.contains(applicationDocumentsItem))
-			this.applicationDocuments.add(applicationDocumentsItem);
+		for (Document applicationDocument : applicationDocuments) {
+			if (applicationDocument.getId().equalsIgnoreCase(applicationDocumentsItem.getId())) {
+				return this;
+			}
+		}
+		this.applicationDocuments.add(applicationDocumentsItem);
 		return this;
+		
 	}
 
 }

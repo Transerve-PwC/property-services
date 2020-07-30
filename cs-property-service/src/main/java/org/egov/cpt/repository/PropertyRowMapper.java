@@ -27,8 +27,6 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 	@Autowired
 	private ObjectMapper mapper;
-	
-	
 
 	@Override
 	public List<Property> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -118,7 +116,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					.revisionPercentage(rs.getString("revision_percentage"))
 					.fatherOrHusband(rs.getString("father_or_husband")).relation(rs.getString("relation"))
 					.applicationType(OwnerDetails.ApplicationTypeEnum.fromValue(rs.getString("application_type")))
-					.applicationNumber(rs.getString("application_number"))
+					.applicationNumber(rs.getString("odapplication_number"))
 					.dateOfDeathAllottee(rs.getLong("date_of_death_allottee"))
 					.relationWithDeceasedAllottee(rs.getString("relation_with_deceased_allottee"))
 					.auditDetails(auditdetails).payment(null).build();
@@ -130,30 +128,27 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 			property.addOwnerItem(owners);
 		}
-		
+
 		String propertyImagesPropertyId = rs.getString("pipropertyid");
-		if (rs.getString("piid") != null &&propertyImagesPropertyId.equals(property.getId())) {
-			
+		if (rs.getString("piid") != null && propertyImagesPropertyId.equals(property.getId())) {
+
 			AuditDetails piAuditDetails = AuditDetails.builder().createdBy(rs.getString("piCreatedBy"))
 					.createdTime(rs.getLong("piCreatedTime")).lastModifiedBy(rs.getString("piModifiedBy"))
 					.lastModifiedTime(rs.getLong("piModifiedTime")).build();
-			
-			PropertyImages propertyImages = PropertyImages.builder().id(rs.getString("piid")).property(property).tenantId(rs.getString("pitenantid"))
-					.applicationNumber(rs.getString("piapp_number")).description(rs.getString("pidescription"))
-					.auditDetails(piAuditDetails).build();
-			
-			property.addPropertyImagesItem(propertyImages);
-			
 
-			
+			PropertyImages propertyImages = PropertyImages.builder().id(rs.getString("piid")).property(property)
+					.tenantId(rs.getString("pitenantid")).applicationNumber(rs.getString("piapp_number"))
+					.description(rs.getString("pidescription")).auditDetails(piAuditDetails).build();
+
+			property.addPropertyImagesItem(propertyImages);
+
 			if (rs.getString("pidocId") != null && rs.getBoolean("pidoc_active")) {
 				PropertyImagesDocument applicationDocument = PropertyImagesDocument.builder()
 						.documentType(rs.getString("pidoctype")).fileStoreId(rs.getString("pidoc_filestoreid"))
-						.id(rs.getString("pidocId")).tenantId(rs.getString("pidoctenantid")).active(rs.getBoolean("pidoc_active"))
-						.applicationId(rs.getString("pidoc_piid")).auditDetails(piAuditDetails).build();
+						.id(rs.getString("pidocId")).tenantId(rs.getString("pidoctenantid"))
+						.active(rs.getBoolean("pidoc_active")).applicationId(rs.getString("pidoc_piid"))
+						.auditDetails(piAuditDetails).build();
 
-
-				
 				PropertyImages propertyImages1 = property.getPropertyImages().stream().filter(p -> {
 					try {
 						return p.getId().equalsIgnoreCase(rs.getString("pidoc_piid"));
@@ -164,7 +159,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					return false;
 				}).findFirst().get();
 				propertyImages1.addApplicationDocumentsItem(applicationDocument);
-				
+
 			}
 		}
 
