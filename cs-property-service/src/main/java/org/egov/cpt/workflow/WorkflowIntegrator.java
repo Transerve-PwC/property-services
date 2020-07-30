@@ -216,6 +216,7 @@ public class WorkflowIntegrator {
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(AUDITDETAILSKEY, application.getAuditDetails());
 			obj.put(COMMENTKEY, application.getComment());
+			obj.put(DOCUMENTSKEY, application.getWfdocuments());
 
 			if (!CollectionUtils.isEmpty(application.getAssignee())) {
 				if (uuidmaps.size() == 1) {
@@ -297,7 +298,7 @@ public class WorkflowIntegrator {
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(AUDITDETAILSKEY, owner.getAuditDetails());
 			obj.put(COMMENTKEY, owner.getComment());
-
+			obj.put(DOCUMENTSKEY, owner.getWfdocuments());
 			if (!CollectionUtils.isEmpty(owner.getAssignee())) {
 				if (assigneeUuidmaps.size() == 1) {
 					obj.put(ASSIGNEEKEY, assigneeUuidmaps.get(0));

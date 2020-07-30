@@ -2,6 +2,7 @@ package org.egov.cpt.models;
 
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.egov.cpt.models.calculation.Calculation;
@@ -69,4 +70,7 @@ public class Owner {
 	@JsonProperty("calculation")
 	Calculation calculation;
 
+	@Valid
+    @JsonProperty("wfDocuments")
+	private List<OwnershipTransferDocument> wfdocuments;
 }
