@@ -5,12 +5,13 @@ import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
+import org.egov.cpt.models.NoticeSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 @Component
-public class MortgageQueryBuilder {
+public class NoticeQueryBuilder {
 
 	@Autowired
 	private PropertyConfiguration config;
@@ -21,36 +22,27 @@ public class MortgageQueryBuilder {
 	private static final String AND_QUERY = " AND ";
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY mgModifiedTime desc) offset_ FROM " + "({})" + " result) result_offset "
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY ngModifiedTime desc) offset_ FROM " + "({})" + " result) result_offset "
 			+ "WHERE offset_ > :start AND offset_ <= :end";
 
-	private static final String MORTGAGE_SEARCH_QUERY = SELECT + "mg.*,ap.*,doc.*,pt.*,address.*,gd.*,"
-			+ " mg.id as mgid, mg.propertyid, mg.tenantid as mgtenantid, mg.state, mg.action,mg.application_number as app_number,"
-			+ "mg.modified_time as mgModifiedTime,"
+	private static final String NOTICE_SEARCH_QUERY = SELECT + "ng.*,doc.*,pt.*,"
+			+ " ng.id as ngid, ng.propertyid, ng.tenantid as ngtenantid,ng.memo_number as memoNumber,"
+			+ "ng.memo_date as memoDate,ng.notice_type as noticeType,ng.guardian as guardian,ng.relationship as relationship,"
+			+ "ng.violations as violations,ng.description as description,ng.demand_notice_from as demandNoticeFrom,"
+			+ "ng.demand_notice_to as demandNoticeTo,ng.recovery_type as recoveryType, ng.amount as amount,"
+			+ "ng.modified_time as ngModifiedTime,"
 
 			+ " pt.id as pid, pt.transit_number, pt.colony,"
 
-			+ " address.pincode, address.area,"
-
-			+ " gd.id as gdid, gd.property_id as gdproperty_detail_id, gd.owner_id as gdowner_id, gd.tenantid as gdtenantid,"
-			+ " gd.bank_name as gdbank_name, gd.mortgage_amount as gdmortgage_amount,"
-			+ " gd.sanction_letter_number as gdsanction_letter_number, gd.sanction_date as gdsanction_date, gd.mortgage_end_date as gdmortgage_end_date,"
-			+ " gd.created_by as gdcreated_by, gd.modified_by as gdmodified_by, gd.created_time as gdcreated_time, gd.modified_time as gdmodified_time,"
-
-			+ " ap.id as aid, ap.mortgage_id as mg_id,ap.tenantid as aptenantid,"
-			+ " ap.name,ap.email,ap.mobileno,ap.guardian,ap.relationship,ap.aadhaar_number as adhaarnumber,"
-
 			+ " doc.id as docId, doc.tenantId as doctenantid,doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
-			+ " doc.mortgage_id as doc_mgid , doc.active as doc_active"
+			+ " doc.notice_id as doc_ngid , doc.active as doc_active"
 
-			+ " FROM cs_pt_mortgage_application mg " + INNER_JOIN + " cs_pt_property_v1 pt on mg.propertyid=pt.id "
-			+ INNER_JOIN + " cs_pt_mortgage_applicant ap ON mg.id =ap.mortgage_id " + LEFT_JOIN
-			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
-			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id " + LEFT_JOIN
-			+ " cs_pt_mortgage_douments doc ON doc.mortgage_id =  mg.id";
+			+ " FROM cs_pt_notice_generation_application ng " + INNER_JOIN + " cs_pt_property_v1 pt on ng.propertyid=pt.id "
+			+ LEFT_JOIN
+			+ " cs_pt_notice_douments doc ON doc.notice_id =  ng.id";
 
 	private String addPaginationWrapper(String query,  Map<String, Object> preparedStmtList,
-			DuplicateCopySearchCriteria criteria) {
+			NoticeSearchCriteria criteria) {
 
 		/*if (criteria.getLimit() == null && criteria.getOffset() == null)
 			return query;*/
@@ -82,29 +74,29 @@ public class MortgageQueryBuilder {
 		}
 	}
 
-	public String getMortgageSearchQuery(DuplicateCopySearchCriteria criteria, Map<String, Object> preparedStmtList) {
+	public String getNoticeSearchQuery(NoticeSearchCriteria criteria, Map<String, Object> preparedStmtList) {
 
-		StringBuilder builder = new StringBuilder(MORTGAGE_SEARCH_QUERY);
+		StringBuilder builder = new StringBuilder(NOTICE_SEARCH_QUERY);
 
 		if (!ObjectUtils.isEmpty(criteria.getPropertyId())) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.propertyid=:propId");
+			builder.append("ng.propertyid=:propId");
 			preparedStmtList.put("propId",criteria.getPropertyId());
 		}
-		if (null != criteria.getAppId()) {
+		if (null != criteria.getNoticeId()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.id=:id");
-			preparedStmtList.put("id",criteria.getAppId());
+			builder.append("ng.id=:id");
+			preparedStmtList.put("id",criteria.getNoticeId());
 		}
 		if (null != criteria.getTransitNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("pt.transit_number=:trnsNumber");
 			preparedStmtList.put("trnsNumber",criteria.getTransitNumber());
 		}
-		if (null != criteria.getApplicationNumber()) {
+		if (null != criteria.getMemoNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.application_number=:appNumber");
-			preparedStmtList.put("appNumber",criteria.getApplicationNumber());
+			builder.append("ng.memo_number=:memoNumber");
+			preparedStmtList.put("memoNumber",criteria.getMemoNumber());
 		}
 		if (null != criteria.getColony()) {
 			addClauseIfRequired(preparedStmtList, builder);
@@ -115,11 +107,6 @@ public class MortgageQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("ap.mobileno=:mobNumber");
 			preparedStmtList.put("mobNumber",criteria.getApplicantMobNo());
-		}
-		if (null != criteria.getStatus()) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("mg.state IN(:states)");
-			preparedStmtList.put("states",criteria.getStatus());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);

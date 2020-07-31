@@ -76,6 +76,14 @@ public class Property {
 	@JsonProperty
 	private List<PropertyImages> propertyImages;
 	
+	@Valid
+	@JsonProperty
+	private List<NoticeGeneration> notices;
+	
+	@Valid
+	@JsonProperty
+	private List<MortgageApprovedGrantDetails> grantDetails;
+	
 
 	public Property addDocumentItem(DuplicateCopy newDuplicateCopyItem) {
 		if (this.duplicateCopys == null) {
@@ -113,6 +121,32 @@ public class Property {
 			}
 		}
 		this.propertyImages.add(newPropertyImagesItem);
+		return this;
+	}
+	
+	public Property addNoticeItem(NoticeGeneration newNoticeItem) {
+		if (this.notices == null) {
+			this.notices = new ArrayList<>();
+		}
+		for (NoticeGeneration notice : notices) {
+			if (notice.getId().equalsIgnoreCase(newNoticeItem.getId())) {
+				return this;
+			}
+		}
+		this.notices.add(newNoticeItem);
+		return this;
+	}
+	
+	public Property addGrantDetailItem(MortgageApprovedGrantDetails newGrantDetailItem) {
+		if (this.grantDetails == null) {
+			this.grantDetails = new ArrayList<>();
+		}
+		for (MortgageApprovedGrantDetails grantDetail : grantDetails) {
+			if (grantDetail.getId().equalsIgnoreCase(newGrantDetailItem.getId())) {
+				return this;
+			}
+		}
+		this.grantDetails.add(newGrantDetailItem);
 		return this;
 	}
 	

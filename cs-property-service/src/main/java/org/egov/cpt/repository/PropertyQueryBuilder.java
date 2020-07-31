@@ -24,7 +24,7 @@ public class PropertyQueryBuilder {
 			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
-	private static final String SEARCH_QUERY = SELECT + "pi.*,pidoc.*,pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,"
+	private static final String SEARCH_QUERY = SELECT + "pi.*,pidoc.*,pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,ng.*,ngdoc.*,gd.*,"
 
 			+ " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,"
 			+ " pt.created_by as pcreated_by, pt.created_date as pcreated_date, pt.modified_by as pmodified_by, pt.modified_date as pmodified_date,"
@@ -54,7 +54,21 @@ public class PropertyQueryBuilder {
 			+ " pi.created_by as piCreatedBy, pi.created_time as piCreatedTime, pi.modified_by as piModifiedBy, pi.modified_time as piModifiedTime,"
 
 			+ " pidoc.id as pidocId, pidoc.tenantId as pidoctenantid, pidoc.documenttype as pidoctype , pidoc.filestoreid as pidoc_filestoreid,"
-			+ " pidoc.property_images_application_id as pidoc_piid , pidoc.active as pidoc_active "
+			+ " pidoc.property_images_application_id as pidoc_piid , pidoc.active as pidoc_active,"
+			
+			+ " ng.id as ngid, ng.propertyid as ng_propertyid, ng.tenantid as ngtenantid,ng.memo_number as ng_memoNumber,"
+			+ " ng.memo_date as ng_memoDate,ng.notice_type as ng_noticeType,ng.guardian as ng_guardian,ng.relationship as ng_relationship,"
+			+ " ng.violations as ng_violations,ng.description as ng_description,ng.demand_notice_from as ng_demandNoticeFrom,"
+			+ " ng.demand_notice_to as ng_demandNoticeTo,ng.recovery_type as ng_recoveryType, ng.amount as ng_amount,"
+			+ " ng.modified_time as ngModifiedTime,ng.modified_by as ngModifiedBy,ng.created_by as ngCreatedBy,ng.created_time as ngCreatedTime,"
+			
+			+ " ngdoc.id as ngdoc_id, ngdoc.tenantId as ngdoc_tenantid,ngdoc.documenttype as ngdoc_type , ngdoc.filestoreid as ngdoc_filestoreid,"
+			+ " ngdoc.notice_id as ngdoc_ngid , ngdoc.active as ngdoc_active,"
+			
+			+ " gd.id as gd_id, gd.property_id as gd_property_id,"
+			+ " gd.bank_name as gd_bank_name, gd.mortgage_amount as gd_mortgage_amount,"
+			+ " gd.sanction_letter_number as gd_sanLetterNum, gd.sanction_date as gd_sanDate, gd.mortgage_end_date as gd_mortgageEndDate,"
+			+ " gd.created_by as gd_createdBy, gd.modified_by as gd_modifiedBy, gd.created_time as gd_createdTime, gd.modified_time as gd_modifiedTime"
 
 			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id "
 			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
@@ -62,8 +76,10 @@ public class PropertyQueryBuilder {
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
 			+ " cs_pt_application_documents_v1 doc ON pt.id=doc.property_id " + LEFT_JOIN
 			+ " cs_pt_property_images_application pi ON pi.propertyid = pt.id " + LEFT_JOIN
-			+ " cs_pt_property_images_document pidoc ON pidoc.property_images_application_id =  pi.id"
-//			+ " WHERE "
+			+ " cs_pt_property_images_document pidoc ON pidoc.property_images_application_id =  pi.id "+LEFT_JOIN
+			+ " cs_pt_notice_generation_application ng ON ng.propertyid = pt.id " + LEFT_JOIN
+			+ " cs_pt_notice_douments ngdoc ON ngdoc.notice_id =  ng.id "+ LEFT_JOIN
+			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id "
 	;
 
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList, PropertyCriteria criteria) {
