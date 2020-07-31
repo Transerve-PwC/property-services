@@ -24,7 +24,7 @@ public class PropertyQueryBuilder {
 			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
-	private static final String SEARCH_QUERY = SELECT + "pi.*,pidoc.*,pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,ng.*,ngdoc.*,"
+	private static final String SEARCH_QUERY = SELECT + "pi.*,pidoc.*,pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,ng.*,ngdoc.*,gd.*,"
 
 			+ " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,"
 			+ " pt.created_by as pcreated_by, pt.created_date as pcreated_date, pt.modified_by as pmodified_by, pt.modified_date as pmodified_date,"
@@ -63,7 +63,12 @@ public class PropertyQueryBuilder {
 			+ " ng.modified_time as ngModifiedTime,ng.modified_by as ngModifiedBy,ng.created_by as ngCreatedBy,ng.created_time as ngCreatedTime,"
 			
 			+ " ngdoc.id as ngdoc_id, ngdoc.tenantId as ngdoc_tenantid,ngdoc.documenttype as ngdoc_type , ngdoc.filestoreid as ngdoc_filestoreid,"
-			+ " ngdoc.notice_id as ngdoc_ngid , ngdoc.active as ngdoc_active"
+			+ " ngdoc.notice_id as ngdoc_ngid , ngdoc.active as ngdoc_active,"
+			
+			+ " gd.id as gd_id, gd.property_id as gd_property_id,"
+			+ " gd.bank_name as gd_bank_name, gd.mortgage_amount as gd_mortgage_amount,"
+			+ " gd.sanction_letter_number as gd_sanLetterNum, gd.sanction_date as gd_sanDate, gd.mortgage_end_date as gd_mortgageEndDate,"
+			+ " gd.created_by as gd_createdBy, gd.modified_by as gd_modifiedBy, gd.created_time as gd_createdTime, gd.modified_time as gd_modifiedTime"
 
 			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id "
 			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
@@ -73,7 +78,8 @@ public class PropertyQueryBuilder {
 			+ " cs_pt_property_images_application pi ON pi.propertyid = pt.id " + LEFT_JOIN
 			+ " cs_pt_property_images_document pidoc ON pidoc.property_images_application_id =  pi.id "+LEFT_JOIN
 			+ " cs_pt_notice_generation_application ng ON ng.propertyid = pt.id " + LEFT_JOIN
-			+ " cs_pt_notice_douments ngdoc ON ngdoc.notice_id =  ng.id"
+			+ " cs_pt_notice_douments ngdoc ON ngdoc.notice_id =  ng.id "+ LEFT_JOIN
+			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id "
 	;
 
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList, PropertyCriteria criteria) {

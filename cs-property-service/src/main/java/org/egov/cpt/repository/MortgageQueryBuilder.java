@@ -32,7 +32,7 @@ public class MortgageQueryBuilder {
 
 			+ " address.pincode, address.area,"
 
-			+ " gd.id as gdid, gd.property_detail_id as gdproperty_detail_id, gd.owner_id as gdowner_id, gd.tenantid as gdtenantid,"
+			+ " gd.id as gdid, gd.property_id as gdproperty_detail_id, gd.owner_id as gdowner_id, gd.tenantid as gdtenantid,"
 			+ " gd.bank_name as gdbank_name, gd.mortgage_amount as gdmortgage_amount,"
 			+ " gd.sanction_letter_number as gdsanction_letter_number, gd.sanction_date as gdsanction_date, gd.mortgage_end_date as gdmortgage_end_date,"
 			+ " gd.created_by as gdcreated_by, gd.modified_by as gdmodified_by, gd.created_time as gdcreated_time, gd.modified_time as gdmodified_time,"
@@ -46,7 +46,7 @@ public class MortgageQueryBuilder {
 			+ " FROM cs_pt_mortgage_application mg " + INNER_JOIN + " cs_pt_property_v1 pt on mg.propertyid=pt.id "
 			+ INNER_JOIN + " cs_pt_mortgage_applicant ap ON mg.id =ap.mortgage_id " + LEFT_JOIN
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
-			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_detail_id " + LEFT_JOIN
+			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id " + LEFT_JOIN
 			+ " cs_pt_mortgage_douments doc ON doc.mortgage_id =  mg.id";
 
 	private String addPaginationWrapper(String query,  Map<String, Object> preparedStmtList,
