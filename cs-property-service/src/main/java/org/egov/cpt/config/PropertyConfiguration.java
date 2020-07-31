@@ -252,6 +252,12 @@ public class PropertyConfiguration {
 
 	@Value("${egov.idgen.rp.applicationNum.format}")
 	private String applicationNumberIdgenFormatRP;
+	
+	@Value("${egov.idgen.rp.allotmentNum.name}")
+	private String allotmentNumberIdgenNameRP;
+
+	@Value("${egov.idgen.rp.allotmentNum.format}")
+	private String allotmentNumberIdgenFormatRP;
 
 	@Value("${egov.idgen.dc.applicationNum.name}")
 	private String applicationNumberIdgenNameDC;

@@ -410,24 +410,17 @@ public class EnrichmentService {
 		String tenantId = request.getOwners().get(0).getTenantId();
 		List<Owner> owners = request.getOwners();
 		int peopertiesSize = request.getOwners().size();
-
-		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNumberIdgenNameRP(),
-				config.getApplicationNumberIdgenFormatRP(), peopertiesSize);
-
+		
+		List<String> applicationNumbers = setIdgenIds(requestInfo, tenantId, peopertiesSize,
+				config.getApplicationNumberIdgenNameRP(), config.getApplicationNumberIdgenFormatRP());
 		ListIterator<String> itr = applicationNumbers.listIterator();
-
-		Map<String, String> errorMap = new HashMap<>();
-		if (applicationNumbers.size() != request.getOwners().size()) {
-			errorMap.put("IDGEN ERROR ",
-					"The number of LicenseNumber returned by idgen is not equal to number of TradeLicenses");
-		}
-
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-
+		List<String> allotmentNumbers = setIdgenIds(requestInfo, tenantId, peopertiesSize,
+				config.getAllotmentNumberIdgenNameRP(), config.getAllotmentNumberIdgenFormatRP());
+		ListIterator<String> allotmentitr = allotmentNumbers.listIterator();
 		if (!CollectionUtils.isEmpty(owners)) {
 			owners.forEach(owner -> {
 				owner.getOwnerDetails().setApplicationNumber(itr.next());
+				owner.setAllotmenNumber(allotmentitr.next());
 			});
 		}
 	}
@@ -545,24 +538,13 @@ public class EnrichmentService {
 		RequestInfo requestInfo = request.getRequestInfo();
 		String tenantId = request.getDuplicateCopyApplications().get(0).getTenantId();
 		List<DuplicateCopy> applications = request.getDuplicateCopyApplications();
-		List<String> applicationNumbers = null;
-		applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNumberIdgenNameDC(),
-				config.getApplicationNumberIdgenFormatDC(), request.getDuplicateCopyApplications().size());
+
+		List<String> applicationNumbers = setIdgenIds(requestInfo, tenantId, applications.size(),
+				config.getApplicationNumberIdgenNameDC(), config.getApplicationNumberIdgenFormatDC());
 		ListIterator<String> itr = applicationNumbers.listIterator();
-
-		Map<String, String> errorMap = new HashMap<>();
-		if (applicationNumbers.size() != request.getDuplicateCopyApplications().size()) {
-			errorMap.put("IDGEN ERROR ",
-					"The number of LicenseNumber returned by idgen is not equal to number of TradeLicenses");
-		}
-
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-
 		applications.forEach(application -> {
 			application.setApplicationNumber(itr.next());
 		});
-
 	}
 
 	// PI IDGen
@@ -570,21 +552,10 @@ public class EnrichmentService {
 		RequestInfo requestInfo = propertyImagesRequest.getRequestInfo();
 		String tenantId = propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId();
 		List<PropertyImages> applications = propertyImagesRequest.getPropertyImagesApplications();
-		List<String> applicationNumbers = null;
-		applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNumberIdgenNamePI(),
-				config.getApplicationNumberIdgenFormatPI(),
-				propertyImagesRequest.getPropertyImagesApplications().size());
+		
+		List<String> applicationNumbers = setIdgenIds(requestInfo, tenantId, applications.size(),
+				config.getApplicationNumberIdgenNamePI(), config.getApplicationNumberIdgenFormatPI());
 		ListIterator<String> itr = applicationNumbers.listIterator();
-
-		Map<String, String> errorMap = new HashMap<>();
-		if (applicationNumbers.size() != propertyImagesRequest.getPropertyImagesApplications().size()) {
-			errorMap.put("IDGEN ERROR ",
-					"The number of LicenseNumber returned by idgen is not equal to number of TradeLicenses");
-		}
-
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-
 		applications.forEach(application -> {
 			application.setApplicationNumber(itr.next());
 		});
