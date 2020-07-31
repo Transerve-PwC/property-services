@@ -138,53 +138,12 @@ public class WorkflowIntegrator {
 
 			array.add(obj);
 		}
-		if (!array.isEmpty()) {
-			JSONObject workFlowRequest = new JSONObject();
-			workFlowRequest.put(REQUESTINFOKEY, request.getRequestInfo());
-			workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);
-			String response = null;
-			try {
-				response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest,
-						String.class);
-			} catch (HttpClientErrorException e) {
-
-				/*
-				 * extracting message from client error exception
-				 */
-				DocumentContext responseContext = JsonPath.parse(e.getResponseBodyAsString());
-				List<Object> errros = null;
-				try {
-					errros = responseContext.read("$.Errors");
-				} catch (PathNotFoundException pnfe) {
-//					log.error("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
-//							" Unable to read the json path in error object : " + pnfe.getMessage());
-					throw new CustomException("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
-							" Unable to read the json path in error object : " + pnfe.getMessage());
-				}
-				throw new CustomException("EG_WF_ERROR", errros.toString());
-			} catch (Exception e) {
-				throw new CustomException("EG_WF_ERROR",
-						" Exception occured while integrating with workflow : " + e.getMessage());
-			}
-
-			/*
-			 * on success result from work-flow read the data and set the status back to
-			 * Property object
-			 */
-			DocumentContext responseContext = JsonPath.parse(response);
-			List<Map<String, Object>> responseArray = responseContext.read(PROCESSINSTANCESJOSNKEY);
-			Map<String, String> idStatusMap = new HashMap<>();
-			responseArray.forEach(object -> {
-
-				DocumentContext instanceContext = JsonPath.parse(object);
-				idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
-			});
+		Map<String, String> idStatusMap = callCommonWorkflow(array, request.getRequestInfo());
 
 			// setting the status back to Property object from wf response
 			request.getProperties().forEach(property -> {
 				property.setMasterDataState(idStatusMap.get(property.getTransitNumber()));
 			});
-		}
 	}
 
 	public void callDuplicateCopyWorkFlow(DuplicateCopyRequest request) {
@@ -228,52 +187,11 @@ public class WorkflowIntegrator {
 			
 			array.add(obj);
 		}
-		if (!array.isEmpty()) {
-			JSONObject workFlowRequest = new JSONObject();
-			workFlowRequest.put(REQUESTINFOKEY, request.getRequestInfo());
-			workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);
-			String response = null;
-			try {
-				response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest,
-						String.class);
-			} catch (HttpClientErrorException e) {
+		Map<String, String> idStatusMap = callCommonWorkflow(array, request.getRequestInfo());
 
-				/*
-				 * extracting message from client error exception
-				 */
-				DocumentContext responseContext = JsonPath.parse(e.getResponseBodyAsString());
-				List<Object> errros = null;
-				try {
-					errros = responseContext.read("$.Errors");
-				} catch (PathNotFoundException pnfe) {
-					log.error("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
-							" Unable to read the json path in error object : " + pnfe.getMessage());
-					throw new CustomException("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
-							" Unable to read the json path in error object : " + pnfe.getMessage());
-				}
-				throw new CustomException("EG_WF_ERROR", errros.toString());
-			} catch (Exception e) {
-				throw new CustomException("EG_WF_ERROR",
-						" Exception occured while integrating with workflow : " + e.getMessage());
-			}
-
-			/*
-			 * on success result from work-flow read the data and set the status back to
-			 * Property object
-			 */
-			DocumentContext responseContext = JsonPath.parse(response);
-			List<Map<String, Object>> responseArray = responseContext.read(PROCESSINSTANCESJOSNKEY);
-			Map<String, String> idStatusMap = new HashMap<>();
-			responseArray.forEach(object -> {
-
-				DocumentContext instanceContext = JsonPath.parse(object);
-				idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
-			});
-
-			// setting the status back to Property object from wf response
+			// setting the status back to Application object from wf response
 			request.getDuplicateCopyApplications()
 					.forEach(application -> application.setState(idStatusMap.get(application.getApplicationNumber())));
-		}
 	}
 
 	public void callOwnershipTransferWorkFlow(OwnershipTransferRequest request) {
@@ -309,53 +227,12 @@ public class WorkflowIntegrator {
 			
 			array.add(obj);
 		}
-		if (!array.isEmpty()) {
-			JSONObject workFlowRequest = new JSONObject();
-			workFlowRequest.put(REQUESTINFOKEY, request.getRequestInfo());
-			workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);
-			String response = null;
-			try {
-				response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest,
-						String.class);
-			} catch (HttpClientErrorException e) {
+		Map<String, String> idStatusMap = callCommonWorkflow(array, request.getRequestInfo());
 
-				/*
-				 * extracting message from client error exception
-				 */
-				DocumentContext responseContext = JsonPath.parse(e.getResponseBodyAsString());
-				List<Object> errros = null;
-				try {
-					errros = responseContext.read("$.Errors");
-				} catch (PathNotFoundException pnfe) {
-//					log.error("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
-//							" Unable to read the json path in error object : " + pnfe.getMessage());
-					throw new CustomException("EG_CSP_WF_ERROR_KEY_NOT_FOUND",
-							" Unable to read the json path in error object : " + pnfe.getMessage());
-				}
-				throw new CustomException("EG_WF_ERROR", errros.toString());
-			} catch (Exception e) {
-				throw new CustomException("EG_WF_ERROR",
-						" Exception occured while integrating with workflow : " + e.getMessage());
-			}
-
-			/*
-			 * on success result from work-flow read the data and set the status back to
-			 * Property object
-			 */
-			DocumentContext responseContext = JsonPath.parse(response);
-			List<Map<String, Object>> responseArray = responseContext.read(PROCESSINSTANCESJOSNKEY);
-			Map<String, String> idStatusMap = new HashMap<>();
-			responseArray.forEach(object -> {
-
-				DocumentContext instanceContext = JsonPath.parse(object);
-				idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
-			});
-
-			// setting the status back to Property object from wf response
+			// setting the status back to Application object from wf response
 			request.getOwners().forEach(owner -> {
 				owner.setApplicationState(idStatusMap.get(owner.getOwnerDetails().getApplicationNumber()));
 			});
-		}
 	}
 
 	public void callMortgageWorkFlow(MortgageRequest request) {
@@ -399,7 +276,7 @@ public class WorkflowIntegrator {
 		}
 		Map<String, String> idStatusMap = callCommonWorkflow(array, request.getRequestInfo());
 
-		// setting the status back to Property object from wf response
+		// setting the status back to Application object from wf response
 		request.getMortgageApplications()
 				.forEach(application -> application.setState(idStatusMap.get(application.getApplicationNumber())));
 	}
