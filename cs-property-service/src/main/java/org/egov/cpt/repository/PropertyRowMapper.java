@@ -10,6 +10,7 @@ import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopyDocument;
+import org.egov.cpt.models.MortgageApprovedGrantDetails;
 import org.egov.cpt.models.NoticeGeneration;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
@@ -211,6 +212,23 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 				notice.addApplicationDocumentsItem(applicationDocument);
 
 			}
+		}
+		
+//GrantDetails
+		if (rs.getString("gd_id") != null) {
+			AuditDetails magdAuditDetails = AuditDetails.builder().createdBy(rs.getString("gd_createdBy"))
+					.createdTime(rs.getLong("gd_createdTime")).lastModifiedBy(rs.getString("gd_modifiedBy"))
+					.lastModifiedTime(rs.getLong("gd_modifiedTime")).build();
+			MortgageApprovedGrantDetails mortgageApprovedGrantDetails = MortgageApprovedGrantDetails.builder()
+					.id(rs.getString("gd_id"))
+					.propertyDetailId(rs.getString("gd_property_id"))
+					.bankName(rs.getString("gd_bank_name"))
+					.mortgageAmount(rs.getBigDecimal("gd_mortgage_amount"))
+					.sanctionLetterNumber(rs.getString("gd_sanLetterNum"))
+					.sanctionDate(rs.getLong("gd_sanDate"))
+					.mortgageEndDate(rs.getLong("gd_mortgageEndDate"))
+					.auditDetails(magdAuditDetails).build();
+			property.addGrantDetailItem(mortgageApprovedGrantDetails);
 		}
 
 	}
