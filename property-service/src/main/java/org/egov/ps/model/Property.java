@@ -18,7 +18,7 @@ import lombok.ToString;
  */
 @ApiModel(description = "A Object holds the basic data for a Property")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-09-18T17:06:11.263+05:30")
+@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2020-07-31T17:06:11.263+05:30")
 
 @Getter
 @Setter

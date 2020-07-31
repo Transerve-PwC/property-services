@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * A Object holds the basic data for a Owner
+ * A Object holds the basic data for a Owner Documents
  */
-@ApiModel(description = "A Object holds the basic data for a Owner")
+@ApiModel(description = "A Object holds the basic data for a Owner Documents")
 @Validated
 @javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2020-07-31T17:06:11.263+05:30")
 
@@ -26,7 +26,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class Owner {
+public class OwnerDocument {
 
 	@JsonProperty("id")
 	private String id;
@@ -34,26 +34,17 @@ public class Owner {
 	@JsonProperty("tenantId")
 	private String tenantId;
 
-	@JsonProperty("propertyDetailsId")
-	private String propertyDetailsId;
+	@JsonProperty("ownerDetailsId")
+	private String ownerDetailsId;
 
-	@JsonProperty("serialNumber")
-	private String serialNumber;
+	@JsonProperty("isActive")
+	private Boolean isActive;
 
-	@JsonProperty("share")
-	private Boolean share;
+	@JsonProperty("documentType")
+	private String documentType;
 
-	@JsonProperty("cpNumber")
-	private String cpNumber;
-
-	@JsonProperty("state")
-	private String state;
-
-	@JsonProperty("action")
-	private String action;
-
-	@JsonProperty("ownerDetails")
-	private OwnerDetails ownerDetails;
+	@JsonProperty("fileStoreId")
+	private String fileStoreId;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;

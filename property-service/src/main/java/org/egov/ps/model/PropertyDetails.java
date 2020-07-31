@@ -16,11 +16,11 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * A Object holds the basic data for a Property
+ * A Object holds the basic data for a Property Details
  */
-@ApiModel(description = "A Object holds the basic data for a Property")
+@ApiModel(description = "A Object holds the basic data for a Property Details")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-09-18T17:06:11.263+05:30")
+@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2020-07-31T17:06:11.263+05:30")
 
 @Getter
 @Setter
@@ -68,6 +68,12 @@ public class PropertyDetails {
 
 	@JsonProperty("owners")
 	private List<Owner> owners;
+
+	@JsonProperty("courtCases")
+	private List<CourtCase> courtCases;
+
+	@JsonProperty("purchaseDetails")
+	private List<PurchaseDetails> purchaseDetails;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
