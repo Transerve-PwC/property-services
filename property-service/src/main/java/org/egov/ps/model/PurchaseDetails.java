@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * A Object holds the basic data for a Owner
+ * A Object holds the basic data for a Court Case
  */
-@ApiModel(description = "A Object holds the basic data for a Owner")
+@ApiModel(description = "A Object holds the basic data for a Court Case")
 @Validated
 @javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2020-07-31T17:06:11.263+05:30")
 
@@ -26,7 +26,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class Owner {
+public class PurchaseDetails {
 
 	@JsonProperty("id")
 	private String id;
@@ -37,23 +37,35 @@ public class Owner {
 	@JsonProperty("propertyDetailsId")
 	private String propertyDetailsId;
 
-	@JsonProperty("serialNumber")
-	private String serialNumber;
+	@JsonProperty("newOwnerName")
+	private String newOwnerName;
 
-	@JsonProperty("share")
-	private Boolean share;
+	@JsonProperty("newOwnerFatherName")
+	private Boolean newOwnerFatherName;
 
-	@JsonProperty("cpNumber")
-	private String cpNumber;
+	@JsonProperty("newOwnerAddress")
+	private String newOwnerAddress;
 
-	@JsonProperty("state")
-	private String state;
+	@JsonProperty("newOwnerMobileNumber")
+	private String newOwnerMobileNumber;
 
-	@JsonProperty("action")
-	private String action;
+	@JsonProperty("sellerName")
+	private String sellerName;
 
-	@JsonProperty("ownerDetails")
-	private OwnerDetails ownerDetails;
+	@JsonProperty("sellerFatherName")
+	private String sellerFatherName;
+
+	@JsonProperty("percentageOfShare")
+	private String percentageOfShare;
+
+	@JsonProperty("modeOfTransfer")
+	private String modeOfTransfer;
+
+	@JsonProperty("registrationNumber")
+	private String registrationNumber;
+
+	@JsonProperty("dateOfRegistration")
+	private Long dateOfRegistration;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;

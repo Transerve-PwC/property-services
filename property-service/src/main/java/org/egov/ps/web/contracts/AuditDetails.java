@@ -1,7 +1,5 @@
 package org.egov.ps.web.contracts;
 
-import javax.validation.constraints.Size;
-
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +16,7 @@ import lombok.Setter;
  */
 @ApiModel(description = "Collection of audit related fields used by most models")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-09-18T17:06:11.263+05:30")
+@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2020-07-31T17:06:11.263+05:30")
 
 @Getter
 @Setter
@@ -27,11 +25,9 @@ import lombok.Setter;
 @Builder
 public class AuditDetails {
 
-	@Size(max = 64)
 	@JsonProperty("createdBy")
 	private String createdBy = null;
 
-	@Size(max = 64)
 	@JsonProperty("lastModifiedBy")
 	private String lastModifiedBy = null;
 

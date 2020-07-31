@@ -1,6 +1,12 @@
 package org.egov.ps.web.contracts;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.validation.Valid;
+
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.ps.model.Property;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -18,16 +24,16 @@ public class PropertyResponse {
 	@JsonProperty("ResponseInfo")
 	private ResponseInfo responseInfo;
 
-//	@JsonProperty("Properties")
-//	@Valid
-//	private List<Property> properties;
-//
-//	public PropertyResponse addPropertiesItem(Property propertiesItem) {
-//		if (this.properties == null) {
-//			this.properties = new ArrayList<>();
-//		}
-//		this.properties.add(propertiesItem);
-//		return this;
-//	}
+	@JsonProperty("Properties")
+	@Valid
+	private List<Property> properties;
+
+	public PropertyResponse addPropertiesItem(Property propertiesItem) {
+		if (this.properties == null) {
+			this.properties = new ArrayList<>();
+		}
+		this.properties.add(propertiesItem);
+		return this;
+	}
 
 }

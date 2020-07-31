@@ -1,6 +1,11 @@
 package org.egov.ps.web.contracts;
 
+import java.util.List;
+
+import javax.validation.Valid;
+
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.ps.model.Property;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -18,7 +23,7 @@ public class PropertyRequest {
 	@JsonProperty("RequestInfo")
 	private RequestInfo requestInfo;
 
-//	@JsonProperty("Properties")
-//	@Valid
-//	private List<Property> properties;
+	@JsonProperty("Properties")
+	@Valid
+	private List<Property> properties;
 }
