@@ -5,6 +5,7 @@ import java.util.List;
 import org.egov.ps.config.Configuration;
 import org.egov.ps.model.Property;
 import org.egov.ps.producer.Producer;
+import org.egov.ps.validator.PropertyValidator;
 import org.egov.ps.web.contracts.PropertyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,13 @@ public class PropertyService {
 
 	@Autowired
 	private Producer producer;
+	
+	@Autowired
+	PropertyValidator propertyValidator;
 
 	public List<Property> createProperty(PropertyRequest request) {
 
-//		propertyValidator.validateCreateRequest(request);
+		propertyValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
 //		if (config.getIsWorkflowEnabled()) {
 //			wfIntegrator.callWorkFlow(request);
