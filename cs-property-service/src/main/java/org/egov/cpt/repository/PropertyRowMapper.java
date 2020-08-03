@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
-import org.egov.cpt.models.Documents;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.MortgageApprovedGrantDetails;
 import org.egov.cpt.models.NoticeGeneration;
 import org.egov.cpt.models.Owner;
@@ -89,7 +89,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					.createdTime(rs.getLong("dcreated_date")).lastModifiedBy(rs.getString("dmodified_by"))
 					.lastModifiedTime(rs.getLong("dmodified_date")).build();
 
-			Documents applicationDocument = Documents.builder().id(rs.getString("docid"))
+			Document applicationDocument = Document.builder().id(rs.getString("docid"))
 					.referenceId(rs.getString("docreference_id"))
 					.propertyId(rs.getString("docproperty_id")).tenantId(rs.getString("doctenantid"))
 					.active(rs.getBoolean("docis_active")).documentType(rs.getString("document_type"))
@@ -145,7 +145,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			property.addPropertyImagesItem(propertyImages);
 
 			if (rs.getString("pidocid") != null && rs.getBoolean("pidoc_active")) {
-				Documents applicationDocument = Documents.builder()
+				Document applicationDocument = Document.builder()
 						.documentType(rs.getString("pidoctype"))
 						.fileStoreId(rs.getString("pidoc_filestoreid"))
 						.id(rs.getString("pidocId"))
@@ -200,7 +200,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			property.addNoticeItem(noticeGeneration);
 
 			if (rs.getString("ngdoc_id") != null && rs.getBoolean("ngdoc_active")) {
-				Documents applicationDocument = Documents.builder()
+				Document applicationDocument = Document.builder()
 						.documentType(rs.getString("ngdoc_type"))
 						.fileStoreId(rs.getString("ngdoc_filestoreid"))
 						.id(rs.getString("ngdoc_id"))

@@ -10,7 +10,7 @@ import java.util.Map;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
-import org.egov.cpt.models.Documents;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Property;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -79,7 +79,7 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 					.createdTime(rs.getLong("ocreated_date")).lastModifiedBy(rs.getString("omodified_by"))
 					.lastModifiedTime(rs.getLong("omodified_date")).build();
 
-			Documents ownershipTransferDocument = Documents.builder()
+			Document ownershipTransferDocument = Document.builder()
 					.id(rs.getString("docid"))
 					.referenceId(rs.getString("doc_referenceId"))
 					.tenantId(rs.getString("doctenantid")).active(rs.getBoolean("docis_active"))

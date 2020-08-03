@@ -134,9 +134,9 @@ public class OwnerDetails {
 
 	@Valid
 	@JsonProperty("ownershipTransferDocuments")
-	private List<Documents> ownershipTransferDocuments;
+	private List<Document> ownershipTransferDocuments;
 
-	public OwnerDetails addownershipTransferDocumentsItem(Documents ownershipTransferDocumentsItem) {
+	public OwnerDetails addownershipTransferDocumentsItem(Document ownershipTransferDocumentsItem) {
 		if (this.ownershipTransferDocuments == null) {
 			this.ownershipTransferDocuments = new ArrayList<>();
 		}

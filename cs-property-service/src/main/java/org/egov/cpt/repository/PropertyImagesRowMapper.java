@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.cpt.models.AuditDetails;
-import org.egov.cpt.models.Documents;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyImages;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +69,7 @@ public class PropertyImagesRowMapper implements ResultSetExtractor<List<Property
 
 
 		if (rs.getString("docId") != null && rs.getBoolean("doc_active")) {
-			Documents applicationDocument = Documents.builder()
+			Document applicationDocument = Document.builder()
 					.documentType(rs.getString("doctype")).fileStoreId(rs.getString("doc_filestoreid"))
 					.id(rs.getString("docId")).tenantId(rs.getString("doctenantid")).active(rs.getBoolean("doc_active"))
 					.referenceId(rs.getString("doc_referenceId"))

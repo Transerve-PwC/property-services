@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.cpt.models.AuditDetails;
-import org.egov.cpt.models.Documents;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopyDocument;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.MortgageApplicant;
@@ -75,7 +75,7 @@ public class NoticeRowMapper implements ResultSetExtractor<List<NoticeGeneration
 				.lastModifiedTime(rs.getLong("created_time")).build();
 		
 		if (rs.getString("docId") != null && rs.getBoolean("doc_active")) {
-			Documents applicationDocument = Documents.builder()
+			Document applicationDocument = Document.builder()
 					.documentType(rs.getString("doctype"))
 					.fileStoreId(rs.getString("doc_filestoreid"))
 					.id(rs.getString("docId"))

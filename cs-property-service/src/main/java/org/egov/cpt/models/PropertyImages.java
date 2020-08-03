@@ -52,17 +52,17 @@ public class PropertyImages {
 	
 	@Valid
 	@JsonProperty("applicationDocuments")
-	private List<Documents> applicationDocuments = null;
+	private List<Document> applicationDocuments = null;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
 
-	public PropertyImages addApplicationDocumentsItem(Documents applicationDocumentsItem) {
+	public PropertyImages addApplicationDocumentsItem(Document applicationDocumentsItem) {
 		if (this.applicationDocuments == null) {
 			this.applicationDocuments = new ArrayList<>();
 		}
-		for (Documents applicationDocument : applicationDocuments) {
+		for (Document applicationDocument : applicationDocuments) {
 			if (applicationDocument.getId().equalsIgnoreCase(applicationDocumentsItem.getId())) {
 				return this;
 			}

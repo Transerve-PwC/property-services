@@ -23,7 +23,7 @@ import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.NoticeGeneration;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
-import org.egov.cpt.models.Documents;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyDetails;
@@ -146,14 +146,14 @@ public class EnrichmentService {
 
 	public PropertyDetails updatePropertyDetail(Property property, RequestInfo requestInfo) {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
-		List<Documents> applicationDocuments = updateApplicationDocs(propertyDetail, property, requestInfo);
+		List<Document> applicationDocuments = updateApplicationDocs(propertyDetail, property, requestInfo);
 		propertyDetail.setApplicationDocuments(applicationDocuments);
 		return propertyDetail;
 	}
 
-	private List<Documents> updateApplicationDocs(PropertyDetails propertyDetails, Property property,
+	private List<Document> updateApplicationDocs(PropertyDetails propertyDetails, Property property,
 			RequestInfo requestInfo) {
-		List<Documents> applicationDocuments = propertyDetails.getApplicationDocuments();
+		List<Document> applicationDocuments = propertyDetails.getApplicationDocuments();
 		if (!CollectionUtils.isEmpty(applicationDocuments)) {
 			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 			applicationDocuments.forEach(document -> {
@@ -182,7 +182,7 @@ public class EnrichmentService {
 		Address address = getAddress(property, requestInfo, gen_property_id);
 		propertyDetail.setAddress(address);
 
-		List<Documents> applicationDocuments = getApplicationDocs(propertyDetail, property, requestInfo,
+		List<Document> applicationDocuments = getApplicationDocs(propertyDetail, property, requestInfo,
 				gen_property_id);
 		propertyDetail.setApplicationDocuments(applicationDocuments);
 
@@ -198,9 +198,9 @@ public class EnrichmentService {
 		return propertyDetail;
 	}
 
-	private List<Documents> getApplicationDocs(PropertyDetails propertyDetails, Property property,
+	private List<Document> getApplicationDocs(PropertyDetails propertyDetails, Property property,
 			RequestInfo requestInfo, String gen_property_id) {
-		List<Documents> applicationDocuments = propertyDetails.getApplicationDocuments();
+		List<Document> applicationDocuments = propertyDetails.getApplicationDocuments();
 		if (!CollectionUtils.isEmpty(applicationDocuments)) {
 			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 			applicationDocuments.forEach(document -> {
@@ -286,7 +286,7 @@ public class EnrichmentService {
 		AuditDetails updateAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 		if (!CollectionUtils.isEmpty(request.getOwners())) {
 			request.getOwners().forEach(owner -> {
-				List<Documents> ownershipTransferDocuments = updateOwnershipTransferDocs(owner,
+				List<Document> ownershipTransferDocuments = updateOwnershipTransferDocs(owner,
 						requestInfo);
 				AuditDetails modifyAuditDetails = owner.getAuditDetails();
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
@@ -349,8 +349,8 @@ public class EnrichmentService {
 		return String.format("%s_%s", businessService, category.toString());
 	}
 
-	private List<Documents> updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
-		List<Documents> ownershipTransferDocuments = owner.getOwnerDetails()
+	private List<Document> updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
+		List<Document> ownershipTransferDocuments = owner.getOwnerDetails()
 				.getOwnershipTransferDocuments();
 		if (!CollectionUtils.isEmpty(ownershipTransferDocuments)) {
 			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);

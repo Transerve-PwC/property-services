@@ -33,8 +33,8 @@ public class Document {
 	@JsonProperty("id")
 	private String id;
 
-	@JsonProperty("propertyId")
-	private String propertyId;
+	@JsonProperty("referenceId")
+	private String referenceId;
 
 	@Size(max = 64)
 	@JsonProperty("tenantId")
@@ -54,6 +54,10 @@ public class Document {
 	@Size(max = 64)
 	@JsonProperty("documentUid")
 	private String documentUid;
+	
+	@Size(max = 64)
+	@JsonProperty("propertyId")
+	private String propertyId;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;

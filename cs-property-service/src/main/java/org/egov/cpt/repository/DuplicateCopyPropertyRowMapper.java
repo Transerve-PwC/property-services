@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.egov.cpt.models.Applicant;
 import org.egov.cpt.models.AuditDetails;
-import org.egov.cpt.models.Documents;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Property;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +82,7 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 		}
 
 		if (rs.getString("docId") != null && rs.getBoolean("doc_active")) {
-			Documents applicationDocument = Documents.builder()
+			Document applicationDocument = Document.builder()
 					.documentType(rs.getString("doctype"))
 					.fileStoreId(rs.getString("doc_filestoreid"))
 					.id(rs.getString("docId"))
