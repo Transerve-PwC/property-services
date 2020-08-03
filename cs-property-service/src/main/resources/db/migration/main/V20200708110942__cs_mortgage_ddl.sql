@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS cs_pt_mortgage_application;
 DROP TABLE IF EXISTS cs_pt_mortgage_applicant;
 DROP TABLE IF EXISTS cs_pt_mortgage_douments;
-DROP TABLE IF EXISTS cs_pt_mortgage_grantdetails;
+DROP TABLE IF EXISTS cs_pt_mortgage_approved_grantdetails;
 DROP TABLE IF EXISTS cs_pt_mortgage_application_audit;
 
 --> Mortgage application table
@@ -63,22 +63,24 @@ CREATE TABLE cs_pt_mortgage_douments(
     CONSTRAINT fk_cs_pt_mortgage_douments FOREIGN KEY (mortgage_id) REFERENCES cs_pt_mortgage_application (id)
 );
 
-CREATE TABLE cs_pt_mortgage_grantdetails(
+CREATE TABLE cs_pt_mortgage_approved_grantdetails(
     id 						CHARACTER VARYING(64),
-    mortgage_id 			CHARACTER VARYING(64),
+    property_id		 		CHARACTER VARYING(64),
+    owner_id 				CHARACTER VARYING(64),
     tenantid 				CHARACTER VARYING(64),
+    
     bank_name 				CHARACTER VARYING(64),
     mortgage_amount 		numeric(12,2),
     sanction_letter_number	CHARACTER VARYING(64),
     sanction_date 			bigint,
+    mortgage_end_date 		CHARACTER VARYING(64),
     
     created_by 				CHARACTER VARYING(64),
     modified_by 			CHARACTER VARYING(64),
     created_time 			bigint,
     modified_time 			bigint,
 
-    CONSTRAINT pk_cs_pt_mortgage_grantdetails PRIMARY KEY (id),
-    CONSTRAINT fk_cs_pt_mortgage_grantdetails FOREIGN KEY (mortgage_id) REFERENCES cs_pt_mortgage_application (id)
+    CONSTRAINT pk_cs_pt_mortgage_approved_grantdetails PRIMARY KEY (id)
 );
 
 --> Mortgage application table
