@@ -160,7 +160,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					OwnerDocument ownerDocument = OwnerDocument.builder().id(rs.getString("docid"))
 							.ownerDetailsId(rs.getString("docowner_details_id")).tenantId(rs.getString("doctenantid"))
 							.isActive(rs.getBoolean("docis_active")).documentType(rs.getString("document_type"))
-							.fileStoreId(rs.getString("fileStore_id"))
+							.fileStoreId(rs.getString("file_store_id"))
 							.auditDetails(docAuditdetails).build();
 					owner.getOwnerDetails().addOwnerDocumentsItem(ownerDocument);
 				}

@@ -1,5 +1,6 @@
 package org.egov.ps.service;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -187,7 +188,7 @@ public class EnrichmentService {
 
 	private List<OwnerDocument> updateOwnerDocs(PropertyDetails propertyDetail, Property property,
 			RequestInfo requestInfo) {
-		List<OwnerDocument> ownerDocs = new LinkedList<>();
+		List<OwnerDocument> ownerDocs = new ArrayList<>();
 		 propertyDetail.getOwners().forEach(owner -> {
 			 List<OwnerDocument> ownerDocuments = owner.getOwnerDetails().getOwnerDocuments();
 				if (!CollectionUtils.isEmpty(ownerDocuments)) {
