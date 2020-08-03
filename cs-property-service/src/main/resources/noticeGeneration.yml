@@ -49,11 +49,13 @@ serviceMaps:
       
         
       
-    - query: INSERT INTO cs_pt_notice_douments (id, tenantid, documenttype, filestoreid, notice_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_documents_v1 (id,reference_id, tenantid, document_type, filestore_id, property_id, is_active, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: NoticeApplications.*.applicationDocuments.*
       jsonMaps:
 
       - jsonPath: $.NoticeApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.refernceId
       
       - jsonPath: $.NoticeApplications.*.applicationDocuments.*.tenantId 
 
@@ -61,7 +63,7 @@ serviceMaps:
       
       - jsonPath: $.NoticeApplications.*.applicationDocuments.*.fileStoreId 
 
-      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.applicationId 
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.propertyId 
       
       - jsonPath: $.NoticeApplications.*.applicationDocuments.*.active 
       
@@ -115,38 +117,40 @@ serviceMaps:
     
         
       
-    - query: INSERT INTO cs_pt_property_images_document (id, tenantid, documenttype, filestoreid, property_images_application_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, modified_by =?, modified_time =?;
-      basePath: PropertyImagesApplications.*.applicationDocuments.*
+    - query: INSERT INTO cs_pt_documents_v1 (id,reference_id, tenantid, document_type, filestore_id, property_id, is_active, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, filestore_id =?, modified_by =?, modified_date =?;
+      basePath: NoticeApplications.*.applicationDocuments.*
       jsonMaps:
 
-      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.id
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.id
       
-      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.tenantId 
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.referenceId
+      
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.tenantId 
 
-      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.documentType 
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.documentType 
       
-      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.fileStoreId 
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.fileStoreId 
 
-      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.applicationId 
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.propertyId 
       
-      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.active 
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.active 
       
-      - jsonPath: $.PropertyImagesApplications.*.auditDetails.createdBy
+      - jsonPath: $.NoticeApplications.*.auditDetails.createdBy
 
-      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedBy 
+      - jsonPath: $.NoticeApplications.*.auditDetails.lastModifiedBy 
       
-      - jsonPath: $.PropertyImagesApplications.*.auditDetails.createdTime
+      - jsonPath: $.NoticeApplications.*.auditDetails.createdTime
 
-      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedTime
+      - jsonPath: $.NoticeApplications.*.auditDetails.lastModifiedTime
       
-      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.active 
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.active 
       
-      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.documentType 
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.documentType 
       
-      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.fileStoreId 
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.fileStoreId 
 
-      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedBy 
+      - jsonPath: $.NoticeApplications.*.auditDetails.lastModifiedBy 
       
-      - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedTime  
+      - jsonPath: $.NoticeApplications.*.auditDetails.lastModifiedTime  
      
       

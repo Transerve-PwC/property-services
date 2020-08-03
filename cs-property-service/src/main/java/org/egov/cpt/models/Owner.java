@@ -72,5 +72,5 @@ public class Owner {
 
 	@Valid
     @JsonProperty("wfDocuments")
-	private List<OwnershipTransferDocument> wfdocuments;
+	private List<Documents> wfdocuments;
 }

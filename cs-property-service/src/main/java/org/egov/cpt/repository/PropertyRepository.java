@@ -79,6 +79,8 @@ public class PropertyRepository {
 
 		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
+		log.info("query:"+query);
+		log.info("preparedStmtList:"+preparedStmtList);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, rowMapper);
 	}
 

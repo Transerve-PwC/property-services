@@ -8,8 +8,7 @@ import java.util.List;
 
 import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
-import org.egov.cpt.models.Document;
-import org.egov.cpt.models.DuplicateCopyDocument;
+import org.egov.cpt.models.Documents;
 import org.egov.cpt.models.MortgageApprovedGrantDetails;
 import org.egov.cpt.models.NoticeGeneration;
 import org.egov.cpt.models.Owner;
@@ -17,7 +16,6 @@ import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.PropertyImages;
-import org.egov.cpt.models.PropertyImagesDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -91,10 +89,11 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					.createdTime(rs.getLong("dcreated_date")).lastModifiedBy(rs.getString("dmodified_by"))
 					.lastModifiedTime(rs.getLong("dmodified_date")).build();
 
-			Document applicationDocument = Document.builder().id(rs.getString("docid"))
+			Documents applicationDocument = Documents.builder().id(rs.getString("docid"))
+					.referenceId(rs.getString("docreference_id"))
 					.propertyId(rs.getString("docproperty_id")).tenantId(rs.getString("doctenantid"))
 					.active(rs.getBoolean("docis_active")).documentType(rs.getString("document_type"))
-					.fileStoreId(rs.getString("fileStore_id")).documentUid(rs.getString("document_uid"))
+					.fileStoreId(rs.getString("fileStore_id"))
 					.auditDetails(docAuditdetails).build();
 			property.getPropertyDetails().addApplicationDocumentsItem(applicationDocument);
 		}
@@ -145,23 +144,32 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 			property.addPropertyImagesItem(propertyImages);
 
-			if (rs.getString("pidocId") != null && rs.getBoolean("pidoc_active")) {
-				PropertyImagesDocument applicationDocument = PropertyImagesDocument.builder()
-						.documentType(rs.getString("pidoctype")).fileStoreId(rs.getString("pidoc_filestoreid"))
-						.id(rs.getString("pidocId")).tenantId(rs.getString("pidoctenantid"))
-						.active(rs.getBoolean("pidoc_active")).applicationId(rs.getString("pidoc_piid"))
+			if (rs.getString("pidocid") != null && rs.getBoolean("pidoc_active")) {
+				Documents applicationDocument = Documents.builder()
+						.documentType(rs.getString("pidoctype"))
+						.fileStoreId(rs.getString("pidoc_filestoreid"))
+						.id(rs.getString("pidocId"))
+						.tenantId(rs.getString("pidoctenantid"))
+						.active(rs.getBoolean("pidoc_active"))
+						.referenceId(rs.getString("pidoc_referenceid"))
+						.propertyId(rs.getString("pidoc_propertyid"))
 						.auditDetails(piAuditDetails).build();
+				
+				for (PropertyImages propertyImage: property.getPropertyImages()){
+					if(propertyImage.getId().equalsIgnoreCase(rs.getString("pidocid"))){
+						propertyImage.addApplicationDocumentsItem(applicationDocument);
+					}
+				}
 
-				PropertyImages propertyImages1 = property.getPropertyImages().stream().filter(p -> {
+				/*PropertyImages propertyImages1 = property.getPropertyImages().stream().filter(p -> {
 					try {
-						return p.getId().equalsIgnoreCase(rs.getString("pidoc_piid"));
+						return p.getId().equalsIgnoreCase(rs.getString("pidocid"));
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					return false;
 				}).findFirst().get();
-				propertyImages1.addApplicationDocumentsItem(applicationDocument);
+				propertyImages1.addApplicationDocumentsItem(applicationDocument);*/
 
 			}
 		}
@@ -192,24 +200,31 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			property.addNoticeItem(noticeGeneration);
 
 			if (rs.getString("ngdoc_id") != null && rs.getBoolean("ngdoc_active")) {
-				DuplicateCopyDocument applicationDocument = DuplicateCopyDocument.builder()
+				Documents applicationDocument = Documents.builder()
 						.documentType(rs.getString("ngdoc_type"))
 						.fileStoreId(rs.getString("ngdoc_filestoreid"))
 						.id(rs.getString("ngdoc_id"))
 						.tenantId(rs.getString("ngdoc_tenantid"))
 						.active(rs.getBoolean("ngdoc_active"))
-						.applicationId(rs.getString("ngdoc_ngid"))
+						.referenceId(rs.getString("ngdoc_referenceid"))
+						.propertyId(rs.getString("ngdoc_propertyid"))
 						.auditDetails(piAuditDetails).build();
+				
+				for (NoticeGeneration notice: property.getNotices()){
+					if(notice.getId().equalsIgnoreCase(rs.getString("ngdoc_id"))){
+						notice.addApplicationDocumentsItem(applicationDocument);
+					}
+				}
 
-				NoticeGeneration notice = property.getNotices().stream().filter(p -> {
+				/*NoticeGeneration notice = property.getNotices().stream().filter(p -> {
 					try {
-						return p.getId().equalsIgnoreCase(rs.getString("ngdoc_ngid"));
+						return p.getId().equalsIgnoreCase(rs.getString("ngdoc_id"));
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
 					return false;
 				}).findFirst().get();
-				notice.addApplicationDocumentsItem(applicationDocument);
+				notice.addApplicationDocumentsItem(applicationDocument);*/
 
 			}
 		}

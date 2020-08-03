@@ -27,7 +27,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class OwnershipTransferDocument {
+public class Documents {
 
 	@Size(max = 64)
 	@JsonProperty("id")

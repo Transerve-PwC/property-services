@@ -64,16 +64,16 @@ public class PropertyDetails {
 
 	@Valid
 	@JsonProperty("applicationDocuments")
-	private List<Document> applicationDocuments;
+	private List<Documents> applicationDocuments;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
-	public PropertyDetails addApplicationDocumentsItem(Document applicationDocumentsItem) {
+	public PropertyDetails addApplicationDocumentsItem(Documents applicationDocumentsItem) {
 		if (this.applicationDocuments == null) {
 			this.applicationDocuments = new ArrayList<>();
 		}
-		for (Document applicationDocument : applicationDocuments) {
+		for (Documents applicationDocument : applicationDocuments) {
 			if (applicationDocument.getId().equalsIgnoreCase(applicationDocumentsItem.getId())) {
 				return this;
 			}

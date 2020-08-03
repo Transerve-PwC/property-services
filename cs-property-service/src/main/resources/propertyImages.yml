@@ -31,11 +31,13 @@ serviceMaps:
       
         
       
-    - query: INSERT INTO cs_pt_property_images_document (id, tenantid, documenttype, filestoreid, property_images_application_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_documents_v1 (id, reference_id, tenantid, document_type, filestore_id, property_id, is_active, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: PropertyImagesApplications.*.applicationDocuments.*
       jsonMaps:
 
       - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.referenceId
       
       - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.tenantId 
 
@@ -43,7 +45,7 @@ serviceMaps:
       
       - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.fileStoreId 
 
-      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.applicationId 
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.propertyId 
       
       - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.active 
       
@@ -82,11 +84,13 @@ serviceMaps:
     
         
       
-    - query: INSERT INTO cs_pt_property_images_document (id, tenantid, documenttype, filestoreid, property_images_application_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, modified_by =?, modified_time =?;
+    - query: INSERT INTO cs_pt_documents_v1 (id,reference_id, tenantid, document_type, filestore_id, property_id, is_active, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, filestore_id =?, modified_by =?, modified_date =?;
       basePath: PropertyImagesApplications.*.applicationDocuments.*
       jsonMaps:
 
       - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.referenceId
       
       - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.tenantId 
 
@@ -94,7 +98,7 @@ serviceMaps:
       
       - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.fileStoreId 
 
-      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.applicationId 
+      - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.propertyId 
       
       - jsonPath: $.PropertyImagesApplications.*.applicationDocuments.*.active 
       
