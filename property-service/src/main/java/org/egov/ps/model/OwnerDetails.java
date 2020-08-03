@@ -1,5 +1,6 @@
 package org.egov.ps.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.ps.web.contracts.AuditDetails;
@@ -77,5 +78,19 @@ public class OwnerDetails {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+
+	public OwnerDetails addOwnerDocumentsItem(OwnerDocument ownerDocumentItem) {
+		if (this.ownerDocuments == null) {
+			this.ownerDocuments = new ArrayList<>();
+		}
+		for (OwnerDocument ownerDocument : ownerDocuments) {
+			if (ownerDocument.getId().equalsIgnoreCase(ownerDocumentItem.getId())) {
+				return this;
+			}
+		}
+		this.ownerDocuments.add(ownerDocumentItem);
+		return this; 
+		
+	}
 
 }
