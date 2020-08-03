@@ -31,8 +31,8 @@ public class PropertyImagesQueryBuilder {
 			
 			+ " address.pincode, address.area,"
 
-			+ " doc.id as docId, doc.tenantId as doctenantid, doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
-			+ " doc.property_images_application_id as doc_piid , doc.active as doc_active"
+			+ " doc.id as docId,doc.reference_id as doc_referenceId, doc.tenantId as doctenantid, doc.document_type as doctype , doc.filestore_id as doc_filestoreid,"
+			+ " doc.property_id as doc_propertyId , doc.is_active as doc_active"
 
 			+ " FROM cs_pt_property_images_application pi " + INNER_JOIN 
 			+ " cs_pt_property_v1 pt on pi.propertyid=pt.id " + INNER_JOIN 

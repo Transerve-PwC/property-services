@@ -17,14 +17,13 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
-import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.NoticeGeneration;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
-import org.egov.cpt.models.OwnershipTransferDocument;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyDetails;
@@ -162,6 +161,7 @@ public class EnrichmentService {
 					String gen_doc_id = UUID.randomUUID().toString();
 					document.setId(gen_doc_id);
 					document.setPropertyId(property.getId());
+					document.setReferenceId(property.getId());
 					document.setTenantId(property.getTenantId());
 				}
 				document.setAuditDetails(docAuditDetails);
@@ -207,6 +207,7 @@ public class EnrichmentService {
 				String gen_doc_id = UUID.randomUUID().toString();
 				document.setId(gen_doc_id);
 				document.setPropertyId(gen_property_id);
+				document.setReferenceId(gen_property_id);
 				document.setTenantId(property.getTenantId());
 				document.setAuditDetails(docAuditDetails);
 			});
@@ -285,7 +286,7 @@ public class EnrichmentService {
 		AuditDetails updateAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 		if (!CollectionUtils.isEmpty(request.getOwners())) {
 			request.getOwners().forEach(owner -> {
-				List<OwnershipTransferDocument> ownershipTransferDocuments = updateOwnershipTransferDocs(owner,
+				List<Document> ownershipTransferDocuments = updateOwnershipTransferDocs(owner,
 						requestInfo);
 				AuditDetails modifyAuditDetails = owner.getAuditDetails();
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
@@ -348,8 +349,8 @@ public class EnrichmentService {
 		return String.format("%s_%s", businessService, category.toString());
 	}
 
-	private List<OwnershipTransferDocument> updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
-		List<OwnershipTransferDocument> ownershipTransferDocuments = owner.getOwnerDetails()
+	private List<Document> updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
+		List<Document> ownershipTransferDocuments = owner.getOwnerDetails()
 				.getOwnershipTransferDocuments();
 		if (!CollectionUtils.isEmpty(ownershipTransferDocuments)) {
 			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
@@ -357,8 +358,9 @@ public class EnrichmentService {
 				if (document.getId() == null) {
 					String gen_doc_id = UUID.randomUUID().toString();
 					document.setId(gen_doc_id);
-					document.setOwnerId(owner.getId());
+					document.setReferenceId(owner.getId());
 					document.setTenantId(owner.getTenantId());
+					document.setPropertyId(owner.getProperty().getId());
 				}
 				document.setAuditDetails(docAuditDetails);
 			});
@@ -476,11 +478,10 @@ public class EnrichmentService {
 									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 							document.setId(UUID.randomUUID().toString());
 							document.setActive(true);
-							document.setApplicationId(
-									propertyImagesRequest.getPropertyImagesApplications().get(0).getId());
+							document.setReferenceId(propertyImagesRequest.getPropertyImagesApplications().get(0).getId());
+							document.setPropertyId(propertyImagesRequest.getPropertyImagesApplications().get(0).getProperty().getId());
 							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(
-									propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId());
+							document.setTenantId(propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId());
 						}
 					});
 
@@ -577,11 +578,10 @@ public class EnrichmentService {
 									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 							document.setId(UUID.randomUUID().toString());
 							document.setActive(true);
-							document.setApplicationId(
-									duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId());
+							document.setPropertyId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
+							document.setReferenceId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId());
 							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(
-									duplicateCopyRequest.getDuplicateCopyApplications().get(0).getTenantId());
+							document.setTenantId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getTenantId());
 						}
 
 //						demand generation
@@ -616,8 +616,8 @@ public class EnrichmentService {
 									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 							document.setId(UUID.randomUUID().toString());
 							document.setActive(true);
-							document.setApplicationId(
-									propertyImagesRequest.getPropertyImagesApplications().get(0).getId());
+							document.setReferenceId(propertyImagesRequest.getPropertyImagesApplications().get(0).getId());
+							document.setPropertyId(propertyImagesRequest.getPropertyImagesApplications().get(0).getProperty().getId());
 							document.setAuditDetails(documentAuditDetails);
 							document.setTenantId(
 									propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId());
@@ -797,7 +797,8 @@ public class EnrichmentService {
 									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 							document.setId(UUID.randomUUID().toString());
 							document.setActive(true);
-							document.setApplicationId(mortgageRequest.getMortgageApplications().get(0).getId());
+							document.setReferenceId(mortgageRequest.getMortgageApplications().get(0).getId());
+							document.setPropertyId(mortgageRequest.getMortgageApplications().get(0).getProperty().getId());
 							document.setAuditDetails(documentAuditDetails);
 							document.setTenantId(mortgageRequest.getMortgageApplications().get(0).getTenantId());
 						}
@@ -887,7 +888,8 @@ public class EnrichmentService {
 									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 							document.setId(UUID.randomUUID().toString());
 							document.setActive(true);
-							document.setApplicationId(noticeGenerationRequest.getNoticeApplications().get(0).getId());
+							document.setReferenceId(noticeGenerationRequest.getNoticeApplications().get(0).getId());
+							document.setPropertyId(noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
 							document.setAuditDetails(documentAuditDetails);
 							document.setTenantId(noticeGenerationRequest.getNoticeApplications().get(0).getTenantId());
 						}

@@ -67,7 +67,7 @@ public class DuplicateCopy {
 
 	@Valid
 	@JsonProperty("applicationDocuments")
-	private List<DuplicateCopyDocument> applicationDocuments = null;
+	private List<Document> applicationDocuments = null;
 
 	@Valid
 	@JsonProperty("applicant")
@@ -78,12 +78,12 @@ public class DuplicateCopy {
 	
 	@Valid
     @JsonProperty("wfDocuments")
-	private List<DuplicateCopyDocument> wfdocuments;
+	private List<Document> wfdocuments;
 
 	@JsonProperty("calculation")
 	Calculation calculation;
 
-	public DuplicateCopy addApplicationDocumentsItem(DuplicateCopyDocument applicationDocumentsItem) {
+	public DuplicateCopy addApplicationDocumentsItem(Document applicationDocumentsItem) {
 		if (this.applicationDocuments == null) {
 			this.applicationDocuments = new ArrayList<>();
 		}

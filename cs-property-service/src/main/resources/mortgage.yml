@@ -64,11 +64,13 @@ serviceMaps:
       
       
       
-    - query: INSERT INTO cs_pt_mortgage_douments (id, tenantid, documenttype, filestoreid, mortgage_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_documents_v1 (id,reference_id,tenantid, document_type, filestore_id, property_id, is_active, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: MortgageApplications.*.applicationDocuments.*
       jsonMaps:
 
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.referenceId
       
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.tenantId 
 
@@ -76,7 +78,7 @@ serviceMaps:
       
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.fileStoreId 
 
-      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.applicationId 
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.propertyId 
       
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.active 
       
@@ -169,11 +171,13 @@ serviceMaps:
       - jsonPath: $.MortgageApplications.*.applicant.*.id
         
       
-    - query: INSERT INTO cs_pt_mortgage_douments (id, tenantid, documenttype, filestoreid, mortgage_id, active, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, modified_by =?, modified_time =?;
+    - query: INSERT INTO cs_pt_documents_v1 (id,reference_id, tenantid, document_type, filestore_id, property_id, is_active, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, filestore_id =?, modified_by =?, modified_date =?;
       basePath: MortgageApplications.*.applicationDocuments.*
       jsonMaps:
 
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.referenceId
       
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.tenantId 
 
@@ -181,7 +185,7 @@ serviceMaps:
       
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.fileStoreId 
 
-      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.applicationId 
+      - jsonPath: $.MortgageApplications.*.applicationDocuments.*.propertyId 
       
       - jsonPath: $.MortgageApplications.*.applicationDocuments.*.active 
       

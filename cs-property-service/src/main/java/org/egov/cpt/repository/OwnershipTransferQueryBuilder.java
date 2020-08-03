@@ -43,13 +43,13 @@ public class OwnershipTransferQueryBuilder {
 			+ " od.monthly_rent, od.revision_period, od.revision_percentage, od.father_or_husband, od.relation,"
 			+ " od.relation_with_deceased_allottee, od.date_of_death_allottee, od.application_number, od.application_type, od.permanent,"
 
-			+ " doc.id as docid, doc.owner_id as docowner_id, doc.tenantid as doctenantid,"
-			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id, doc.document_uid"
+			+ " doc.id as docid, doc.reference_id as doc_referenceId, doc.tenantid as doctenantid,"
+			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id,doc.property_id as doc_propertyId"
 
 			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_address_v1 address ON pt.id=address.property_id "
 			+ LEFT_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
 			+ " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
-			+ " cs_pt_ot_documents_v1 doc ON ownership.id=doc.owner_id ";
+			+ " cs_pt_documents_v1 doc ON ownership.id=doc.reference_id ";
 
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {

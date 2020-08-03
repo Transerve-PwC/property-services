@@ -46,15 +46,15 @@ public class PropertyQueryBuilder {
 			+ " address.tenantid as atenantid, address.colony, address.area as addressArea, address.district,"
 			+ " address.state, address.country, address.pincode, address.landmark,"
 
-			+ " doc.id as docid, doc.property_id as docproperty_id, doc.tenantid as doctenantid,"
-			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id, doc.document_uid,"
+			+ " doc.id as docid, doc.property_id as docproperty_id,doc.reference_id as docreference_id, doc.tenantid as doctenantid,"
+			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id,"
 			+ " doc.created_by as dcreated_by, doc.created_date as dcreated_date, doc.modified_by as dmodified_by, doc.modified_date as dmodified_date,"
 
 			+ " pi.id as piid, pi.propertyid as pipropertyid, pi.tenantid as pitenantid, pi.application_number as piapp_number, pi.description as pidescription,"
 			+ " pi.created_by as piCreatedBy, pi.created_time as piCreatedTime, pi.modified_by as piModifiedBy, pi.modified_time as piModifiedTime,"
 
-			+ " pidoc.id as pidocId, pidoc.tenantId as pidoctenantid, pidoc.documenttype as pidoctype , pidoc.filestoreid as pidoc_filestoreid,"
-			+ " pidoc.property_images_application_id as pidoc_piid , pidoc.active as pidoc_active,"
+			+ " pidoc.id as pidocid,pidoc.reference_id as pidoc_referenceid, pidoc.tenantId as pidoctenantid, pidoc.document_type as pidoctype , pidoc.filestore_id as pidoc_filestoreid,"
+			+ " pidoc.property_id as pidoc_propertyid , pidoc.is_active as pidoc_active,"
 			
 			+ " ng.id as ngid, ng.propertyid as ng_propertyid, ng.tenantid as ngtenantid,ng.memo_number as ng_memoNumber,"
 			+ " ng.memo_date as ng_memoDate,ng.notice_type as ng_noticeType,ng.guardian as ng_guardian,ng.relationship as ng_relationship,"
@@ -62,8 +62,8 @@ public class PropertyQueryBuilder {
 			+ " ng.demand_notice_to as ng_demandNoticeTo,ng.recovery_type as ng_recoveryType, ng.amount as ng_amount,"
 			+ " ng.modified_time as ngModifiedTime,ng.modified_by as ngModifiedBy,ng.created_by as ngCreatedBy,ng.created_time as ngCreatedTime,"
 			
-			+ " ngdoc.id as ngdoc_id, ngdoc.tenantId as ngdoc_tenantid,ngdoc.documenttype as ngdoc_type , ngdoc.filestoreid as ngdoc_filestoreid,"
-			+ " ngdoc.notice_id as ngdoc_ngid , ngdoc.active as ngdoc_active,"
+			+ " ngdoc.id as ngdoc_id,ngdoc.reference_id as ngdoc_referenceid, ngdoc.tenantId as ngdoc_tenantid,ngdoc.document_type as ngdoc_type , ngdoc.filestore_id as ngdoc_filestoreid,"
+			+ " ngdoc.property_id as ngdoc_propertyid , ngdoc.is_active as ngdoc_active,"
 			
 			+ " gd.id as gd_id, gd.property_id as gd_property_id,"
 			+ " gd.bank_name as gd_bank_name, gd.mortgage_amount as gd_mortgage_amount,"
@@ -74,11 +74,11 @@ public class PropertyQueryBuilder {
 			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
 			+ " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
-			+ " cs_pt_application_documents_v1 doc ON pt.id=doc.property_id " + LEFT_JOIN
+			+ " cs_pt_documents_v1 doc ON pt.id=doc.reference_id " + LEFT_JOIN
 			+ " cs_pt_property_images_application pi ON pi.propertyid = pt.id " + LEFT_JOIN
-			+ " cs_pt_property_images_document pidoc ON pidoc.property_images_application_id =  pi.id "+LEFT_JOIN
+			+ " cs_pt_documents_v1 pidoc ON pidoc.reference_id =  pi.id "+LEFT_JOIN
 			+ " cs_pt_notice_generation_application ng ON ng.propertyid = pt.id " + LEFT_JOIN
-			+ " cs_pt_notice_douments ngdoc ON ngdoc.notice_id =  ng.id "+ LEFT_JOIN
+			+ " cs_pt_documents_v1 ngdoc ON ngdoc.reference_id =  ng.id "+ LEFT_JOIN
 			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id "
 	;
 

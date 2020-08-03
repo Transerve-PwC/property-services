@@ -65,7 +65,7 @@ public class Mortgage {
 
 	@Valid
 	@JsonProperty("applicationDocuments")
-	private List<DuplicateCopyDocument> applicationDocuments = null;
+	private List<Document> applicationDocuments = null;
 
 	@Valid
 	@JsonProperty("applicant")
@@ -75,11 +75,11 @@ public class Mortgage {
 	@JsonProperty("mortgageApprovedGrantDetails")
 	private List<MortgageApprovedGrantDetails> mortgageApprovedGrantDetails;
 
-	public Mortgage addApplicationDocumentsItem(DuplicateCopyDocument newApplicationDocumentsItem) {
+	public Mortgage addApplicationDocumentsItem(Document newApplicationDocumentsItem) {
 		if (this.applicationDocuments == null) {
 			this.applicationDocuments = new ArrayList<>();
 		}
-		for (DuplicateCopyDocument applicationDocument : applicationDocuments) {
+		for (Document applicationDocument : applicationDocuments) {
 			if (applicationDocument.getId().equalsIgnoreCase(newApplicationDocumentsItem.getId())) {
 				return this;
 			}

@@ -34,14 +34,14 @@ public class DuplicateCopyQueryBuilder {
 			+ " ap.id as aid, ap.application_id as app_id,ap.tenantid as aptenantid,"
 			+ " ap.name,ap.email,ap.mobileno,ap.guardian,ap.relationship,ap.aadhaar_number as adhaarnumber,"
 
-			+ " doc.id as docId, doc.tenantId as doctenantid,doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
-			+ " doc.application_id as doc_applid , doc.active as doc_active"
+			+ " doc.id as docId,doc.reference_id as doc_referenceid, doc.tenantId as doctenantid,doc.document_type as doctype , doc.fileStore_id as doc_filestoreid,"
+			+ " doc.property_id as doc_propertyid , doc.is_active as doc_active"
 
 			+ " FROM cs_pt_duplicate_ownership_application dca " + INNER_JOIN
 			+ " cs_pt_property_v1 pt on dca.property_id=pt.id " + INNER_JOIN
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
 			+ " cs_pt_duplicatecopy_applicant ap ON dca.id =ap.application_id " + LEFT_JOIN
-			+ " cs_pt_duplicatecopy_document doc ON doc.application_id =  dca.id";
+			+ " cs_pt_documents_v1 doc ON doc.reference_id =  dca.id";
 
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {

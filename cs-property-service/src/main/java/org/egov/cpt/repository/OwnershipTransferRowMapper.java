@@ -10,7 +10,7 @@ import java.util.Map;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
-import org.egov.cpt.models.OwnershipTransferDocument;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Property;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -79,11 +79,14 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 					.createdTime(rs.getLong("ocreated_date")).lastModifiedBy(rs.getString("omodified_by"))
 					.lastModifiedTime(rs.getLong("omodified_date")).build();
 
-			OwnershipTransferDocument ownershipTransferDocument = OwnershipTransferDocument.builder()
-					.id(rs.getString("docid")).ownerId(rs.getString("docowner_id"))
+			Document ownershipTransferDocument = Document.builder()
+					.id(rs.getString("docid"))
+					.referenceId(rs.getString("doc_referenceId"))
 					.tenantId(rs.getString("doctenantid")).active(rs.getBoolean("docis_active"))
 					.documentType(rs.getString("document_type")).fileStoreId(rs.getString("fileStore_id"))
-					.documentUid(rs.getString("document_uid")).auditDetails(auditdetails).build();
+					.auditDetails(auditdetails)
+					.propertyId(rs.getString("doc_propertyId"))
+					.build();
 			owner.getOwnerDetails().addownershipTransferDocumentsItem(ownershipTransferDocument);
 		}
 	}

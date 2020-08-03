@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.cpt.models.AuditDetails;
-import org.egov.cpt.models.DuplicateCopyDocument;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.MortgageApplicant;
 import org.egov.cpt.models.MortgageApprovedGrantDetails;
@@ -96,10 +96,12 @@ public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
 		}
 
 		if (rs.getString("docId") != null && rs.getBoolean("doc_active")) {
-			DuplicateCopyDocument applicationDocument = DuplicateCopyDocument.builder()
+			Document applicationDocument = Document.builder()
 					.documentType(rs.getString("doctype")).fileStoreId(rs.getString("doc_filestoreid"))
 					.id(rs.getString("docId")).tenantId(rs.getString("doctenantid")).active(rs.getBoolean("doc_active"))
-					.applicationId(rs.getString("doc_mgid")).auditDetails(auditDetails).build();
+					.referenceId(rs.getString("doc_referenceid"))
+					.propertyId(rs.getString("doc_propertyid"))
+					.auditDetails(auditDetails).build();
 			currentapplication.addApplicationDocumentsItem(applicationDocument);
 		}
 

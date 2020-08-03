@@ -40,14 +40,14 @@ public class MortgageQueryBuilder {
 			+ " ap.id as aid, ap.mortgage_id as mg_id,ap.tenantid as aptenantid,"
 			+ " ap.name,ap.email,ap.mobileno,ap.guardian,ap.relationship,ap.aadhaar_number as adhaarnumber,"
 
-			+ " doc.id as docId, doc.tenantId as doctenantid,doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
-			+ " doc.mortgage_id as doc_mgid , doc.active as doc_active"
+			+ " doc.id as docId,doc.reference_id as doc_referenceid, doc.tenantId as doctenantid,doc.document_type as doctype , doc.filestore_id as doc_filestoreid,"
+			+ " doc.property_id as doc_propertyid, doc.is_active as doc_active"
 
 			+ " FROM cs_pt_mortgage_application mg " + INNER_JOIN + " cs_pt_property_v1 pt on mg.propertyid=pt.id "
 			+ INNER_JOIN + " cs_pt_mortgage_applicant ap ON mg.id =ap.mortgage_id " + LEFT_JOIN
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
 			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id " + LEFT_JOIN
-			+ " cs_pt_mortgage_douments doc ON doc.mortgage_id =  mg.id";
+			+ " cs_pt_documents_v1 doc ON doc.reference_id =  mg.id";
 
 	private String addPaginationWrapper(String query,  Map<String, Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {

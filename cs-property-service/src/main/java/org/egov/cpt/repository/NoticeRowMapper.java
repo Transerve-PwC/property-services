@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.cpt.models.AuditDetails;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopyDocument;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.MortgageApplicant;
@@ -74,10 +75,16 @@ public class NoticeRowMapper implements ResultSetExtractor<List<NoticeGeneration
 				.lastModifiedTime(rs.getLong("created_time")).build();
 		
 		if (rs.getString("docId") != null && rs.getBoolean("doc_active")) {
-			DuplicateCopyDocument applicationDocument = DuplicateCopyDocument.builder()
-					.documentType(rs.getString("doctype")).fileStoreId(rs.getString("doc_filestoreid"))
-					.id(rs.getString("docId")).tenantId(rs.getString("doctenantid")).active(rs.getBoolean("doc_active"))
-					.applicationId(rs.getString("doc_ngid")).auditDetails(auditDetails).build();
+			Document applicationDocument = Document.builder()
+					.documentType(rs.getString("doctype"))
+					.fileStoreId(rs.getString("doc_filestoreid"))
+					.id(rs.getString("docId"))
+				    .propertyId(rs.getString("doc_propertyid"))
+					.tenantId(rs.getString("doctenantid"))
+					.active(rs.getBoolean("doc_active"))
+					.referenceId(rs.getString("doc_referenceid"))
+					.auditDetails(auditDetails)
+					.build();
 			currentapplication.addApplicationDocumentsItem(applicationDocument);
 		}
 

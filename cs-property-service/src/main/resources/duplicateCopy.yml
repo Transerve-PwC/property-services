@@ -64,11 +64,13 @@ serviceMaps:
       
     
          
-    - query: INSERT INTO cs_pt_duplicatecopy_document (id, tenantid, documenttype, filestoreid, application_id, active, createdBy, lastModifiedBy, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_documents_v1 (id,reference_id, tenantid, document_type, fileStore_id, application_id, is_active, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: DuplicateCopyApplications.*.applicationDocuments.*
       jsonMaps:
 
       - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.referenceId
       
       - jsonPath: $.DuplicateCopyApplications.*.tenantId 
 
@@ -150,11 +152,13 @@ serviceMaps:
       - jsonPath: $.DuplicateCopyApplications.*.applicant.*.id
         
       
-    - query: INSERT INTO cs_pt_duplicatecopy_document (id, tenantid, documenttype, filestoreid, application_id, active, createdBy, lastModifiedBy, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?, lastModifiedBy =?, modified_time =?;
+    - query: INSERT INTO cs_pt_documents_v1 (id,reference_id, tenantid, document_type, filestore_id, property_id, is_active, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, filestore_id =?, modified_by =?, modified_date =?;
       basePath: DuplicateCopyApplications.*.applicationDocuments.*
       jsonMaps:
 
       - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.id
+      
+      - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.referenceId
       
       - jsonPath: $.DuplicateCopyApplications.*.applicationDocuments.*.tenantId 
 

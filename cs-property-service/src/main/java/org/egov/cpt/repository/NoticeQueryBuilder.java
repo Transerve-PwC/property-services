@@ -34,12 +34,12 @@ public class NoticeQueryBuilder {
 
 			+ " pt.id as pid, pt.transit_number, pt.colony,"
 
-			+ " doc.id as docId, doc.tenantId as doctenantid,doc.documenttype as doctype , doc.filestoreid as doc_filestoreid,"
-			+ " doc.notice_id as doc_ngid , doc.active as doc_active"
+			+ " doc.id as docId,doc.reference_id as doc_referenceId, doc.tenantId as doctenantid,doc.document_type as doctype , doc.filestore_id as doc_filestoreid,"
+			+ " doc.property_id as doc_propertyid , doc.is_active as doc_active"
 
 			+ " FROM cs_pt_notice_generation_application ng " + INNER_JOIN + " cs_pt_property_v1 pt on ng.propertyid=pt.id "
 			+ LEFT_JOIN
-			+ " cs_pt_notice_douments doc ON doc.notice_id =  ng.id";
+			+ " cs_pt_documents_v1 doc ON doc.reference_id =  ng.id";
 
 	private String addPaginationWrapper(String query,  Map<String, Object> preparedStmtList,
 			NoticeSearchCriteria criteria) {

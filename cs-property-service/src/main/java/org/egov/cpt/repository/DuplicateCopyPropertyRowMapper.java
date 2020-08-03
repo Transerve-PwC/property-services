@@ -9,8 +9,8 @@ import java.util.Map;
 
 import org.egov.cpt.models.Applicant;
 import org.egov.cpt.models.AuditDetails;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
-import org.egov.cpt.models.DuplicateCopyDocument;
 import org.egov.cpt.models.Property;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -82,10 +82,15 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 		}
 
 		if (rs.getString("docId") != null && rs.getBoolean("doc_active")) {
-			DuplicateCopyDocument applicationDocument = DuplicateCopyDocument.builder()
-					.documentType(rs.getString("doctype")).fileStoreId(rs.getString("doc_filestoreid"))
-					.id(rs.getString("docId")).tenantId(rs.getString("doctenantid")).active(rs.getBoolean("doc_active"))
-					.auditDetails(auditDetails).applicationId(rs.getString("doc_applid")).build();
+			Document applicationDocument = Document.builder()
+					.documentType(rs.getString("doctype"))
+					.fileStoreId(rs.getString("doc_filestoreid"))
+					.id(rs.getString("docId"))
+					.referenceId(rs.getString("doc_referenceid"))
+					.tenantId(rs.getString("doctenantid"))
+					.active(rs.getBoolean("doc_active"))
+					.auditDetails(auditDetails)
+					.propertyId(rs.getString("doc_propertyid")).build();
 			currentapplication.addApplicationDocumentsItem(applicationDocument);
 		}
 

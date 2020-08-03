@@ -79,16 +79,16 @@ public class NoticeGeneration {
 	
 	@Valid
 	@JsonProperty("applicationDocuments")
-	private List<DuplicateCopyDocument> applicationDocuments = null;
+	private List<Document> applicationDocuments = null;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 	
-	public NoticeGeneration addApplicationDocumentsItem(DuplicateCopyDocument applicationDocumentsItem) {
+	public NoticeGeneration addApplicationDocumentsItem(Document applicationDocumentsItem) {
 		if (this.applicationDocuments == null) {
 			this.applicationDocuments = new ArrayList<>();
 		}
-		for (DuplicateCopyDocument applicationDocument : applicationDocuments) {
+		for (Document applicationDocument : applicationDocuments) {
 			if (applicationDocument.getId().equalsIgnoreCase(applicationDocumentsItem.getId())) {
 				return this;
 			}
