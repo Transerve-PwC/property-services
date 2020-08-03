@@ -80,10 +80,12 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 					.lastModifiedTime(rs.getLong("omodified_date")).build();
 
 			OwnershipTransferDocument ownershipTransferDocument = OwnershipTransferDocument.builder()
-					.id(rs.getString("docid")).ownerId(rs.getString("docowner_id"))
+					.id(rs.getString("docid")).referenceId(rs.getString("docowner_id"))
 					.tenantId(rs.getString("doctenantid")).active(rs.getBoolean("docis_active"))
 					.documentType(rs.getString("document_type")).fileStoreId(rs.getString("fileStore_id"))
-					.documentUid(rs.getString("document_uid")).auditDetails(auditdetails).build();
+					.auditDetails(auditdetails)
+					.propertyId(rs.getString("doc_propertyId"))
+					.build();
 			owner.getOwnerDetails().addownershipTransferDocumentsItem(ownershipTransferDocument);
 		}
 	}

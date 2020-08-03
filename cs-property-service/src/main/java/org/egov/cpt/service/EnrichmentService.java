@@ -357,8 +357,9 @@ public class EnrichmentService {
 				if (document.getId() == null) {
 					String gen_doc_id = UUID.randomUUID().toString();
 					document.setId(gen_doc_id);
-					document.setOwnerId(owner.getId());
+					document.setReferenceId(owner.getId());
 					document.setTenantId(owner.getTenantId());
+					document.setPropertyId(owner.getProperty().getId());
 				}
 				document.setAuditDetails(docAuditDetails);
 			});

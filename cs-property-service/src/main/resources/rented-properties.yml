@@ -803,13 +803,13 @@ serviceMaps:
       - jsonPath: $.Owners.*.ownerDetails.id     
       
       
-    - query: INSERT INTO cs_pt_ot_documents_v1 (id, owner_id, tenantid, is_active, document_type, fileStore_id, document_uid, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, fileStore_id =?, document_uid =?, modified_by =?, modified_date =?;
+    - query: INSERT INTO cs_pt_documents_v1 (id, reference_id, tenantid, is_active, document_type, fileStore_id, property_id, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, fileStore_id =?, document_uid =?, modified_by =?, modified_date =?;
       basePath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*
       jsonMaps:
 
       - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.id
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.ownerId
+      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.referenceId
 
       - jsonPath: $.Owners.*.tenantId
 
@@ -819,7 +819,7 @@ serviceMaps:
 
       - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.fileStoreId
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.documentUid
+      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.propertyId
 
       - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.createdBy
 
