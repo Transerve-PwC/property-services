@@ -46,7 +46,35 @@ public class Configuration {
 	}
 
 	// PERSISTER
+	
 	@Value("${persister.save.property.topic}")
 	private String savePropertyTopic;
+	
+	@Value("${persister.update.property.topic}")
+	private String updatePropertyTopic;
+	
+	//Workflow
+	
+	@Value("${is.workflow.enabled}")
+	private Boolean isWorkflowEnabled;
+	
+	@Value("${create.ps.workflow.name}")
+	private String psBusinessServiceValue;
+	
+	@Value("${workflow.context.path}")
+	private String wfHost;
+
+	@Value("${workflow.transition.path}")
+	private String wfTransitionPath;
+	
+	//Property Search params
+	@Value("${pt.search.pagination.default.limit}")
+	private Long defaultLimit;
+
+	@Value("${pt.search.pagination.default.offset}")
+	private Long defaultOffset;
+
+	@Value("${pt.search.pagination.max.search.limit}")
+	private Long maxSearchLimit;
 
 }

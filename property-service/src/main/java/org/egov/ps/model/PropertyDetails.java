@@ -1,5 +1,6 @@
 package org.egov.ps.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.ps.web.contracts.AuditDetails;
@@ -77,5 +78,47 @@ public class PropertyDetails {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+
+	public PropertyDetails addOwnerItem(Owner newOwnerItem) {
+		if (this.owners == null) {
+			this.owners = new ArrayList<>();
+		}
+		for (Owner owner : owners) {
+			if (owner.getId().equalsIgnoreCase(newOwnerItem.getId())) {
+				return this;
+			}
+		}
+		this.owners.add(newOwnerItem);
+		return this;
+		
+	}
+
+	public PropertyDetails addCourtCaseItem(CourtCase courtCaseItem) {
+		if (this.courtCases == null) {
+			this.courtCases = new ArrayList<>();
+		}
+		for (CourtCase courtCase : courtCases) {
+			if (courtCase.getId().equalsIgnoreCase(courtCaseItem.getId())) {
+				return this;
+			}
+		}
+		this.courtCases.add(courtCaseItem);
+		return this;
+		
+	}
+	
+	public PropertyDetails addPurchaseDetailsItem(PurchaseDetails purchaseDetailsItem) {
+		if (this.purchaseDetails == null) {
+			this.purchaseDetails = new ArrayList<>();
+		}
+		for (PurchaseDetails purchaseDetail : purchaseDetails) {
+			if (purchaseDetail.getId().equalsIgnoreCase(purchaseDetailsItem.getId())) {
+				return this;
+			}
+		}
+		this.purchaseDetails.add(purchaseDetailsItem);
+		return this;
+		
+	}
 
 }
