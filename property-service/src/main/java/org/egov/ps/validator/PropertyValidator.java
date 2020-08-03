@@ -5,14 +5,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.ps.model.Property;
+import org.egov.ps.model.PropertyCriteria;
+import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.web.contracts.PropertyRequest;
+import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class PropertyValidator {
+	
+	@Autowired
+	private PropertyRepository repository;
 	
 	public void validateCreateRequest(PropertyRequest request) {
 		
@@ -47,6 +55,38 @@ public class PropertyValidator {
 			return false;
 		else
 			return true;
+	}
+
+	public List<Property> validateUpdateRequest(PropertyRequest request) {
+		 
+		Map<String, String> errorMap = new HashMap<>();
+		
+		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
+		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
+		boolean ifPropertyExists = PropertyExists(propertiesFromSearchResponse);
+		if (!ifPropertyExists) {
+			throw new CustomException("PROPERTY NOT FOUND", "The property to be updated does not exist");
+		}
+		
+		return null; //TODO: add next lines
+	}
+
+	private boolean PropertyExists(List<Property> responseProperties) {
+		 
+		return (!CollectionUtils.isEmpty(responseProperties) && responseProperties.size() == 1);
+	}
+
+	private PropertyCriteria getPropertyCriteriaForSearch(PropertyRequest request) {
+		
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		if (!CollectionUtils.isEmpty(request.getProperties())) {
+			request.getProperties().forEach(property -> {
+				if (property.getId() != null)
+					propertyCriteria.setPropertyId(property.getId());
+				
+			});
+		}
+		return propertyCriteria;
 	}
 
 }
