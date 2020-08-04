@@ -26,8 +26,8 @@ CREATE TABLE cs_pm_property_v1 (
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
-   created_time         CHARACTER VARYING NOT NULL,
-   last_modified_time   CHARACTER VARYING,
+   created_time         bigint NOT NULL,
+   last_modified_time   bigint,
 
   CONSTRAINT pk_cs_pm_property_v1 PRIMARY KEY (id)
 );
@@ -40,16 +40,16 @@ CREATE TABLE cs_pm_property_details_v1 (
    type_of_allocation   CHARACTER VARYING (256),
    mode_of_auction      CHARACTER VARYING (256),
    scheme_name        	CHARACTER VARYING (256),
-   date_of_auction      CHARACTER VARYING (256),
+   date_of_auction      bigint,
    area_sqft   			CHARACTER VARYING (256),
    rate_per_sqft        CHARACTER VARYING (256),
-   last_noc_date        CHARACTER VARYING (256),
+   last_noc_date        bigint,
    service_category   	CHARACTER VARYING (256),
    
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
-   created_time         CHARACTER VARYING NOT NULL,
-   last_modified_time   CHARACTER VARYING,
+   created_time         bigint NOT NULL,
+   last_modified_time   bigint,
 
   CONSTRAINT pk_cs_pm_property_details_v1 PRIMARY KEY (id),
   CONSTRAINT fk_cs_pm_property_details_v1 FOREIGN KEY (property_id) REFERENCES cs_pm_property_v1 (id)
@@ -69,8 +69,8 @@ CREATE TABLE cs_pm_owner_v1 (
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
-   created_time         CHARACTER VARYING NOT NULL,
-   last_modified_time   CHARACTER VARYING,
+   created_time         bigint NOT NULL,
+   last_modified_time   bigint,
 
   CONSTRAINT pk_cs_pm_owner_v1 PRIMARY KEY (id),
   CONSTRAINT fk_cs_pm_owner_v1 FOREIGN KEY (property_details_id) REFERENCES cs_pm_property_details_v1 (id)
@@ -87,17 +87,17 @@ CREATE TABLE cs_pm_owner_details_v1 (
    guardian_relation    CHARACTER VARYING (256),
    mobile_number       	CHARACTER VARYING (256),
    allotment_number     CHARACTER VARYING (256),
-   date_of_allotment    CHARACTER VARYING (256),
-   possesion_date       CHARACTER VARYING (256),
-   is_current_owner  	CHARACTER VARYING (256),
-   is_master_entry    	CHARACTER VARYING (256),
-   due_amount  			CHARACTER VARYING (256),
+   date_of_allotment    bigint,
+   possesion_date       bigint,
+   is_current_owner  	BOOLEAN,
+   is_master_entry    	BOOLEAN,
+   due_amount  			numeric(12,2),
    address    			CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
-   created_time         CHARACTER VARYING NOT NULL,
-   last_modified_time   CHARACTER VARYING,
+   created_time         bigint NOT NULL,
+   last_modified_time   bigint,
 
   CONSTRAINT pk_cs_pm_owner_details_v1 PRIMARY KEY (id),
   CONSTRAINT fk_cs_pm_owner_details_v1 FOREIGN KEY (owner_id) REFERENCES cs_pm_owner_v1 (id)
@@ -111,12 +111,12 @@ CREATE TABLE cs_pm_owner_documents_v1 (
    owner_details_id     CHARACTER VARYING (256) NOT NULL,
    document_type		CHARACTER VARYING (256),
    file_store_id        CHARACTER VARYING (256),
-   is_active            CHARACTER VARYING (256),
+   is_active            BOOLEAN,
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
-   created_time         CHARACTER VARYING NOT NULL,
-   last_modified_time   CHARACTER VARYING,
+   created_time         bigint NOT NULL,
+   last_modified_time   bigint,
 
   CONSTRAINT pk_cs_pm_owner_documents_v1 PRIMARY KEY (id),
   CONSTRAINT fk_cs_pm_owner_documents_v1 FOREIGN KEY (owner_details_id) REFERENCES cs_pm_owner_details_v1 (id)
@@ -138,8 +138,8 @@ CREATE TABLE cs_pm_court_case_v1 (
   
    created_by           		CHARACTER VARYING (128) NOT NULL,
    last_modified_by     		CHARACTER VARYING (128),
-   created_time         		CHARACTER VARYING NOT NULL,
-   last_modified_time   		CHARACTER VARYING,
+   created_time         		bigint NOT NULL,
+   last_modified_time   		bigint,
 
   CONSTRAINT pk_cs_pm_court_case_v1 PRIMARY KEY (id),
   CONSTRAINT fk_cs_pm_court_case_v1 FOREIGN KEY (property_details_id) REFERENCES cs_pm_property_details_v1 (id)
@@ -160,12 +160,12 @@ CREATE TABLE cs_pm_purchase_details_v1 (
    percentage_of_share   		CHARACTER VARYING (256),
    mode_of_transfer   			CHARACTER VARYING (256),
    registration_number         	CHARACTER VARYING (256),
-   date_of_registration   		CHARACTER VARYING (256),
+   date_of_registration   		bigint,
   
    created_by           		CHARACTER VARYING (128) NOT NULL,
    last_modified_by     		CHARACTER VARYING (128),
-   created_time         		CHARACTER VARYING NOT NULL,
-   last_modified_time   		CHARACTER VARYING,
+   created_time         		bigint NOT NULL,
+   last_modified_time   		bigint,
 
   CONSTRAINT pk_cs_pm_purchase_details_v1 PRIMARY KEY (id),
   CONSTRAINT fk_cs_pm_purchase_details_v1 FOREIGN KEY (property_details_id) REFERENCES cs_pm_property_details_v1 (id)

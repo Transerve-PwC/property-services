@@ -13,6 +13,7 @@ import org.egov.ps.model.OwnerDocument;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.model.PurchaseDetails;
+import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.egov.ps.web.contracts.PropertyRequest;
@@ -28,6 +29,7 @@ public class EnrichmentService {
 
 	@Autowired
 	Util util;
+	
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
@@ -43,6 +45,7 @@ public class EnrichmentService {
 				property.setId(gen_property_id);
 				property.setAuditDetails(propertyAuditDetails);
 				property.setPropertyDetails(propertyDetail);
+				property.setState(PSConstants.PM_DRAFTED);
 
 			});
 		}
