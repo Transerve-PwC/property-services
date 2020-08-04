@@ -41,7 +41,7 @@ public class CourtCase {
 	private String estateOfficerCourt;
 
 	@JsonProperty("commissionersCourt")
-	private Boolean commissionersCourt;
+	private String commissionersCourt;
 
 	@JsonProperty("chiefAdministartorsCourt")
 	private String chiefAdministartorsCourt;

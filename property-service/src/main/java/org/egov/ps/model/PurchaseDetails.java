@@ -41,7 +41,7 @@ public class PurchaseDetails {
 	private String newOwnerName;
 
 	@JsonProperty("newOwnerFatherName")
-	private Boolean newOwnerFatherName;
+	private String newOwnerFatherName;
 
 	@JsonProperty("newOwnerAddress")
 	private String newOwnerAddress;
