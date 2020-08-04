@@ -41,9 +41,6 @@ public class PropertyService {
 
 		propertyValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
-		if (config.getIsWorkflowEnabled()) {
-			wfIntegrator.callWorkFlow(request);
-		}
 		producer.push(config.getSavePropertyTopic(), request);
 		return request.getProperties();
 	}

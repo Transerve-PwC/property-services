@@ -1,5 +1,6 @@
 package org.egov.ps.service;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import org.egov.ps.model.OwnerDocument;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.model.PurchaseDetails;
+import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.egov.ps.web.contracts.PropertyRequest;
@@ -27,6 +29,7 @@ public class EnrichmentService {
 
 	@Autowired
 	Util util;
+	
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
@@ -42,6 +45,7 @@ public class EnrichmentService {
 				property.setId(gen_property_id);
 				property.setAuditDetails(propertyAuditDetails);
 				property.setPropertyDetails(propertyDetail);
+				property.setState(PSConstants.PM_DRAFTED);
 
 			});
 		}
@@ -187,7 +191,7 @@ public class EnrichmentService {
 
 	private List<OwnerDocument> updateOwnerDocs(PropertyDetails propertyDetail, Property property,
 			RequestInfo requestInfo) {
-		List<OwnerDocument> ownerDocs = new LinkedList<>();
+		List<OwnerDocument> ownerDocs = new ArrayList<>();
 		 propertyDetail.getOwners().forEach(owner -> {
 			 List<OwnerDocument> ownerDocuments = owner.getOwnerDetails().getOwnerDocuments();
 				if (!CollectionUtils.isEmpty(ownerDocuments)) {

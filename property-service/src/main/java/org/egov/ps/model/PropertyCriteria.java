@@ -1,6 +1,8 @@
 package org.egov.ps.model;
 
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,5 +33,7 @@ public class PropertyCriteria {
 	private Long limit;
 
 	private String propertyId;
+	
+	private List<String> relations;
 	
 }

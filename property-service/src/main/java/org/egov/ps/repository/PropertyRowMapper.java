@@ -130,7 +130,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.mobileNumber(rs.getString("mobile_number")).allotmentNumber(rs.getString("allotment_number"))
 						.dateOfAllotment(rs.getLong("date_of_allotment")).possesionDate(rs.getLong("possesion_date"))
 						.isCurrentOwner(rs.getBoolean("is_current_owner"))
-						.isMasterEntry(rs.getBoolean("is_master_entry")).dueAmount(rs.getString("due_amount"))
+						.isMasterEntry(rs.getBoolean("is_master_entry")).dueAmount(rs.getBigDecimal("due_amount"))
 						.address(rs.getString("address")).auditDetails(auditdetails).build();
 
 				Owner owners = Owner.builder().id(ownerId).propertyDetailsId(propertyDetailId)
@@ -160,7 +160,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					OwnerDocument ownerDocument = OwnerDocument.builder().id(rs.getString("docid"))
 							.ownerDetailsId(rs.getString("docowner_details_id")).tenantId(rs.getString("doctenantid"))
 							.isActive(rs.getBoolean("docis_active")).documentType(rs.getString("document_type"))
-							.fileStoreId(rs.getString("fileStore_id"))
+							.fileStoreId(rs.getString("file_store_id"))
 							.auditDetails(docAuditdetails).build();
 					owner.getOwnerDetails().addOwnerDocumentsItem(ownerDocument);
 				}
@@ -181,7 +181,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			CourtCase courtCase = CourtCase.builder().id(rs.getString("ccid"))
 					.propertyDetailsId(courtCasePropertDetailId).tenantId(rs.getString("cctenantid"))
 					.estateOfficerCourt(rs.getString("ccestate_officer_court"))
-					.commissionersCourt(rs.getBoolean("cccommissioners_court"))
+					.commissionersCourt(rs.getString("cccommissioners_court"))
 					.chiefAdministartorsCourt(rs.getString("ccchief_administartors_court"))
 					.advisorToAdminCourt(rs.getString("ccadvisor_to_admin_court"))
 					.honorableDistrictCourt(rs.getString("cchonorable_district_court"))
@@ -204,7 +204,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			PurchaseDetails purchaseDetails = PurchaseDetails.builder().id(rs.getString("pdid"))
 					.propertyDetailsId(purchaseDetailPropertyDetailId).tenantId(rs.getString("pdtenantid"))
 					.newOwnerName(rs.getString("pdnew_owner_name"))
-					.newOwnerFatherName(rs.getBoolean("pdnew_owner_father_name"))
+					.newOwnerFatherName(rs.getString("pdnew_owner_father_name"))
 					.newOwnerAddress(rs.getString("pdnew_owner_address"))
 					.newOwnerMobileNumber(rs.getString("pdnew_owner_mobile_number"))
 					.sellerName(rs.getString("pdseller_name")).sellerFatherName(rs.getString("pdseller_father_name"))

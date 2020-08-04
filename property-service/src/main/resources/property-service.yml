@@ -144,27 +144,29 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_pm_owner_documents_v1 (id, tenantid, is_active, document_type, file_store_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*
+    - query: INSERT INTO cs_pm_owner_documents_v1 (id, tenantid, owner_details_id, is_active, document_type, file_store_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.id
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.id
 
       - jsonPath: $.Properties.*.tenantId
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.ownerDetailsId
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.isActive
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.isActive
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.documentType
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.documentType
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.fileStoreId
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.fileStoreId
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.auditDetails.createdBy
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.auditDetails.lastModifiedBy
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.auditDetails.createdTime
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.auditDetails.lastModifiedTime  
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedTime  
       
       
            
@@ -388,37 +390,39 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.id
 
 
-    - query: INSERT INTO cs_pm_owner_documents_v1 (id, tenantid, is_active, document_type, file_store_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type = ?, file_store_id = ?, last_modified_by = ?, last_modified_time = ?;
-      basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*
+    - query: INSERT INTO cs_pm_owner_documents_v1 (id, tenantid, owner_details_id, is_active, document_type, file_store_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type = ?, file_store_id = ?, last_modified_by = ?, last_modified_time = ?;
+      basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*
       jsonMaps:
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.id
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.id
 
       - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.isActive
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.documentType
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.fileStoreId
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.auditDetails.createdBy
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.auditDetails.lastModifiedBy
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.auditDetails.createdTime
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.auditDetails.lastModifiedTime  
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.ownerDetailsId
       
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.isActive
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.isActive
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.documentType
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.documentType
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.fileStoreId
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.fileStoreId
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.auditDetails.lastModifiedBy
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.*.ownerDocuments.*.auditDetails.lastModifiedTime
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.createdTime
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedTime  
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.isActive
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.documentType
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.fileStoreId
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedTime
       
            
     - query: UPDATE cs_pm_court_case_v1 SET tenantid = ?, estate_officer_court = ?, commissioners_court = ?, chief_administartors_court = ?, advisor_to_admin_court = ?, honorable_district_court = ?, honorable_high_court = ?, honorable_supreme_court = ?, last_modified_by = ?, last_modified_time = ? WHERE id = ?;
