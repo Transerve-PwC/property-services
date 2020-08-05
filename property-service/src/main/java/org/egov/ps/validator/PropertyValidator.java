@@ -62,7 +62,7 @@ public class PropertyValidator {
 		Map<String, String> errorMap = new HashMap<>();
 		
 		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
-		List<Object> propertiesFromSearchResponse = repository.getProperties(criteria);
+		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
 		boolean ifPropertyExists = PropertyExists(propertiesFromSearchResponse);
 		if (!ifPropertyExists) {
 			throw new CustomException("PROPERTY NOT FOUND", "The property to be updated does not exist");
@@ -71,7 +71,7 @@ public class PropertyValidator {
 		return null; //TODO: add next lines
 	}
 
-	private boolean PropertyExists(List<Object> propertiesFromSearchResponse) {
+	private boolean PropertyExists(List<Property> propertiesFromSearchResponse) {
 		 
 		return (!CollectionUtils.isEmpty(propertiesFromSearchResponse) && propertiesFromSearchResponse.size() == 1);
 	}

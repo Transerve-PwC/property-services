@@ -62,8 +62,8 @@ public class PropertyService {
 		return request.getProperties();
 	}
 	
-	public List<Object> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
-		List<Object> properties = repository.getProperties(criteria);
+	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
+		List<Property> properties = repository.getProperties(criteria);
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
 		return properties;

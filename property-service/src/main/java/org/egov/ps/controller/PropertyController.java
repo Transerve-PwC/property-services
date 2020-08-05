@@ -52,18 +52,15 @@ public class PropertyController {
 	}
 	
 	@PostMapping("/_search")
-	public ResponseEntity<SearchResponse> search(@Valid @RequestBody RequestInfoMapper requestInfoWrapper,
+	public ResponseEntity<PropertyResponse> search(@Valid @RequestBody RequestInfoMapper requestInfoWrapper,
 			@Valid @ModelAttribute PropertyCriteria propertyCriteria) {
 
-		List<Object> properties = propertyService.searchProperty(propertyCriteria,
+		List<Property> properties = propertyService.searchProperty(propertyCriteria,
 				requestInfoWrapper.getRequestInfo());
-		SearchResponse response = SearchResponse.builder().properties(properties).responseInfo(
+		PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
 				.build();
-//		String modelName =  response.getProperties().get(0).getClass().getName();
-//		if (modelName.equals("org.egov.ps.Owner")) {
-//			response.r;
-//		}
+
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 

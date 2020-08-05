@@ -20,13 +20,12 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PropertyRowMapper implements ResultSetExtractor<List<Object>> {
+public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 	@Override
-	public List<Object> extractData(ResultSet rs) throws SQLException, DataAccessException {
+	public List<Property> extractData(ResultSet rs) throws SQLException, DataAccessException {
 
 		LinkedHashMap<String, Property> propertyMap = new LinkedHashMap<>();
-		LinkedHashMap<String, Owner> ownerMap = new LinkedHashMap<>();
 
 		while (rs.next()) {
 
@@ -65,18 +64,14 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Object>> {
 				}
 			}
 
-			addChildrenToProperty(rs, currentProperty, ownerMap, propertyMap);
+			addChildrenToProperty(rs, currentProperty, propertyMap);
 		}
-		if (hasColumn(rs, "pid")) {
-			return new ArrayList<>(propertyMap.values());
-		} else if (hasColumn(rs, "oid")) {
-			return new ArrayList<>(propertyMap.values());
-		}
-		return null;
+
+		return new ArrayList<>(propertyMap.values());
 
 	}
 
-	private void addChildrenToProperty(ResultSet rs, Property property, LinkedHashMap<String, Owner> ownerMap, LinkedHashMap<String, Property> propertyMap)
+	private void addChildrenToProperty(ResultSet rs, Property property, LinkedHashMap<String, Property> propertyMap)
 			throws SQLException {
 
 		if (hasColumn(rs, "oid")) {
@@ -102,8 +97,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Object>> {
 				Owner owners = Owner.builder().id(ownerId).propertyDetailsId(OwnerPropertyDetailId)
 						.tenantId(rs.getString("otenantid")).serialNumber(rs.getString("oserial_number"))
 						.share(rs.getString("oshare")).cpNumber(rs.getString("ocp_number"))
-						.state(rs.getString("ostate")).action(rs.getString("oaction"))
-						.ownerDetails(ownerDetails)
+						.state(rs.getString("ostate")).action(rs.getString("oaction")).ownerDetails(ownerDetails)
 						.auditDetails(auditdetails).build();
 
 				if (hasColumn(rs, "pid")) {
@@ -113,7 +107,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Object>> {
 					PropertyDetails propertyDetails = new PropertyDetails();
 					propertyDetails.addOwnerItem(owners);
 					property2.setPropertyDetails(propertyDetails);
-//					ownerMap.put(ownerId, owners);
+
 					propertyMap.put(ownerId, property2);
 				}
 
