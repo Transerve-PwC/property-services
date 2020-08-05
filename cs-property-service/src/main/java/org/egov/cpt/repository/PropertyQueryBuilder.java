@@ -47,7 +47,7 @@ public class PropertyQueryBuilder {
 			+ " address.state, address.country, address.pincode, address.landmark,"
 
 			+ " doc.id as docid, doc.property_id as docproperty_id,doc.reference_id as docreference_id, doc.tenantid as doctenantid,"
-			+ " doc.is_active as docis_active, doc.document_type, doc.fileStore_id,"
+			+ " doc.is_active as docis_active, doc.document_type as doc_document_type, doc.fileStore_id as doc_fileStore_id,"
 			+ " doc.created_by as dcreated_by, doc.created_date as dcreated_date, doc.modified_by as dmodified_by, doc.modified_date as dmodified_date,"
 
 			+ " pi.id as piid, pi.propertyid as pipropertyid, pi.tenantid as pitenantid, pi.application_number as piapp_number, pi.description as pidescription,"
