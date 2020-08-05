@@ -12,6 +12,7 @@ import org.egov.ps.service.PropertyService;
 import org.egov.ps.util.ResponseInfoFactory;
 import org.egov.ps.web.contracts.PropertyRequest;
 import org.egov.ps.web.contracts.PropertyResponse;
+import org.egov.ps.web.contracts.SearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,14 +52,18 @@ public class PropertyController {
 	}
 	
 	@PostMapping("/_search")
-	public ResponseEntity<PropertyResponse> search(@Valid @RequestBody RequestInfoMapper requestInfoWrapper,
+	public ResponseEntity<SearchResponse> search(@Valid @RequestBody RequestInfoMapper requestInfoWrapper,
 			@Valid @ModelAttribute PropertyCriteria propertyCriteria) {
 
-		List<Property> properties = propertyService.searchProperty(propertyCriteria,
+		List<Object> properties = propertyService.searchProperty(propertyCriteria,
 				requestInfoWrapper.getRequestInfo());
-		PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
+		SearchResponse response = SearchResponse.builder().properties(properties).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
 				.build();
+//		String modelName =  response.getProperties().get(0).getClass().getName();
+//		if (modelName.equals("org.egov.ps.Owner")) {
+//			response.r;
+//		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 

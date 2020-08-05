@@ -42,7 +42,7 @@ public class PropertyRepository {
 	@Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
-	public List<Property> getProperties(PropertyCriteria criteria) {
+	public List<Object> getProperties(PropertyCriteria criteria) {
 
 		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);

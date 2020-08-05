@@ -18,17 +18,45 @@ public class PropertyQueryBuilder {
 	private static final String INNER_JOIN = "INNER JOIN";
 	private static final String LEFT_JOIN = "LEFT OUTER JOIN";
 	private static final String AND_QUERY = " AND ";
+//	private static String SORT_BY = "";
+
+	private static final String PT_ALL = " pt.*, ptdl.*, ";
+	private static final String OWNER_ALL = " ownership.*, od.*, ";
+
+	private static final String PT_COLUMNS = " pt.id as pid, pt.file_number, pt.tenantid as pttenantid, pt.category, pt.sub_category, "
+			+ " pt.site_number, pt.sector_number, pt.state, pt.action, pt.created_by as pcreated_by, pt.created_time as pcreated_time, "
+			+ " pt.last_modified_by as pmodified_by, pt.last_modified_time as pmodified_time,"
+			
+			+ " ptdl.id as ptdlid, ptdl.property_id as pdproperty_id, ptdl.property_type as pdproperty_type, "
+			+ " ptdl.tenantid as pdtenantid, ptdl.type_of_allocation, ptdl.mode_of_auction, ptdl.scheme_name,ptdl.date_of_auction, "
+			+ " ptdl.area_sqft, ptdl.rate_per_sqft, ptdl.last_noc_date, ptdl.service_category";
+	private static final String OWNER_COLUMNS = " ownership.id as oid, ownership.property_details_id as oproperty_details_id, "
+			+ " ownership.tenantid as otenantid, ownership.serial_number as oserial_number, "
+			+ " ownership.share as oshare, ownership.cp_number as ocp_number, ownership.state as ostate, ownership.action as oaction, "
+			+ " ownership.created_by as ocreated_by, ownership.created_time as ocreated_time, "
+			+ " ownership.last_modified_by as omodified_by, ownership.last_modified_time as omodified_time, "
+			
+			+ " od.id as odid, od.owner_id as odowner_id,"
+			+ " od.owner_name as odowner_name, od.tenantid as odtenantid,"
+			+ " od.guardian_name, od.guardian_relation, od.mobile_number,"
+			+ " od.allotment_number, od.date_of_allotment, od.possesion_date,"
+			+ " od.is_current_owner, od.is_master_entry," + " od.due_amount, od.address";
+
+	private static final String PT_TABLE = " cs_pm_property_v1 pt " + INNER_JOIN
+			+ " cs_pm_property_details_v1 ptdl  ON pt.id =ptdl.property_id ";
+	private static final String OWNER_TABLE = " cs_pm_owner_v1 ownership " + LEFT_JOIN
+			+ " cs_pm_owner_details_v1 od ON ownership.id = od.owner_id";
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pmodified_time desc) offset_ FROM " + "({})"
-			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pmodified_time desc) offset_ FROM " + "({})" + " result) result_offset "
+			+ "WHERE offset_ > :start AND offset_ <= :end";
 
 	private static final String SEARCH_QUERY = SELECT + "pt.*,ptdl.*,ownership.*,od.*,doc.*,cc.*,pd.*,"
 
 			+ " pt.id as pid, pt.file_number, pt.tenantid as pttenantid, pt.category, pt.sub_category, pt.site_number, pt.sector_number, pt.state, pt.action,"
 			+ " pt.created_by as pcreated_by, pt.created_time as pcreated_time, pt.last_modified_by as pmodified_by, pt.last_modified_time as pmodified_time,"
 
-			+ " ptdl.id as pdid, ptdl.property_id as pdproperty_id, ptdl.property_type as pdproperty_type,"
+			+ " ptdl.id as ptdlid, ptdl.property_id as pdproperty_id, ptdl.property_type as pdproperty_type,"
 			+ " ptdl.tenantid as pdtenantid, ptdl.type_of_allocation, ptdl.mode_of_auction, ptdl.scheme_name, ptdl.date_of_auction, ptdl.area_sqft, ptdl.rate_per_sqft, ptdl.last_noc_date, ptdl.service_category,"
 
 			+ " ownership.id as oid, ownership.property_details_id as oproperty_details_id,"
@@ -58,9 +86,8 @@ public class PropertyQueryBuilder {
 			+ " pd.seller_father_name as pdseller_father_name, pd.percentage_of_share as pdpercentage_of_share, pd.mode_of_transfer as pdmode_of_transfer, pd.registration_number as pdregistration_number, pd.date_of_registration as pddate_of_registration,"
 			+ " pd.created_by as pdcreated_by, pd.created_time as pdcreated_time, pd.last_modified_by as pdmodified_by, pd.last_modified_time as pdmodified_time"
 
-			+ " FROM cs_pm_property_v1 pt " + INNER_JOIN 
-			+ " cs_pm_property_details_v1 ptdl ON pt.id =ptdl.property_id " + INNER_JOIN 
-			+ " cs_pm_owner_v1 ownership ON ptdl.id=ownership.property_details_id " + LEFT_JOIN
+			+ " FROM cs_pm_property_v1 pt " + INNER_JOIN + " cs_pm_property_details_v1 ptdl ON pt.id =ptdl.property_id "
+			+ INNER_JOIN + " cs_pm_owner_v1 ownership ON ptdl.id=ownership.property_details_id " + LEFT_JOIN
 			+ " cs_pm_owner_details_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
 			+ " cs_pm_owner_documents_v1 doc ON od.id=doc.owner_details_id " + LEFT_JOIN
 			+ " cs_pm_court_case_v1 cc ON ptdl.id=cc.property_details_id " + LEFT_JOIN
@@ -72,10 +99,13 @@ public class PropertyQueryBuilder {
 		 * if (criteria.getLimit() == null && criteria.getOffset() == null) return
 		 * query;
 		 */
+		
+//		String sort = SORT_BY;
 
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();
 		String finalQuery = paginationWrapper.replace("{}", query);
+//		finalQuery = finalQuery.replace("<1>", sort);
 
 		if (criteria.getLimit() != null && criteria.getLimit() <= config.getMaxSearchLimit())
 			limit = criteria.getLimit();
@@ -89,6 +119,8 @@ public class PropertyQueryBuilder {
 		preparedStmtList.put("start", offset);
 		preparedStmtList.put("end", limit + offset);
 
+		System.out.println(finalQuery.toString());
+
 		return finalQuery;
 	}
 
@@ -100,7 +132,81 @@ public class PropertyQueryBuilder {
 	 */
 	public String getPropertySearchQuery(PropertyCriteria criteria, Map<String, Object> preparedStmtList) {
 
-		StringBuilder builder = new StringBuilder(SEARCH_QUERY);
+		StringBuilder builder;
+
+		if (criteria.getRelations() == null) {
+			builder = new StringBuilder(SEARCH_QUERY);
+//			SORT_BY = " pmodified_time ";
+		} else {
+
+			builder = new StringBuilder(SELECT);
+
+//			if (criteria.getRelations().contains("property")) {
+//				SORT_BY = " pmodified_time ";
+//			}
+//
+//			if (criteria.getRelations().contains("owner")) {
+//				SORT_BY = " omodified_time ";
+//			}
+
+			int size = criteria.getRelations().size();
+			int j = 1;
+			int k = 1;
+			int l = 1;
+
+//			if (criteria.getRelations().contains("property")) {
+				builder.append(PT_ALL);
+//			}
+
+			if (criteria.getRelations().contains("owner")) {
+				builder.append(OWNER_ALL);
+			}
+
+			// columns
+//			if (criteria.getRelations().contains("property")) {
+				builder.append(PT_COLUMNS);
+				if (j < size || !criteria.getRelations().contains("property")) {
+					builder.append(",");
+					j++;
+				}
+//			}
+
+			if (criteria.getRelations().contains("owner")) {
+				builder.append(OWNER_COLUMNS);
+				if (j < size) {
+					builder.append(",");
+					j++;
+				}
+			}
+
+			// Joins
+//			if (criteria.getRelations().contains("property")) {
+				if (l == 1) {
+					builder.append(" FROM");
+					l++;
+				}
+				builder.append(PT_TABLE);
+				if (k < size || !criteria.getRelations().contains("property")) {
+					builder.append(LEFT_JOIN);
+					k++;
+				}
+//			}
+
+			if (criteria.getRelations().contains("owner")) {
+				if (l == 1) {
+					builder.append(" FROM");
+					l++;
+				}
+				builder.append(OWNER_TABLE);
+//				if (criteria.getRelations().contains("property")) {
+					builder.append(" ON ptdl.id=ownership.property_details_id ");
+//				}
+				if (k < size) {
+					builder.append(LEFT_JOIN);
+					k++;
+				}
+			}
+		}
 
 		if (!ObjectUtils.isEmpty(criteria.getFileNumber())) {
 			addClauseIfRequired(preparedStmtList, builder);
@@ -123,7 +229,7 @@ public class PropertyQueryBuilder {
 		if (null != criteria.getMobileNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("od.mobile_number = :phone");
-			preparedStmtList.put("phone", criteria.getMobileNumber()); //TODO: change phone to name in this line only
+			preparedStmtList.put("phone", criteria.getMobileNumber());
 		}
 
 		if (null != criteria.getState()) {
@@ -140,7 +246,7 @@ public class PropertyQueryBuilder {
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
-	
+
 	private static void addClauseIfRequired(Map<String, Object> values, StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
