@@ -92,8 +92,9 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			Document applicationDocument = Document.builder().id(rs.getString("docid"))
 					.referenceId(rs.getString("docreference_id"))
 					.propertyId(rs.getString("docproperty_id")).tenantId(rs.getString("doctenantid"))
-					.active(rs.getBoolean("docis_active")).documentType(rs.getString("document_type"))
-					.fileStoreId(rs.getString("fileStore_id"))
+					.active(rs.getBoolean("docis_active"))
+					.documentType(rs.getString("doc_document_type"))
+					.fileStoreId(rs.getString("doc_fileStore_id"))
 					.auditDetails(docAuditdetails).build();
 			property.getPropertyDetails().addApplicationDocumentsItem(applicationDocument);
 		}
@@ -156,7 +157,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.auditDetails(piAuditDetails).build();
 				
 				for (PropertyImages propertyImage: property.getPropertyImages()){
-					if(propertyImage.getId().equalsIgnoreCase(rs.getString("pidocid"))){
+					if(propertyImage.getId().equalsIgnoreCase(rs.getString("pidoc_referenceid"))){
 						propertyImage.addApplicationDocumentsItem(applicationDocument);
 					}
 				}
@@ -211,7 +212,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.auditDetails(piAuditDetails).build();
 				
 				for (NoticeGeneration notice: property.getNotices()){
-					if(notice.getId().equalsIgnoreCase(rs.getString("ngdoc_id"))){
+					if(notice.getId().equalsIgnoreCase(rs.getString("ngdoc_referenceid"))){
 						notice.addApplicationDocumentsItem(applicationDocument);
 					}
 				}
