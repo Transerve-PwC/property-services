@@ -156,7 +156,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.auditDetails(piAuditDetails).build();
 				
 				for (PropertyImages propertyImage: property.getPropertyImages()){
-					if(propertyImage.getId().equalsIgnoreCase(rs.getString("pidocid"))){
+					if(propertyImage.getId().equalsIgnoreCase(rs.getString("pidoc_referenceid"))){
 						propertyImage.addApplicationDocumentsItem(applicationDocument);
 					}
 				}
@@ -211,7 +211,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.auditDetails(piAuditDetails).build();
 				
 				for (NoticeGeneration notice: property.getNotices()){
-					if(notice.getId().equalsIgnoreCase(rs.getString("ngdoc_id"))){
+					if(notice.getId().equalsIgnoreCase(rs.getString("ngdoc_referenceid"))){
 						notice.addApplicationDocumentsItem(applicationDocument);
 					}
 				}
