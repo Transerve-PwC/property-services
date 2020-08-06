@@ -106,12 +106,6 @@ public class User {
 	@JsonProperty("active")
 	private Boolean active;
 
-	@JsonProperty("dob")
-	private Long dob;
-
-	@JsonProperty("pwdExpiryDate")
-	private Long pwdExpiryDate;
-
 	@Size(max = 16)
 	@JsonProperty("locale")
 	private String locale;
@@ -151,15 +145,9 @@ public class User {
 	@JsonProperty("createdBy")
 	private String createdBy;
 
-	@JsonProperty("createdDate")
-	private Long createdDate;
-
 	@Size(max = 64)
 	@JsonProperty("lastModifiedBy")
 	private String lastModifiedBy;
-
-	@JsonProperty("lastModifiedDate")
-	private Long lastModifiedDate;
 
 	@Size(max = 256)
 	@JsonProperty("tenantId")

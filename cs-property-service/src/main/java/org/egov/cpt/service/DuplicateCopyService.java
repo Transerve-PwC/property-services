@@ -58,8 +58,6 @@ public class DuplicateCopyService {
 		propertyValidator.isPropertyExist(duplicateCopyRequest);
 		propertyValidator.validateDuplicateCopyCreateRequest(duplicateCopyRequest);
 		enrichmentService.enrichDuplicateCopyCreateRequest(duplicateCopyRequest);
-		demandService.createDuplicateCopyDemand(duplicateCopyRequest.getRequestInfo(),
-				duplicateCopyRequest.getDuplicateCopyApplications());
 		propertyValidator.validateDuplicateCreate(duplicateCopyRequest);
 		if (config.getIsWorkflowEnabled()) {
 			wfIntegrator.callDuplicateCopyWorkFlow(duplicateCopyRequest);
@@ -105,12 +103,12 @@ public class DuplicateCopyService {
 				.validateDuplicateCopyUpdateRequest(duplicateCopyRequest);
 		enrichmentService.enrichDuplicateCopyUpdateRequest(duplicateCopyRequest, searchedProperty);
 		String applicationState = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getState();
-		if (applicationState.equalsIgnoreCase(PTConstants.DC_STATE_PENDING_SA_VERIFICATION)) {
+		/*if (applicationState.equalsIgnoreCase(PTConstants.DC_STATE_PENDING_SA_VERIFICATION)) {
 			demandService.updateDuplicateCopyDemand(duplicateCopyRequest.getRequestInfo(),
 					duplicateCopyRequest.getDuplicateCopyApplications());
-		}
+		}*/
 		if (applicationState.equalsIgnoreCase(PTConstants.DC_STATE_PENDING_APRO)) {
-			demandService.updateDuplicateCopyDemand(duplicateCopyRequest.getRequestInfo(),
+			demandService.generateDuplicateCopyDemand(duplicateCopyRequest.getRequestInfo(),
 					duplicateCopyRequest.getDuplicateCopyApplications());
 		}
 		propertyValidator.validateDuplicateUpdate(duplicateCopyRequest);

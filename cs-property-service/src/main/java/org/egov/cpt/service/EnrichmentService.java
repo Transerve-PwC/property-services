@@ -327,18 +327,26 @@ public class EnrichmentService {
 	private void enrichUpdateDemand(Owner owner) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
 		owner.setBusinessService(PTConstants.BUSINESS_SERVICE_OT);
-		TaxHeadEstimate estimate = new TaxHeadEstimate();
-		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.OT_STATE_PENDING_SA_VERIFICATION)) {
+//		TaxHeadEstimate estimate = new TaxHeadEstimate();
+		/*if (owner.getApplicationState().equalsIgnoreCase(PTConstants.OT_STATE_PENDING_SA_VERIFICATION)) {
 			estimate.setEstimateAmount(owner.getOwnerDetails().getDueAmount());
 			estimate.setCategory(Category.DUE);
 			estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
-		}
+		}*/
 		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.OT_STATE_PENDING_APRO)) {
-			estimate.setEstimateAmount(owner.getOwnerDetails().getAproCharge());
-			estimate.setCategory(Category.CHARGES);
-			estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.CHARGES));
+			TaxHeadEstimate estimate1 = new TaxHeadEstimate();
+			estimate1.setEstimateAmount(owner.getOwnerDetails().getDueAmount());
+			estimate1.setCategory(Category.DUE);
+			estimate1.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
+			estimates.add(estimate1);
+			
+			TaxHeadEstimate estimate2= new TaxHeadEstimate();
+			estimate2.setEstimateAmount(owner.getOwnerDetails().getAproCharge());
+			estimate2.setCategory(Category.CHARGES);
+			estimate2.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.CHARGES));
+			estimates.add(estimate2);
 		}
-		estimates.add(estimate);
+//		estimates.add(estimate);
 		Calculation calculation = Calculation.builder()
 				.applicationNumber(owner.getOwnerDetails().getApplicationNumber()).taxHeadEstimates(estimates)
 				.tenantId(owner.getTenantId()).build();
@@ -518,18 +526,24 @@ public class EnrichmentService {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
 		application.setBusinessService(PTConstants.BUSINESS_SERVICE_DC);
 
-		TaxHeadEstimate estimate = new TaxHeadEstimate();
-		if (application.getState().equalsIgnoreCase(PTConstants.DC_STATE_PENDING_SA_VERIFICATION)) {
+		/*if (application.getState().equalsIgnoreCase(PTConstants.DC_STATE_PENDING_SA_VERIFICATION)) {
 			estimate.setEstimateAmount(application.getApplicant().get(0).getFeeAmount());
 			estimate.setCategory(Category.FEE);
 			estimate.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.FEE));
-		}
+		}*/
 		if (application.getState().equalsIgnoreCase(PTConstants.DC_STATE_PENDING_APRO)) {
-			estimate.setEstimateAmount(application.getApplicant().get(0).getAproCharge());
-			estimate.setCategory(Category.CHARGES);
-			estimate.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.CHARGES));
+			TaxHeadEstimate estimate1 = new TaxHeadEstimate();
+			estimate1.setEstimateAmount(application.getApplicant().get(0).getFeeAmount());
+			estimate1.setCategory(Category.FEE);
+			estimate1.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.FEE));
+			estimates.add(estimate1);
+			
+			TaxHeadEstimate estimate2 = new TaxHeadEstimate();
+			estimate2.setEstimateAmount(application.getApplicant().get(0).getAproCharge());
+			estimate2.setCategory(Category.CHARGES);
+			estimate2.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.CHARGES));
+			estimates.add(estimate2);
 		}
-		estimates.add(estimate);
 		Calculation calculation = Calculation.builder().applicationNumber(application.getApplicationNumber())
 				.taxHeadEstimates(estimates).tenantId(application.getTenantId()).build();
 		application.setCalculation(calculation);
@@ -566,21 +580,27 @@ public class EnrichmentService {
 	public void enrichDuplicateCopyUpdateRequest(DuplicateCopyRequest duplicateCopyRequest,
 			List<DuplicateCopy> searchedProperty) {
 		RequestInfo requestInfo = duplicateCopyRequest.getRequestInfo();
-		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
+		AuditDetails updateAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 		// String propertyDtlId = searchedProperty.get(0).getPropertyDetails().getId();
 		if (!CollectionUtils.isEmpty(duplicateCopyRequest.getDuplicateCopyApplications())) {
 			duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
-				application.setAuditDetails(propertyAuditDetails);
+				AuditDetails modifyAuditDetails = application.getAuditDetails();
+				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
+				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
+				application.setAuditDetails(modifyAuditDetails);
 				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
 					application.getApplicationDocuments().forEach(document -> {
 						if (document.getId() == null) {
 							AuditDetails documentAuditDetails = propertyutil
 									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							AuditDetails modifyDocAuditDetails = application.getAuditDetails();
+							modifyDocAuditDetails.setLastModifiedBy(documentAuditDetails.getLastModifiedBy());
+							modifyDocAuditDetails.setLastModifiedTime(documentAuditDetails.getLastModifiedTime());
 							document.setId(UUID.randomUUID().toString());
 							document.setActive(true);
 							document.setPropertyId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
 							document.setReferenceId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId());
-							document.setAuditDetails(documentAuditDetails);
+							document.setAuditDetails(modifyDocAuditDetails);
 							document.setTenantId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getTenantId());
 						}
 
@@ -592,7 +612,7 @@ public class EnrichmentService {
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {
-						applicant.setAuditDetails(propertyAuditDetails);
+						applicant.setAuditDetails(modifyAuditDetails);
 					});
 				}
 			});
