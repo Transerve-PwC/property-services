@@ -59,6 +59,7 @@ public class PropertyController {
 		PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
 				.build();
+
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
