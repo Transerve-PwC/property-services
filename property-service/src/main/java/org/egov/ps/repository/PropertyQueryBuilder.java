@@ -1,5 +1,7 @@
 package org.egov.ps.repository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class PropertyQueryBuilder {
 
@@ -16,8 +21,8 @@ public class PropertyQueryBuilder {
 	private Configuration config;
 
 	private static final String SELECT = "SELECT ";
-	private static final String INNER_JOIN = "INNER JOIN";
-	private static final String LEFT_JOIN = "LEFT OUTER JOIN";
+	private static final String INNER_JOIN = " INNER JOIN ";
+	private static final String LEFT_JOIN = " LEFT OUTER JOIN ";
 
 	private static final String PT_ALL = " pt.*, ptdl.*, ";
 	private static final String OWNER_ALL = " ownership.*, od.*, doc.*, ";
@@ -139,8 +144,8 @@ public class PropertyQueryBuilder {
 
 		preparedStmtList.put("start", offset);
 		preparedStmtList.put("end", limit + offset);
-
-		System.out.println(finalQuery.toString());
+		
+		log.info(finalQuery);
 
 		return finalQuery;
 	}
@@ -162,9 +167,11 @@ public class PropertyQueryBuilder {
 
 			builder = new StringBuilder(SELECT);
 
-			int size = relations.size();
-			int j = 1;
-			int k = 1;
+			String columns[] = {PT_COLUMNS};
+			List<String> columnList = new ArrayList<>(Arrays.asList(columns));
+			
+			String tables[] = {PT_TABLE};
+			List<String> tableList = new ArrayList<>(Arrays.asList(tables));
 
 			builder.append(PT_ALL);
 
@@ -181,74 +188,34 @@ public class PropertyQueryBuilder {
 			}
 
 			// columns
-			builder.append(PT_COLUMNS);
-			if (j < size || !relations.contains("property")) {
-				builder.append(",");
-				if (!relations.contains("property")) {
-					j--;
-				}
-				j++;
-			}
-
 			if (relations.contains("owner")) {
-				builder.append(OWNER_COLUMNS);
-				if (j < size) {
-					builder.append(",");
-					j++;
-				}
+				columnList.add(OWNER_COLUMNS);
 			}
 
 			if (relations.contains("court")) {
-				builder.append(CC_COLUMNS);
-				if (j < size) {
-					builder.append(",");
-					j++;
-				}
+				columnList.add(CC_COLUMNS);
 			}
 			
 			if (relations.contains("purchase")) {
-				builder.append(PD_COLUMNS);
-				if (j < size) {
-					builder.append(",");
-					j++;
-				}
+				columnList.add(PD_COLUMNS);
 			}
+			String output = columnList.stream().reduce(null, (str1, str2) -> str1 == null ? str2 : str1 + " , " + str2);
+			builder.append(output);
 
 			// Joins
-			builder.append(PT_TABLE);
-			if (k < size || !relations.contains("property")) {
-				builder.append(LEFT_JOIN);
-				if (!relations.contains("property")) {
-					k--;
-				}
-				k++;
-			}
-
-			if (relations.contains("owner")) {
-
-				builder.append(OWNER_TABLE);
-
-				if (k < size) {
-					builder.append(LEFT_JOIN);
-					k++;
-				}
+			if (relations.contains("owner")) {	
+				tableList.add(OWNER_TABLE);
 			}
 
 			if (relations.contains("court")) {
-				builder.append(CC_TABLE);
-				if (k < size) {
-					builder.append(LEFT_JOIN);
-					k++;
-				}
+				tableList.add(CC_TABLE);
 			}
 			
 			if (relations.contains("purchase")) {
-				builder.append(PD_TABLE);
-				if (k < size) {
-					builder.append(LEFT_JOIN);
-					k++;
-				}
+				tableList.add(PD_TABLE);
 			}
+			String tableOutput = tableList.stream().reduce(null, (str1, str2) -> str1 == null ? str2 : str1 + LEFT_JOIN + str2);
+			builder.append(tableOutput);
 		}
 
 		if (!ObjectUtils.isEmpty(criteria.getFileNumber())) {

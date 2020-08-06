@@ -12,7 +12,6 @@ import org.egov.ps.service.PropertyService;
 import org.egov.ps.util.ResponseInfoFactory;
 import org.egov.ps.web.contracts.PropertyRequest;
 import org.egov.ps.web.contracts.PropertyResponse;
-import org.egov.ps.web.contracts.SearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
