@@ -1,6 +1,5 @@
 package org.egov.ps.model;
 
-
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -33,7 +32,14 @@ public class PropertyCriteria {
 	private Long limit;
 
 	private String propertyId;
-	
+
 	private List<String> relations;
-	
+
+	@Builder.Default
+	private String tenantId = "ch.chandigarh";
+
+	private List<String> status;
+
+	private String userId;
+
 }

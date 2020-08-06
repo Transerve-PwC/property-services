@@ -118,7 +118,6 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			String docOwnerDetailId = rs.getString("docowner_details_id");
 			List<Owner> owners = property.getPropertyDetails().getOwners();
 			owners.forEach(owner -> {
-				System.out.println("sdfghjkl");
 				try {
 					if (rs.getString("docid") != null && rs.getBoolean("docis_active")
 							&& docOwnerDetailId.equals(owner.getOwnerDetails().getId())) {
