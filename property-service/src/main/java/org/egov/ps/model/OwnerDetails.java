@@ -75,23 +75,23 @@ public class OwnerDetails {
 	private String address;
 
 	@JsonProperty("ownerDocuments")
-	private List<OwnerDocument> ownerDocuments;
+	private List<Document> ownerDocuments;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 
-	public OwnerDetails addOwnerDocumentsItem(OwnerDocument ownerDocumentItem) {
+	public OwnerDetails addOwnerDocumentsItem(Document ownerDocumentItem) {
 		if (this.ownerDocuments == null) {
 			this.ownerDocuments = new ArrayList<>();
 		}
-		for (OwnerDocument ownerDocument : ownerDocuments) {
+		for (Document ownerDocument : ownerDocuments) {
 			if (ownerDocument.getId().equalsIgnoreCase(ownerDocumentItem.getId())) {
 				return this;
 			}
 		}
 		this.ownerDocuments.add(ownerDocumentItem);
-		return this; 
-		
+		return this;
+
 	}
 
 }

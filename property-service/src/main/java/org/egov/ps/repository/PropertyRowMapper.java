@@ -8,9 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.egov.ps.model.CourtCase;
+import org.egov.ps.model.Document;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
-import org.egov.ps.model.OwnerDocument;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.model.PurchaseDetails;
@@ -116,8 +116,9 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 		if (hasColumn(rs, "docid")) {
 			String docOwnerDetailId = rs.getString("docowner_details_id");
-			property.getPropertyDetails().getOwners().forEach(owner -> {
-
+			List<Owner> owners = property.getPropertyDetails().getOwners();
+			owners.forEach(owner -> {
+				System.out.println("sdfghjkl");
 				try {
 					if (rs.getString("docid") != null && rs.getBoolean("docis_active")
 							&& docOwnerDetailId.equals(owner.getOwnerDetails().getId())) {
@@ -126,15 +127,14 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 								.createdTime(rs.getLong("dcreated_time")).lastModifiedBy(rs.getString("dmodified_by"))
 								.lastModifiedTime(rs.getLong("dmodified_time")).build();
 
-						OwnerDocument ownerDocument = OwnerDocument.builder().id(rs.getString("docid"))
-								.ownerDetailsId(rs.getString("docowner_details_id"))
-								.tenantId(rs.getString("doctenantid")).isActive(rs.getBoolean("docis_active"))
-								.documentType(rs.getString("document_type")).fileStoreId(rs.getString("file_store_id"))
+						Document ownerDocument = Document.builder().id(rs.getString("docid"))
+								.referenceId(rs.getString("docowner_details_id")).tenantId(rs.getString("doctenantid"))
+								.isActive(rs.getBoolean("docis_active")).documentType(rs.getString("document_type"))
+								.fileStoreId(rs.getString("file_store_id")).propertyId(rs.getString("docproperty_id"))
 								.auditDetails(docAuditdetails).build();
 						owner.getOwnerDetails().addOwnerDocumentsItem(ownerDocument);
 					}
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			});
