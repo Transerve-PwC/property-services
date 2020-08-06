@@ -30,7 +30,7 @@ public class PropertyService {
 
 	@Autowired
 	PropertyValidator propertyValidator;
-	
+
 	@Autowired
 	PropertyRepository repository;
 
@@ -38,7 +38,6 @@ public class PropertyService {
 	WorkflowIntegrator wfIntegrator;
 
 	public List<Property> createProperty(PropertyRequest request) {
-
 		propertyValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
 		producer.push(config.getSavePropertyTopic(), request);
@@ -58,10 +57,10 @@ public class PropertyService {
 			wfIntegrator.callWorkFlow(request);
 		}
 		producer.push(config.getUpdatePropertyTopic(), request);
-		
+
 		return request.getProperties();
 	}
-	
+
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
 		List<Property> properties = repository.getProperties(criteria);
 		if (CollectionUtils.isEmpty(properties))

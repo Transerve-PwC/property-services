@@ -44,8 +44,8 @@ public class PropertyQueryBuilder {
 			+ " od.allotment_number, od.date_of_allotment, od.possesion_date,"
 			+ " od.is_current_owner, od.is_master_entry," + " od.due_amount, od.address, "
 
-			+ " doc.id as docid, doc.owner_details_id as docowner_details_id, doc.tenantid as doctenantid,"
-			+ " doc.is_active as docis_active, doc.document_type, doc.file_store_id,"
+			+ " doc.id as docid, doc.reference_id as docowner_details_id, doc.tenantid as doctenantid,"
+			+ " doc.is_active as docis_active, doc.document_type, doc.file_store_id, doc.property_id as docproperty_id,"
 			+ " doc.created_by as dcreated_by, doc.created_time as dcreated_time, doc.last_modified_by as dmodified_by, doc.last_modified_time as dmodified_time ";
 
 	private static final String CC_COLUMNS = " cc.id as ccid, cc.property_details_id as ccproperty_details_id,"
@@ -65,7 +65,7 @@ public class PropertyQueryBuilder {
 
 	private static final String OWNER_TABLE = " cs_pm_owner_v1 ownership  ON ptdl.id=ownership.property_details_id "
 			+ LEFT_JOIN + " cs_pm_owner_details_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
-			+ " cs_pm_owner_documents_v1 doc ON od.id=doc.owner_details_id ";
+			+ " cs_pm_documents_v1 doc ON od.id=doc.reference_id ";
 
 	private static final String CC_TABLE = " cs_pm_court_case_v1 cc ON ptdl.id=cc.property_details_id ";
 
@@ -94,8 +94,8 @@ public class PropertyQueryBuilder {
 			+ " od.allotment_number, od.date_of_allotment, od.possesion_date,"
 			+ " od.is_current_owner, od.is_master_entry," + " od.due_amount, od.address,"
 
-			+ " doc.id as docid, doc.owner_details_id as docowner_details_id, doc.tenantid as doctenantid,"
-			+ " doc.is_active as docis_active, doc.document_type, doc.file_store_id,"
+			+ " doc.id as docid, doc.reference_id as docowner_details_id, doc.tenantid as doctenantid,"
+			+ " doc.is_active as docis_active, doc.document_type, doc.file_store_id, doc.property_id as docproperty_id,"
 			+ " doc.created_by as dcreated_by, doc.created_time as dcreated_time, doc.last_modified_by as dmodified_by, doc.last_modified_time as dmodified_time,"
 
 			+ " cc.id as ccid, cc.property_details_id as ccproperty_details_id,"
@@ -113,7 +113,7 @@ public class PropertyQueryBuilder {
 			+ " FROM cs_pm_property_v1 pt " + INNER_JOIN + " cs_pm_property_details_v1 ptdl ON pt.id =ptdl.property_id "
 			+ INNER_JOIN + " cs_pm_owner_v1 ownership ON ptdl.id=ownership.property_details_id " + LEFT_JOIN
 			+ " cs_pm_owner_details_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
-			+ " cs_pm_owner_documents_v1 doc ON od.id=doc.owner_details_id " + LEFT_JOIN
+			+ " cs_pm_documents_v1 doc ON od.id=doc.reference_id " + LEFT_JOIN
 			+ " cs_pm_court_case_v1 cc ON ptdl.id=cc.property_details_id " + LEFT_JOIN
 			+ " cs_pm_purchase_details_v1 pd ON ptdl.id=pd.property_details_id";
 
@@ -175,7 +175,7 @@ public class PropertyQueryBuilder {
 			if (relations.contains("court")) {
 				builder.append(CC_ALL);
 			}
-			
+
 			if (relations.contains("purchase")) {
 				builder.append(PD_ALL);
 			}
@@ -205,7 +205,7 @@ public class PropertyQueryBuilder {
 					j++;
 				}
 			}
-			
+
 			if (relations.contains("purchase")) {
 				builder.append(PD_COLUMNS);
 				if (j < size) {
@@ -241,7 +241,7 @@ public class PropertyQueryBuilder {
 					k++;
 				}
 			}
-			
+
 			if (relations.contains("purchase")) {
 				builder.append(PD_TABLE);
 				if (k < size) {

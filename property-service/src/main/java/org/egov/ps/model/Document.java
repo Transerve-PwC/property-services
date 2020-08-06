@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * A Object holds the basic data for a Owner Documents
+ * A Object holds the basic data for a Documents
  */
-@ApiModel(description = "A Object holds the basic data for a Owner Documents")
+@ApiModel(description = "A Object holds the basic data for a Documents")
 @Validated
-@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2020-07-31T17:06:11.263+05:30")
+@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2020-08-05T17:06:11.263+05:30")
 
 @Getter
 @Setter
@@ -26,7 +26,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class OwnerDocument {
+public class Document {
 
 	@JsonProperty("id")
 	private String id;
@@ -34,17 +34,20 @@ public class OwnerDocument {
 	@JsonProperty("tenantId")
 	private String tenantId;
 
-	@JsonProperty("ownerDetailsId")
-	private String ownerDetailsId;
-
-	@JsonProperty("isActive")
-	private Boolean isActive;
+	@JsonProperty("referenceId")
+	private String referenceId;
 
 	@JsonProperty("documentType")
 	private String documentType;
 
 	@JsonProperty("fileStoreId")
 	private String fileStoreId;
+
+	@JsonProperty("isActive")
+	private Boolean isActive;
+
+	@JsonProperty("propertyId")
+	private String propertyId;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;

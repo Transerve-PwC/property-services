@@ -1,15 +1,14 @@
 package org.egov.ps.service;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.model.CourtCase;
+import org.egov.ps.model.Document;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
-import org.egov.ps.model.OwnerDocument;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.model.PurchaseDetails;
@@ -29,7 +28,6 @@ public class EnrichmentService {
 
 	@Autowired
 	Util util;
-	
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
@@ -158,7 +156,7 @@ public class EnrichmentService {
 	public void enrichUpdateRequest(PropertyRequest request, List<Property> propertyFromDb) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
-		
+
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
 				AuditDetails modifyAuditDetails = property.getAuditDetails();
@@ -182,34 +180,34 @@ public class EnrichmentService {
 
 	private PropertyDetails updatePropertyDetail(Property property, RequestInfo requestInfo) {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
-		List<OwnerDocument> ownerDocuments = updateOwnerDocs(propertyDetail, property, requestInfo);
+		List<Document> ownerDocuments = updateOwnerDocs(propertyDetail, property, requestInfo);
 		propertyDetail.getOwners().forEach(owner -> {
 			owner.getOwnerDetails().setOwnerDocuments(ownerDocuments);
 		});
 		return propertyDetail;
 	}
 
-	private List<OwnerDocument> updateOwnerDocs(PropertyDetails propertyDetail, Property property,
-			RequestInfo requestInfo) {
-		List<OwnerDocument> ownerDocs = new ArrayList<>();
-		 propertyDetail.getOwners().forEach(owner -> {
-			 List<OwnerDocument> ownerDocuments = owner.getOwnerDetails().getOwnerDocuments();
-				if (!CollectionUtils.isEmpty(ownerDocuments)) {
-					AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-					ownerDocuments.forEach(document -> {
-						if (document.getId() == null) {
-							String gen_doc_id = UUID.randomUUID().toString();
-							document.setId(gen_doc_id);
-							document.setOwnerDetailsId(owner.getOwnerDetails().getId());
-							document.setTenantId(property.getTenantId());
-						}
-						document.setAuditDetails(docAuditDetails);
-					});
-				}
-				ownerDocs.addAll(ownerDocuments); //TODO: verify the return type and submit
-		 });
+	private List<Document> updateOwnerDocs(PropertyDetails propertyDetail, Property property, RequestInfo requestInfo) {
+		List<Document> ownerDocs = new ArrayList<>();
+		propertyDetail.getOwners().forEach(owner -> {
+			List<Document> ownerDocuments = owner.getOwnerDetails().getOwnerDocuments();
+			if (!CollectionUtils.isEmpty(ownerDocuments)) {
+				AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				ownerDocuments.forEach(document -> {
+					if (document.getId() == null) {
+						String gen_doc_id = UUID.randomUUID().toString();
+						document.setId(gen_doc_id);
+						document.setTenantId(property.getTenantId());
+						document.setReferenceId(owner.getOwnerDetails().getId());
+						document.setPropertyId(property.getId());
+					}
+					document.setAuditDetails(docAuditDetails);
+				});
+			}
+			ownerDocs.addAll(ownerDocuments);
+		});
 		return ownerDocs;
-		
+
 	}
 
 }

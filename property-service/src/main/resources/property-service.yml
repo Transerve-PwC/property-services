@@ -144,7 +144,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_pm_owner_documents_v1 (id, tenantid, owner_details_id, is_active, document_type, file_store_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pm_documents_v1 (id, tenantid, reference_id, is_active, document_type, file_store_id, property_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*
       jsonMaps:
 
@@ -152,13 +152,15 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.tenantId
       
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.ownerDetailsId
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.referenceId
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.isActive
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.documentType
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.fileStoreId
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.propertyId
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.createdBy
 
@@ -390,21 +392,23 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.id
 
 
-    - query: INSERT INTO cs_pm_owner_documents_v1 (id, tenantid, owner_details_id, is_active, document_type, file_store_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type = ?, file_store_id = ?, last_modified_by = ?, last_modified_time = ?;
+    - query: INSERT INTO cs_pm_documents_v1 (id, tenantid, reference_id, is_active, document_type, file_store_id, property_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type = ?, file_store_id = ?, last_modified_by = ?, last_modified_time = ?;
       basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*
       jsonMaps:
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.id
 
       - jsonPath: $.Properties.*.tenantId
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.ownerDetailsId
       
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.referenceId
+
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.isActive
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.documentType
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.fileStoreId
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.propertyId
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.createdBy
 
@@ -412,7 +416,7 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedTime  
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedTime 
       
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.isActive
 
@@ -483,3 +487,4 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.auditDetails.lastModifiedTime
       
       - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.id
+      
