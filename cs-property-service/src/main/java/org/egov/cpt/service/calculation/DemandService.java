@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -15,7 +17,11 @@ import org.egov.common.contract.request.User;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.RequestInfoWrapper;
+import org.egov.cpt.models.UserResponse;
+import org.egov.cpt.models.UserSearchRequest;
+import org.egov.cpt.models.UserSearchRequestCore;
 import org.egov.cpt.models.calculation.Demand;
 import org.egov.cpt.models.calculation.Demand.StatusEnum;
 import org.egov.cpt.models.calculation.DemandDetail;
@@ -30,6 +36,9 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class DemandService {
 
@@ -64,8 +73,25 @@ public class DemandService {
 
 			String tenantId = owner.getTenantId();
 			String consumerCode = owner.getOwnerDetails().getApplicationNumber();
+			
+			String url = config.getUserHost().concat(config.getUserSearchEndpoint());
 
-			User requestUser = requestInfo.getUserInfo(); // user from request information
+			List<org.egov.cpt.models.User> ownerUser = null;
+			Set<String> uuid = new HashSet<>();
+			uuid.add(owner.getAuditDetails().getCreatedBy());
+
+			UserSearchRequestCore userSearchRequest = UserSearchRequestCore.builder().requestInfo(requestInfo).
+					uuid(uuid).
+					build();
+
+			ownerUser = mapper.convertValue(serviceRequestRepository.fetchResult(url, userSearchRequest), UserResponse.class)
+					.getUser();
+			
+			log.info("ownerUser:"+ownerUser);
+
+//			User requestUser = requestInfo.getUserInfo(); // user from request information
+			User requestUser = ownerUser.get(0).toCommonUser();
+			log.info("requestUser:"+requestUser);
 			User user = null;
 			if (requestUser.getMobileNumber() != null) {
 				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
@@ -80,7 +106,7 @@ public class DemandService {
 						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
 						.build();
 			}
-
+			
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			if (!CollectionUtils.isEmpty(owner.getCalculation().getTaxHeadEstimates())) {
 				owner.getCalculation().getTaxHeadEstimates().forEach(taxHeadEstimate -> {
@@ -111,25 +137,30 @@ public class DemandService {
 	 * @param calculations List of calculation object
 	 * @return Demands that are updated
 	 */
-	public List<Demand> updateDemand(RequestInfo requestInfo, List<Owner> owners) {
+	public List<Demand> generateDemand(RequestInfo requestInfo, List<Owner> owners) {
 		List<Demand> demands = new LinkedList<>();
 		for (Owner owner : owners) {
 
 			List<Demand> searchResult = searchDemand(owner.getTenantId(),
-					Collections.singleton(owner.getOwnerDetails().getApplicationNumber()), requestInfo,
-					owner.getBusinessService());
+					Collections.singleton(owner.getOwnerDetails().getApplicationNumber()), requestInfo,owner.getBusinessService());
 
 			if (CollectionUtils.isEmpty(searchResult))
-				throw new CustomException("INVALID UPDATE",
-						"No demand exists for applicationNumber: " + owner.getOwnerDetails().getApplicationNumber());
-
-			Demand demand = searchResult.get(0);
-			List<DemandDetail> demandDetails = demand.getDemandDetails();
-			List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(owner, demandDetails);
-			demand.setDemandDetails(updatedDemandDetails);
-			demands.add(demand);
+			{
+				demands = createDemand(requestInfo,owners);
+				/*throw new CustomException("INVALID UPDATE",
+						"No demand exists for applicationNumber: " + owner.getOwnerDetails().getApplicationNumber());*/
+			}
+			else{
+				Demand demand = searchResult.get(0);
+				List<DemandDetail> demandDetails = demand.getDemandDetails();
+				List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(owner, demandDetails);
+				demand.setDemandDetails(updatedDemandDetails);
+				demands.add(demand);
+				demands= demandRepository.updateDemand(requestInfo, demands);
+			}
+		
 		}
-		return demandRepository.updateDemand(requestInfo, demands);
+		return demands;
 	}
 
 	/**
@@ -222,8 +253,26 @@ public class DemandService {
 
 			String tenantId = application.getTenantId();
 			String consumerCode = application.getApplicationNumber();
+			
+			String url = config.getUserHost().concat(config.getUserSearchEndpoint());
 
-			User requestUser = requestInfo.getUserInfo();
+			List<org.egov.cpt.models.User> ownerUser = null;
+			Set<String> uuid = new HashSet<>();
+			uuid.add(application.getAuditDetails().getCreatedBy());
+
+			UserSearchRequestCore userSearchRequest = UserSearchRequestCore.builder().requestInfo(requestInfo).
+					uuid(uuid).
+					build();
+
+			ownerUser = mapper.convertValue(serviceRequestRepository.fetchResult(url, userSearchRequest), UserResponse.class)
+					.getUser();
+			
+			log.info("ownerUser:"+ownerUser);
+
+//			User requestUser = requestInfo.getUserInfo(); // user from request information
+			User requestUser = ownerUser.get(0).toCommonUser();
+			log.info("requestUser:"+requestUser);
+
 			User user = null;
 			if (requestUser.getMobileNumber() != null) {
 				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
@@ -264,7 +313,7 @@ public class DemandService {
 
 	}
 
-	public List<Demand> updateDuplicateCopyDemand(RequestInfo requestInfo,
+	public List<Demand> generateDuplicateCopyDemand(RequestInfo requestInfo,
 			List<DuplicateCopy> duplicateCopyApplications) {
 		List<Demand> demands = new LinkedList<>();
 		for (DuplicateCopy application : duplicateCopyApplications) {
@@ -273,17 +322,21 @@ public class DemandService {
 					Collections.singleton(application.getApplicationNumber()), requestInfo,
 					application.getBusinessService());
 			if (CollectionUtils.isEmpty(searchResult)) {
-				throw new CustomException("INVALID UPDATE",
-						"No demand exists for applicationNumber: " + application.getApplicationNumber());
+				demands = createDuplicateCopyDemand(requestInfo,duplicateCopyApplications);
+				/*throw new CustomException("INVALID UPDATE",
+						"No demand exists for applicationNumber: " + application.getApplicationNumber());*/
 
 			}
-			Demand demand = searchResult.get(0);
-			List<DemandDetail> demandDetails = demand.getDemandDetails();
-			List<DemandDetail> updatedDemandDetails = getUpdatedDuplicateCopyDemandDetails(application, demandDetails);
-			demand.setDemandDetails(updatedDemandDetails);
-			demands.add(demand);
+			else{
+				Demand demand = searchResult.get(0);
+				List<DemandDetail> demandDetails = demand.getDemandDetails();
+				List<DemandDetail> updatedDemandDetails = getUpdatedDuplicateCopyDemandDetails(application, demandDetails);
+				demand.setDemandDetails(updatedDemandDetails);
+				demands.add(demand);
+				demands=demandRepository.updateDemand(requestInfo, demands);
+			}
 		}
-		return demandRepository.updateDemand(requestInfo, demands);
+		return demands;
 
 	}
 
