@@ -71,9 +71,9 @@ public class PropertyValidator {
 		return null; //TODO: add next lines
 	}
 
-	private boolean PropertyExists(List<Property> responseProperties) {
+	private boolean PropertyExists(List<Property> propertiesFromSearchResponse) {
 		 
-		return (!CollectionUtils.isEmpty(responseProperties) && responseProperties.size() == 1);
+		return (!CollectionUtils.isEmpty(propertiesFromSearchResponse) && propertiesFromSearchResponse.size() == 1);
 	}
 
 	private PropertyCriteria getPropertyCriteriaForSearch(PropertyRequest request) {
