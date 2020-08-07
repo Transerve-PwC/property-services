@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.egov.ps.config.Configuration;
 import org.egov.ps.model.PropertyCriteria;
+import org.egov.ps.util.PSConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -184,10 +185,19 @@ public class PropertyQueryBuilder {
 //		Search Query for Drafted applications
 //		createdBy = currentUserId OR states IN (’STATE1’,’STATE2’,’STATE3’,’STATE4’)
 
-		addClauseIfRequired(preparedStmtList, builder);
-		builder.append("pt.created_by = '" + criteria.getUserId() + "' OR ");
-		builder.append("pt.state IN (:state)");
-		preparedStmtList.put("state", criteria.getStatus());
+		if (null != criteria.getState()) {
+			if (criteria.getState().contains(PSConstants.PM_DRAFTED)) {
+				addClauseIfRequired(preparedStmtList, builder);
+				builder.append("pt.created_by = '" + criteria.getUserId() + "' AND ");
+				builder.append("pt.state IN (:state)");
+				preparedStmtList.put("state", criteria.getState());
+			} else {
+				addClauseIfRequired(preparedStmtList, builder);
+				builder.append("pt.created_by = '" + criteria.getUserId() + "' OR ");
+				builder.append("pt.state IN (:state)");
+				preparedStmtList.put("state", criteria.getState());
+			}
+		}
 
 		if (!ObjectUtils.isEmpty(criteria.getFileNumber())) {
 			addClauseIfRequired(preparedStmtList, builder);
@@ -213,11 +223,11 @@ public class PropertyQueryBuilder {
 			preparedStmtList.put("phone", criteria.getMobileNumber());
 		}
 
-		if (null != criteria.getState()) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.state = :state");
-			preparedStmtList.put("state", criteria.getState());
-		}
+//		if (null != criteria.getState()) {
+//			addClauseIfRequired(preparedStmtList, builder);
+//			builder.append("pt.state = :state");
+//			preparedStmtList.put("state", criteria.getState());
+//		}
 
 		if (null != criteria.getPropertyId()) {
 			addClauseIfRequired(preparedStmtList, builder);

@@ -72,18 +72,38 @@ public class PropertyService {
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
 
 //		It will add all the states of the property which are in workflow
-		String wfbusinessServiceName = PSConstants.BUSINESS_SERVICE_PM;
-		BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo,
-				wfbusinessServiceName);
-		List<State> stateList = otBusinessService.getStates();
-		List<String> states = new ArrayList<String>();
+//		if (criteria.isEmpty()) {
+//			String wfbusinessServiceName = PSConstants.BUSINESS_SERVICE_PM;
+//			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo,
+//					wfbusinessServiceName);
+//			List<State> stateList = otBusinessService.getStates();
+//			List<String> states = new ArrayList<String>();
+//
+//			for (State state : stateList) {
+//				states.add(state.getState());
+//			}
+//			states.remove("");
+//			criteria.setState(states);
+//			criteria.setUserId("");
+//		} else
+		if (criteria.isEmpty()) {
+			String wfbusinessServiceName = PSConstants.BUSINESS_SERVICE_PM;
+			BusinessService otBusinessService = workflowService.getBusinessService(PSConstants.TENENT_ID, requestInfo,
+					wfbusinessServiceName);
+			List<State> stateList = otBusinessService.getStates();
+			List<String> states = new ArrayList<String>();
 
-		for (State state : stateList) {
-			states.add(state.getState());
+			for (State state : stateList) {
+				states.add(state.getState());
+			}
+			states.remove("");
+			criteria.setState(states);
+			criteria.setUserId(requestInfo.getUserInfo().getUuid());
+		} else {
+			if (criteria.getState() != null && criteria.getState().contains(PSConstants.PM_DRAFTED)) {
+				criteria.setUserId(requestInfo.getUserInfo().getUuid());
+			}
 		}
-		states.remove("");
-		criteria.setStatus(states);
-		criteria.setUserId(requestInfo.getUserInfo().getUuid());
 
 		List<Property> properties = repository.getProperties(criteria);
 

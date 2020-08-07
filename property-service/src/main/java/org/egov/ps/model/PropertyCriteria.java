@@ -25,7 +25,7 @@ public class PropertyCriteria {
 
 	private String ownerName;
 
-	private String state;
+	private List<String> state;
 
 	private Long offset;
 
@@ -35,11 +35,13 @@ public class PropertyCriteria {
 
 	private List<String> relations;
 
-	@Builder.Default
-	private String tenantId = "ch.chandigarh";
-
-	private List<String> status;
+	private String tenantId;
 
 	private String userId;
 
+	public boolean isEmpty() {
+		return (this.fileNumber == null && this.category == null && this.mobileNumber == null && this.ownerName == null
+				&& this.state == null && this.offset == null && this.limit == null && this.propertyId == null
+				&& this.relations == null && this.tenantId == null && this.userId == null);
+	}
 }
