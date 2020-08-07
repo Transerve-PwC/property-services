@@ -46,7 +46,9 @@ public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
 
 				currentapplication = Mortgage.builder().id(mortgageId).property(property)
 						.tenantId(rs.getString("tenantid")).state(rs.getString("state")).action(rs.getString("action"))
-						.applicationNumber(rs.getString("app_number")).auditDetails(auditdetails).build();
+						.applicationNumber(rs.getString("app_number"))
+						.allotmentNumber(rs.getString("owner_allot_number"))
+						.auditDetails(auditdetails).build();
 				applicationMap.put(mortgageId, currentapplication);
 			}
 			addChildrenToProperty(rs, currentapplication);
