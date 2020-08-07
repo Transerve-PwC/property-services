@@ -1,5 +1,7 @@
 package org.egov.cpt.models;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +17,9 @@ import lombok.ToString;
 @Builder
 
 public class PropertyCriteria {
+	
+	@Builder.Default
+	private String tenantId = "ch.chandigarh";
 
 	private String transitNumber;
 
@@ -24,12 +29,15 @@ public class PropertyCriteria {
 
 	private String name;
 
-	private String state;
+	private List<String> state;
 
 	private Long offset;
 
 	private Long limit;
 
 	private String propertyId;
+	
+	private String createdBy;
+	
 
 }

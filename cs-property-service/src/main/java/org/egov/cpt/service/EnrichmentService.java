@@ -84,6 +84,7 @@ public class EnrichmentService {
 				property.setId(gen_property_id);
 				property.setAuditDetails(propertyAuditDetails);
 				property.setPropertyDetails(propertyDetail);
+				property.setMasterDataState(PTConstants.PM_DRAFTED);
 //				log.info("property id: " + gen_property_id);
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {

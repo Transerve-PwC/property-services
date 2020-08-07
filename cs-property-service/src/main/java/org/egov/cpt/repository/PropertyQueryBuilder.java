@@ -144,8 +144,14 @@ public class PropertyQueryBuilder {
 
 		if (null != criteria.getState()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.master_data_state = :state");
-			preparedStmtList.put("state", criteria.getState());
+			builder.append("pt.master_data_state IN (:states)");
+			preparedStmtList.put("states", criteria.getState());
+		}
+		
+		if (null != criteria.getCreatedBy()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("pt.created_by =:createdBy");
+			preparedStmtList.put("createdBy", criteria.getCreatedBy());
 		}
 
 		if (null != criteria.getPropertyId()) {

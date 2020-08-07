@@ -60,7 +60,8 @@ public class PTConstants {
 	public static final String BOUNDARY_HEIRARCHY_CODE = "REVENUE";
 
 //	payment
-
+	public static final String BUSINESS_SERVICE_PM = "MasterRP";
+	
 	public static final String BUSINESS_SERVICE_OT = "OwnershipTransferRP";
 
 	public static final String BUSINESS_SERVICE_DC = "DuplicateCopyOfAllotmentLetterRP";
@@ -214,6 +215,7 @@ public class PTConstants {
 	public static final String OT_DRAFTED ="OT_DRAFTED";
 	public static final String MG_DRAFTED ="MG_DRAFTED";
 	public static final String DC_DRAFTED ="DC_DRAFTED";
+	public static final String PM_DRAFTED ="PM_DRAFTED";
 	
 //Reject State
 	public static final String MG_REJECTED ="MG_REJECTED";
