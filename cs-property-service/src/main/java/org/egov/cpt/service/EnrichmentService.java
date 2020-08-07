@@ -875,6 +875,23 @@ public class EnrichmentService {
 				notice.setId(gen_notice_id);
 				notice.getProperty().setId(noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
 				notice.setAuditDetails(noticeAuditDetails);
+				
+				if (!CollectionUtils.isEmpty(notice.getApplicationDocuments())) {
+					notice.getApplicationDocuments().forEach(document -> {
+						if (document.getId() == null) {
+							AuditDetails documentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							
+							document.setId(UUID.randomUUID().toString());
+							document.setActive(true);
+							document.setReferenceId(gen_notice_id);
+							document.setPropertyId(noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
+							document.setAuditDetails(documentAuditDetails);
+							document.setTenantId(noticeGenerationRequest.getNoticeApplications().get(0).getTenantId());
+						}
+
+					});
+
+				}
 			});
 		}
 		setNoticeIdgenIds(noticeGenerationRequest);
@@ -896,11 +913,14 @@ public class EnrichmentService {
 	public void enrichNoticeUpdateRequest(NoticeGenerationRequest noticeGenerationRequest,
 			List<NoticeGeneration> searchedProperty) {
 		RequestInfo requestInfo = noticeGenerationRequest.getRequestInfo();
-		AuditDetails noticeAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
+		AuditDetails updateAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 		// String propertyDtlId = searchedProperty.get(0).getPropertyDetails().getId();
 		if (!CollectionUtils.isEmpty(noticeGenerationRequest.getNoticeApplications())) {
 			noticeGenerationRequest.getNoticeApplications().forEach(application -> {
-				application.setAuditDetails(noticeAuditDetails);
+				AuditDetails modifyAuditDetails = application.getAuditDetails();
+				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
+				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
+				application.setAuditDetails(modifyAuditDetails);
 				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
 					application.getApplicationDocuments().forEach(document -> {
 						if (document.getId() == null) {

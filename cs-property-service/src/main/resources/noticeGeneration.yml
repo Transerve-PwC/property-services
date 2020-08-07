@@ -55,7 +55,7 @@ serviceMaps:
 
       - jsonPath: $.NoticeApplications.*.applicationDocuments.*.id
       
-      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.refernceId
+      - jsonPath: $.NoticeApplications.*.applicationDocuments.*.referenceId
       
       - jsonPath: $.NoticeApplications.*.applicationDocuments.*.tenantId 
 
