@@ -1,6 +1,5 @@
 DROP TABLE IF EXISTS cs_pt_duplicate_ownership_application;
 DROP TABLE IF EXISTS cs_pt_duplicatecopy_applicant;
-DROP TABLE IF EXISTS cs_pt_duplicatecopy_document;
 DROP TABLE IF EXISTS cs_pt_duplicate_ownership_application_audit;
 DROP TABLE IF EXISTS cs_pt_duplicatecopy_applicant_audit;
 
@@ -46,23 +45,6 @@ CREATE TABLE cs_pt_duplicatecopy_applicant (
   CONSTRAINT fk_cs_pt_duplicatecopy_applicant FOREIGN KEY (application_id) REFERENCES cs_pt_duplicate_ownership_application (id)
 );
 
---> Duplicate copy document table
-CREATE TABLE cs_pt_duplicatecopy_document(
-    id 					CHARACTER VARYING(64),
-    tenantId 			CHARACTER VARYING(64),
-    documentType 		CHARACTER VARYING(64),
-    filestoreid 		CHARACTER VARYING(64),
-    application_id  	CHARACTER VARYING(64),
-    active 				BOOLEAN,
-    
-    createdBy 			CHARACTER VARYING(64),
-    lastModifiedBy 		CHARACTER VARYING(64),
-    created_time 		bigint,
-    modified_time 		bigint,
-
-    CONSTRAINT uk_cs_pt_duplicatecopy_document PRIMARY KEY (id),
-    CONSTRAINT fk_cs_pt_duplicatecopy_document FOREIGN KEY (application_id) REFERENCES cs_pt_duplicate_ownership_application (id)
-);
 
 CREATE TABLE cs_pt_duplicate_ownership_application_audit(
    id           			CHARACTER VARYING (256) NOT NULL,

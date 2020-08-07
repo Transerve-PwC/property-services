@@ -3,7 +3,6 @@ DROP TABLE IF EXISTS cs_pt_propertydetails_v1;
 DROP TABLE IF EXISTS cs_pt_ownership_v1;
 DROP TABLE IF EXISTS cs_pt_ownershipdetails_v1;
 DROP TABLE IF EXISTS cs_pt_address_v1;
-DROP TABLE IF EXISTS cs_pt_application_documents_v1;
 
 DROP TABLE IF EXISTS cs_pt_property_audit_v1;
 DROP TABLE IF EXISTS cs_pt_propertydetails_audit_v1;
@@ -132,26 +131,6 @@ CREATE TABLE cs_pt_address_v1 (
 
   CONSTRAINT pk_cs_pt_address_v1 PRIMARY KEY (id),
   CONSTRAINT fk_cs_pt_address_v1 FOREIGN KEY (property_id) REFERENCES cs_pt_property_v1 (id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
-);
-
-CREATE TABLE cs_pt_application_documents_v1 (
-   id           		CHARACTER VARYING (256) NOT NULL,
-   property_id       	CHARACTER VARYING (256) NOT NULL,
-   tenantid			    CHARACTER VARYING (256),
-   is_active   			CHARACTER VARYING (256),
-   document_type   		CHARACTER VARYING (256),
-   fileStore_id         CHARACTER VARYING (256),
-   document_uid   		CHARACTER VARYING (256),
-  
-   created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         CHARACTER VARYING NOT NULL,
-   modified_by     		CHARACTER VARYING (128),
-   modified_date       	CHARACTER VARYING,
-
-  CONSTRAINT pk_cs_pt_application_documents_v1 PRIMARY KEY (id),
-  CONSTRAINT fk_cs_pt_application_documents_v1 FOREIGN KEY (property_id) REFERENCES cs_pt_property_v1 (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
 );
