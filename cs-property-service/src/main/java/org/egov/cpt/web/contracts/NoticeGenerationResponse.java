@@ -25,7 +25,7 @@ public class NoticeGenerationResponse {
 	@JsonProperty("ResponseInfo")
 	private ResponseInfo responseInfo;
 
-	@JsonProperty("noticeApplications")
+	@JsonProperty("NoticeApplications")
 	@Valid
 	private List<NoticeGeneration> noticeApplications;
 

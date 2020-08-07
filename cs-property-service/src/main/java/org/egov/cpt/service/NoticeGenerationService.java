@@ -55,8 +55,8 @@ public class NoticeGenerationService {
 	}
 
 	public List<NoticeGeneration> updateNotice(NoticeGenerationRequest noticeGenerationRequest) {
-		List<NoticeGeneration> searchedProperty = propertyValidator.validateNoticeUpdateRequest(noticeGenerationRequest); 
-		enrichmentService.enrichNoticeUpdateRequest(noticeGenerationRequest,searchedProperty);
+		List<NoticeGeneration> searchedApplication = propertyValidator.validateNoticeUpdateRequest(noticeGenerationRequest); 
+		enrichmentService.enrichNoticeUpdateRequest(noticeGenerationRequest,searchedApplication);
 		propertyValidator.validateNoticeUpdate(noticeGenerationRequest);
 		producer.push(config.getUpdateNoticeTopic(), noticeGenerationRequest);
 		return noticeGenerationRequest.getNoticeApplications();
