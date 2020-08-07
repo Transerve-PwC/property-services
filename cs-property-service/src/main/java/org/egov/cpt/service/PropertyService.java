@@ -80,7 +80,7 @@ public class PropertyService {
 	}
 
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
-		if(CollectionUtils.isEmpty(criteria.getState())){
+		if(criteria.isEmpty()){
 			String wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_PM;
 			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, wfbusinessServiceName);
 			List<State> stateList= otBusinessService.getStates();
@@ -95,6 +95,11 @@ public class PropertyService {
 			criteria.setState(states);
 			criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
 		}
+		else{
+			if(!CollectionUtils.isEmpty(criteria.getState())&&criteria.getState().contains(PTConstants.PM_DRAFTED))
+				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
+		}
+		
 		List<Property> properties = repository.getProperties(criteria);
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
