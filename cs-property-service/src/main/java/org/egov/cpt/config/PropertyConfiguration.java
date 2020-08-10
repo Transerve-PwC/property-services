@@ -132,6 +132,12 @@ public class PropertyConfiguration {
 
 	@Value("${notification.sms.enabled}")
 	private Boolean isSMSNotificationEnabled;
+	
+	@Value("${notification.email.enabled}")
+	private Boolean isEMAILNotificationEnabled;
+	
+	@Value("${kafka.topics.notification.email}")
+	private String emailNotifTopic;
 
 	// Property Search Params
 	@Value("${citizen.allowed.search.params}")
