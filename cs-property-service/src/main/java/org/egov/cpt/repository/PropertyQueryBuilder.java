@@ -140,7 +140,7 @@ public class PropertyQueryBuilder {
 		if (null != criteria.getPhone()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("od.phone = :phone");
-			preparedStmtList.put("name", criteria.getPhone());
+			preparedStmtList.put("phone", criteria.getPhone());
 		}
 
 		if (null != criteria.getState()) {
