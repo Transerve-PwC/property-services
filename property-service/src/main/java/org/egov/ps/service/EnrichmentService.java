@@ -208,6 +208,7 @@ public class EnrichmentService {
 	private PropertyDetails updatePropertyDetail(Property property, RequestInfo requestInfo) {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
 		List<Document> ownerDocuments = updateOwnerDocs(propertyDetail, property, requestInfo);
+		List<Payment> paymentDetails = updatePaymentDetails(propertyDetail, property, requestInfo);
 		propertyDetail.getOwners().forEach(owner -> {
 			owner.getOwnerDetails().setOwnerDocuments(ownerDocuments);
 		});
@@ -234,7 +235,29 @@ public class EnrichmentService {
 			ownerDocs.addAll(ownerDocuments);
 		});
 		return ownerDocs;
+	}
 
+	private List<Payment> updatePaymentDetails(PropertyDetails propertyDetail, Property property,
+			RequestInfo requestInfo) {
+		List<Payment> paymentDetails = new ArrayList<>();
+		propertyDetail.getOwners().forEach(owner -> {
+			List<Payment> payments = owner.getOwnerDetails().getPaymentDetails();
+			if (!CollectionUtils.isEmpty(payments)) {
+				AuditDetails paymentAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				payments.forEach(payment -> {
+					if (payment.getId() == null) {
+						String gen_payment_detail_id = UUID.randomUUID().toString();
+						payment.setId(gen_payment_detail_id);
+						payment.setTenantId(property.getTenantId());
+						payment.setOwnerDetailsId(owner.getOwnerDetails().getId());
+						payment.setAuditDetails(paymentAuditDetails);
+					}
+					payment.setAuditDetails(paymentAuditDetails);
+				});
+			}
+			paymentDetails.addAll(payments);
+		});
+		return paymentDetails;
 	}
 
 }

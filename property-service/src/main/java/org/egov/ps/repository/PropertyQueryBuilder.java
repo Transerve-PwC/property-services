@@ -26,7 +26,7 @@ public class PropertyQueryBuilder {
 	private static final String LEFT_JOIN = " LEFT OUTER JOIN ";
 
 	private static final String PT_ALL = " pt.*, ptdl.*, ";
-	private static final String OWNER_ALL = " ownership.*, od.*, doc.*, ";
+	private static final String OWNER_ALL = " ownership.*, od.*, doc.*, payment.*,";
 	private static final String CC_ALL = " cc.*, ";
 	private static final String PD_ALL = "  pd.*, ";
 
@@ -52,7 +52,20 @@ public class PropertyQueryBuilder {
 
 			+ " doc.id as docid, doc.reference_id as docowner_details_id, doc.tenantid as doctenantid,"
 			+ " doc.is_active as docis_active, doc.document_type, doc.file_store_id, doc.property_id as docproperty_id,"
-			+ " doc.created_by as dcreated_by, doc.created_time as dcreated_time, doc.last_modified_by as dmodified_by, doc.last_modified_time as dmodified_time ";
+			+ " doc.created_by as dcreated_by, doc.created_time as dcreated_time, doc.last_modified_by as dmodified_by, doc.last_modified_time as dmodified_time, "
+
+			+ " payment.id as payid, payment.tenantid as paytenantid, payment.owner_details_id as payowner_details_id, "
+			+ " payment.gr_due_date_of_payment, payment.gr_payable, payment.gr_amount_of_gr, "
+			+ " payment.gr_total_gr, payment.gr_date_of_deposit, payment.gr_delay_in_payment, "
+			+ " payment.gr_interest_for_delay, payment.gr_total_amount_due_with_interest, payment.gr_amount_deposited_gr, "
+			+ " payment.gr_amount_deposited_intt, payment.gr_balance_gr, payment.gr_balance_intt, "
+			+ " payment.gr_total_due, payment.gr_receipt_number, payment.gr_receipt_date, "
+			+ " payment.st_rate_of_st_gst, payment.st_amount_of_gst, payment.st_amount_due, "
+			+ " payment.st_date_of_deposit, payment.st_delay_in_payment, payment.st_interest_for_delay, "
+			+ " payment.st_total_amount_due_with_interest, payment.st_amount_deposited_st_gst, payment.st_amount_deposited_intt, "
+			+ " payment.st_balance_st_gst, payment.st_balance_intt, payment.st_total_due, "
+			+ " payment.st_receipt_number, payment.st_receipt_date, payment.st_payment_made_by, "
+			+ " payment.created_by as paycreated_by, payment.created_time as paycreated_time, payment.last_modified_by as paymodified_by, payment.last_modified_time as paymodified_time ";
 
 	private static final String CC_COLUMNS = " cc.id as ccid, cc.property_details_id as ccproperty_details_id,"
 			+ " cc.tenantid as cctenantid, cc.estate_officer_court as ccestate_officer_court,"
@@ -71,7 +84,8 @@ public class PropertyQueryBuilder {
 
 	private static final String OWNER_TABLE = " cs_pm_owner_v1 ownership  ON ptdl.id=ownership.property_details_id "
 			+ LEFT_JOIN + " cs_pm_owner_details_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
-			+ " cs_pm_documents_v1 doc ON od.id=doc.reference_id ";
+			+ " cs_pm_documents_v1 doc ON od.id=doc.reference_id " + LEFT_JOIN
+			+ " cs_pm_payment_v1 payment ON od.id=payment.owner_details_id ";
 
 	private static final String CC_TABLE = " cs_pm_court_case_v1 cc ON ptdl.id=cc.property_details_id ";
 
