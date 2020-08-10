@@ -1,21 +1,18 @@
 package org.egov.cpt.service.notification;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.Role;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.EmailRequest;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.SMSRequest;
-import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.PaymentDetail;
 import org.egov.cpt.models.calculation.PaymentRequest;
 import org.egov.cpt.repository.OwnershipTransferRepository;
@@ -25,9 +22,6 @@ import org.egov.cpt.service.EnrichmentService;
 import org.egov.cpt.service.OwnershipTransferService;
 import org.egov.cpt.util.NotificationUtil;
 import org.egov.cpt.util.PTConstants;
-import org.egov.cpt.util.PropertyUtil;
-import org.egov.cpt.web.contracts.DuplicateCopyRequest;
-import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
@@ -40,7 +34,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
-import io.micrometer.core.instrument.MeterRegistry.Config;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -151,8 +144,10 @@ public class PaymentNotificationService {
 							util.sendSMS(smsRequests, config.getIsSMSNotificationEnabled());
 							
 							if (config.getIsEMAILNotificationEnabled()) {
-		                    	 List<EmailRequest> emailRequests = getOTEmailRequests(owner, valMap, localizationMessages);
-		                    	 util.sendEMAIL(emailRequests,true);
+								if(owner.getOwnerDetails().getEmail()!=null){
+			                    	 List<EmailRequest> emailRequests = getOTEmailRequests(owner, valMap, localizationMessages);
+			                    	 util.sendEMAIL(emailRequests,true);
+								}
 		                     }
 						});
 
@@ -177,8 +172,10 @@ public class PaymentNotificationService {
 							util.sendSMS(smsRequests, config.getIsSMSNotificationEnabled());
 							
 							if (config.getIsEMAILNotificationEnabled()) {
-		                    	 List<EmailRequest> emailRequests = getDCEmailRequests(copy, valMap, localizationMessages);
-		                    	 util.sendEMAIL(emailRequests,true);
+								if(copy.getApplicant().get(0).getEmail() != null){
+				                     List<EmailRequest> emailRequests = getDCEmailRequests(copy, valMap, localizationMessages);
+				                     util.sendEMAIL(emailRequests,true);
+								}
 		                     }
 						});
 
@@ -223,7 +220,7 @@ public class PaymentNotificationService {
 	        EmailRequest emailRequest = EmailRequest.builder()
 	        								.subject(PTConstants.EMAIL_SUBJECT)
 	        								.isHTML(true)
-	        								.email(valMap.get(emailKey))
+	        								.email(copy.getApplicant().get(0).getEmail())
 	        								.body(message)
 	        								.build();
 	        		
@@ -245,7 +242,7 @@ public class PaymentNotificationService {
 	        EmailRequest emailRequest = EmailRequest.builder()
 	        								.subject(PTConstants.EMAIL_SUBJECT)
 	        								.isHTML(true)
-	        								.email(valMap.get(emailKey))
+	        								.email(owner.getOwnerDetails().getEmail())
 	        								.body(message)
 	        								.build();
 	        		
@@ -254,31 +251,30 @@ public class PaymentNotificationService {
 
 	private List<SMSRequest> getDCSMSRequests(DuplicateCopy copy, String localizationMessages) {
 		String message = util.getDCOwnerPaymentMsg(copy, localizationMessages);
-		SMSRequest ownerSmsRequest = new SMSRequest(valMap.get(mobileKey), message);
+		SMSRequest ownerSmsRequest = new SMSRequest(copy.getApplicant().get(0).getPhone(), message);
 		
-		String payerMessage = util.getDCPayerPaymentMsg(copy,valMap, localizationMessages);
+		/*String payerMessage = util.getDCPayerPaymentMsg(copy,valMap, localizationMessages);
 		payerMessage = payerMessage.replace("<1>",valMap.get(paidByKey));
-		SMSRequest payerSmsRequest = new SMSRequest(valMap.get(mobileKey), payerMessage);
+		SMSRequest payerSmsRequest = new SMSRequest(valMap.get(mobileKey), payerMessage);*/
 		
 		List<SMSRequest> totalSMS = new LinkedList<>();
 		totalSMS.add(ownerSmsRequest);
-		totalSMS.add(payerSmsRequest);
+//		totalSMS.add(payerSmsRequest);
 
 		return totalSMS;
 	}
 
 	private List<SMSRequest> getOTSMSRequests(Owner owner,Map<String,String> valMap, String localizationMessages) {
-//		SMSRequest payerSmsRequest = getOTSMSRequest(owner, localizationMessages);
 		String ownerMessage = util.getOTOwnerPaymentMsg(owner, localizationMessages);
-		SMSRequest ownerSmsRequest = new SMSRequest(valMap.get(mobileKey), ownerMessage);
+		SMSRequest ownerSmsRequest = new SMSRequest(owner.getOwnerDetails().getPhone(), ownerMessage);
 		
-		String payerMessage = util.getOTPayerPaymentMsg(owner,valMap, localizationMessages);
+		/*String payerMessage = util.getOTPayerPaymentMsg(owner,valMap, localizationMessages);
 		payerMessage = payerMessage.replace("<1>",valMap.get(paidByKey));
-		SMSRequest payerSmsRequest = new SMSRequest(valMap.get(mobileKey), payerMessage);
+		SMSRequest payerSmsRequest = new SMSRequest(valMap.get(mobileKey), payerMessage);*/
 		
 		List<SMSRequest> totalSMS = new LinkedList<>();
 		totalSMS.add(ownerSmsRequest);
-		totalSMS.add(payerSmsRequest);
+//		totalSMS.add(payerSmsRequest);
 
 		return totalSMS;
 	}
