@@ -11,7 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.EmailRequest;
 import org.egov.cpt.models.Mortgage;
+import org.egov.cpt.models.NoticeGeneration;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.SMSRequest;
 import org.egov.cpt.producer.Producer;
@@ -58,7 +60,7 @@ public class NotificationUtil {
 	 * @param localizationMessage The messages from localisation
 	 * @return customised message based on ownershipTransfer
 	 */
-	public String getCustomizedMsg(RequestInfo requestInfo, Owner owner, String localizationMessage) {
+	public String getCustomizedOTMsg(RequestInfo requestInfo, Owner owner, String localizationMessage) {
 		String message = null, messageTemplate;
 		String ACTION_STATUS = owner.getApplicationAction() + "_" + owner.getApplicationState();
 
@@ -133,6 +135,20 @@ public class NotificationUtil {
 		}
 		return smsRequest;
 	}
+	
+	public List<EmailRequest> createEMAILRequest(String message, Map<String, String> emailIdToApplicant) {
+		List<EmailRequest> emailRequest = new LinkedList<>();
+		for (Map.Entry<String, String> entryset : emailIdToApplicant.entrySet()) {
+			String customizedMsg = message.replace("<1>", entryset.getValue());
+			emailRequest.add(EmailRequest.builder()
+					.email(entryset.getKey())
+					.subject(PTConstants.EMAIL_SUBJECT)
+					.body(customizedMsg)
+					.isHTML(false)
+					.build());
+		}
+		return emailRequest;
+	}
 
 	public void sendSMS(List<SMSRequest> smsRequestsList, boolean isSMSEnabled) {
 		if (isSMSEnabled) {
@@ -145,6 +161,17 @@ public class NotificationUtil {
 			}
 		}
 
+	}
+	
+	public void sendEMAIL(List<EmailRequest> emailRequestList, boolean isEMAILEnabled) {
+		if (isEMAILEnabled) {
+			if (CollectionUtils.isEmpty(emailRequestList))
+				log.info("Messages from localization couldn't be fetched!");
+			for (EmailRequest emailRequest : emailRequestList) {
+				producer.pushEmail(config.getEmailNotifTopic(), emailRequest.getEmail(),  emailRequest.getBody(),PTConstants.EMAIL_SUBJECT, false);
+				log.info("EmailAddress: " + emailRequest.getEmail() + " Messages: " + emailRequest.getBody());
+			}
+		}
 	}
 
 	public String getLocalizationMessages(String tenantId, RequestInfo requestInfo) {
@@ -220,26 +247,20 @@ public class NotificationUtil {
 		return message;
 	}
 
-	public String getOTPaymentMsg(Owner owner, String localizationMessages) {
+	public String getOTOwnerPaymentMsg(Owner owner, String localizationMessages) {
 		String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS, localizationMessages);
-		messageTemplate = messageTemplate.replace("<2>",
-				getMessageTemplate(owner.getOwnerDetails().getName(), localizationMessages));
-		messageTemplate = messageTemplate.replace("<4>",
-				getMessageTemplate(owner.getOwnerDetails().getApplicationNumber(), localizationMessages));
-		messageTemplate = messageTemplate.replace("<3>",
-				getMessageTemplate(PTConstants.OWNERSHIP_TRANSFER_APPLICATION, localizationMessages));
+		messageTemplate = messageTemplate.replace("<2>",owner.getOwnerDetails().getName());
+		messageTemplate = messageTemplate.replace("<3>",PTConstants.OWNERSHIP_TRANSFER_APPLICATION);
+		messageTemplate = messageTemplate.replace("<4>",owner.getOwnerDetails().getApplicationNumber());
 
 		return messageTemplate;
 	}
 
-	public String getDCPaymentMsg(DuplicateCopy copy, String localizationMessages) {
+	public String getDCOwnerPaymentMsg(DuplicateCopy copy, String localizationMessages) {
 		String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS, localizationMessages);
-		messageTemplate = messageTemplate.replace("<2>",
-				getMessageTemplate(copy.getApplicant().get(0).getName(), localizationMessages));
-		messageTemplate = messageTemplate.replace("<4>",
-				getMessageTemplate(copy.getApplicationNumber(), localizationMessages));
-		messageTemplate = messageTemplate.replace("<3>",
-				getMessageTemplate(PTConstants.DUPLICATE_COPY_APPLICATION, localizationMessages));
+		messageTemplate = messageTemplate.replace("<2>",copy.getApplicant().get(0).getName());
+		messageTemplate = messageTemplate.replace("<3>",PTConstants.DUPLICATE_COPY_APPLICATION);
+		messageTemplate = messageTemplate.replace("<4>",copy.getApplicationNumber());
 
 		return messageTemplate;
 	}
@@ -282,6 +303,50 @@ public class NotificationUtil {
 		message = message.replace("<4>", mortgage.getApplicationNumber());
 
 		return message;
+	}
+
+	public String getCustomizedNoticeMsg(RequestInfo requestInfo, NoticeGeneration notice,Owner ownerDtl,String localizationMessages) {
+		String message = null, messageTemplate;
+		if(notice.getNoticeType().equalsIgnoreCase(PTConstants.NG_TYPE_VIOLATION)){
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_NG_VIOLATION, localizationMessages);
+			message = getViolationNoticeMsg(notice,ownerDtl, messageTemplate);
+		}
+		else{
+			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_NG_RECOVERY, localizationMessages);
+			message = getRecoveryNoticeMsg(notice,ownerDtl, messageTemplate);
+		}
+		return message;
+	}
+	
+	private String getViolationNoticeMsg(NoticeGeneration notice,Owner ownerDtl, String message) {
+		message = message.replace("<1>", ownerDtl.getOwnerDetails().getName());
+		message = message.replace("<2>", ownerDtl.getAllotmenNumber());
+		message = message.replace("<3>", notice.getMemoNumber());
+
+		return message;
+	}
+	private String getRecoveryNoticeMsg(NoticeGeneration notice,Owner ownerDtl, String message) {
+		message = message.replace("<1>", ownerDtl.getOwnerDetails().getName());
+		message = message.replace("<2>", notice.getMemoNumber());
+		message = message.replace("<3>", notice.getAmount().toString());
+
+		return message;
+	}
+
+	public String getOTPayerPaymentMsg(Owner owner, Map<String,String> valMap,String localizationMessages) {
+		String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS_PAYER, localizationMessages);
+		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
+		messageTemplate = messageTemplate.replace("<3>", owner.getOwnerDetails().getApplicationNumber());
+		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));
+		return messageTemplate;
+	}
+
+	public String getDCPayerPaymentMsg(DuplicateCopy copy, Map<String, String> valMap, String localizationMessages) {
+		String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS_PAYER, localizationMessages);
+		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
+		messageTemplate = messageTemplate.replace("<3>", copy.getApplicationNumber());
+		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));
+		return messageTemplate;
 	}
 
 }

@@ -170,10 +170,13 @@ public class PTConstants {
 	public static final String NOTIFICATION_OT_SENDBACK = "rp.en.counter.sendback";
 	public static final String NOTIFICATION_OT_PAYMENT = "rp.en.counter.payment";
 	public static final String NOTIFICATION_OT_PAYMENT_SUCCESS = "rp.en.counter.paymentsuccess";
+	public static final String NOTIFICATION_OT_PAYMENT_SUCCESS_PAYER = "rp.en.counter.paymentsuccesspayer";
 	public static final String NOTIFICATION_OT_APPROVED = "rp.en.counter.approved";
 	public static final String OWNERSHIP_TRANSFER_APPLICATION = "Ownership Transfer request";
 	public static final String DUPLICATE_COPY_APPLICATION = "Duplicate Copy request";
 	public static final String MORTGAGE_APPLICATION = "Mortgage request";
+	public static final String NOTIFICATION_NG_VIOLATION = "rp.en.counter.violationnoticegenerated";
+	public static final String NOTIFICATION_NG_RECOVERY = "rp.en.counter.recoverynoticegenerated";
 	
 	//Ownership Transfer ACTION_STATUS combinations for notification
 
@@ -181,9 +184,9 @@ public class PTConstants {
 	public static final String OT_ACTION_STATUS_SUBMIT = "SUBMIT_OT_PENDINGCLVERIFICATION";
 	public static final String OT_ACTION_STATUS_REJECTED = "REJECT_OT_REJECTED";
 	public static final String OT_ACTION_STATUS_SENDBACK = "SENDBACK_OT_PENDINGCLARIFICATION";
-	public static final String OT_ACTION_STATUS_PAYMENT = "APPROVE_OT_PENDINGPAYMENT";
+	public static final String OT_ACTION_STATUS_PAYMENT = "SENDFORPAYMENT_OT_PENDINGPAYMENT";
 	public static final String OT_ACTION_STATUS_PAYMENT_SUCCESS = "PAY_OT_APPROVED";
-	public static final String OT_ACTION_STATUS_APPROVED = "PAY_OT_APPROVED";
+	public static final String OT_ACTION_STATUS_APPROVED = "APPROVE_OT_APPROVED";
 	
 	//Duplicate Copy ACTION_STATUS combinations for notification
 
@@ -191,9 +194,9 @@ public class PTConstants {
 	public static final String DC_ACTION_STATUS_SUBMIT = "SUBMIT_DC_PENDINGCLVERIFICATION";
 	public static final String DC_ACTION_STATUS_REJECTED = "REJECT_DC_REJECTED";
 	public static final String DC_ACTION_STATUS_SENDBACK = "SENDBACK_DC_PENDINGCLARIFICATION";
-	public static final String DC_ACTION_STATUS_PAYMENT = "APPROVE_DC_PENDINGPAYMENT";
+	public static final String DC_ACTION_STATUS_PAYMENT = "SENDFORPAYMENT_DC_PENDINGPAYMENT";
 	public static final String DC_ACTION_STATUS_PAYMENT_SUCCESS = "PAY_DC_APPROVED";
-	public static final String DC_ACTION_STATUS_APPROVED = "PAY_DC_APPROVED";
+	public static final String DC_ACTION_STATUS_APPROVED = "APPROVE_DC_APPROVED";
 	
 	//Mortgage ACTION_STATUS combinations for notification
 
@@ -219,5 +222,10 @@ public class PTConstants {
 	
 //Reject State
 	public static final String MG_REJECTED ="MG_REJECTED";
+
+	public static final String EMAIL_SUBJECT = "Chandigarh mSeva Application Status";
+
+	public static final String NG_TYPE_VIOLATION = "Violation";
+	public static final String NG_TYPE_RECOVERY = "Recovery";
 
 }
