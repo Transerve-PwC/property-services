@@ -146,11 +146,8 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			String payOwnerDetailId = rs.getString("payowner_details_id");
 			List<Owner> owners = property.getPropertyDetails().getOwners();
 			owners.forEach(owner -> {
-				System.out.println("asdfghjkl 1");
 				try {
-					System.out.println("asdfghjkl 2");
 					if (payId != null && payOwnerDetailId.equals(owner.getOwnerDetails().getId())) {
-						System.out.println("asdfghjkl 3");
 
 						AuditDetails payAuditdetails = AuditDetails.builder().createdBy(rs.getString("paycreated_by"))
 								.createdTime(rs.getLong("paycreated_time"))
