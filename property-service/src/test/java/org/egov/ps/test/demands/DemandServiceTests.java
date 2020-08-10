@@ -13,6 +13,7 @@ import org.egov.ps.model.RentDemand;
 import org.egov.ps.model.RentPayment;
 import org.egov.ps.service.RentCollectionService;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,17 +33,17 @@ public class DemandServiceTests {
 		this.initialDemands = new ArrayList<RentDemand>(2);
 		RentDemand demand1 = RentDemand.builder()
 				.id("Demand1")
-				.generationDate(getDateFromString("06/01/2020"))
+				.generationDate(getDateFromString("01 06 2020"))
 				.collectionPrincipal(250.0)
 				.build();
 		RentDemand demand2 = RentDemand.builder()
 				.id("Demand2")
-				.generationDate(getDateFromString("07/01/2020"))
+				.generationDate(getDateFromString("01 07 2020"))
 				.collectionPrincipal(250.0)
 				.build();
 		RentDemand demand3 = RentDemand.builder()
 				.id("Demand3")
-				.generationDate(getDateFromString("08/01/2020"))
+				.generationDate(getDateFromString("01 08 2020"))
 				.collectionPrincipal(250.0)
 				.build();
 		this.initialDemands.add(demand1);
@@ -50,10 +51,11 @@ public class DemandServiceTests {
 		this.initialDemands.add(demand3);
 	}
 	
+	@Test
 	public void testSimpleDemand() throws ParseException {
 		RentPayment payment1 = RentPayment.builder()
 				.amountPaid(750.0)
-				.dateOfPayment(getDateFromString("08/05/2020"))
+				.dateOfPayment(getDateFromString("05 08 2020"))
 				.receiptNo("Receipt 1")
 				.build();
 		
@@ -68,7 +70,7 @@ public class DemandServiceTests {
 		assertEquals(collections.get(2).getPrincipalCollected(), 250 - 10.85 - 5.92, 0.01);
 	}
 	
-	private static final String DATE_FORMAT = "mm/dd/yyyy";
+	private static final String DATE_FORMAT = "dd MM yyyy";
 	private static final SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT); 
 	private Date getDateFromString(String date) throws ParseException {
 		return dateFormatter.parse(date);
