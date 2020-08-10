@@ -170,8 +170,7 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedTime  
       
-      
-           
+         
     - query: INSERT INTO cs_pm_court_case_v1 (id, property_details_id, tenantid, estate_officer_court, commissioners_court, chief_administartors_court, advisor_to_admin_court, honorable_district_court, honorable_high_court, honorable_supreme_court, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.propertyDetails.courtCases.*
       jsonMaps:
@@ -244,6 +243,88 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.auditDetails.lastModifiedTime
       
           
+    - query: INSERT INTO cs_pm_payment_v1 (id, tenantid, owner_details_id,   gr_due_date_of_payment, gr_payable, gr_amount_of_gr, gr_total_gr, gr_date_of_deposit, gr_delay_in_payment, gr_interest_for_delay, gr_total_amount_due_with_interest, gr_amount_deposited_gr, gr_amount_deposited_intt, gr_balance_gr, gr_balance_intt, gr_total_due, gr_receipt_number, gr_receipt_date,   st_rate_of_st_gst, st_amount_of_gst, st_amount_due, st_date_of_deposit, st_delay_in_payment, st_interest_for_delay, st_total_amount_due_with_interest, st_amount_deposited_st_gst, st_amount_deposited_intt, st_balance_st_gst, st_balance_intt, st_total_due, st_receipt_number, st_receipt_date, st_payment_made_by,   created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?,   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,   ?, ?, ?, ?);
+      basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*
+      jsonMaps:
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.id
+
+      - jsonPath: $.Properties.*.tenantId
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.ownerDetailsId
+      
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grDueDateOfPayment
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grPayable
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grAmountOfGr
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grTotalGr
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grDateOfDeposit
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grDelayInPayment
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grInterestForDelay
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grTotalAmountDueWithInterest
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grAmountDepositedGr
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grAmountDepositedIntt
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grBalanceGr
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grBalanceIntt
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grTotalDue
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grReceiptNumber
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.grReceiptDate   
+      
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stRateOfStGst
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stAmountOfGst
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stAmountDue
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stDateOfDeposit
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stDelayInPayment
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stInterestForDelay
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stTotalAmountDueWithInterest
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stAmountDepositedStGst
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stAmountDepositedIntt
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stBalanceStGst
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stBalanceIntt
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stTotalDue
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stReceiptNumber
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stReceiptDate
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.stPaymentMadeBy   
+            
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.auditDetails.createdBy
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.auditDetails.createdTime
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.auditDetails.lastModifiedTime
+      
+      
 
 
   - version: 1.0

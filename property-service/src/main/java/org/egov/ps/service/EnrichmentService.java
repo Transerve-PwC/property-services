@@ -9,6 +9,7 @@ import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
+import org.egov.ps.model.Payment;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.model.PurchaseDetails;
@@ -100,12 +101,38 @@ public class EnrichmentService {
 		String gen_owner_details_id = UUID.randomUUID().toString();
 		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
+		List<Payment> paymentDetails = getPaymentDetails(property, owner, requestInfo, gen_owner_details_id);
+
 		ownerDetails.setId(gen_owner_details_id);
 		ownerDetails.setTenantId(property.getTenantId());
 		ownerDetails.setOwnerId(gen_owner_id);
+		ownerDetails.setPaymentDetails(paymentDetails);
 		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
 
 		return ownerDetails;
+	}
+
+	private List<Payment> getPaymentDetails(Property property, Owner owner, RequestInfo requestInfo,
+			String gen_owner_details_id) {
+
+		List<Payment> paymentDetails = owner.getOwnerDetails().getPaymentDetails();
+
+		if (!CollectionUtils.isEmpty(paymentDetails)) {
+
+			AuditDetails paymentDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+			paymentDetails.forEach(paymentDetail -> {
+
+				String gen_payment_detail_id = UUID.randomUUID().toString();
+
+				paymentDetail.setId(gen_payment_detail_id);
+				paymentDetail.setTenantId(property.getTenantId());
+				paymentDetail.setOwnerDetailsId(gen_owner_details_id);
+				paymentDetail.setAuditDetails(paymentDetailsAuditDetails);
+
+			});
+		}
+		return paymentDetails;
 	}
 
 	private List<CourtCase> getCourtCases(Property property, RequestInfo requestInfo, String gen_property_details_id) {
