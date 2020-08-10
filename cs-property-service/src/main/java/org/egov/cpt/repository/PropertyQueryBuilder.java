@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.PropertyCriteria;
+import org.egov.cpt.util.PTConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -139,14 +140,33 @@ public class PropertyQueryBuilder {
 		if (null != criteria.getPhone()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("od.phone = :phone");
-			preparedStmtList.put("name", criteria.getPhone());
+			preparedStmtList.put("phone", criteria.getPhone());
 		}
 
 		if (null != criteria.getState()) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.master_data_state = :state");
-			preparedStmtList.put("state", criteria.getState());
+			if(criteria.getState().contains(PTConstants.PM_DRAFTED)){
+				addClauseIfRequired(preparedStmtList, builder);
+				builder.append("pt.master_data_state IN (:states)");
+				preparedStmtList.put("states", criteria.getState());
+				builder.append(" AND ");
+				builder.append("pt.created_by =:createdBy");
+				preparedStmtList.put("createdBy", criteria.getCreatedBy());
+			}
+			else{
+				addClauseIfRequired(preparedStmtList, builder);
+				builder.append("pt.master_data_state IN (:states)");
+				preparedStmtList.put("states", criteria.getState());
+				builder.append(" OR ");
+				builder.append("pt.created_by =:createdBy");
+				preparedStmtList.put("createdBy", criteria.getCreatedBy());
+			}
 		}
+		
+		/*if (null != criteria.getCreatedBy()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("pt.created_by =:createdBy");
+			preparedStmtList.put("createdBy", criteria.getCreatedBy());
+		}*/
 
 		if (null != criteria.getPropertyId()) {
 			addClauseIfRequired(preparedStmtList, builder);
