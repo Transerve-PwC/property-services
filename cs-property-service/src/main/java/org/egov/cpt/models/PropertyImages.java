@@ -50,6 +50,9 @@ public class PropertyImages {
 	@JsonProperty("description")
 	private String description;
 	
+	@JsonProperty("capturedBy")
+	private String capturedBy;
+	
 	@Valid
 	@JsonProperty("applicationDocuments")
 	private List<Document> applicationDocuments = null;
