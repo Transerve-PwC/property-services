@@ -197,8 +197,13 @@ public class EnrichmentService {
 
 				if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 					property.getPropertyDetails().getOwners().forEach(owner -> {
-						owner.setAuditDetails(modifyAuditDetails);
-						owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
+						if (owner.getId() == null) {
+							List<Owner> ownerUpdate = getOwners(property, requestInfo, propertyDetail.getId());
+							propertyDetail.setOwners(ownerUpdate);
+						} else {
+							owner.setAuditDetails(modifyAuditDetails);
+							owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
+						}
 					});
 				}
 			});
@@ -209,9 +214,31 @@ public class EnrichmentService {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
 		List<Document> ownerDocuments = updateOwnerDocs(propertyDetail, property, requestInfo);
 		List<Payment> paymentDetails = updatePaymentDetails(propertyDetail, property, requestInfo);
+
 		propertyDetail.getOwners().forEach(owner -> {
 			owner.getOwnerDetails().setOwnerDocuments(ownerDocuments);
+			owner.getOwnerDetails().setPaymentDetails(paymentDetails);
 		});
+
+		if (!CollectionUtils.isEmpty(propertyDetail.getCourtCases())) {
+			propertyDetail.getCourtCases().forEach(courtCase -> {
+				if (courtCase.getId() == null) {
+					List<CourtCase> courtCases = getCourtCases(property, requestInfo, propertyDetail.getId());
+					propertyDetail.setCourtCases(courtCases);
+				}
+			});
+		}
+
+		if (!CollectionUtils.isEmpty(propertyDetail.getPurchaseDetails())) {
+			propertyDetail.getPurchaseDetails().forEach(purchaseDetail -> {
+				if (purchaseDetail.getId() == null) {
+					List<PurchaseDetails> purchaseDetails = getPurchaseDetails(property, requestInfo,
+							propertyDetail.getId());
+					propertyDetail.setPurchaseDetails(purchaseDetails);
+				}
+			});
+		}
+
 		return propertyDetail;
 	}
 
@@ -231,8 +258,8 @@ public class EnrichmentService {
 					}
 					document.setAuditDetails(docAuditDetails);
 				});
+				ownerDocs.addAll(ownerDocuments);
 			}
-			ownerDocs.addAll(ownerDocuments);
 		});
 		return ownerDocs;
 	}
@@ -254,8 +281,8 @@ public class EnrichmentService {
 					}
 					payment.setAuditDetails(paymentAuditDetails);
 				});
+				paymentDetails.addAll(payments);
 			}
-			paymentDetails.addAll(payments);
 		});
 		return paymentDetails;
 	}

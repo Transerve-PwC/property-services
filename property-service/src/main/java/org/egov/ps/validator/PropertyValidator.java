@@ -18,31 +18,31 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class PropertyValidator {
-	
+
 	@Autowired
 	private PropertyRepository repository;
-	
+
 	public void validateCreateRequest(PropertyRequest request) {
-		
+
 		Map<String, String> errorMap = new HashMap<>();
-		
+
 		validateOwner(request, errorMap);
-		
-		
+
 	}
 
 	private void validateOwner(PropertyRequest request, Map<String, String> errorMap) {
-		 
+
 		List<Property> property = request.getProperties();
-		
+
 		property.forEach(properties -> {
-			properties.getPropertyDetails().getOwners().forEach(owner -> {
-				
-				if (!isMobileNumberValid(owner.getOwnerDetails().getMobileNumber())) {
-					errorMap.put("INVALID MOBILE NUMBER",
-							"MobileNumber is not valid for user : " + owner.getOwnerDetails().getOwnerName());
-				}
-			});
+			if (!CollectionUtils.isEmpty(properties.getPropertyDetails().getOwners())) {
+				properties.getPropertyDetails().getOwners().forEach(owner -> {
+					if (!isMobileNumberValid(owner.getOwnerDetails().getMobileNumber())) {
+						errorMap.put("INVALID MOBILE NUMBER",
+								"MobileNumber is not valid for user : " + owner.getOwnerDetails().getOwnerName());
+					}
+				});
+			}
 		});
 	}
 
@@ -58,32 +58,32 @@ public class PropertyValidator {
 	}
 
 	public List<Property> validateUpdateRequest(PropertyRequest request) {
-		 
+
 		Map<String, String> errorMap = new HashMap<>();
-		
+
 		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
 		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
 		boolean ifPropertyExists = PropertyExists(propertiesFromSearchResponse);
 		if (!ifPropertyExists) {
 			throw new CustomException("PROPERTY NOT FOUND", "The property to be updated does not exist");
 		}
-		
-		return null; //TODO: add next lines
+
+		return null; // TODO: add next lines
 	}
 
 	private boolean PropertyExists(List<Property> propertiesFromSearchResponse) {
-		 
+
 		return (!CollectionUtils.isEmpty(propertiesFromSearchResponse) && propertiesFromSearchResponse.size() == 1);
 	}
 
 	private PropertyCriteria getPropertyCriteriaForSearch(PropertyRequest request) {
-		
+
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
 				if (property.getId() != null)
 					propertyCriteria.setPropertyId(property.getId());
-				
+
 			});
 		}
 		return propertyCriteria;
