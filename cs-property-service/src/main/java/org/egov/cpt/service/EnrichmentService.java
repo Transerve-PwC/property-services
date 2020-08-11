@@ -477,7 +477,8 @@ public class EnrichmentService {
 				application.getProperty()
 						.setId(propertyImagesRequest.getPropertyImagesApplications().get(0).getProperty().getId());
 				application.setAuditDetails(propertyAuditDetails);
-				System.out.println(propertyAuditDetails.toString() + " audit details here");
+				
+				application.setCapturedBy(requestInfo.getUserInfo().getName());
 
 				// Document details
 				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
@@ -630,6 +631,9 @@ public class EnrichmentService {
 		if (!CollectionUtils.isEmpty(propertyImagesRequest.getPropertyImagesApplications())) {
 			propertyImagesRequest.getPropertyImagesApplications().forEach(application -> {
 				application.setAuditDetails(propertyAuditDetails);
+				
+				application.setCapturedBy(requestInfo.getUserInfo().getName());
+				
 				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
 					application.getApplicationDocuments().forEach(document -> {
 						if (document.getId() == null) {
