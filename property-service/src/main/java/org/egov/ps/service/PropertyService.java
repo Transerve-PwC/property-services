@@ -61,7 +61,8 @@ public class PropertyService {
 	public List<Property> updateProperty(PropertyRequest request) {
 		List<Property> propertyFromSearch = propertyValidator.validateUpdateRequest(request);
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
-		if (config.getIsWorkflowEnabled()) {
+		String action = request.getProperties().get(0).getAction();
+		if (config.getIsWorkflowEnabled() && !action.contentEquals("")) {
 			wfIntegrator.callWorkFlow(request);
 		}
 		producer.push(config.getUpdatePropertyTopic(), request);
@@ -71,21 +72,6 @@ public class PropertyService {
 
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
 
-//		It will add all the states of the property which are in workflow
-//		if (criteria.isEmpty()) {
-//			String wfbusinessServiceName = PSConstants.BUSINESS_SERVICE_PM;
-//			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo,
-//					wfbusinessServiceName);
-//			List<State> stateList = otBusinessService.getStates();
-//			List<String> states = new ArrayList<String>();
-//
-//			for (State state : stateList) {
-//				states.add(state.getState());
-//			}
-//			states.remove("");
-//			criteria.setState(states);
-//			criteria.setUserId("");
-//		} else
 		if (criteria.isEmpty()) {
 			String wfbusinessServiceName = PSConstants.BUSINESS_SERVICE_PM;
 			BusinessService otBusinessService = workflowService.getBusinessService(PSConstants.TENENT_ID, requestInfo,
@@ -99,10 +85,8 @@ public class PropertyService {
 			states.remove("");
 			criteria.setState(states);
 			criteria.setUserId(requestInfo.getUserInfo().getUuid());
-		} else {
-			if (criteria.getState() != null && criteria.getState().contains(PSConstants.PM_DRAFTED)) {
-				criteria.setUserId(requestInfo.getUserInfo().getUuid());
-			}
+		} else if (criteria.getState() != null && criteria.getState().contains(PSConstants.PM_DRAFTED)) {
+			criteria.setUserId(requestInfo.getUserInfo().getUuid());
 		}
 
 		List<Property> properties = repository.getProperties(criteria);
