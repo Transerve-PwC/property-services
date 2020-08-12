@@ -55,4 +55,9 @@ public class RentDemand {
      * Last date on which interest was made as 0.
      */
     private Date interestSince;
+    
+    /**
+     * The remaining interest that still has to be collected.
+     */
+    private Double remainingInterest;
 }

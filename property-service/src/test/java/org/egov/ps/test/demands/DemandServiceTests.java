@@ -11,6 +11,7 @@ import java.util.List;
 import org.egov.ps.model.RentCollection;
 import org.egov.ps.model.RentDemand;
 import org.egov.ps.model.RentPayment;
+import org.egov.ps.model.User;
 import org.egov.ps.service.RentCollectionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class DemandServiceTests {
 
 	ArrayList<RentDemand> initialDemands;
+	User user;
 
 	@Autowired
 	RentCollectionService rentCollectionService;
@@ -31,6 +33,9 @@ public class DemandServiceTests {
 	@Before
 	public void setup() throws ParseException {
 		this.initialDemands = new ArrayList<RentDemand>(2);
+		this.user= new User();
+		 this.user.setId("user01");
+	        this.user.setRemainingAmount(0.0);
 		RentDemand demand1 = RentDemand.builder()
 				.id("Demand1")
 				.generationDate(getDateFromString("01 06 2020"))
@@ -48,7 +53,7 @@ public class DemandServiceTests {
 				.build();
 		this.initialDemands.add(demand1);
 		this.initialDemands.add(demand2);
-		this.initialDemands.add(demand3);
+		this.initialDemands.add(demand3);       
 	}
 	
 	@Test
@@ -59,8 +64,7 @@ public class DemandServiceTests {
 				.receiptNo("Receipt 1")
 				.build();
 		
-		
-		List<RentCollection> collections = this.rentCollectionService.getCollectionsForPayment(this.initialDemands, payment1);
+		List<RentCollection> collections = this.rentCollectionService.getCollectionsForPayment(this.initialDemands, payment1,this.user);
 		
 		assertEquals(collections.get(0).getInterestCollected(), 10.85, 0.01);
 		assertEquals(collections.get(0).getPrincipalCollected(), 250, 0.01);
