@@ -832,3 +832,75 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.auditDetails.lastModifiedTime
       
+      
+      
+      
+  - version: 1.0
+    description: Persists Application details in cs_pm_application_v1 table
+    fromTopic: save-application-topic
+    isTransaction: true
+    queryMaps:
+    
+    - query: INSERT INTO cs_pm_application_v1 (id, tenantid, property_id, application_number, module_id, comments, hardcopy_received_date, additional_details, state, action, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: Applications.*
+      jsonMaps:
+
+      - jsonPath: $.Applications.*.id
+
+      - jsonPath: $.Applications.*.tenantId
+      
+      - jsonPath: $.Applications.*.propertyId
+
+      - jsonPath: $.Applications.*.applicationNumber
+
+      - jsonPath: $.Applications.*.moduleId
+
+      - jsonPath: $.Applications.*.comments 
+      
+      - jsonPath: $.Applications.*.hardcopyReceivedDate
+      
+      - jsonPath: $.Applications.*.additionalDetails 
+      
+      - jsonPath: $.Applications.*.state 
+      
+      - jsonPath: $.Applications.*.action 
+      
+      - jsonPath: $.Applications.*.auditDetails.createdBy
+
+      - jsonPath: $.Applications.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Applications.*.auditDetails.createdTime
+
+      - jsonPath: $.Applications.*.auditDetails.lastModifiedTime
+            
+      
+    - query: INSERT INTO cs_pm_applicant_v1 (id, tenantid, property_id, application_id, mobile_number, first_name, last_name, user_id, additional_details, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: Applications.*.applicant
+      jsonMaps:
+
+      - jsonPath: $.Applications.*.applicant.id
+
+      - jsonPath: $.Applications.*.applicant.tenantId
+      
+      - jsonPath: $.Applications.*.applicant.propertyId
+
+      - jsonPath: $.Applications.*.applicant.applicationId
+
+      - jsonPath: $.Applications.*.applicant.mobileNumber
+
+      - jsonPath: $.Applications.*.applicant.firstName 
+            
+      - jsonPath: $.Applications.*.applicant.lastName 
+      
+      - jsonPath: $.Applications.*.applicant.userId 
+      
+      - jsonPath: $.Applications.*.applicant.additionalDetails 
+      
+      - jsonPath: $.Applications.*.applicant.auditDetails.createdBy
+
+      - jsonPath: $.Applications.*.applicant.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Applications.*.applicant.auditDetails.createdTime
+
+      - jsonPath: $.Applications.*.applicant.auditDetails.lastModifiedTime
+            

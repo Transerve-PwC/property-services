@@ -52,6 +52,12 @@ public class Configuration {
 
 	@Value("${persister.update.property.topic}")
 	private String updatePropertyTopic;
+	
+	@Value("${persister.save.application.topic}")
+	private String saveApplicationTopic;
+
+	@Value("${persister.update.application.topic}")
+	private String updateApplicationTopic;
 
 	// Workflow
 
@@ -81,5 +87,20 @@ public class Configuration {
 
 	@Value("${workflow.businessservice.search.path}")
 	private String wfBusinessServiceSearchPath;
+	
+
+//	ID Generation
+
+	@Value("${egov.idgen.host}")
+	private String idGenHost;
+
+	@Value("${egov.idgen.path}")
+	private String idGenPath;
+	
+	@Value("${egov.idgen.ps.applicationNum.name}")
+	private String applicationNumberIdgenNamePS;
+
+	@Value("${egov.idgen.ps.applicationNum.format}")
+	private String applicationNumberIdgenFormatPS;
 
 }
