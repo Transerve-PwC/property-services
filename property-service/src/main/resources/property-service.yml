@@ -841,7 +841,7 @@ serviceMaps:
     isTransaction: true
     queryMaps:
     
-    - query: INSERT INTO cs_pm_application_v1 (id, tenantid, property_id, application_number, module_id, comments, hardcopy_received_date, additional_details, state, action, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pm_application_v1 (id, tenantid, property_id, application_number, module_id, comments, hardcopy_received_date, additional_details, state, action, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?, ?, ?);
       basePath: Applications.*
       jsonMaps:
 
@@ -874,7 +874,7 @@ serviceMaps:
       - jsonPath: $.Applications.*.auditDetails.lastModifiedTime
             
       
-    - query: INSERT INTO cs_pm_applicant_v1 (id, tenantid, property_id, application_id, mobile_number, first_name, last_name, user_id, additional_details, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pm_applicant_v1 (id, tenantid, property_id, application_id, mobile_number, first_name, last_name, user_id, additional_details, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?);
       basePath: Applications.*.applicant
       jsonMaps:
 
