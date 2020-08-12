@@ -9,6 +9,7 @@ import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
+import org.egov.ps.model.Payment;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.model.PurchaseDetails;
@@ -100,12 +101,38 @@ public class EnrichmentService {
 		String gen_owner_details_id = UUID.randomUUID().toString();
 		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
+		List<Payment> paymentDetails = getPaymentDetails(property, owner, requestInfo, gen_owner_details_id);
+
 		ownerDetails.setId(gen_owner_details_id);
 		ownerDetails.setTenantId(property.getTenantId());
 		ownerDetails.setOwnerId(gen_owner_id);
+		ownerDetails.setPaymentDetails(paymentDetails);
 		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
 
 		return ownerDetails;
+	}
+
+	private List<Payment> getPaymentDetails(Property property, Owner owner, RequestInfo requestInfo,
+			String gen_owner_details_id) {
+
+		List<Payment> paymentDetails = owner.getOwnerDetails().getPaymentDetails();
+
+		if (!CollectionUtils.isEmpty(paymentDetails)) {
+
+			AuditDetails paymentDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+			paymentDetails.forEach(paymentDetail -> {
+
+				String gen_payment_detail_id = UUID.randomUUID().toString();
+
+				paymentDetail.setId(gen_payment_detail_id);
+				paymentDetail.setTenantId(property.getTenantId());
+				paymentDetail.setOwnerDetailsId(gen_owner_details_id);
+				paymentDetail.setAuditDetails(paymentDetailsAuditDetails);
+
+			});
+		}
+		return paymentDetails;
 	}
 
 	private List<CourtCase> getCourtCases(Property property, RequestInfo requestInfo, String gen_property_details_id) {
@@ -170,8 +197,13 @@ public class EnrichmentService {
 
 				if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 					property.getPropertyDetails().getOwners().forEach(owner -> {
-						owner.setAuditDetails(modifyAuditDetails);
-						owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
+						if (owner.getId() == null) {
+							List<Owner> ownerUpdate = getOwners(property, requestInfo, propertyDetail.getId());
+							propertyDetail.setOwners(ownerUpdate);
+						} else {
+							owner.setAuditDetails(modifyAuditDetails);
+							owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
+						}
 					});
 				}
 			});
@@ -181,9 +213,32 @@ public class EnrichmentService {
 	private PropertyDetails updatePropertyDetail(Property property, RequestInfo requestInfo) {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
 		List<Document> ownerDocuments = updateOwnerDocs(propertyDetail, property, requestInfo);
+		List<Payment> paymentDetails = updatePaymentDetails(propertyDetail, property, requestInfo);
+
 		propertyDetail.getOwners().forEach(owner -> {
 			owner.getOwnerDetails().setOwnerDocuments(ownerDocuments);
+			owner.getOwnerDetails().setPaymentDetails(paymentDetails);
 		});
+
+		if (!CollectionUtils.isEmpty(propertyDetail.getCourtCases())) {
+			propertyDetail.getCourtCases().forEach(courtCase -> {
+				if (courtCase.getId() == null) {
+					List<CourtCase> courtCases = getCourtCases(property, requestInfo, propertyDetail.getId());
+					propertyDetail.setCourtCases(courtCases);
+				}
+			});
+		}
+
+		if (!CollectionUtils.isEmpty(propertyDetail.getPurchaseDetails())) {
+			propertyDetail.getPurchaseDetails().forEach(purchaseDetail -> {
+				if (purchaseDetail.getId() == null) {
+					List<PurchaseDetails> purchaseDetails = getPurchaseDetails(property, requestInfo,
+							propertyDetail.getId());
+					propertyDetail.setPurchaseDetails(purchaseDetails);
+				}
+			});
+		}
+
 		return propertyDetail;
 	}
 
@@ -203,11 +258,33 @@ public class EnrichmentService {
 					}
 					document.setAuditDetails(docAuditDetails);
 				});
+				ownerDocs.addAll(ownerDocuments);
 			}
-			ownerDocs.addAll(ownerDocuments);
 		});
 		return ownerDocs;
+	}
 
+	private List<Payment> updatePaymentDetails(PropertyDetails propertyDetail, Property property,
+			RequestInfo requestInfo) {
+		List<Payment> paymentDetails = new ArrayList<>();
+		propertyDetail.getOwners().forEach(owner -> {
+			List<Payment> payments = owner.getOwnerDetails().getPaymentDetails();
+			if (!CollectionUtils.isEmpty(payments)) {
+				AuditDetails paymentAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				payments.forEach(payment -> {
+					if (payment.getId() == null) {
+						String gen_payment_detail_id = UUID.randomUUID().toString();
+						payment.setId(gen_payment_detail_id);
+						payment.setTenantId(property.getTenantId());
+						payment.setOwnerDetailsId(owner.getOwnerDetails().getId());
+						payment.setAuditDetails(paymentAuditDetails);
+					}
+					payment.setAuditDetails(paymentAuditDetails);
+				});
+				paymentDetails.addAll(payments);
+			}
+		});
+		return paymentDetails;
 	}
 
 }

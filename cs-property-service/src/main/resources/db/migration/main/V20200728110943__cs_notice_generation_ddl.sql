@@ -1,5 +1,4 @@
 DROP TABLE IF EXISTS cs_pt_notice_generation_application;
-DROP TABLE IF EXISTS cs_pt_notice_douments;
 DROP TABLE IF EXISTS cs_pt_notice_generation_application_audit;
 
 --> Notice Generation application table
@@ -28,26 +27,6 @@ CREATE TABLE cs_pt_notice_generation_application (
   CONSTRAINT pk_cs_pt_notice_generation_application PRIMARY KEY (id),
   CONSTRAINT fk_cs_pt_notice_generation_application FOREIGN KEY (propertyid) REFERENCES cs_pt_property_v1 (id)  
 );
-
---> Notice Generation document table
-CREATE TABLE cs_pt_notice_douments(
-    id 					CHARACTER VARYING(64),
-    tenantId 			CHARACTER VARYING(64),
-    documentType 		CHARACTER VARYING(64),
-    filestoreid 		CHARACTER VARYING(64),
-    notice_id 			CHARACTER VARYING(64),
-    active 				BOOLEAN,
-    
-    created_by 			CHARACTER VARYING(64),
-    modified_by 		CHARACTER VARYING(64),
-    created_time 		bigint,
-    modified_time 		bigint,
-
-    CONSTRAINT uk_cs_pt_notice_douments PRIMARY KEY (id),
-    CONSTRAINT fk_cs_pt_notice_douments FOREIGN KEY (notice_id) REFERENCES cs_pt_notice_generation_application (id)
-);
-
-
 
 --> Notice Generation audit table
 

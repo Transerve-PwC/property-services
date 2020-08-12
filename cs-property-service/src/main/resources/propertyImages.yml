@@ -7,7 +7,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-    - query: INSERT INTO cs_pt_property_images_application (id, propertyid, tenantid, application_number, description, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_property_images_application (id, propertyid, tenantid, application_number, description,capturedby, created_by, modified_by, created_time, modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.PropertyImagesApplications.*
       jsonMaps:
 
@@ -20,6 +20,8 @@ serviceMaps:
       - jsonPath: $.PropertyImagesApplications.*.applicationNumber
       
       - jsonPath: $.PropertyImagesApplications.*.description
+      
+      - jsonPath: $.PropertyImagesApplications.*.capturedBy
 
       - jsonPath: $.PropertyImagesApplications.*.auditDetails.createdBy
 
@@ -70,11 +72,13 @@ serviceMaps:
       jsonMaps:
       - jsonPath: $.PropertyImagesApplications.*.id
 
-    - query: UPDATE cs_pt_property_images_application SET description=?, modified_by=?, modified_time=? WHERE id=?;
+    - query: UPDATE cs_pt_property_images_application SET description=?,capturedby=?, modified_by=?, modified_time=? WHERE id=?;
       basePath: PropertyImagesApplications.*
       jsonMaps:
 
       - jsonPath: $.PropertyImagesApplications.*.description
+      
+      - jsonPath: $.PropertyImagesApplications.*.capturedBy
       
       - jsonPath: $.PropertyImagesApplications.*.auditDetails.lastModifiedBy
 

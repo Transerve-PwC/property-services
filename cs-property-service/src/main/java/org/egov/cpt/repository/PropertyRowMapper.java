@@ -141,7 +141,9 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 			PropertyImages propertyImages = PropertyImages.builder().id(rs.getString("piid")).property(property)
 					.tenantId(rs.getString("pitenantid")).applicationNumber(rs.getString("piapp_number"))
-					.description(rs.getString("pidescription")).auditDetails(piAuditDetails).build();
+					.description(rs.getString("pidescription"))
+					.capturedBy(rs.getString("picapturedBy"))
+					.auditDetails(piAuditDetails).build();
 
 			property.addPropertyImagesItem(propertyImages);
 
@@ -196,6 +198,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					.demandNoticeTo(rs.getLong("ng_demandNoticeTo"))
 					.recoveryType(rs.getString("ng_recoveryType"))
 					.amount(rs.getDouble("ng_amount"))
+					.propertyImageId(rs.getString("ng_p_image_id"))
 					.build();
 
 			property.addNoticeItem(noticeGeneration);

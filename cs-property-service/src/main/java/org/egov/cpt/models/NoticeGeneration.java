@@ -77,6 +77,9 @@ public class NoticeGeneration {
 	@JsonProperty("amount")
 	private Double amount;
 	
+	@JsonProperty("propertyImageId")
+	private String propertyImageId;
+	
 	@Valid
 	@JsonProperty("applicationDocuments")
 	private List<Document> applicationDocuments = null;

@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
+import org.egov.cpt.models.EmailRequest;
+import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.SMSRequest;
 import org.egov.cpt.repository.ServiceRequestRepository;
 import org.egov.cpt.util.NotificationUtil;
@@ -38,6 +40,7 @@ public class DuplicateCopyNotificationService {
 	public void process(DuplicateCopyRequest request) {
 
 		List<SMSRequest> smsRequestsProperty = new LinkedList<>();
+		List<EmailRequest> emailRequest = new LinkedList<>();
 
 		if (config.getIsSMSNotificationEnabled() != null) {
 			if (config.getIsSMSNotificationEnabled()) {
@@ -46,9 +49,41 @@ public class DuplicateCopyNotificationService {
 					util.sendSMS(smsRequestsProperty, true);
 				}
 			}
-
+		}
+		if(null != config.getIsEMAILNotificationEnabled()) {
+			if(config.getIsEMAILNotificationEnabled()) {
+				enrichEMAILRequest(request,emailRequest);
+				if(!CollectionUtils.isEmpty(emailRequest))
+					util.sendEMAIL(emailRequest,true);
+			}
 		}
 
+	}
+
+	private void enrichEMAILRequest(DuplicateCopyRequest request, List<EmailRequest> emailRequest) {
+		String tenantId = request.getDuplicateCopyApplications().get(0).getTenantId();
+        for(DuplicateCopy duplicateCopy : request.getDuplicateCopyApplications()){
+        	Map<String,String > emailIdToApplicant = new HashMap<>();
+            
+        	 
+        	duplicateCopy.getApplicant().forEach(applicant -> {
+                if(applicant.getEmail()!= null)
+                	emailIdToApplicant.put(applicant.getEmail(),applicant.getName());
+            });
+                if (emailIdToApplicant.isEmpty()) {
+            	continue;
+            }
+			String message = null;
+			String localizationMessages;
+					localizationMessages = util.getLocalizationMessages(tenantId, request.getRequestInfo());
+					message = util.getCustomizedDcMsg(request.getRequestInfo(), duplicateCopy, localizationMessages);
+            if(message==null) continue;
+
+			message = message.replace("\\n", "\n");
+			emailRequest.addAll(util.createEMAILRequest(message,emailIdToApplicant));
+        }
+	
+		
 	}
 
 	private void enrichSMSRequest(DuplicateCopyRequest request, List<SMSRequest> smsRequests) {

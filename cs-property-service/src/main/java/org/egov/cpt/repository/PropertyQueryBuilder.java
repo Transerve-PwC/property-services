@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.PropertyCriteria;
+import org.egov.cpt.util.PTConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -50,7 +51,7 @@ public class PropertyQueryBuilder {
 			+ " doc.is_active as docis_active, doc.document_type as doc_document_type, doc.fileStore_id as doc_fileStore_id,"
 			+ " doc.created_by as dcreated_by, doc.created_date as dcreated_date, doc.modified_by as dmodified_by, doc.modified_date as dmodified_date,"
 
-			+ " pi.id as piid, pi.propertyid as pipropertyid, pi.tenantid as pitenantid, pi.application_number as piapp_number, pi.description as pidescription,"
+			+ " pi.id as piid, pi.propertyid as pipropertyid, pi.tenantid as pitenantid, pi.application_number as piapp_number, pi.description as pidescription, pi.capturedby as picapturedBy,"
 			+ " pi.created_by as piCreatedBy, pi.created_time as piCreatedTime, pi.modified_by as piModifiedBy, pi.modified_time as piModifiedTime,"
 
 			+ " pidoc.id as pidocid,pidoc.reference_id as pidoc_referenceid, pidoc.tenantId as pidoctenantid, pidoc.document_type as pidoctype , pidoc.filestore_id as pidoc_filestoreid,"
@@ -59,7 +60,7 @@ public class PropertyQueryBuilder {
 			+ " ng.id as ngid, ng.propertyid as ng_propertyid, ng.tenantid as ngtenantid,ng.memo_number as ng_memoNumber,"
 			+ " ng.memo_date as ng_memoDate,ng.notice_type as ng_noticeType,ng.guardian as ng_guardian,ng.relationship as ng_relationship,"
 			+ " ng.violations as ng_violations,ng.description as ng_description,ng.demand_notice_from as ng_demandNoticeFrom,"
-			+ " ng.demand_notice_to as ng_demandNoticeTo,ng.recovery_type as ng_recoveryType, ng.amount as ng_amount,"
+			+ " ng.demand_notice_to as ng_demandNoticeTo,ng.recovery_type as ng_recoveryType, ng.amount as ng_amount, ng.property_image_id as ng_p_image_id,"
 			+ " ng.modified_time as ngModifiedTime,ng.modified_by as ngModifiedBy,ng.created_by as ngCreatedBy,ng.created_time as ngCreatedTime,"
 			
 			+ " ngdoc.id as ngdoc_id,ngdoc.reference_id as ngdoc_referenceid, ngdoc.tenantId as ngdoc_tenantid,ngdoc.document_type as ngdoc_type , ngdoc.filestore_id as ngdoc_filestoreid,"
@@ -139,14 +140,33 @@ public class PropertyQueryBuilder {
 		if (null != criteria.getPhone()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("od.phone = :phone");
-			preparedStmtList.put("name", criteria.getPhone());
+			preparedStmtList.put("phone", criteria.getPhone());
 		}
 
 		if (null != criteria.getState()) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.master_data_state = :state");
-			preparedStmtList.put("state", criteria.getState());
+			if(criteria.getState().contains(PTConstants.PM_DRAFTED)){
+				addClauseIfRequired(preparedStmtList, builder);
+				builder.append("pt.master_data_state IN (:states)");
+				preparedStmtList.put("states", criteria.getState());
+				builder.append(" AND ");
+				builder.append("pt.created_by =:createdBy");
+				preparedStmtList.put("createdBy", criteria.getCreatedBy());
+			}
+			else{
+				addClauseIfRequired(preparedStmtList, builder);
+				builder.append("pt.master_data_state IN (:states)");
+				preparedStmtList.put("states", criteria.getState());
+				builder.append(" OR ");
+				builder.append("pt.created_by =:createdBy");
+				preparedStmtList.put("createdBy", criteria.getCreatedBy());
+			}
 		}
+		
+		/*if (null != criteria.getCreatedBy()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("pt.created_by =:createdBy");
+			preparedStmtList.put("createdBy", criteria.getCreatedBy());
+		}*/
 
 		if (null != criteria.getPropertyId()) {
 			addClauseIfRequired(preparedStmtList, builder);

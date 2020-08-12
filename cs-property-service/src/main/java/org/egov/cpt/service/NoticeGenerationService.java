@@ -9,6 +9,7 @@ import org.egov.cpt.models.Property;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.service.notification.MortgageNotificationService;
+import org.egov.cpt.service.notification.NoticeNotificationService;
 import org.egov.cpt.validator.PropertyValidator;
 import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.NoticeGenerationRequest;
@@ -41,7 +42,7 @@ public class NoticeGenerationService {
 	private WorkflowIntegrator wfIntegrator;
 	
 	@Autowired
-	MortgageNotificationService notificationService;
+	NoticeNotificationService notificationService;
 	
 	@Autowired
 	private WorkflowService workflowService;
@@ -51,6 +52,7 @@ public class NoticeGenerationService {
 //		propertyValidator.validateMortgageCreateRequest(noticeGenerationRequest);
 		enrichmentService.enrichNoticeCreateRequest(noticeGenerationRequest);
 		producer.push(config.getSaveNoticeTopic(), noticeGenerationRequest);
+		notificationService.process(noticeGenerationRequest,propertiesFromDb);
 		return noticeGenerationRequest.getNoticeApplications();
 	}
 
@@ -59,6 +61,8 @@ public class NoticeGenerationService {
 		enrichmentService.enrichNoticeUpdateRequest(noticeGenerationRequest,searchedApplication);
 		propertyValidator.validateNoticeUpdate(noticeGenerationRequest);
 		producer.push(config.getUpdateNoticeTopic(), noticeGenerationRequest);
+		List<Property> propertiesFromDb = propertyValidator.isPropertyExist(noticeGenerationRequest);
+		notificationService.process(noticeGenerationRequest,propertiesFromDb);
 		return noticeGenerationRequest.getNoticeApplications();
 				
 	}

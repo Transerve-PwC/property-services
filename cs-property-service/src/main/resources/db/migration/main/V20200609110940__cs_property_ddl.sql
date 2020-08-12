@@ -3,7 +3,6 @@ DROP TABLE IF EXISTS cs_pt_propertydetails_v1;
 DROP TABLE IF EXISTS cs_pt_ownership_v1;
 DROP TABLE IF EXISTS cs_pt_ownershipdetails_v1;
 DROP TABLE IF EXISTS cs_pt_address_v1;
-DROP TABLE IF EXISTS cs_pt_application_documents_v1;
 
 DROP TABLE IF EXISTS cs_pt_property_audit_v1;
 DROP TABLE IF EXISTS cs_pt_propertydetails_audit_v1;
@@ -57,7 +56,8 @@ CREATE TABLE cs_pt_ownership_v1 (
    property_id       	CHARACTER VARYING (256) NOT NULL,
    tenantid			    CHARACTER VARYING (256),
    allotmen_number   	CHARACTER VARYING (256),
-   application_status   CHARACTER VARYING (256),
+   application_state    CHARACTER VARYING (256),
+   application_action 	CHARACTER VARYING (256),
    active_state         CHARACTER VARYING (256),
    is_primary_owner   	CHARACTER VARYING (256),
   
@@ -73,23 +73,32 @@ CREATE TABLE cs_pt_ownership_v1 (
 );
 
 CREATE TABLE cs_pt_ownershipdetails_v1 (
-   id           		CHARACTER VARYING (256) NOT NULL,
-   property_id       	CHARACTER VARYING (256),
-   owner_id       		CHARACTER VARYING (256),
-   tenantid			    CHARACTER VARYING (256),
-   name       			CHARACTER VARYING (256),
-   email       			CHARACTER VARYING (256),
-   phone       			CHARACTER VARYING (256),
-   gender       		CHARACTER VARYING (256),
-   date_of_birth       	CHARACTER VARYING (256),
-   aadhaar_number       CHARACTER VARYING (256),
-   allotment_startdate  CHARACTER VARYING (256),
-   allotment_enddate    CHARACTER VARYING (256),
-   posession_startdate  CHARACTER VARYING (256),
-   posession_enddate    CHARACTER VARYING (256),
-   monthly_rent         CHARACTER VARYING (256),
-   revision_period      CHARACTER VARYING (256),
-   revision_percentage  CHARACTER VARYING (256),
+   id           				CHARACTER VARYING (256) NOT NULL,
+   property_id       			CHARACTER VARYING (256),
+   owner_id       				CHARACTER VARYING (256),
+   tenantid			    		CHARACTER VARYING (256),
+   name       					CHARACTER VARYING (256),
+   email       					CHARACTER VARYING (256),
+   phone       					CHARACTER VARYING (256),
+   gender       				CHARACTER VARYING (256),
+   date_of_birth       			CHARACTER VARYING (256),
+   aadhaar_number       		CHARACTER VARYING (256),
+   father_or_husband 			CHARACTER VARYING (256),
+   relation 					CHARACTER VARYING (256),
+   allotment_startdate  		CHARACTER VARYING (256),
+   allotment_enddate    		CHARACTER VARYING (256),
+   posession_startdate  		CHARACTER VARYING (256),
+   posession_enddate    		CHARACTER VARYING (256),
+   monthly_rent         		CHARACTER VARYING (256),
+   revision_period      		CHARACTER VARYING (256),
+   revision_percentage  		CHARACTER VARYING (256),
+   relation_with_deceased_allottee CHARACTER VARYING (256),
+   date_of_death_allottee 		CHARACTER VARYING (256),
+   application_number 			CHARACTER VARYING (256),
+   application_type				CHARACTER VARYING (256),
+   permanent 					CHARACTER VARYING (256),
+   due_amount 					INTEGER,
+   apro_charge 					INTEGER,
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    created_date         CHARACTER VARYING NOT NULL,
@@ -122,26 +131,6 @@ CREATE TABLE cs_pt_address_v1 (
 
   CONSTRAINT pk_cs_pt_address_v1 PRIMARY KEY (id),
   CONSTRAINT fk_cs_pt_address_v1 FOREIGN KEY (property_id) REFERENCES cs_pt_property_v1 (id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
-);
-
-CREATE TABLE cs_pt_application_documents_v1 (
-   id           		CHARACTER VARYING (256) NOT NULL,
-   property_id       	CHARACTER VARYING (256) NOT NULL,
-   tenantid			    CHARACTER VARYING (256),
-   is_active   			CHARACTER VARYING (256),
-   document_type   		CHARACTER VARYING (256),
-   fileStore_id         CHARACTER VARYING (256),
-   document_uid   		CHARACTER VARYING (256),
-  
-   created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         CHARACTER VARYING NOT NULL,
-   modified_by     		CHARACTER VARYING (128),
-   modified_date       	CHARACTER VARYING,
-
-  CONSTRAINT pk_cs_pt_application_documents_v1 PRIMARY KEY (id),
-  CONSTRAINT fk_cs_pt_application_documents_v1 FOREIGN KEY (property_id) REFERENCES cs_pt_property_v1 (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
 );
@@ -184,7 +173,8 @@ CREATE TABLE cs_pt_ownership_audit_v1 (
    property_id       	CHARACTER VARYING (256),
    tenantid			    CHARACTER VARYING (256),
    allotmen_number   	CHARACTER VARYING (256),
-   application_status   CHARACTER VARYING (256),
+   application_state    CHARACTER VARYING (256),
+   application_action 	CHARACTER VARYING (256),
    active_state         CHARACTER VARYING (256),
    is_primary_owner   	CHARACTER VARYING (256),
   
@@ -195,27 +185,36 @@ CREATE TABLE cs_pt_ownership_audit_v1 (
 );
 
 CREATE TABLE cs_pt_ownershipdetails_audit_v1 (
-   id           		CHARACTER VARYING (256) NOT NULL,
-   property_id       	CHARACTER VARYING (256),
-   owner_id       		CHARACTER VARYING (256),
-   tenantid			    CHARACTER VARYING (256),
-   name       			CHARACTER VARYING (256),
-   email       			CHARACTER VARYING (256),
-   phone       			CHARACTER VARYING (256),
-   gender       		CHARACTER VARYING (256),
-   date_of_birth       	CHARACTER VARYING (256),
-   aadhaar_number       CHARACTER VARYING (256),
-   allotment_startdate  CHARACTER VARYING (256),
-   allotment_enddate    CHARACTER VARYING (256),
-   posession_startdate  CHARACTER VARYING (256),
-   posession_enddate    CHARACTER VARYING (256),
-   monthly_rent         CHARACTER VARYING (256),
-   revision_period      CHARACTER VARYING (256),
-   revision_percentage  CHARACTER VARYING (256),
+   id           				CHARACTER VARYING (256) NOT NULL,
+   property_id       			CHARACTER VARYING (256),
+   owner_id       				CHARACTER VARYING (256),
+   tenantid			   			CHARACTER VARYING (256),
+   name       					CHARACTER VARYING (256),
+   email       					CHARACTER VARYING (256),
+   phone       					CHARACTER VARYING (256),
+   gender       				CHARACTER VARYING (256),
+   date_of_birth       			CHARACTER VARYING (256),
+   aadhaar_number       		CHARACTER VARYING (256),
+   father_or_husband 			CHARACTER VARYING (256),
+   relation 					CHARACTER VARYING (256),
+   allotment_startdate  		CHARACTER VARYING (256),
+   allotment_enddate    		CHARACTER VARYING (256),
+   posession_startdate  		CHARACTER VARYING (256),
+   posession_enddate    		CHARACTER VARYING (256),
+   monthly_rent         		CHARACTER VARYING (256),
+   revision_period      		CHARACTER VARYING (256),
+   revision_percentage  		CHARACTER VARYING (256),
+   relation_with_deceased_allottee CHARACTER VARYING (256),
+   date_of_death_allottee 		CHARACTER VARYING (256),
+   application_number 			CHARACTER VARYING (256),
+   application_type				CHARACTER VARYING (256),
+   permanent 					CHARACTER VARYING (256),
+   due_amount 					INTEGER,
+   apro_charge 					INTEGER,
   
-   created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         CHARACTER VARYING NOT NULL,
-   modified_by     		CHARACTER VARYING (128),
-   modified_date       	CHARACTER VARYING
+   created_by           		CHARACTER VARYING (128) NOT NULL,
+   created_date         		CHARACTER VARYING NOT NULL,
+   modified_by     				CHARACTER VARYING (128),
+   modified_date       			CHARACTER VARYING
 );
 

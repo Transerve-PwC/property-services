@@ -11,6 +11,7 @@ import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
+import org.egov.ps.model.Payment;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.model.PurchaseDetails;
@@ -18,6 +19,7 @@ import org.egov.ps.web.contracts.AuditDetails;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 @Component
 public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
@@ -117,26 +119,87 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		if (hasColumn(rs, "docid")) {
 			String docOwnerDetailId = rs.getString("docowner_details_id");
 			List<Owner> owners = property.getPropertyDetails().getOwners();
-			owners.forEach(owner -> {
-				try {
-					if (rs.getString("docid") != null && rs.getBoolean("docis_active")
-							&& docOwnerDetailId.equals(owner.getOwnerDetails().getId())) {
+			if (!CollectionUtils.isEmpty(owners)) {
+				owners.forEach(owner -> {
+					try {
+						if (rs.getString("docid") != null && rs.getBoolean("docis_active")
+								&& docOwnerDetailId.equals(owner.getOwnerDetails().getId())) {
 
-						AuditDetails docAuditdetails = AuditDetails.builder().createdBy(rs.getString("dcreated_by"))
-								.createdTime(rs.getLong("dcreated_time")).lastModifiedBy(rs.getString("dmodified_by"))
-								.lastModifiedTime(rs.getLong("dmodified_time")).build();
+							AuditDetails docAuditdetails = AuditDetails.builder().createdBy(rs.getString("dcreated_by"))
+									.createdTime(rs.getLong("dcreated_time"))
+									.lastModifiedBy(rs.getString("dmodified_by"))
+									.lastModifiedTime(rs.getLong("dmodified_time")).build();
 
-						Document ownerDocument = Document.builder().id(rs.getString("docid"))
-								.referenceId(rs.getString("docowner_details_id")).tenantId(rs.getString("doctenantid"))
-								.isActive(rs.getBoolean("docis_active")).documentType(rs.getString("document_type"))
-								.fileStoreId(rs.getString("file_store_id")).propertyId(rs.getString("docproperty_id"))
-								.auditDetails(docAuditdetails).build();
-						owner.getOwnerDetails().addOwnerDocumentsItem(ownerDocument);
+							Document ownerDocument = Document.builder().id(rs.getString("docid"))
+									.referenceId(rs.getString("docowner_details_id"))
+									.tenantId(rs.getString("doctenantid")).isActive(rs.getBoolean("docis_active"))
+									.documentType(rs.getString("document_type"))
+									.fileStoreId(rs.getString("file_store_id"))
+									.propertyId(rs.getString("docproperty_id")).auditDetails(docAuditdetails).build();
+							owner.getOwnerDetails().addOwnerDocumentsItem(ownerDocument);
+						}
+					} catch (SQLException e) {
+						e.printStackTrace();
 					}
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			});
+				});
+			}
+		}
+
+		if (hasColumn(rs, "payid")) {
+			String payId = rs.getString("payid");
+			String payTenentId = rs.getString("paytenantid");
+			String payOwnerDetailId = rs.getString("payowner_details_id");
+			List<Owner> owners = property.getPropertyDetails().getOwners();
+			if (!CollectionUtils.isEmpty(owners)) {
+				owners.forEach(owner -> {
+					try {
+						if (payId != null && payOwnerDetailId.equals(owner.getOwnerDetails().getId())) {
+
+							AuditDetails payAuditdetails = AuditDetails.builder()
+									.createdBy(rs.getString("paycreated_by")).createdTime(rs.getLong("paycreated_time"))
+									.lastModifiedBy(rs.getString("paymodified_by"))
+									.lastModifiedTime(rs.getLong("paymodified_time")).build();
+
+							Payment paymentItem = Payment.builder().id(payId).tenantId(payTenentId)
+									.ownerDetailsId(payOwnerDetailId)
+									.grDueDateOfPayment(rs.getLong("gr_due_date_of_payment"))
+									.grPayable(rs.getBigDecimal("gr_payable"))
+									.grAmountOfGr(rs.getBigDecimal("gr_amount_of_gr"))
+									.grTotalGr(rs.getBigDecimal("gr_total_gr"))
+									.grDateOfDeposit(rs.getLong("gr_date_of_deposit"))
+									.grDelayInPayment(rs.getBigDecimal("gr_delay_in_payment"))
+									.grInterestForDelay(rs.getBigDecimal("gr_interest_for_delay"))
+									.grTotalAmountDueWithInterest(rs.getBigDecimal("gr_total_amount_due_with_interest"))
+									.grAmountDepositedGr(rs.getBigDecimal("gr_amount_deposited_gr"))
+									.grAmountDepositedIntt(rs.getBigDecimal("gr_amount_deposited_intt"))
+									.grBalanceGr(rs.getBigDecimal("gr_balance_gr"))
+									.grBalanceIntt(rs.getBigDecimal("gr_balance_intt"))
+									.grTotalDue(rs.getBigDecimal("gr_total_due"))
+									.grReceiptNumber(rs.getString("gr_receipt_number"))
+									.grReceiptDate(rs.getLong("gr_receipt_date"))
+									.stRateOfStGst(rs.getBigDecimal("st_rate_of_st_gst"))
+									.stAmountOfGst(rs.getBigDecimal("st_amount_of_gst"))
+									.stAmountDue(rs.getBigDecimal("st_amount_due"))
+									.stDateOfDeposit(rs.getLong("st_date_of_deposit"))
+									.stDelayInPayment(rs.getBigDecimal("st_delay_in_payment"))
+									.stInterestForDelay(rs.getBigDecimal("st_interest_for_delay"))
+									.stTotalAmountDueWithInterest(rs.getBigDecimal("st_total_amount_due_with_interest"))
+									.stAmountDepositedStGst(rs.getBigDecimal("st_amount_deposited_st_gst"))
+									.stAmountDepositedIntt(rs.getBigDecimal("st_amount_deposited_intt"))
+									.stBalanceStGst(rs.getBigDecimal("st_balance_st_gst"))
+									.stBalanceIntt(rs.getBigDecimal("st_balance_intt"))
+									.stTotalDue(rs.getBigDecimal("st_total_due"))
+									.stReceiptNumber(rs.getString("st_receipt_number"))
+									.stReceiptDate(rs.getLong("st_receipt_date"))
+									.stPaymentMadeBy(rs.getString("st_payment_made_by")).auditDetails(payAuditdetails)
+									.build();
+							owner.getOwnerDetails().addPaymentItem(paymentItem);
+						}
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				});
+			}
 		}
 
 		if (hasColumn(rs, "ccid")) {
