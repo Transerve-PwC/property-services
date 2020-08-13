@@ -32,28 +32,21 @@ public class DemandServiceTests {
 	
 	@Before
 	public void setup() throws ParseException {
-		this.initialDemands = new ArrayList<RentDemand>(2);
+		this.initialDemands = new ArrayList<RentDemand>(2);		
 		this.user= new User();
-		 this.user.setId("user01");
-	        this.user.setRemainingAmount(0.0);
-		RentDemand demand1 = RentDemand.builder()
-				.id("Demand1")
-				.generationDate(getDateFromString("01 06 2020"))
-				.collectionPrincipal(250.0)
-				.build();
-		RentDemand demand2 = RentDemand.builder()
-				.id("Demand2")
-				.generationDate(getDateFromString("01 07 2020"))
-				.collectionPrincipal(250.0)
-				.build();
-		RentDemand demand3 = RentDemand.builder()
-				.id("Demand3")
-				.generationDate(getDateFromString("01 08 2020"))
-				.collectionPrincipal(250.0)
-				.build();
-		this.initialDemands.add(demand1);
-		this.initialDemands.add(demand2);
-		this.initialDemands.add(demand3);       
+		this.user.setId("user01");
+	    this.user.setRemainingAmount(0.0);
+		
+	    String[] dynamicDates = {"01 06 2020","01 07 2020","01 08 2020","01 09 2020","01 10 2020","01 11 2020","01 12 2020"};
+		Double[] dynamicCollectionPrincipal = {250.0,250.0,250.0,250.0,250.0,250.0,250.0};
+		for(int i=0; i < 7;i++) {
+			RentDemand demand = RentDemand.builder()
+					.id("Demand"+(i+1))
+					.generationDate(getDateFromString(dynamicDates[i]))
+					.collectionPrincipal(dynamicCollectionPrincipal[i])
+					.build();
+			this.initialDemands.add(demand);
+		}
 	}
 	
 	@Test
@@ -64,8 +57,9 @@ public class DemandServiceTests {
 				.receiptNo("Receipt 1")
 				.build();
 		
-		List<RentCollection> collections = this.rentCollectionService.getCollectionsForPayment(this.initialDemands, payment1,this.user);
-		
+		List<RentCollection> collections = this.rentCollectionService.getCollectionsForPayment(this.initialDemands.subList(0, 3), payment1,this.user);
+		List<RentCollection> secondCollections = this.rentCollectionService.getCollectionsForPayment(this.initialDemands.subList(3, 6), payment1,this.user);
+				
 		assertEquals(collections.get(0).getInterestCollected(), 10.85, 0.01);
 		assertEquals(collections.get(0).getPrincipalCollected(), 250, 0.01);
 		assertEquals(collections.get(1).getInterestCollected(), 5.92, 0.01);
@@ -73,6 +67,7 @@ public class DemandServiceTests {
 		assertEquals(collections.get(2).getInterestCollected(), 0, 0.01);
 		assertEquals(collections.get(2).getPrincipalCollected(), 250 - 10.85 - 5.92, 0.01);
 	}
+	
 	
 	private static final String DATE_FORMAT = "dd MM yyyy";
 	private static final SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT); 

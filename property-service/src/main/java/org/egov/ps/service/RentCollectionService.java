@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RentCollectionService {
 
-	public List<RentCollection> getCollectionsForPayment(ArrayList<RentDemand> demands, RentPayment payment,
+	public List<RentCollection> getCollectionsForPayment(List<RentDemand> demands, RentPayment payment,
 			User user) {
 		double interestRate = 24;
 		Date paymentDate = payment.getDateOfPayment();
