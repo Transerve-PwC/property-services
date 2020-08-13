@@ -1,0 +1,74 @@
+{
+	"info": {
+		"_postman_id": "7e2bd90e-85d0-46c4-9fd6-d2f370555c59",
+		"name": "Transerve",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Fetch Url (filestore-services) ",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8060/filestore/v1/files/url?tenantId=ch&fileStoreIds=17b8523a-879c-4c84-a41e-174903716137",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8060",
+					"path": [
+						"filestore",
+						"v1",
+						"files",
+						"url"
+					],
+					"query": [
+						{
+							"key": "tenantId",
+							"value": "ch"
+						},
+						{
+							"key": "fileStoreIds",
+							"value": "17b8523a-879c-4c84-a41e-174903716137"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Excel From AWS",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/excelutility/v1/excel/read?tenantId=ch&fileStoreId=17b8523a-879c-4c84-a41e-174903716137",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"excelutility",
+						"v1",
+						"excel",
+						"read"
+					],
+					"query": [
+						{
+							"key": "tenantId",
+							"value": "ch"
+						},
+						{
+							"key": "fileStoreId",
+							"value": "17b8523a-879c-4c84-a41e-174903716137"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
