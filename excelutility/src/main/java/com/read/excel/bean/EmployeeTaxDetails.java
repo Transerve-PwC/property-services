@@ -38,8 +38,11 @@ public class EmployeeTaxDetails {
 	
 	@JsonProperty("Per day Interest Calculation")
     private String perDayInterestCalculation;
+		
+	@JsonProperty("Receipt No")
+    private String receiptNo;
 	
-	@JsonProperty("Receipt No. & Date")
-    private String receiptNoDate;
+	@JsonProperty("Receipt Date")
+    private String receiptDate;
 	
 }

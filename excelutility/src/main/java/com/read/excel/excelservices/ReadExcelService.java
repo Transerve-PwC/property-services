@@ -1,7 +1,9 @@
 package com.read.excel.excelservices;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +28,6 @@ public class ReadExcelService {
 		try {
 			File tempFile = new File(filePath);
 			Workbook workbook = WorkbookFactory.create(tempFile);
-			System.out.println(workbook.getNumberOfSheets());
 			Sheet sheet = workbook.getSheet(sheetName);
 			Iterator<Row> rowIterator = sheet.iterator();
 			int count = 0;
@@ -52,6 +53,21 @@ public class ReadExcelService {
 							cellData.put(headerCells.get(cn), getValueFromCell(cell));
 						}
 					}
+					cellData.put("Receipt No", "");
+					cellData.put("Receipt Date", "");
+					if(cellData.get("Receipt No. & Date") != null &&
+							!"".equalsIgnoreCase(String.valueOf(cellData.get("Receipt No. & Date")))) {
+						String[] receiptDetails = cellData.get("Receipt No. & Date").toString().split(" ");
+						cellData.put("Receipt No", receiptDetails[0]);
+						if(receiptDetails.length > 1 ) {
+							String receiptDate = receiptDetails[receiptDetails.length - 1];
+							int receiptDay = Integer.parseInt(receiptDate.substring(0, receiptDate.indexOf(".")));
+							Date date1 = new SimpleDateFormat("dd-MM-yyyy").parse(cellData.get("Month").toString());
+							date1.setDate(receiptDay);
+							cellData.put("Receipt Date", convertDateinSameFormat(date1));							
+						}						
+					}
+					cellData.remove("Receipt No. & Date");
 					ObjectMapper mapper = new ObjectMapper();
 					employees.add(mapper.convertValue(cellData, EmployeeTaxDetails.class));
 					/* Fetching Data will End after this */
@@ -65,6 +81,11 @@ public class ReadExcelService {
 		}
 		return employees;
 	}
+	
+	private static String convertDateinSameFormat(Date date) {
+		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+		return DATE_FORMAT.format(date);
+	}
 
 	private static Object getValueFromCell(Cell cell1) {
 		Object objValue = "";
@@ -77,7 +98,7 @@ public class ReadExcelService {
 				break;
 			case NUMERIC:
 				if (DateUtil.isCellDateFormatted(cell1)) {
-					objValue = cell1.getDateCellValue();
+					objValue = convertDateinSameFormat(cell1.getDateCellValue());
 				} else {
 					objValue = cell1.getNumericCellValue();
 				}
@@ -94,9 +115,9 @@ public class ReadExcelService {
 
 	public static void main(String args[]) {
 		List<EmployeeTaxDetails> temps = getDatafromExcel("D:\\Projects\\Transerve\\Docs\\521 to 530.xlsx","521");
-		System.out.println(temps.get(temps.size()-1));
-		List<EmployeeTaxDetails> temps1 = getDatafromExcel("D:\\Projects\\Transerve\\Docs\\521 to 530.xlsx","522");
-		System.out.println(temps1.get(temps1.size()-1));
+		System.out.println(temps);
+//		List<EmployeeTaxDetails> temps1 = getDatafromExcel("D:\\Projects\\Transerve\\Docs\\521 to 530.xlsx","522");
+//		System.out.println(temps1.get(temps1.size()-1));
 
 	}
 }
