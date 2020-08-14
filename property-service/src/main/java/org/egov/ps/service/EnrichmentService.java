@@ -326,9 +326,12 @@ public class EnrichmentService {
 		Applicant applicant = application.getApplicant();
 		String gen_applicant_id = UUID.randomUUID().toString();
 		
+		Property property = application.getProperty();
+		property.setId(application.getProperty().getId());
+		
 		applicant.setId(gen_applicant_id);
 		applicant.setTenantId(application.getTenantId());
-		applicant.setPropertyId(application.getPropertyId());
+		applicant.setProperty(property);
 		applicant.setApplicationId(gen_application_id);
 		applicant.setUserId(requestInfo.getUserInfo().getUuid());
 		applicant.setAuditDetails(auditDetails);

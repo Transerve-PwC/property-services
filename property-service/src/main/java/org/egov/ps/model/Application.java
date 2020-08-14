@@ -1,10 +1,12 @@
 package org.egov.ps.model;
 
+import org.egov.ps.util.PropertySerializer;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -35,8 +37,8 @@ public class Application {
 	@JsonProperty("tenantId")
 	private String tenantId;
 
-	@JsonProperty("propertyId")
-	private String propertyId;
+	@JsonSerialize(using = PropertySerializer.class)
+	private Property property;
 
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
@@ -56,8 +58,8 @@ public class Application {
 	@JsonProperty("hardcopyReceivedDate")
 	private Long hardcopyReceivedDate;
 
-	@JsonProperty("additionalDetails")
-	private JsonNode additionalDetails;
+	@JsonProperty("applicationDetails")
+	private JsonNode applicationDetails;
 
 	@JsonProperty("state")
 	private String state;
@@ -67,7 +69,7 @@ public class Application {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
-	
+
 	@JsonProperty("applicant")
 	private Applicant applicant;
 }
