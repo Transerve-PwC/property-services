@@ -25,7 +25,7 @@ public class ApplicationService {
 	@Autowired
 	PropertyValidator validator;
 
-	public List<Application> createProperty(ApplicationRequest request) {
+	public List<Application> createApplication(ApplicationRequest request) {
 		validator.validateRequest(request);
 //		enrichmentService.enrichCreateApplication(request);
 //		producer.push(config.getSaveApplicationTopic(), request);
