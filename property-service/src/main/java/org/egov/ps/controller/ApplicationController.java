@@ -31,7 +31,7 @@ public class ApplicationController {
 	@PostMapping("/_create")
 	public ResponseEntity<ApplicationResponse> create(@Valid @RequestBody ApplicationRequest applicationRequest) {
 
-		List<Application> applications = applicationService.createProperty(applicationRequest);
+		List<Application> applications = applicationService.createApplication(applicationRequest);
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(),
 				true);
 		ApplicationResponse response = ApplicationResponse.builder().applications(applications).responseInfo(resInfo).build();

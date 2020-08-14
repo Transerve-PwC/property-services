@@ -41,18 +41,24 @@ public class Application {
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
 
-	@JsonProperty("moduleId")
-	private String moduleId;
+	@JsonProperty("branchType")
+	private String branchType;
+
+	@JsonProperty("moduleType")
+	private String moduleType;
+
+	@JsonProperty("applicationType")
+	private String applicationType;
 
 	@JsonProperty("comments")
 	private String comments;
 
 	@JsonProperty("hardcopyReceivedDate")
 	private Long hardcopyReceivedDate;
-	
+
 	@JsonProperty("additionalDetails")
-    private JsonNode additionalDetails;
-	
+	private JsonNode additionalDetails;
+
 	@JsonProperty("state")
 	private String state;
 

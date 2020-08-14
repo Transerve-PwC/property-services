@@ -180,7 +180,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 //Notice Generation	
 		if (rs.getString("ngid") != null && rs.getString("ng_propertyid").equals(property.getId())) {
 
-			AuditDetails piAuditDetails = AuditDetails.builder().createdBy(rs.getString("ngCreatedBy"))
+			AuditDetails ngAuditDetails = AuditDetails.builder().createdBy(rs.getString("ngCreatedBy"))
 					.createdTime(rs.getLong("ngCreatedTime")).lastModifiedBy(rs.getString("ngModifiedBy"))
 					.lastModifiedTime(rs.getLong("ngModifiedTime")).build();
 
@@ -199,6 +199,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					.recoveryType(rs.getString("ng_recoveryType"))
 					.amount(rs.getDouble("ng_amount"))
 					.propertyImageId(rs.getString("ng_p_image_id"))
+					.auditDetails(ngAuditDetails)
 					.build();
 
 			property.addNoticeItem(noticeGeneration);
@@ -212,7 +213,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.active(rs.getBoolean("ngdoc_active"))
 						.referenceId(rs.getString("ngdoc_referenceid"))
 						.propertyId(rs.getString("ngdoc_propertyid"))
-						.auditDetails(piAuditDetails).build();
+						.auditDetails(ngAuditDetails).build();
 				
 				for (NoticeGeneration notice: property.getNotices()){
 					if(notice.getId().equalsIgnoreCase(rs.getString("ngdoc_referenceid"))){
