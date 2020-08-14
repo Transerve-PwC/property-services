@@ -25,7 +25,7 @@ public class PropertyQueryBuilder {
 			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
 
 //  reference from pt-services-v2 package:package org.egov.pt.repository.builder;
-	private static final String SEARCH_QUERY = SELECT + "pi.*,pidoc.*,pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,ng.*,ngdoc.*,gd.*,"
+	private static final String SEARCH_QUERY = SELECT + "pi.*,pidoc.*,pt.*,ptdl.*,ownership.*,od.*,address.*,doc.*,ng.*,ngdoc.*,gd.*,demand.*,payment.*, "
 
 			+ " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,"
 			+ " pt.created_by as pcreated_by, pt.created_date as pcreated_date, pt.modified_by as pmodified_by, pt.modified_date as pmodified_date,"
@@ -69,8 +69,17 @@ public class PropertyQueryBuilder {
 			+ " gd.id as gd_id, gd.property_id as gd_property_id,"
 			+ " gd.bank_name as gd_bank_name, gd.mortgage_amount as gd_mortgage_amount,"
 			+ " gd.sanction_letter_number as gd_sanLetterNum, gd.sanction_date as gd_sanDate, gd.mortgage_end_date as gd_mortgageEndDate,"
-			+ " gd.created_by as gd_createdBy, gd.modified_by as gd_modifiedBy, gd.created_time as gd_createdTime, gd.modified_time as gd_modifiedTime"
-
+			+ " gd.created_by as gd_createdBy, gd.modified_by as gd_modifiedBy, gd.created_time as gd_createdTime, gd.modified_time as gd_modifiedTime,"
+			
+			+ "demand.id as demand_id,demand.property_id as demand_pid,demand.initialGracePeriod as demand_IniGracePeriod, demand.generationDate as demand_genDate,"
+			+ "demand.collectionPrincipal as demand_colPrincipal,demand.remainingPrincipal as demand_remPrincipal, demand.interestSince as demand_intSince,"
+			+ "demand.mode as demand_mode, demand.created_by as demand_created_by, demand.created_date as demand_created_date,"
+			+ "demand.modified_by as demand_modified_by,demand.modified_date as demand_modified_date,"
+			
+			+ "payment.id as payment_id, payment.property_id as payment_pid,payment.receiptNo as payment_receiptNo,payment.amountPaid as payment_amtPaid,"
+			+ "payment.dateOfPayment as payment_dateOfPayment,payment.mode as payment_mode,payment.created_by as payment_created_by, payment.created_date as payment_created_date,"
+			+ "payment.modified_by as payment_modified_by,payment.modified_date as payment_modified_date"
+			
 			+ " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id "
 			+ INNER_JOIN + " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id " + LEFT_JOIN
 			+ " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
@@ -80,7 +89,9 @@ public class PropertyQueryBuilder {
 			+ " cs_pt_documents_v1 pidoc ON pidoc.reference_id =  pi.id "+LEFT_JOIN
 			+ " cs_pt_notice_generation_application ng ON ng.propertyid = pt.id " + LEFT_JOIN
 			+ " cs_pt_documents_v1 ngdoc ON ngdoc.reference_id =  ng.id "+ LEFT_JOIN
-			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id "
+			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id "+ LEFT_JOIN
+			+ " cs_pt_demand demand ON pt.id=demand.property_id "+LEFT_JOIN
+			+ " cs_pt_payment payment ON pt.id=payment.property_id"
 	;
 
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList, PropertyCriteria criteria) {

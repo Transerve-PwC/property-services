@@ -227,5 +227,9 @@ public class PTConstants {
 
 	public static final String NG_TYPE_VIOLATION = "Violation";
 	public static final String NG_TYPE_RECOVERY = "Recovery";
+	
+//Mode of payment
+	public static final String MODE_UPLOADED = "Uploaded";
+	public static final String MODE_GENERATED = "Generated";
 
 }

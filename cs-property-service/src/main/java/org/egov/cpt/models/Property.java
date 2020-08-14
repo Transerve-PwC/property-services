@@ -84,6 +84,14 @@ public class Property {
 	@JsonProperty
 	private List<MortgageApprovedGrantDetails> grantDetails;
 	
+	@Valid
+	@JsonProperty
+	private List<RentDemand> demands;
+	
+	@Valid
+	@JsonProperty
+	private List<RentPayment> payments;
+	
 
 	public Property addDocumentItem(DuplicateCopy newDuplicateCopyItem) {
 		if (this.duplicateCopys == null) {
@@ -147,6 +155,32 @@ public class Property {
 			}
 		}
 		this.grantDetails.add(newGrantDetailItem);
+		return this;
+	}
+	
+	public Property addDemandItem(RentDemand newDemandItem) {
+		if (this.demands == null) {
+			this.demands = new ArrayList<>();
+		}
+		for (RentDemand grantDetail : demands) {
+			if (grantDetail.getId().equalsIgnoreCase(newDemandItem.getId())) {
+				return this;
+			}
+		}
+		this.demands.add(newDemandItem);
+		return this;
+	}
+	
+	public Property addPaymentItem(RentPayment newPaymentItem) {
+		if (this.payments == null) {
+			this.payments = new ArrayList<>();
+		}
+		for (RentPayment grantDetail : payments) {
+			if (grantDetail.getId().equalsIgnoreCase(newPaymentItem.getId())) {
+				return this;
+			}
+		}
+		this.payments.add(newPaymentItem);
 		return this;
 	}
 	
