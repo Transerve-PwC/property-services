@@ -1,10 +1,17 @@
 package org.egov.ps.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.ps.config.Configuration;
+import org.egov.ps.model.Applicant;
+import org.egov.ps.model.Application;
 import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.Owner;
@@ -13,10 +20,14 @@ import org.egov.ps.model.Payment;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.model.PurchaseDetails;
+import org.egov.ps.model.idgen.IdResponse;
+import org.egov.ps.repository.IdGenRepository;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
+import org.egov.ps.web.contracts.ApplicationRequest;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.egov.ps.web.contracts.PropertyRequest;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -29,6 +40,12 @@ public class EnrichmentService {
 
 	@Autowired
 	Util util;
+
+	@Autowired
+	IdGenRepository idGenRepository;
+
+	@Autowired
+	private Configuration config;
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
@@ -285,6 +302,98 @@ public class EnrichmentService {
 			}
 		});
 		return paymentDetails;
+	}
+
+	public void enrichCreateApplication(ApplicationRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		List<Application> applications = request.getApplications();
+		if (!CollectionUtils.isEmpty(applications)) {
+
+			applications.forEach(application -> {
+				String gen_application_id = UUID.randomUUID().toString();
+				AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				Applicant applicant = getApplicant(application, requestInfo, gen_application_id, auditDetails);
+
+				application.setId(gen_application_id);
+				application.setAuditDetails(auditDetails);
+				application.setApplicant(applicant);
+			});
+			setIdgenIds(request);
+		}
+	}
+
+	private Applicant getApplicant(Application application, RequestInfo requestInfo, String gen_application_id, AuditDetails auditDetails) {
+		Applicant applicant = application.getApplicant();
+		String gen_applicant_id = UUID.randomUUID().toString();
+		
+		applicant.setId(gen_applicant_id);
+		applicant.setTenantId(application.getTenantId());
+		applicant.setPropertyId(application.getPropertyId());
+		applicant.setApplicationId(gen_application_id);
+		applicant.setUserId(requestInfo.getUserInfo().getUuid());
+		applicant.setAuditDetails(auditDetails);
+		
+		return applicant;
+	}
+
+	/**
+	 * Returns a list of numbers generated from idgen
+	 *
+	 * @param requestInfo RequestInfo from the request
+	 * @param tenantId    tenantId of the city
+	 * @param idKey       code of the field defined in application properties for
+	 *                    which ids are generated for
+	 * @param idformat    format in which ids are to be generated
+	 * @param count       Number of ids to be generated
+	 * @return List of ids generated using idGen service
+	 */
+	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
+		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idformat, count)
+				.getIdResponses();
+
+		if (CollectionUtils.isEmpty(idResponses))
+			throw new CustomException("IDGEN ERROR", "No ids returned from idgen Service");
+
+		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
+	}
+
+	/**
+	 * Sets the ApplicationNumber for given TradeLicenseRequest
+	 *
+	 * @param request TradeLicenseRequest which is to be created
+	 */
+	private void setIdgenIds(ApplicationRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		String tenantId = request.getApplications().get(0).getTenantId();
+		List<Application> applications = request.getApplications();
+		int size = request.getApplications().size();
+
+		List<String> applicationNumbers = setIdgenIds(requestInfo, tenantId, size,
+				config.getApplicationNumberIdgenNamePS(), config.getApplicationNumberIdgenFormatPS());
+		ListIterator<String> itr = applicationNumbers.listIterator();
+
+		if (!CollectionUtils.isEmpty(applications)) {
+			applications.forEach(application -> {
+				application.setApplicationNumber(itr.next());
+			});
+		}
+	}
+
+	private List<String> setIdgenIds(RequestInfo requestInfo, String tenantId, int size, String idGenName,
+			String idGenFormate) {
+		List<String> applicationNumbers = null;
+
+		applicationNumbers = getIdList(requestInfo, tenantId, idGenName, idGenFormate, size);
+
+		Map<String, String> errorMap = new HashMap<>();
+		if (applicationNumbers.size() != size) {
+			errorMap.put("IDGEN ERROR ",
+					"The number of application number returned by idgen is not equal to number of Applications");
+		}
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+
+		return applicationNumbers;
 	}
 
 }

@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * A Object holds the basic data for a Application
+ * A Object holds the basic data for a Applicant
  */
-@ApiModel(description = "A Object holds the basic data for a Application")
+@ApiModel(description = "A Object holds the basic data for a Applicant")
 @Validated
 @javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2020-08-12T10:06:11.263+05:30")
 
@@ -27,47 +27,36 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class Application {
+public class Applicant {
 
 	@JsonProperty("id")
 	private String id;
 
 	@JsonProperty("tenantId")
 	private String tenantId;
-
+	
 	@JsonProperty("propertyId")
 	private String propertyId;
 
-	@JsonProperty("applicationNumber")
-	private String applicationNumber;
+	@JsonProperty("applicationId")
+	private String applicationId;
 
-	@JsonProperty("branchType")
-	private String branchType;
+	@JsonProperty("mobileNumber")
+	private String mobileNumber;
 
-	@JsonProperty("moduleType")
-	private String moduleType;
+	@JsonProperty("firstName")
+	private String firstName;
 
-	@JsonProperty("applicationType")
-	private String applicationType;
+	@JsonProperty("lastName")
+	private String lastName;
 
-	@JsonProperty("comments")
-	private String comments;
-
-	@JsonProperty("hardcopyReceivedDate")
-	private Long hardcopyReceivedDate;
-
+	@JsonProperty("userId")
+	private String userId;
+	
 	@JsonProperty("additionalDetails")
-	private JsonNode additionalDetails;
-
-	@JsonProperty("state")
-	private String state;
-
-	@JsonProperty("action")
-	private String action;
+    private JsonNode additionalDetails;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
-	
-	@JsonProperty("applicant")
-	private Applicant applicant;
+
 }
