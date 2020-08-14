@@ -512,7 +512,76 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime      
     
+    
+    - query : DELETE FROM cs_pt_demand WHERE property_id=? and tenantid=?;
+      basePath: $.Properties.*.demands.*
+      jsonMaps:
+       - jsonPath: $.Properties.*.demands.*.propertyId
+       
+       - jsonPath: $.Properties.*.demands.*.tenantId
 
+    - query : INSERT INTO cs_pt_demand(id, property_id, initialGracePeriod, generationDate, collectionPrincipal, remainingPrincipal, interestSince,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.Properties.*.demands.*
+      jsonMaps:
+        - jsonPath: $.Properties.*.demands.*.id 
+      
+        - jsonPath: $.Properties.*.demands.*.propertyId
+
+        - jsonPath: $.Properties.*.demands.*.initialGracePeriod
+       
+        - jsonPath: $.Properties.*.demands.*.generationDate
+  
+        - jsonPath: $.Properties.*.demands.*.collectionPrincipal
+
+        - jsonPath: $.Properties.*.demands.*.remainingPrincipal
+        
+        - jsonPath: $.Properties.*.demands.*.interestSince 
+      
+        - jsonPath: $.Properties.*.demands.*.mode
+
+        - jsonPath: $.Properties.*.demands.*.tenantId
+       
+        - jsonPath: $.Properties.*.demands.*.auditDetails.createdBy
+  
+        - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedBy
+
+        - jsonPath: $.Properties.*.demands.*.auditDetails.createdTime
+        
+        - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedTime
+        
+       
+    - query : DELETE FROM cs_pt_payment WHERE property_id=? and tenantid=?;
+      basePath: $.Properties.*.payments.*
+      jsonMaps:
+       - jsonPath: $.Properties.*.payments.*.propertyId
+       
+       - jsonPath: $.Properties.*.payments.*.tenantId
+
+    
+    - query : INSERT INTO cs_pt_payment(id, property_id, receiptNo, amountPaid, dateOfPayment,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.Properties.*.payments.*
+      jsonMaps:
+        - jsonPath: $.Properties.*.payments.*.id 
+      
+        - jsonPath: $.Properties.*.payments.*.propertyId
+
+        - jsonPath: $.Properties.*.payments.*.receiptNo
+       
+        - jsonPath: $.Properties.*.payments.*.amountPaid
+  
+        - jsonPath: $.Properties.*.payments.*.dateOfPayment
+
+        - jsonPath: $.Properties.*.payments.*.mode
+
+        - jsonPath: $.Properties.*.payments.*.tenantId
+       
+        - jsonPath: $.Properties.*.payments.*.auditDetails.createdBy
+  
+        - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedBy
+
+        - jsonPath: $.Properties.*.payments.*.auditDetails.createdTime
+        
+        - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedTime
     
     
   - version: 1.0

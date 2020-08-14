@@ -49,6 +49,9 @@ public class PropertyService {
 	
 	@Autowired
 	private WorkflowService workflowService;
+	
+	@Autowired
+	private RentEnrichmentService rentEnrichmentService;
 
 	public List<Property> createProperty(PropertyRequest request) {
 
@@ -71,6 +74,7 @@ public class PropertyService {
 	public List<Property> updateProperty(PropertyRequest request) {
 		List<Property> propertyFromSearch = propertyValidator.validateUpdateRequest(request);
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
+		rentEnrichmentService.enrichDemandsPayments(request);
 		userService.createUser(request);
 		if (config.getIsWorkflowEnabled()) {
 			wfIntegrator.callWorkFlow(request);
