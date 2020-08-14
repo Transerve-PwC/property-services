@@ -31,24 +31,24 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ReadExcelService {
 
-	public DemandPaymentResponse getDatafromExcelPath(String filePath, String sheetName) {
+	public DemandPaymentResponse getDatafromExcelPath(String filePath) {
 		DemandPaymentResponse response = new DemandPaymentResponse();
 		try {
-			response =  getDatafromExcel(new FileInputStream(new File(filePath)), sheetName);
+			response =  getDatafromExcel(new FileInputStream(new File(filePath)));
 		} catch (FileNotFoundException e) {
 			log.error("File converting inputstream operation failed due to :" + e.getMessage());
 		}
 		return response;
 	}
 
-	public DemandPaymentResponse getDatafromExcel(InputStream inputStream, String sheetName) {
+	public DemandPaymentResponse getDatafromExcel(InputStream inputStream) {
 		List<Demand> demands = new ArrayList<>();
 		List<Payment> payments = new ArrayList<>();
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		try {
 			Workbook workbook = WorkbookFactory.create(inputStream);
-			Sheet sheet = workbook.getSheet(sheetName);
+			Sheet sheet = workbook.getSheetAt(0);
 			Iterator<Row> rowIterator = sheet.iterator();
 			int count = 0;
 
@@ -140,7 +140,7 @@ public class ReadExcelService {
 
 	public void main(String args[]) {
 		
-		DemandPaymentResponse temps = getDatafromExcelPath("D:\\Projects\\Transerve\\Docs\\521 to 530.xlsx","521");
+		DemandPaymentResponse temps = getDatafromExcelPath("D:\\Projects\\Transerve\\Docs\\521 to 530.xlsx");
 		System.out.println(temps);
 
 	}
