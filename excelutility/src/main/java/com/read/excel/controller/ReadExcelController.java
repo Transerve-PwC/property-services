@@ -1,6 +1,5 @@
 package com.read.excel.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.core.io.UrlResource;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.read.excel.bean.DemandPaymentResponse;
 import com.read.excel.bean.EmployeeTaxDetails;
 import com.read.excel.excelservices.ReadExcelService;
 import com.read.excel.utils.FileStoreUtils;
@@ -32,10 +32,10 @@ public class ReadExcelController {
 	}
 
 	@GetMapping("/read")
-	public ResponseEntity<List<EmployeeTaxDetails>> readExcel(@RequestParam(value = "tenantId") String tenantId,
+	public ResponseEntity<DemandPaymentResponse> readExcel(@RequestParam(value = "tenantId") String tenantId,
 			@RequestParam("fileStoreId") String fileStoreId) {
 		log.info("Start controller method readExcel()");
-		List<EmployeeTaxDetails> employees = new ArrayList<>();
+		DemandPaymentResponse employees = new DemandPaymentResponse();
 		try {
 			String filePath = fileStoreUtils.fetchFileStoreUrl(tenantId, fileStoreId);
 			if (!"".equals(filePath))
