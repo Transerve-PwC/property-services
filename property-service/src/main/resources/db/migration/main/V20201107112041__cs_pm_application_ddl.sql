@@ -11,7 +11,7 @@ CREATE TABLE cs_pm_application_v1 (
    application_type			CHARACTER VARYING (256),
    comments   				CHARACTER VARYING (256),
    hardcopy_received_date 	bigint,
-   additional_details       jsonb,
+   application_details      jsonb,
    state   					CHARACTER VARYING (256),
    action    				CHARACTER VARYING (256),
   
@@ -34,7 +34,7 @@ CREATE TABLE cs_pm_applicant_v1 (
    first_name   			CHARACTER VARYING (256),
    last_name 				CHARACTER VARYING (256),
    user_id   				CHARACTER VARYING (256),
-   additional_details       jsonb,
+   applicant_details        jsonb,
   
    created_by           	CHARACTER VARYING (128) NOT NULL,
    last_modified_by     	CHARACTER VARYING (128),
