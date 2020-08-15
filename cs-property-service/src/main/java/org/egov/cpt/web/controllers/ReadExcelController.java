@@ -1,6 +1,6 @@
 package org.egov.cpt.web.controllers;
 
-import org.egov.cpt.models.paymentcalculation.DemandPaymentResponse;
+import org.egov.cpt.models.RentDemandResponse;
 import org.egov.cpt.service.ReadExcelService;
 import org.egov.cpt.util.FileStoreUtils;
 import org.springframework.core.io.UrlResource;
@@ -28,18 +28,18 @@ public class ReadExcelController {
 	}
 
 	@GetMapping("/read")
-	public ResponseEntity<DemandPaymentResponse> readExcel(@RequestParam(value = "tenantId") String tenantId,
+	public ResponseEntity<RentDemandResponse> readExcel(@RequestParam(value = "tenantId") String tenantId,
 			@RequestParam("fileStoreId") String fileStoreId) {
 		log.info("Start controller method readExcel()");
-		DemandPaymentResponse employees = new DemandPaymentResponse();
+		RentDemandResponse data = new RentDemandResponse();
 		try {
 			String filePath = fileStoreUtils.fetchFileStoreUrl(tenantId, fileStoreId);
 			if (!"".equals(filePath))
-				employees = readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream());
+				data = readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream());
 			log.info("End controller method readExcel");
 		} catch (Exception e) {
 			log.error("Error occur during runnig controller method readExcel():" + e.getMessage());
 		}
-		return new ResponseEntity<>(employees, HttpStatus.OK);
+		return new ResponseEntity<>(data, HttpStatus.OK);
 	}
 }

@@ -17,9 +17,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.egov.cpt.models.paymentcalculation.Demand;
-import org.egov.cpt.models.paymentcalculation.DemandPaymentResponse;
-import org.egov.cpt.models.paymentcalculation.Payment;
+//import org.egov.cpt.models.paymentcalculation.Demand;
+import org.egov.cpt.models.RentDemand;
+import org.egov.cpt.models.RentDemandResponse;
+import org.egov.cpt.models.RentPayment;
+//import org.egov.cpt.models.paymentcalculation.DemandPaymentResponse;
+//import org.egov.cpt.models.paymentcalculation.Payment;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -31,8 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ReadExcelService {
 
-	public DemandPaymentResponse getDatafromExcelPath(String filePath) {
-		DemandPaymentResponse response = new DemandPaymentResponse();
+	public RentDemandResponse getDatafromExcelPath(String filePath) {
+		RentDemandResponse response = new RentDemandResponse();
 		try {
 			response =  getDatafromExcel(new FileInputStream(new File(filePath)));
 		} catch (FileNotFoundException e) {
@@ -41,9 +44,9 @@ public class ReadExcelService {
 		return response;
 	}
 
-	public DemandPaymentResponse getDatafromExcel(InputStream inputStream) {
-		List<Demand> demands = new ArrayList<>();
-		List<Payment> payments = new ArrayList<>();
+	public RentDemandResponse getDatafromExcel(InputStream inputStream) {
+		List<RentDemand> demands = new ArrayList<>();
+		List<RentPayment> payments = new ArrayList<>();
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		try {
@@ -97,10 +100,10 @@ public class ReadExcelService {
 					cellData.remove("Receipt No. & Date");
 					if(cellData.get("Realization Amount") != null && 
 							Double.parseDouble(cellData.get("Realization Amount").toString()) > 0) {
-						payments.add(mapper.convertValue(cellData, Payment.class));
+						payments.add(mapper.convertValue(cellData, RentPayment.class));
 					}else if(cellData.get("Realization Amount") != null &&
 							Double.parseDouble(cellData.get("Realization Amount").toString()) == 0) {
-						demands.add(mapper.convertValue(cellData, Demand.class));
+						demands.add(mapper.convertValue(cellData, RentDemand.class));
 					}
 				}
 			}
@@ -108,7 +111,7 @@ public class ReadExcelService {
 			e.printStackTrace();
 			log.error("File reading operation fails due to :" + e.getMessage());
 		}
-		return new DemandPaymentResponse(demands,payments);
+		return new RentDemandResponse(demands,payments);
 	}
 
 	
@@ -140,7 +143,7 @@ public class ReadExcelService {
 
 	public void main(String args[]) {
 		
-		DemandPaymentResponse temps = getDatafromExcelPath("D:\\Projects\\Transerve\\Docs\\521 to 530.xlsx");
+		RentDemandResponse temps = getDatafromExcelPath("D:\\Projects\\Transerve\\Docs\\521 to 530.xlsx");
 		System.out.println(temps);
 
 	}
