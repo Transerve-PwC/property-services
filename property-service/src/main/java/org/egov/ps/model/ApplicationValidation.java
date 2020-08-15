@@ -1,8 +1,9 @@
 package org.egov.ps.model;
 
+import java.util.Map;
+
 import lombok.Builder;
 import lombok.Getter;
-import net.minidev.json.JSONObject;
 
 @Getter
 @Builder
@@ -12,6 +13,6 @@ public class ApplicationValidation implements IValidation {
 
     private String errorMessageFormat;
 
-    private JSONObject params;
+    private Map<String, Object> params;
 
 }

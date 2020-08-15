@@ -1,6 +1,6 @@
 package org.egov.ps.model;
 
-import net.minidev.json.JSONObject;
+import java.util.Map;
 
 public interface IValidation {
 
@@ -8,5 +8,5 @@ public interface IValidation {
 
     public String getErrorMessageFormat();
 
-    public JSONObject getParams();
+    public Map<String, Object> getParams();
 }

@@ -3,10 +3,16 @@ package org.egov.ps.validator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.model.ApplicationField;
+import org.egov.ps.model.ApplicationValidation;
 import org.egov.ps.model.IApplicationField;
+import org.egov.ps.model.IValidation;
 import org.egov.ps.service.MDMSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -32,30 +38,45 @@ public class ApplicationValidatorService {
 		beans.entrySet().stream().forEach(entry -> {
 			ApplicationValidator annotation = this.context.findAnnotationOnBean(entry.getKey(),
 					ApplicationValidator.class);
-			System.out.println(annotation.value());
 			if (entry.getValue() instanceof IApplicationValidator) {
 				validators.put(annotation.value(), (IApplicationValidator) entry.getValue());
 			}
 		});
 	}
 
-	public void performValidationsFromMDMS(String applicationType, Map<String, Object> applicationObject,
+	public void performValidationsFromMDMS(String applicationType, DocumentContext applicationObject,
 			RequestInfo RequestInfo, String tenantId) {
 		List<Map<String, Object>> fieldConfigurations = this.mdmsService.getApplicationConfig(applicationType,
 				RequestInfo, tenantId);
 		for (int i = 0; i < fieldConfigurations.size(); i++) {
 			Map<String, Object> fieldConfigMap = fieldConfigurations.get(i);
 			String path = (String) fieldConfigMap.get("path");
-			Object value = applicationObject.get(path);
+			Object value = applicationObject.read(path);
+			List<Map<String, Object>> validationObjects = (List<Map<String, Object>>) fieldConfigMap.get("validations");
+			System.out.println(validationObjects);
+			List<IValidation> validations = validationObjects.stream()
+					.map(validationObject -> ApplicationValidation.builder().type((String) validationObject.get("type"))
+							.errorMessageFormat((String) validationObject.get("errorMessageFormat"))
+							.params((Map<String, Object>) validationObject.get("params")).build())
+					.collect(Collectors.toList());
 			IApplicationField field = ApplicationField.builder().path(path)
 					.required((boolean) fieldConfigMap.get("required")).rootObject(applicationObject).value(value)
-					.build();
-			System.out.println(field);
+					.validations(validations).build();
+			this.performValidations(applicationObject, field);
 		}
 		System.out.println("Field configurations length" + fieldConfigurations);
 	}
 
-	public void performValidations(JSONObject applicationObject, List<IApplicationField> fields) {
-
+	private void performValidations(DocumentContext applicationObject, IApplicationField field) {
+		for (int i = 0; i < field.getValidations().size(); i++) {
+			IValidation validation = field.getValidations().get(i);
+			IApplicationValidator validator = validators.get(validation.getType());
+			if (validator == null) {
+				System.out.println("No validator found for " + validation);
+				return;
+			}
+			Object value = applicationObject.read(field.getPath());
+			validator.isValid(validation, field, value, applicationObject);
+		}
 	}
 }

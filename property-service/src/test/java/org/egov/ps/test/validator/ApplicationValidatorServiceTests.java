@@ -15,9 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.service.MDMSService;
 import org.egov.ps.validator.ApplicationValidatorService;
-import org.javers.common.collections.Arrays;
 import org.json.JSONException;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -44,12 +42,16 @@ public class ApplicationValidatorServiceTests {
 		String configJSON = getFileContents("simpleApplicationConfig.json");
 		String simpleApplicationObjectJSON = getFileContents("simpleApplicationObject.json");
 		List<Map<String, Object>> result = JsonPath.read(configJSON, "$.fields");
-		// System.out.println(result.getClass());
+		DocumentContext applicationObjectContext = JsonPath.parse(simpleApplicationObjectJSON);
+
+		/**
+		 * if in the future mdmsService.getApplicationConfig is called, then return
+		 * `result`
+		 */
 		Mockito.when(
 				mdmsService.getApplicationConfig(eq(SampleApplicationType), any(RequestInfo.class), any(String.class)))
 				.thenReturn(result);
-		this.validatorService.performValidationsFromMDMS(SampleApplicationType,
-				JsonPath.read(simpleApplicationObjectJSON, "$"), null, null);
+		this.validatorService.performValidationsFromMDMS(SampleApplicationType, applicationObjectContext, null, null);
 		// this.validatorService.processAnnotations();
 	}
 
@@ -62,6 +64,10 @@ public class ApplicationValidatorServiceTests {
 		System.out.println("purchaser: " + purchaser);
 		String purchaserName = documentContext.read("$.purchaser.name");
 		assertEquals("foo", purchaserName);
+
+		String modeOfTransfer = documentContext.read("modeOfTransfer");
+		System.out.println("modeOfTransfer: " + modeOfTransfer);
+		assertEquals("someValue", modeOfTransfer);
 	}
 
 	@Test

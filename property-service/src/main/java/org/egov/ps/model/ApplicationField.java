@@ -1,7 +1,8 @@
 package org.egov.ps.model;
 
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
+
+import com.jayway.jsonpath.DocumentContext;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -16,9 +17,9 @@ public class ApplicationField implements IApplicationField {
 
     private boolean required;
 
-    private Map<String, Object> rootObject;
+    private DocumentContext rootObject;
 
-    private ArrayList<IValidation> validations;
+    private List<IValidation> validations;
 
     private Object value;
 }

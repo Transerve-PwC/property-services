@@ -37,19 +37,6 @@
                     "type": "email"
                 }
             ]
-        },
-        {
-            "path": "purchaser.colony",
-            "required": false,
-            "validations": [
-                {
-                    "type": "mdms",
-                    "params": {
-                        "moduleName": "EstateProperties",
-                        "masterName": "colonies"
-                    }
-                }
-            ]
         }
     ]
 }

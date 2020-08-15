@@ -1,7 +1,8 @@
 package org.egov.ps.model;
 
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
+
+import com.jayway.jsonpath.DocumentContext;
 
 public interface IApplicationField {
 
@@ -9,9 +10,9 @@ public interface IApplicationField {
 
     public boolean isRequired();
 
-    public Map<String, Object> getRootObject();
+    public DocumentContext getRootObject();
 
-    public ArrayList<IValidation> getValidations();
+    public List<IValidation> getValidations();
 
     public Object getValue();
 }
