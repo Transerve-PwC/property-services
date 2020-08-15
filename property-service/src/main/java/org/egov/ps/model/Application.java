@@ -35,39 +35,76 @@ public class Application {
 	@JsonProperty("tenantId")
 	private String tenantId;
 
-	@JsonProperty("propertyId")
-	private String propertyId;
+	/**
+	 * Property for which we are trying to create this application for.
+	 */
+	@JsonProperty("property")
+	private Property property;
 
+	/**
+	 * Generated number that will be visible to employees and to the user.
+	 */
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
 
+	/**
+	 * This will be one of "Estate Branch", "Building Branch", "Manimajra Branch"
+	 */
 	@JsonProperty("branchType")
 	private String branchType;
 
+	/**
+	 * This will be one of "TransferOfOwnership", "OtherCitizenServices",
+	 * "InternalServices" "CitizenServices"
+	 */
 	@JsonProperty("moduleType")
 	private String moduleType;
 
+	/**
+	 * This should be an enum.
+	 */
 	@JsonProperty("applicationType")
 	private String applicationType;
 
+	/**
+	 * Latest comments entered by an employee during workflow.
+	 */
 	@JsonProperty("comments")
 	private String comments;
 
+	/**
+	 * Date of documents hard copies received at MCC by DispatchSectionOfficer.
+	 */
 	@JsonProperty("hardcopyReceivedDate")
 	private Long hardcopyReceivedDate;
 
-	@JsonProperty("additionalDetails")
+	/**
+	 * A JSON string that contains all the application details.
+	 */
+	@JsonProperty("applicationDetails")
 	private JsonNode additionalDetails;
 
+	/**
+	 * The current workflow status of application.
+	 */
 	@JsonProperty("state")
 	private String state;
 
+	/**
+	 * The latest workflow action performed on this application.
+	 */
 	@JsonProperty("action")
 	private String action;
 
+	/**
+	 * History of changes for this application.
+	 */
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
-	
+
+	/**
+	 * User who is applying for this application(service).
+	 */
 	@JsonProperty("applicant")
 	private Applicant applicant;
 }

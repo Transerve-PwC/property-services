@@ -1,0 +1,7 @@
+{
+    "modeOfTransfer": "someValue",
+    "purchaser": {
+        "name": "foo",
+        "email": "something"
+    }
+}
