@@ -49,7 +49,9 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 				currentProperty = Property.builder().id(propertyId).transitNumber(rs.getString("transit_number"))
 						.tenantId(tenantId).colony(rs.getString("colony"))
 						.masterDataState(rs.getString("master_data_state"))
-						.masterDataAction(rs.getString("master_data_action")).auditDetails(auditdetails).build();
+						.masterDataAction(rs.getString("master_data_action"))
+						.propertyNumber(rs.getString("pt_property_number"))
+						.auditDetails(auditdetails).build();
 				propertyMap.put(propertyId, currentProperty);
 			}
 			addChildrenToProperty(rs, currentProperty);

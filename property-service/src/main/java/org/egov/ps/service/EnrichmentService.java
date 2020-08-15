@@ -322,7 +322,8 @@ public class EnrichmentService {
 		}
 	}
 
-	private Applicant getApplicant(Application application, RequestInfo requestInfo, String gen_application_id, AuditDetails auditDetails) {
+	private Applicant getApplicant(Application application, RequestInfo requestInfo, String gen_application_id,
+			AuditDetails auditDetails) {
 		Applicant applicant = application.getApplicant();
 		String gen_applicant_id = UUID.randomUUID().toString();
 		
@@ -335,7 +336,7 @@ public class EnrichmentService {
 		applicant.setApplicationId(gen_application_id);
 		applicant.setUserId(requestInfo.getUserInfo().getUuid());
 		applicant.setAuditDetails(auditDetails);
-		
+
 		return applicant;
 	}
 
