@@ -50,6 +50,9 @@ public class Property {
 
 	@JsonProperty("masterDataAction")
 	private String masterDataAction;
+	
+	@JsonProperty("propertyNumber")
+	private String propertyNumber;
 
 	@JsonProperty("assignee")
 	private List<String> assignee = null;

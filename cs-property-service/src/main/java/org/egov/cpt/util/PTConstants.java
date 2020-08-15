@@ -222,6 +222,7 @@ public class PTConstants {
 	
 //Reject State
 	public static final String MG_REJECTED ="MG_REJECTED";
+	public static final String PM_REJECTED ="PM_REJECTED";
 
 	public static final String EMAIL_SUBJECT = "Chandigarh mSeva Application Status";
 

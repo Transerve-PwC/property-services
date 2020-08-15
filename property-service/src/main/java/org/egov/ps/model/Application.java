@@ -1,10 +1,12 @@
 package org.egov.ps.model;
 
+import org.egov.ps.util.PropertySerializer;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -38,6 +40,7 @@ public class Application {
 	/**
 	 * Property for which we are trying to create this application for.
 	 */
+  @JsonSerialize(using = PropertySerializer.class)
 	@JsonProperty("property")
 	private Property property;
 
@@ -82,7 +85,7 @@ public class Application {
 	 * A JSON string that contains all the application details.
 	 */
 	@JsonProperty("applicationDetails")
-	private JsonNode additionalDetails;
+	private JsonNode applicationDetails;
 
 	/**
 	 * The current workflow status of application.
