@@ -30,7 +30,7 @@ public class PropertyQueryBuilder {
 	private static final String FINANCE_ALL =" demand.*,payment.*, "; 
 	
 	
-	private static final String PT_COLUMNS = " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,"
+	private static final String PT_COLUMNS = " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,pt.property_number as pt_property_number,"
 											+ " pt.created_by as pcreated_by, pt.created_date as pcreated_date, pt.modified_by as pmodified_by, pt.modified_date as pmodified_date,"
 
 											+ " ptdl.id as pdid, ptdl.property_id as pdproperty_id, ptdl.transit_number as pdtransit_number,"
