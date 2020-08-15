@@ -1,5 +1,6 @@
 package org.egov.ps.test.validator;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 
@@ -7,13 +8,16 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 import org.apache.commons.io.IOUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.service.MDMSService;
 import org.egov.ps.validator.ApplicationValidatorService;
+import org.javers.common.collections.Arrays;
 import org.json.JSONException;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -41,13 +45,33 @@ public class ApplicationValidatorServiceTests {
 		String simpleApplicationObjectJSON = getFileContents("simpleApplicationObject.json");
 		List<Map<String, Object>> result = JsonPath.read(configJSON, "$.fields");
 		// System.out.println(result.getClass());
-		// System.out.println(new JSONObject(json).toString());
 		Mockito.when(
 				mdmsService.getApplicationConfig(eq(SampleApplicationType), any(RequestInfo.class), any(String.class)))
 				.thenReturn(result);
 		this.validatorService.performValidationsFromMDMS(SampleApplicationType,
 				JsonPath.read(simpleApplicationObjectJSON, "$"), null, null);
 		// this.validatorService.processAnnotations();
+	}
+
+	@Test
+	public void testSimpleJSONPath() {
+		String simpleApplicationObjectJSON = getFileContents("simpleApplicationObject.json");
+		System.out.println(simpleApplicationObjectJSON);
+		DocumentContext documentContext = JsonPath.parse(simpleApplicationObjectJSON);
+		Map<String, Object> purchaser = documentContext.read("$.purchaser");
+		System.out.println("purchaser: " + purchaser);
+		String purchaserName = documentContext.read("$.purchaser.name");
+		assertEquals("foo", purchaserName);
+	}
+
+	@Test
+	public void testArrayJSONPath() {
+		String simpleApplicationObjectJSON = getFileContents("testJSONPath.json");
+		System.out.println(simpleApplicationObjectJSON);
+		DocumentContext documentContext = JsonPath.parse(simpleApplicationObjectJSON);
+		List<String> ownerNames = documentContext.read("$.owners.*.name");
+		assertEquals("Ramu", ownerNames.get(0));
+		assertEquals("Shamu", ownerNames.get(1));
 	}
 
 	// @Test
