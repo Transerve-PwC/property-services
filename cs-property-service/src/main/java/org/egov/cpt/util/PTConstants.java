@@ -232,4 +232,11 @@ public class PTConstants {
 	public static final String MODE_UPLOADED = "Uploaded";
 	public static final String MODE_GENERATED = "Generated";
 
+//Relations in PM
+	public static final Object RELATION_OWNER = "owner";
+	public static final Object RELATION_PI = "propertyImage";
+	public static final Object RELATION_GD = "GrantDetail";
+	public static final Object RELATION_NOTICE = "notice";
+	public static final Object RELATION_FINANCE = "finance";
+
 }
