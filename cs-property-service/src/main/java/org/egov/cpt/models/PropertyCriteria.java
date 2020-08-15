@@ -37,6 +37,8 @@ public class PropertyCriteria {
 
 	private String propertyId;
 	
+	private List<String> relations;
+	
 	@Builder.Default
 	private String createdBy="";
 	
