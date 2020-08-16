@@ -31,7 +31,7 @@ public class SampleTest {
 
         String modeOfTransfer = documentContext.read("modeOfTransfer");
         System.out.println("modeOfTransfer: " + modeOfTransfer);
-        assertEquals("someValue", modeOfTransfer);
+        assertEquals("GIFT", modeOfTransfer);
     }
 
     @Test
