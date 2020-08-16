@@ -1,12 +1,12 @@
 package org.egov.ps.validator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.model.ApplicationField;
@@ -18,12 +18,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import net.minidev.json.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class ApplicationValidatorService {
 
-	Map<String, IApplicationValidator> validators = new HashMap<String, IApplicationValidator>();
+	/**
+	 * A map whose keys are annotation names and whose values are the validator
+	 * beans.
+	 */
+	Map<String, IApplicationValidator> validators;
 
 	ApplicationContext context;
 
@@ -35,48 +40,103 @@ public class ApplicationValidatorService {
 		this.mdmsService = mdmsService;
 		Map<String, Object> beans = this.context.getBeansWithAnnotation(ApplicationValidator.class);
 
-		beans.entrySet().stream().forEach(entry -> {
-			ApplicationValidator annotation = this.context.findAnnotationOnBean(entry.getKey(),
-					ApplicationValidator.class);
-			if (entry.getValue() instanceof IApplicationValidator) {
-				validators.put(annotation.value(), (IApplicationValidator) entry.getValue());
-			}
-		});
+		/**
+		 * Construct validators object by reading annotations from beans and discarding
+		 * all beans that does not implement IApplicationValidator.
+		 */
+		this.validators = beans.entrySet().stream().filter(entry -> entry.getValue() instanceof IApplicationValidator)
+				.collect(Collectors.toMap(e -> {
+					ApplicationValidator annotation = this.context.findAnnotationOnBean(e.getKey(),
+							ApplicationValidator.class);
+					return annotation.value();
+				}, e -> (IApplicationValidator) e.getValue()));
 	}
 
-	public void performValidationsFromMDMS(String applicationType, DocumentContext applicationObject,
-			RequestInfo RequestInfo, String tenantId) {
+	@SuppressWarnings("unchecked")
+	public Map<String, List<String>> performValidationsFromMDMS(String applicationType,
+			DocumentContext applicationObject, RequestInfo RequestInfo, String tenantId) {
 		List<Map<String, Object>> fieldConfigurations = this.mdmsService.getApplicationConfig(applicationType,
 				RequestInfo, tenantId);
+		Map<String, List<String>> errorsMap = new HashMap<String, List<String>>();
 		for (int i = 0; i < fieldConfigurations.size(); i++) {
 			Map<String, Object> fieldConfigMap = fieldConfigurations.get(i);
+
+			/**
+			 * Get field path from fieldConfig.
+			 */
 			String path = (String) fieldConfigMap.get("path");
+
+			/**
+			 * Get Value from applicationObject.
+			 */
 			Object value = applicationObject.read(path);
 			List<Map<String, Object>> validationObjects = (List<Map<String, Object>>) fieldConfigMap.get("validations");
-			System.out.println(validationObjects);
+
+			/**
+			 * Build IValidation object by reading from field configuration.
+			 */
 			List<IValidation> validations = validationObjects.stream()
 					.map(validationObject -> ApplicationValidation.builder().type((String) validationObject.get("type"))
 							.errorMessageFormat((String) validationObject.get("errorMessageFormat"))
 							.params((Map<String, Object>) validationObject.get("params")).build())
 					.collect(Collectors.toList());
+
+			/**
+			 * Construct the ApplicationField object.
+			 */
 			IApplicationField field = ApplicationField.builder().path(path)
 					.required((boolean) fieldConfigMap.get("required")).rootObject(applicationObject).value(value)
 					.validations(validations).build();
-			this.performValidations(applicationObject, field);
+
+			/**
+			 * Perform validations.
+			 */
+			List<String> errorMessages = this.performFieldValidations(applicationObject, field);
+			if (errorMessages != null && !errorMessages.isEmpty()) {
+				errorsMap.put(path, errorMessages);
+			}
 		}
-		System.out.println("Field configurations length" + fieldConfigurations);
+		return errorsMap;
 	}
 
-	private void performValidations(DocumentContext applicationObject, IApplicationField field) {
-		for (int i = 0; i < field.getValidations().size(); i++) {
-			IValidation validation = field.getValidations().get(i);
+	private static final String TYPE_REQUIRED = "required";
+
+	private List<String> performFieldValidations(DocumentContext applicationObject, IApplicationField field) {
+
+		Object value = applicationObject.read(field.getPath());
+
+		/**
+		 * Perform required validator validation first.
+		 */
+		IApplicationValidator requiredValidator = validators.get(TYPE_REQUIRED);
+		List<String> requiredValidationErrors = requiredValidator
+				.validate(ApplicationValidation.builder().type(TYPE_REQUIRED).build(), field, value, applicationObject);
+		boolean isFieldEmpty = requiredValidationErrors != null && !requiredValidationErrors.isEmpty();
+
+		if (field.isRequired() && isFieldEmpty) {
+			log.debug("{} validator failed validating {} for path {}", TYPE_REQUIRED, value, field.getPath());
+			return requiredValidationErrors;
+		} else if (isFieldEmpty) {
+			// field is not required and is empty. No validations to perform.
+			return null;
+		}
+
+		/**
+		 * Perform other validations and combine all the indivial error messages into a
+		 * single list.
+		 */
+		return field.getValidations().stream().map(validation -> {
 			IApplicationValidator validator = validators.get(validation.getType());
 			if (validator == null) {
-				System.out.println("No validator found for " + validation);
-				return;
+				log.error("No validator found for {} for path {}", validation.getType(), field.getPath());
+				return null;
 			}
-			Object value = applicationObject.read(field.getPath());
-			validator.isValid(validation, field, value, applicationObject);
-		}
+			log.debug("{} validator validating {} for path {}", validation.getType(), value, field.getPath());
+			return validator.validate(validation, field, value, applicationObject);
+		}).filter(validationErrors -> validationErrors != null && !validationErrors.isEmpty())
+				.reduce(new ArrayList<String>(), (a, b) -> {
+					a.addAll(b);
+					return a;
+				});
 	}
 }

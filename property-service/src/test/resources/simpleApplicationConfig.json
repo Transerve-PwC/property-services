@@ -11,8 +11,7 @@
                             "SALE",
                             "GIFT"
                         ]
-                    },
-                    "errorMessage": "modeOfTransfer will only access types 'SALE', 'GIFT'"
+                    }
                 }
             ]
         },
