@@ -3,12 +3,12 @@ package org.egov.ps.test.validator;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertFalse;
 
-import org.egov.ps.model.ApplicationField;
-import org.egov.ps.model.ApplicationValidation;
-import org.egov.ps.model.IApplicationField;
-import org.egov.ps.model.IValidation;
-import org.egov.ps.validator.EmailValidator;
-import org.egov.ps.validator.PhoneNumberValidator;
+import org.egov.ps.validator.ApplicationField;
+import org.egov.ps.validator.ApplicationValidation;
+import org.egov.ps.validator.IApplicationField;
+import org.egov.ps.validator.IValidation;
+import org.egov.ps.validator.application.EmailValidator;
+import org.egov.ps.validator.application.PhoneNumberValidator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

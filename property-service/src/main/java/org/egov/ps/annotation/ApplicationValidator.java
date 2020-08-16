@@ -1,4 +1,4 @@
-package org.egov.ps.validator;
+package org.egov.ps.annotation;
 
 import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;

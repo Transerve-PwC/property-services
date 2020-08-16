@@ -2,9 +2,6 @@ package org.egov.ps.validator;
 
 import java.util.List;
 
-import org.egov.ps.model.IApplicationField;
-import org.egov.ps.model.IValidation;
-
 /**
  * @param validation The validation configuration object. Usually contains the
  *                   type of validation and <code>params</code> which is a

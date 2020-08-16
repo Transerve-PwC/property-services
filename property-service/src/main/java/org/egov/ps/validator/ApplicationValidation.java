@@ -1,4 +1,4 @@
-package org.egov.ps.model;
+package org.egov.ps.validator;
 
 import java.util.Map;
 

@@ -9,10 +9,7 @@ import java.util.stream.Collectors;
 import com.jayway.jsonpath.DocumentContext;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.ps.model.ApplicationField;
-import org.egov.ps.model.ApplicationValidation;
-import org.egov.ps.model.IApplicationField;
-import org.egov.ps.model.IValidation;
+import org.egov.ps.annotation.ApplicationValidator;
 import org.egov.ps.service.MDMSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
