@@ -104,13 +104,13 @@ public class Configuration {
 
 	// MDMS Configuration
 
-	@Value("{egov.mdms.host}")
+	@Value("${egov.mdms.host}")
 	private String mdmsHost;
 
-	@Value("{egov.mdms.search.endpoint}")
+	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsSearchEndpoint;
 
-	@Value("{egov.mdms.get.endpoint}")
+	@Value("${egov.mdms.get.endpoint}")
 	private String mdmsGetEndpoint;
 
 }

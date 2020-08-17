@@ -6,11 +6,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.annotation.ApplicationValidator;
+import org.egov.ps.model.Application;
+import org.egov.ps.model.Property;
+import org.egov.ps.model.PropertyCriteria;
+import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.service.MDMSService;
+import org.egov.ps.util.PSConstants;
+import org.egov.ps.web.contracts.ApplicationRequest;
+import org.egov.tracer.model.CustomException;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -31,10 +45,17 @@ public class ApplicationValidatorService {
 
 	MDMSService mdmsService;
 
+	PropertyRepository propertyRepository;
+
+	ObjectMapper objectMapper;
+
 	@Autowired
-	ApplicationValidatorService(ApplicationContext context, MDMSService mdmsService) {
+	ApplicationValidatorService(ApplicationContext context, MDMSService mdmsService,
+			PropertyRepository propertyRepository, ObjectMapper objectMapper) {
 		this.context = context;
 		this.mdmsService = mdmsService;
+		this.propertyRepository = propertyRepository;
+		this.objectMapper = objectMapper;
 		Map<String, Object> beans = this.context.getBeansWithAnnotation(ApplicationValidator.class);
 
 		/**
@@ -47,6 +68,32 @@ public class ApplicationValidatorService {
 							ApplicationValidator.class);
 					return annotation.value();
 				}, e -> (IApplicationValidator) e.getValue()));
+	}
+
+	public void validateCreateRequest(ApplicationRequest request) {
+		List<Application> applications = request.getApplications();
+		applications.stream().forEach(application -> {
+			String propertyId = application.getProperty().getId();
+			// validatePropertyExists(request.getRequestInfo(), propertyId);
+			JsonNode applicationDetails = application.getApplicationDetails();
+			try {
+				String applicationDetailsString = this.objectMapper.writeValueAsString(applicationDetails);
+				Configuration conf = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS);
+				DocumentContext applicationObjectContext = JsonPath.using(conf).parse(applicationDetailsString);
+				this.performValidationsFromMDMS(application.getApplicationType(), applicationObjectContext,
+						request.getRequestInfo(), application.getTenantId());
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+	}
+
+	private void validatePropertyExists(RequestInfo requestInfo, String propertyId) {
+		Property property = propertyRepository.findPropertyById(propertyId);
+		if (property == null || property.getState() != PSConstants.PM_APPROVED) {
+			throw new CustomException("INVALID_PROPERTY", "Could not find property with the given id");
+		}
 	}
 
 	@SuppressWarnings("unchecked")
