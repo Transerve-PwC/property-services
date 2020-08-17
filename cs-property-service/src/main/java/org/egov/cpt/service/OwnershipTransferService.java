@@ -108,6 +108,11 @@ public class OwnershipTransferService {
 			wfIntegrator.callOwnershipTransferWorkFlow(request);
 		}
 		producer.push(config.getOwnershipTransferUpdateTopic(), request);
+		
+		if (request.getOwners().get(0).getApplicationState().equalsIgnoreCase(PTConstants.OT_STATUS_APPROVED)) {
+			enrichmentService.postStatusEnrichment(request);
+		}
+		
 		notificationService.process(request);
 		return request.getOwners();
 	}

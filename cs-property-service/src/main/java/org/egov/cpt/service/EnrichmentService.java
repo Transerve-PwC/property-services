@@ -3,6 +3,7 @@ package org.egov.cpt.service;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -768,7 +769,7 @@ public class EnrichmentService {
 	 * 
 	 * meu or applications separate allotment date
 	 */
-	public void postStatusEnrichment(OwnershipTransferRequest ownershipTransferRequest, List<String> endstates) {
+	public void postStatusEnrichment(OwnershipTransferRequest ownershipTransferRequest) {
 		ownershipTransferRequest.getOwners().forEach(latestOwner -> {
 
 			PropertyCriteria criteria = getPropertyCriteriaForOT(ownershipTransferRequest);
@@ -817,6 +818,9 @@ public class EnrichmentService {
 			request.getOwners().forEach(owner -> {
 				if (owner.getProperty().getId() != null)
 					propertyCriteria.setPropertyId(owner.getProperty().getId());
+					ArrayList<String> relations = new ArrayList<String>();
+					relations.add(PTConstants.RELATION_OWNER);
+					propertyCriteria.setRelations(relations);
 			});
 		}
 		return propertyCriteria;

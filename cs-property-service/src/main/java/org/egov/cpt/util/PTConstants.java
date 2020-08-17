@@ -234,10 +234,12 @@ public class PTConstants {
 	public static final String MODE_GENERATED = "Generated";
 
 //Relations in PM
-	public static final Object RELATION_OWNER = "owner";
-	public static final Object RELATION_PI = "propertyImage";
-	public static final Object RELATION_GD = "GrantDetail";
-	public static final Object RELATION_NOTICE = "notice";
-	public static final Object RELATION_FINANCE = "finance";
+	public static final String RELATION_OWNER = "owner";
+	public static final String RELATION_PI = "propertyImage";
+	public static final String RELATION_GD = "GrantDetail";
+	public static final String RELATION_NOTICE = "notice";
+	public static final String RELATION_FINANCE = "finance";
+
+	public static final String OT_STATUS_APPROVED = "OT_APPROVED";
 
 }
