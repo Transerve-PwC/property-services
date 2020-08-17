@@ -1,6 +1,10 @@
 package org.egov.ps.test.validator;
 
 import static org.junit.Assert.assertNull;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertFalse;
 
 import org.egov.ps.validator.ApplicationField;
@@ -8,6 +12,7 @@ import org.egov.ps.validator.ApplicationValidation;
 import org.egov.ps.validator.IApplicationField;
 import org.egov.ps.validator.IValidation;
 import org.egov.ps.validator.application.EmailValidator;
+import org.egov.ps.validator.application.LengthValidator;
 import org.egov.ps.validator.application.PhoneNumberValidator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,12 +31,17 @@ public class ValidatorTests {
 
     @Autowired
     PhoneNumberValidator phoneNumberValidator;
+    
+    @Autowired
+    LengthValidator lengthValidator;
 
     @Test
     public void testEmailValidator() {
         IValidation validation = ApplicationValidation.builder().type("email").build();
         IApplicationField field = ApplicationField.builder().path("email").required(false).build();
 
+        assertNull(emailValidator.validate(validation, field, "", null));
+        assertNull(emailValidator.validate(validation, field, null, null));
         assertNull(emailValidator.validate(validation, field, "minesh.b@transerve.com", null));
         assertNull(emailValidator.validate(validation, field, "minesh.b@gmail.com", null));
 
@@ -56,5 +66,25 @@ public class ValidatorTests {
         assertFalse(phoneNumberValidator.validate(validation, field, "8866581197a", null).isEmpty());
         assertFalse(phoneNumberValidator.validate(validation, field, "008866581197", null).isEmpty());
         assertFalse(phoneNumberValidator.validate(validation, field, "+918866581197", null).isEmpty());
+    }
+    
+    @Test
+    public void testLengthValidator() {
+    	
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put("max", 6);
+    	map.put("min", 3);
+    	
+    	IValidation validation = ApplicationValidation.builder()
+    			.type("length")
+    			.params(map)
+    			.build();
+        IApplicationField field = ApplicationField.builder().required(true).build();
+        
+        assertNull(lengthValidator.validate(validation, field, "tested", null));
+        
+        assertFalse(lengthValidator.validate(validation, field, "te", null).isEmpty());
+        assertFalse(lengthValidator.validate(validation, field, "testing", null).isEmpty());
+        
     }
 }
