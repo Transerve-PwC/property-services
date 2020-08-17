@@ -81,16 +81,18 @@ public class DemandServiceTests {
 				.receiptNo("Receipt 1")
 				.build();
 		
-		Map<String,List> collections = this.rentCollectionService.getCollectionsForPayment(this.initialDemands, this.initialPayments,this.rentAccount);
-	//	List<RentCollection> secondCollections = this.rentCollectionService.getCollectionsForPayment(this.initialDemands.subList(3, 6), payment1,this.remainingAmount);
+		Map<String,ArrayList> response = this.rentCollectionService.getCollectionsForPayment(this.initialDemands, this.initialPayments,this.rentAccount);
+		ArrayList<RentCollection> collections=response.get("colection");
+		ArrayList<RentDemand> processedDemands=response.get("demand");
+		//	List<RentCollection> secondCollections = this.rentCollectionService.getCollectionsForPayment(this.initialDemands.subList(3, 6), payment1,this.remainingAmount);
 				
-//		assertEquals(collections.get(0).getInterestCollected(), 10.85, 0.01);
-//		assertEquals(collections.get(0).getPrincipalCollected(), 250, 0.01);
-//		assertEquals(collections.get(1).getInterestCollected(), 5.92, 0.01);
-//		assertEquals(collections.get(1).getPrincipalCollected(), 250, 0.01);
-//		assertEquals(collections.get(2).getInterestCollected(), 0, 0.01);
-//		assertEquals(collections.get(2).getPrincipalCollected(), 250 - 10.85 - 5.92, 0.01);
-	}
+		assertEquals(collections.get(0).getInterestCollected(), 10.85, 0.01);
+		assertEquals(collections.get(0).getPrincipalCollected(), 250, 0.01);
+		assertEquals(collections.get(1).getInterestCollected(), 5.92, 0.01);
+		assertEquals(collections.get(1).getPrincipalCollected(), 250, 0.01);
+		assertEquals(collections.get(2).getInterestCollected(), 0, 0.01);
+		assertEquals(collections.get(2).getPrincipalCollected(), 250 - 10.85 - 5.92, 0.01);
+		}
 	
 	
 	private static final String DATE_FORMAT = "dd MM yyyy";

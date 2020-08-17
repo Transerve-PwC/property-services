@@ -1,10 +1,14 @@
 package org.egov.cpt.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.egov.cpt.models.RentAccount;
 import org.egov.cpt.models.RentCollection;
@@ -16,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RentCollectionService {
 	List<RentCollection> collections = new ArrayList<RentCollection>();
-	List<RentDemand> processedDemand=new ArrayList<RentDemand>();
+	Set<RentDemand> processedDemand=new LinkedHashSet<RentDemand>();
 	
 /**
  * This method is process the demand against given payment 
@@ -141,7 +145,7 @@ public List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, RentP
  */
 public Map getCollectionsForPayment(List<RentDemand> demands, List<RentPayment> payments,
 			RentAccount rentAccount) {
-		Map<String,List> responseMap=new HashMap<String,List>();
+		Map<String,Collection> responseMap=new HashMap<String,Collection>();
 		List<RentDemand> lstRentDemandProcess;
 		for(RentPayment rentPayment:payments) {
 			
@@ -157,9 +161,8 @@ public Map getCollectionsForPayment(List<RentDemand> demands, List<RentPayment> 
 			}
                         //call the function to proceed demand against payment 
 			List<RentDemand> paidDemands=getCollectionsForPayment(lstRentDemandProcess,rentPayment,rentAccount);
-			                 System.out.println("before= "+demands);
-                        demands.removeAll(paidDemands);
-                        System.out.println("after= "+demands);
+		    demands.removeAll(paidDemands);
+                        
 		}
                 // cron job
                 if(demands.size()>0 && rentAccount.getRemainingAmount()>0){
