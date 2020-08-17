@@ -152,7 +152,7 @@ public class ValidatorTests {
     	map.put("end", "01-Dec-2020");
     	
     	IValidation validation_ = ApplicationValidation.builder()
-    			.type("date-range")
+    			.type("date-range") 
     			.params(map)
     			.build();
     	assertFalse(dateRangeValidator.validate(validation_, field, null, null).isEmpty());
