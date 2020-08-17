@@ -254,6 +254,18 @@ public class PropertyValidator {
 		PropertyCriteria criteria = new PropertyCriteria();
 //      criteria.setTransitNumber(request.getProperties().get(0).getTransitNumber()); // TODO loop it array later
 
+		BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), request.getRequestInfo(), PTConstants.BUSINESS_SERVICE_PM);
+		List<State> stateList= otBusinessService.getStates();
+		List<String> states = new ArrayList<String>();
+		
+		for(State state: stateList){
+				states.add(state.getState());
+		}
+		states.remove(PTConstants.PM_REJECTED);
+		log.info("states:"+states);
+		criteria.setState(states);
+		
+		
 		List<Property> properties = repository.getProperties(criteria);
 
 		properties.forEach(property -> {

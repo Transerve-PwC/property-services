@@ -52,7 +52,7 @@ public class Configuration {
 
 	@Value("${persister.update.property.topic}")
 	private String updatePropertyTopic;
-	
+
 	@Value("${persister.save.application.topic}")
 	private String saveApplicationTopic;
 
@@ -87,20 +87,30 @@ public class Configuration {
 
 	@Value("${workflow.businessservice.search.path}")
 	private String wfBusinessServiceSearchPath;
-	
 
-//	ID Generation
+	// ID Generation
 
 	@Value("${egov.idgen.host}")
 	private String idGenHost;
 
 	@Value("${egov.idgen.path}")
 	private String idGenPath;
-	
+
 	@Value("${egov.idgen.ps.applicationNum.name}")
 	private String applicationNumberIdgenNamePS;
 
 	@Value("${egov.idgen.ps.applicationNum.format}")
 	private String applicationNumberIdgenFormatPS;
+
+	// MDMS Configuration
+
+	@Value("${egov.mdms.host}")
+	private String mdmsHost;
+
+	@Value("${egov.mdms.search.endpoint}")
+	private String mdmsSearchEndpoint;
+
+	@Value("${egov.mdms.get.endpoint}")
+	private String mdmsGetEndpoint;
 
 }

@@ -222,6 +222,7 @@ public class PTConstants {
 	
 //Reject State
 	public static final String MG_REJECTED ="MG_REJECTED";
+	public static final String PM_REJECTED ="PM_REJECTED";
 
 	public static final String EMAIL_SUBJECT = "Chandigarh mSeva Application Status";
 
@@ -231,5 +232,12 @@ public class PTConstants {
 //Mode of payment
 	public static final String MODE_UPLOADED = "Uploaded";
 	public static final String MODE_GENERATED = "Generated";
+
+//Relations in PM
+	public static final Object RELATION_OWNER = "owner";
+	public static final Object RELATION_PI = "propertyImage";
+	public static final Object RELATION_GD = "GrantDetail";
+	public static final Object RELATION_NOTICE = "notice";
+	public static final Object RELATION_FINANCE = "finance";
 
 }
