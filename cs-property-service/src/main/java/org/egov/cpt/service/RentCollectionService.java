@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.cpt.models.RentAccount;
 import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
@@ -14,27 +15,38 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RentCollectionService {
-
-	public List<RentCollection> getCollectionsForPayment(List<RentDemand> demands, RentPayment payment,
-			double remainingAmount) {
+	List<RentCollection> collections = new ArrayList<RentCollection>();
+	List<RentDemand> processedDemand=new ArrayList<RentDemand>();
+	
+/**
+ * This method is process the demand against given payment 
+ * Save the collected amount 
+ * return the paid demands  
+ * @param demands
+ * @param payment
+ * @param rentAccount
+ * @return List<RentDemand>
+ */
+public List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, RentPayment payment,
+			RentAccount rentAccount) {
+		List<RentDemand> paidDemand=new ArrayList<RentDemand>();
 		double interestRate = 24;
-		Date paymentDate = new Date(payment.getDateOfPayment());
-		Double paybleAmount = payment.getAmountPaid();
-		ArrayList<RentCollection> collections = new ArrayList<RentCollection>();
+		Double paidAmount = payment.getAmountPaid();
+		
 		Map<String, RentCollection> mapColletedInterest = new HashMap<String, RentCollection>();
 		for (RentDemand rentDemand : demands) {
 			RentCollection rentalCollection = new RentCollection();
 			// Start the interest calculation
-			Date generationDate = new Date(rentDemand.getGenerationDate());
+			//Date generationDate = new Date(rentDemand.getGenerationDate());
 
-			float daysBetween = ((paymentDate.getTime() - generationDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+			float daysBetween = ((payment.getDateOfPayment() - rentDemand.getGenerationDate()) / (1000 * 60 * 60 * 24)) + 1-rentDemand.getInitialGracePeriod();
 			// If days cross the gross period then the interest is applicable
 			if (daysBetween > rentDemand.getInitialGracePeriod()) {
-				double interest = ((rentDemand.getCollectionPrincipal() * interestRate) / 100) * (daysBetween / 365);
+				double interest = ((rentDemand.getRemainingPrincipal()* interestRate) / 100) * (daysBetween / 365);
 
-				if (interest < paybleAmount) {
+				if (interest < paidAmount) {
 					rentalCollection.setInterestCollected(interest);
-					paybleAmount = paybleAmount - interest;
+					paidAmount = paidAmount - interest;
 
 				} else {
 					// interest amount is more then the amount which have paid by user
@@ -42,20 +54,21 @@ public class RentCollectionService {
 					// 2. check if user have any past balance i yes pay remaining amounts from the
 					// user's balance
 					// if(user.getRemainingAmount()>0){
-					if (remainingAmount > (interest - paybleAmount)) {
+					
+					if (rentAccount.getRemainingAmount() > (interest - paidAmount)) {
 						rentalCollection.setInterestCollected(interest);
-						remainingAmount=(remainingAmount - (interest - paybleAmount));
+						rentAccount.setRemainingAmount((rentAccount.getRemainingAmount() - (interest - paidAmount)));
 					} else {
-						rentalCollection.setInterestCollected(paybleAmount + remainingAmount);
-						interest = interest - (paybleAmount + remainingAmount);
-						remainingAmount=0.0;
+						rentalCollection.setInterestCollected(paidAmount + rentAccount.getRemainingAmount());
+						interest = interest - (paidAmount + rentAccount.getRemainingAmount());
+						rentAccount.setRemainingAmount(0.0);
 						// save the remaining interest
 						//rentDemand.setRemainingInterest(interest);
 
 					}
 					// }
-					// rentalCollection.setInterestCollected(paybleAmount);
-					paybleAmount = 0.0;
+					// rentalCollection.setInterestCollected(paidAmount);
+					paidAmount = 0.0;
 				}
 			} else
 				rentalCollection.setInterestCollected(0.0);
@@ -66,10 +79,14 @@ public class RentCollectionService {
 		// start the calculation
 		for (RentDemand rentDemand : demands) {
 			RentCollection rentalCollection = mapColletedInterest.get(rentDemand.getId());
+                        rentalCollection.setDemandId(rentDemand.getId());
+                        rentalCollection.setPaymentId(payment.getId());
 
-			if (rentDemand.getCollectionPrincipal() < paybleAmount) {
-				rentalCollection.setPrincipalCollected(rentDemand.getCollectionPrincipal());
-				paybleAmount = paybleAmount - rentDemand.getCollectionPrincipal();
+			if (rentDemand.getRemainingPrincipal()< paidAmount) {
+				rentalCollection.setPrincipalCollected(rentDemand.getRemainingPrincipal());
+				paidAmount = paidAmount - rentDemand.getRemainingPrincipal();
+                                rentDemand.setRemainingPrincipal(0.0);
+                                
 			} else {
 
 				// CollectionPrincipal amount is more then the amount which have paid by user
@@ -77,28 +94,89 @@ public class RentCollectionService {
 				// 2. check if user have any past balance i yes pay remaining amounts from the
 				// user's balance
 				// if(user.getRemainingAmount()>0){
-				if (remainingAmount > (rentDemand.getCollectionPrincipal() - paybleAmount)) {
-					rentalCollection.setPrincipalCollected(rentDemand.getCollectionPrincipal());
-					remainingAmount=
-							remainingAmount - (rentDemand.getCollectionPrincipal() - paybleAmount);
-				} else {
-					rentalCollection.setPrincipalCollected(paybleAmount + remainingAmount);
+				if (rentAccount.getRemainingAmount() > (rentDemand.getRemainingPrincipal()- paidAmount)) {
+					rentalCollection.setPrincipalCollected(rentDemand.getRemainingPrincipal());
+					rentAccount.setRemainingAmount(
+							rentAccount.getRemainingAmount() - (rentDemand.getRemainingPrincipal()- paidAmount));
+                                        rentDemand.setRemainingPrincipal(0.0);
+                                } else {
+					rentalCollection.setPrincipalCollected(paidAmount + rentAccount.getRemainingAmount());
 
-					remainingAmount=0.0;
+					rentAccount.setRemainingAmount(0.0);
 					// save the remaining amount
 					rentDemand.setRemainingPrincipal(
-							rentDemand.getCollectionPrincipal() - rentalCollection.getPrincipalCollected());
+							rentDemand.getRemainingPrincipal()- rentalCollection.getPrincipalCollected());
 
 				}
 				// }
 
-				paybleAmount = 0.0;
+				paidAmount = 0.0;
+			}
+			if(rentDemand.getRemainingPrincipal()==0) {
+				paidDemand.add(rentDemand);
+
+                                
+				
+				
 			}
 			collections.add(rentalCollection);
-
+                        rentDemand.setInterestSince(payment.getDateOfPayment());
+                        processedDemand.add(rentDemand);    
 		}
-
-		return collections;
+                if(paidAmount>0)
+                    rentAccount.setRemainingAmount(rentAccount.getRemainingAmount()+paidAmount);
+                
+                
+		return paidDemand;
 
 	}
+
+	
+/**
+ * This method accept the rent demands and payments and call the method to process the demand
+ * @param demands
+ * @param payments
+ * @param rentAccount
+ * @return List<RentDemand>
+ */
+public Map getCollectionsForPayment(List<RentDemand> demands, List<RentPayment> payments,
+			RentAccount rentAccount) {
+		Map<String,List> responseMap=new HashMap<String,List>();
+		List<RentDemand> lstRentDemandProcess;
+		for(RentPayment rentPayment:payments) {
+			
+			lstRentDemandProcess=new ArrayList<RentDemand>();
+			Date paymentDate = new Date(rentPayment.getDateOfPayment());
+			
+			for(RentDemand rentDemand:demands) {
+				Date demandDate = new Date(rentDemand.getGenerationDate());
+                                //filter out the demands which have earlier date than payment 
+				if(demandDate.compareTo(paymentDate)<0) {
+					lstRentDemandProcess.add(rentDemand);
+				}
+			}
+                        //call the function to proceed demand against payment 
+			List<RentDemand> paidDemands=getCollectionsForPayment(lstRentDemandProcess,rentPayment,rentAccount);
+			                 System.out.println("before= "+demands);
+                        demands.removeAll(paidDemands);
+                        System.out.println("after= "+demands);
+		}
+                // cron job
+                if(demands.size()>0 && rentAccount.getRemainingAmount()>0){
+                    RentPayment payment1 = new RentPayment();
+                        payment1.setId("payment");
+                        payment1.setAmountPaid(rentAccount.getRemainingAmount());
+                        payment1.setDateOfPayment(new Date().getTime());
+                        payment1.setReceiptNo("Receipt" );
+                        rentAccount.setRemainingAmount(0.0);
+                        List<RentDemand> paidDemands=getCollectionsForPayment(demands,payment1,rentAccount);
+			            demands.removeAll(paidDemands);
+                        
+                }
+                responseMap.put("demand", processedDemand);
+                responseMap.put("colection", collections);
+	 return responseMap;	
+	}
+
+
 }
