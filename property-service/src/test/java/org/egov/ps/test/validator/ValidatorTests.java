@@ -2,15 +2,18 @@ package org.egov.ps.test.validator;
 
 import static org.junit.Assert.assertNull;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import org.egov.ps.validator.ApplicationField;
 import org.egov.ps.validator.ApplicationValidation;
 import org.egov.ps.validator.IApplicationField;
 import org.egov.ps.validator.IValidation;
+import org.egov.ps.validator.application.DateRangeValidator;
 import org.egov.ps.validator.application.EmailValidator;
 import org.egov.ps.validator.application.LengthValidator;
 import org.egov.ps.validator.application.PhoneNumberValidator;
@@ -34,6 +37,9 @@ public class ValidatorTests {
     
     @Autowired
     LengthValidator lengthValidator;
+    
+    @Autowired
+    DateRangeValidator dateRangeValidator;
 
     @Test
     public void testEmailValidator() {
@@ -70,7 +76,6 @@ public class ValidatorTests {
     
     @Test
     public void testLengthValidator() {
-    	
     	Map<String, Object> map = new HashMap<String, Object>();
     	map.put("max", 6);
     	map.put("min", 3);
@@ -86,5 +91,82 @@ public class ValidatorTests {
         assertFalse(lengthValidator.validate(validation, field, "te", null).isEmpty());
         assertFalse(lengthValidator.validate(validation, field, "testing", null).isEmpty());
         
+    }
+    
+    @Test
+    public void testDateRangeValidator() {
+    	IApplicationField field = ApplicationField.builder().required(true).build();
+    	
+    	//
+    	/*
+    	Object startDate = new Object();
+    	set(startDate, "unit", "month");
+    	set(startDate, "value", "-6");
+    	
+    	Object endDate = new Object();
+    	set(endDate, "unit", "second");
+    	set(endDate, "value", "0");
+    	
+    	Map<String, Object> map_2= new HashMap<String, Object>();
+    	map_2.put("start", startDate);
+    	map_2.put("end", endDate);
+    	
+    	IValidation validation_2 = ApplicationValidation.builder()
+    			.type("date-range")
+    			.params(map_2)
+    			.build();
+    	
+    	 assertNull(dateRangeValidator.validate(validation_2, field, null, null));
+    	 
+    	 */
+        
+    	//case : pass start date and end date - positive test case start < end
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put("start", "01-Jan-2020");
+    	map.put("end", "01-Dec-2020");
+    	
+    	IValidation validation = ApplicationValidation.builder()
+    			.type("date-range")
+    			.params(map)
+    			.build();
+    	
+        assertNull(dateRangeValidator.validate(validation, field, null, null));
+        
+        //case : not pass date start and end 
+        IValidation validation_1 = ApplicationValidation.builder()
+    			.type("date-range")
+    			.build();
+        assertNotNull(dateRangeValidator.validate(validation_1, field, "", null));
+        assertNotNull(dateRangeValidator.validate(validation_1, field, null, null));
+        
+        
+        //case : pass date start and end - negative test case start > end.. 
+        map = new HashMap<String, Object>();
+    	map.put("start", "01-Jan-2021");
+    	map.put("end", "01-Dec-2020");
+    	
+    	IValidation validation_ = ApplicationValidation.builder()
+    			.type("date-range")
+    			.params(map)
+    			.build();
+    	assertFalse(dateRangeValidator.validate(validation_, field, null, null).isEmpty());
+    	
+    }
+    
+    public static boolean set(Object object, String fieldName, Object fieldValue) {
+        Class<?> clazz = object.getClass();
+        while (clazz != null) {
+            try {
+                Field field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                field.set(object, fieldValue);
+                return true;
+            } catch (NoSuchFieldException e) {
+                clazz = clazz.getSuperclass();
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return false;
     }
 }
