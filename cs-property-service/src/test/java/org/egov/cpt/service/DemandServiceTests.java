@@ -86,14 +86,38 @@ public class DemandServiceTests {
 		ArrayList<RentDemand> processedDemands=response.get("demand");
 		//	List<RentCollection> secondCollections = this.rentCollectionService.getCollectionsForPayment(this.initialDemands.subList(3, 6), payment1,this.remainingAmount);
 				
-		assertEquals(collections.get(0).getInterestCollected(), 10.85, 0.01);
+		assertEquals(collections.get(0).getInterestCollected(), 9.04, 0.01);
 		assertEquals(collections.get(0).getPrincipalCollected(), 250, 0.01);
-		assertEquals(collections.get(1).getInterestCollected(), 5.92, 0.01);
+		assertEquals(collections.get(1).getInterestCollected(), 4.27, 0.01);
 		assertEquals(collections.get(1).getPrincipalCollected(), 250, 0.01);
 		assertEquals(collections.get(2).getInterestCollected(), 0, 0.01);
-		assertEquals(collections.get(2).getPrincipalCollected(), 250 - 10.85 - 5.92, 0.01);
+		assertEquals(collections.get(2).getPrincipalCollected(), 250, 0.01);
+		assertEquals(collections.get(3).getInterestCollected(), 0.21, 0.01);
+		assertEquals(collections.get(3).getPrincipalCollected(), 250, 0.01);
+		
+		assertEquals(collections.get(4).getInterestCollected(), 0.0, 0.01);
+		assertEquals(collections.get(4).getPrincipalCollected(), 250, 0.01);
+		
+		assertEquals(collections.get(5).getInterestCollected(), 11.17, 0.01);
+		assertEquals(collections.get(5).getPrincipalCollected(), 250, 0.01);
+		
+		assertEquals(collections.get(6).getInterestCollected(), 6.24, 0.01);
+		assertEquals(collections.get(6).getPrincipalCollected(), 250, 0.01);
+		assertEquals(collections.get(7).getInterestCollected(), 0.0, 0.01);
+		assertEquals(collections.get(7).getPrincipalCollected(), 119.0, 0.01);
+		
+		assertEquals(processedDemands.get(0).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(processedDemands.get(1).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(processedDemands.get(2).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(processedDemands.get(3).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(processedDemands.get(4).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(processedDemands.get(5).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(processedDemands.get(6).getRemainingPrincipal(), 130.90, 0.01);
+		
+		
+		
 		}
-	
+
 	
 	private static final String DATE_FORMAT = "dd MM yyyy";
 	private static final SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT); 

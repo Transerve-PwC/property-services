@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RentCollectionService {
 	List<RentCollection> collections = new ArrayList<RentCollection>();
-	Set<RentDemand> processedDemand=new LinkedHashSet<RentDemand>();
+	Set<RentDemand> processedDemand=new HashSet<RentDemand>();
 	
 /**
  * This method is process the demand against given payment 
