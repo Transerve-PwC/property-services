@@ -11,7 +11,7 @@ import org.egov.ps.validator.IValidation;
 import org.egov.ps.validator.IApplicationValidator;
 import org.springframework.stereotype.Component;
 
-@ApplicationValidator("phoneNumber")
+@ApplicationValidator("mobile")
 @Component
 public class PhoneNumberValidator implements IApplicationValidator {
 	private static final String phoneRegex = "(0/91)?[7-9][0-9]{9}";

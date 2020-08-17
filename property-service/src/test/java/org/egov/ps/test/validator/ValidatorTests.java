@@ -65,7 +65,7 @@ public class ValidatorTests {
 
     @Test
     public void testPhoneNumberValidator() {
-        IValidation validation = ApplicationValidation.builder().type("phoneNumber").build();
+        IValidation validation = ApplicationValidation.builder().type("mobile").build();
         IApplicationField field = ApplicationField.builder().required(true).build();
 
         assertNull(phoneNumberValidator.validate(validation, field, "8866581197", null));
