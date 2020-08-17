@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 	@Override
 	public List<Owner> extractData(ResultSet rs) throws SQLException, DataAccessException {
 
-		Map<String, Owner> ownerMap = new HashMap<>();
+		LinkedHashMap<String, Owner> ownerMap = new LinkedHashMap<>();
 		while (rs.next()) {
 			String ownerId = rs.getString("oid");
 			String applicationType = rs.getString("application_type");

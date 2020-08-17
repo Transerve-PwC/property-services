@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
 
 	@Override
 	public List<Mortgage> extractData(ResultSet rs) throws SQLException, DataAccessException {
-		Map<String, Mortgage> applicationMap = new HashMap<>();
+		LinkedHashMap<String, Mortgage> applicationMap = new LinkedHashMap<>();
 		while (rs.next()) {
 			String mortgageId = rs.getString("mgid");
 			Mortgage currentapplication = applicationMap.get(mortgageId);
