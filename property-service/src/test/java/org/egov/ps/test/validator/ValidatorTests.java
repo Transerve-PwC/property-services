@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.egov.ps.validator.ApplicationField;
 import org.egov.ps.validator.ApplicationValidation;
+import org.egov.ps.validator.DateField;
 import org.egov.ps.validator.IApplicationField;
 import org.egov.ps.validator.IValidation;
 import org.egov.ps.validator.application.DateRangeValidator;
@@ -23,6 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 @ActiveProfiles("test")
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -98,14 +102,16 @@ public class ValidatorTests {
     	IApplicationField field = ApplicationField.builder().required(true).build();
     	
     	//
-    	/*
-    	Object startDate = new Object();
-    	set(startDate, "unit", "month");
-    	set(startDate, "value", "-6");
     	
-    	Object endDate = new Object();
-    	set(endDate, "unit", "second");
-    	set(endDate, "value", "0");
+    	DateField startDate = DateField.builder()
+    			.unit("month")
+    			.value("-6")
+    			.build();
+    	
+    	DateField endDate = DateField.builder()
+    			.unit("second")
+    			.value("0")
+    			.build();
     	
     	Map<String, Object> map_2= new HashMap<String, Object>();
     	map_2.put("start", startDate);
@@ -118,7 +124,7 @@ public class ValidatorTests {
     	
     	 assertNull(dateRangeValidator.validate(validation_2, field, null, null));
     	 
-    	 */
+    	 
         
     	//case : pass start date and end date - positive test case start < end
     	Map<String, Object> map = new HashMap<String, Object>();
@@ -152,21 +158,5 @@ public class ValidatorTests {
     	assertFalse(dateRangeValidator.validate(validation_, field, null, null).isEmpty());
     	
     }
-    
-    public static boolean set(Object object, String fieldName, Object fieldValue) {
-        Class<?> clazz = object.getClass();
-        while (clazz != null) {
-            try {
-                Field field = clazz.getDeclaredField(fieldName);
-                field.setAccessible(true);
-                field.set(object, fieldValue);
-                return true;
-            } catch (NoSuchFieldException e) {
-                clazz = clazz.getSuperclass();
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-        }
-        return false;
-    }
+ 
 }

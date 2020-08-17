@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,8 +22,8 @@ import org.springframework.stereotype.Component;
  * 																							“6 months ago” 
  * 																							or dates like “01-Jan-2020”, “23-Sep-2020” etc. 
  * example: 
- * { "type" : "date-range", "params" : { "start" : "6 months ago", "end" : "now" } }
- * { "type" : "date-range", "params": { "start" : { "unit" : "month", "value" : -6}, "end": { "unit": "second", "value" : 0 }}}
+ * { "type" : "date-range", "params" : { "start" : "01-Jan-2020", "end" : "23-Sep-2020" } }
+ * { "type" : "date-range", "params": { "start" : { "unit" : "month", "value" : -6}, "end": { "unit": "time", "value" : now }}}
  * The above validator config should make sure the value is in the last 6 months and no before or no after.
  * 
  */
@@ -69,17 +70,17 @@ public class DateRangeValidator implements IApplicationValidator {
 			endDateStr = validation.getParams().get("end").toString();
 		}
 		
-		/*if(validation.getParams().get("start") instanceof Object) {
+		if(null == startDateStr && validation.getParams().get("start") instanceof Object) {
 			Object startDt = validation.getParams().get("start");
 			Map<String, Object> values = getFieldNamesAndValues(startDt);
 			startDateStr = calculateDate(values);
 		}
 		
-		if(validation.getParams().get("end") instanceof Object) {
-			Object endDt = validation.getParams().get("start").toString();
+		if(null == endDateStr && validation.getParams().get("end") instanceof Object) {
+			Object endDt = validation.getParams().get("end");
 			Map<String, Object> values = getFieldNamesAndValues(endDt);
 			endDateStr = calculateDate(values);
-		}*/
+		}
 
 		//###################################
 
@@ -111,7 +112,33 @@ public class DateRangeValidator implements IApplicationValidator {
 
 	private String calculateDate(Map<String, Object> values) {
 		// TODO Auto-generated method stub
+		Date d = null ;
+		if(null != values.get("unit")) {
+			String unit = values.get("unit").toString();
+			int val = Integer.parseInt(values.get("value").toString());
+			
+			if(unit.equalsIgnoreCase("month")) {
+				d = diffDate(Calendar.MONTH, val);
+			}else if(unit.equalsIgnoreCase("year")) {
+				d =  diffDate(Calendar.YEAR, val);
+			}else if(unit.equalsIgnoreCase("date")) {
+				d = diffDate(Calendar.DATE, val);
+			}else if (unit.equalsIgnoreCase("second")) {
+				d = diffDate(Calendar.SECOND, val);
+			}
+		}
+		
+		if(null != d) {
+			return formatter.format(d);
+		}
 		return null;
+	}
+
+	private Date diffDate(int month, int val) {
+		Calendar c = Calendar.getInstance(); 
+		c.add(Calendar.MONTH, val);
+		
+		return c.getTime();
 	}
 
 	public Map<String, Object> getFieldNamesAndValues(Object obj)
@@ -132,5 +159,11 @@ public class DateRangeValidator implements IApplicationValidator {
 			e.printStackTrace();
 		}
 		return map;
+	}
+	
+	public static void main(String arg[]) {
+		Calendar c = Calendar.getInstance(); 
+		c.add(Calendar.MONTH, -6);
+		System.out.println(c.getTime());
 	}
 }
