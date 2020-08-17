@@ -6,6 +6,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.ps.annotation.ApplicationValidator;
+import org.egov.ps.model.Application;
+import org.egov.ps.model.Property;
+import org.egov.ps.repository.PropertyRepository;
+import org.egov.ps.service.MDMSService;
+import org.egov.ps.util.PSConstants;
+import org.egov.ps.web.contracts.ApplicationRequest;
+import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,21 +26,6 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
-
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.ps.annotation.ApplicationValidator;
-import org.egov.ps.model.Application;
-import org.egov.ps.model.Property;
-import org.egov.ps.model.PropertyCriteria;
-import org.egov.ps.repository.PropertyRepository;
-import org.egov.ps.service.MDMSService;
-import org.egov.ps.util.PSConstants;
-import org.egov.ps.web.contracts.ApplicationRequest;
-import org.egov.tracer.model.CustomException;
-import org.json.JSONException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 

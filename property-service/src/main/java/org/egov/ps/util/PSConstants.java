@@ -16,4 +16,6 @@ public class PSConstants {
 
 	public static final String MDMS_PS_FIELDS = "fields";
 
+	public static final String MDMS_PS_PATH_FILTER = "$.*.path";
+
 }
