@@ -30,10 +30,10 @@ public class EmailValidator implements IApplicationValidator {
 
 	public List<String> validate(IValidation validation, IApplicationField field, Object value, Object parent) {
 		boolean isEmpty = value == null || value.toString().trim().length() == 0;
-		String trimmedValue = value.toString().trim();
 		if (!field.isRequired() && isEmpty) {
 			return null;
 		}
+		String trimmedValue = value.toString().trim();
 		if (!isValid(trimmedValue)) {
 			return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
 		}

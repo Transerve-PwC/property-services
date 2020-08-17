@@ -1,11 +1,12 @@
 package org.egov.ps.validator.application;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.egov.ps.annotation.ApplicationValidator;
 import org.egov.ps.validator.IApplicationField;
-import org.egov.ps.validator.IValidation;
 import org.egov.ps.validator.IApplicationValidator;
+import org.egov.ps.validator.IValidation;
 import org.springframework.stereotype.Component;
 
 @ApplicationValidator("length")
@@ -16,10 +17,39 @@ import org.springframework.stereotype.Component;
  */
 public class LengthValidator implements IApplicationValidator {
 
+	private static final String DEFAULT_FORMAT = "Invalid Field '%s' at path '%s'";
+
+	private List<String> formatErrorMessage(String format, Object value, String path) {
+		if (format == null) {
+			format = DEFAULT_FORMAT;
+		}
+		return Arrays.asList(String.format(format, value, path));
+	}
+	
     @Override
     public List<String> validate(IValidation validation, IApplicationField field, Object value, Object parent) {
         // TODO: Validate based on the params.
+    	if(validation.getType().equalsIgnoreCase("length")) {
+    		boolean isEmpty = value == null || value.toString().trim().length() == 0;
+    		if (!field.isRequired() && isEmpty) {
+    			return null;
+    		}
+    		String trimmedValue = value.toString().trim();
+    		if (!isValid(validation, trimmedValue)) {
+    			return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
+    		}
+    	}
         return null;
     }
+    
+    private boolean isValid(IValidation validation, String fieldValue) {
+		int max = (int) validation.getParams().get("max");
+		int min = (int) validation.getParams().get("min");
+    	
+    	if(fieldValue.length() < min || fieldValue.length() > max) {
+    		return false;
+    	}
+    	return true;
+	}
 
 }
