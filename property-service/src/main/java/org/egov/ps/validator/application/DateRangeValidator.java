@@ -93,13 +93,22 @@ public class DateRangeValidator implements IApplicationValidator {
 		try {
 			Date startDate = formatter.parse(startDateStr);
 			Date endDate = formatter.parse(endDateStr);
+			Date actualDateValidat = value != null ? formatter.parse(value.toString()) : null;
 
 			/* 	start date occurs before end date - if ( startDate.compareTo(endDate) < 0 )
 			 * 	start date occurs after end date - if ( startDate.compareTo(endDate) > 0 )
 			 * 	Both dates are equal dates - if (startDate.compareTo(endDate) == 0  )
 			 */
 
+			if(null == actualDateValidat) {
+				return false;
+			}
+			
 			if(startDate.compareTo(endDate) > 0 || startDate.compareTo(endDate) == 0 ) {
+				return false;
+			}
+			
+			if(!(startDate.compareTo(actualDateValidat) < 0 && endDate.compareTo(actualDateValidat) > 0 )) {
 				return false;
 			}
 		} catch (ParseException e) {

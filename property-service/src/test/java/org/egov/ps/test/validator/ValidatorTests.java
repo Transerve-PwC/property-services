@@ -122,7 +122,7 @@ public class ValidatorTests {
     			.params(map_2)
     			.build();
     	
-    	 assertNull(dateRangeValidator.validate(validation_2, field, null, null));
+    	 assertNull(dateRangeValidator.validate(validation_2, field, "16-aug-2020", null));
     	 
     	 
         
@@ -136,7 +136,7 @@ public class ValidatorTests {
     			.params(map)
     			.build();
     	
-        assertNull(dateRangeValidator.validate(validation, field, null, null));
+        assertNull(dateRangeValidator.validate(validation, field, "01-Oct-2020", null));
         
         //case : not pass date start and end 
         IValidation validation_1 = ApplicationValidation.builder()
@@ -155,7 +155,8 @@ public class ValidatorTests {
     			.type("date-range") 
     			.params(map)
     			.build();
-    	assertFalse(dateRangeValidator.validate(validation_, field, null, null).isEmpty());
+    	assertNotNull(dateRangeValidator.validate(validation_, field, null, null));
+    	assertNotNull(dateRangeValidator.validate(validation_, field, "01-Jan-1990", null));
     	
     }
  
