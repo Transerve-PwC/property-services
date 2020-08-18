@@ -258,7 +258,7 @@ public class ValidatorTests {
 		IValidation validation = ApplicationValidation.builder().type("numeric").build();
 		
 		//field require true 
-		IApplicationField field = ApplicationField.builder().required(true).build();
+		IApplicationField field = ApplicationField.builder().required(true).build(); 
 
 		assertNull(numericValidator.validate(validation, field, "123654789", null));
 		assertNull(numericValidator.validate(validation, field, "9876543210", null));
