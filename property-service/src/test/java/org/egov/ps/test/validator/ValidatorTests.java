@@ -12,6 +12,8 @@ import org.egov.ps.validator.ApplicationValidation;
 import org.egov.ps.validator.DateField;
 import org.egov.ps.validator.IApplicationField;
 import org.egov.ps.validator.IValidation;
+import org.egov.ps.validator.application.ArrayLengthValidator;
+import org.egov.ps.validator.application.ArrayValidator;
 import org.egov.ps.validator.application.BooleanValidator;
 import org.egov.ps.validator.application.DateRangeValidator;
 import org.egov.ps.validator.application.DateValidator;
@@ -59,6 +61,12 @@ public class ValidatorTests {
 
 	@Autowired
 	BooleanValidator booleanValidator;
+
+	@Autowired
+	ArrayValidator arrayValidator;
+	
+	@Autowired
+	ArrayLengthValidator arrayLengthValidator;
 
 	@Test
 	public void testEmailValidator() {
@@ -400,7 +408,7 @@ public class ValidatorTests {
 		assertNull(objectValidator.validate(validation, field, 123, null));
 
 		assertFalse(objectValidator.validate(validation, field, null, null).isEmpty());
-		assertFalse(objectValidator.validate(validation, field, "", null).isEmpty());
+		assertNull(objectValidator.validate(validation, field, "", null));
 
 
 		//field require false
@@ -412,5 +420,59 @@ public class ValidatorTests {
 		assertNull(objectValidator.validate(validation, field, "", null));
 
 		assertNull(objectValidator.validate(validation, field, 123, null));
+	}
+
+	@Test
+	public void testArrayValidator() {
+		IValidation validation = ApplicationValidation.builder().type("array").build();
+		//field require true
+		IApplicationField field = ApplicationField.builder().required(true).build();
+
+		String[] arr = {"1","2","3","4","5"};
+		assertNull(arrayValidator.validate(validation, field, arr, null));
+
+		String[] arr1 = {};
+		assertNull(arrayValidator.validate(validation, field, arr1, null));
+
+		assertFalse(arrayValidator.validate(validation, field, "", null).isEmpty());
+		assertFalse(arrayValidator.validate(validation, field, null, null).isEmpty());
+
+		//field require true
+		field = ApplicationField.builder().required(true).build();
+		assertNull(arrayValidator.validate(validation, field, arr, null));
+		
+		assertFalse(arrayValidator.validate(validation, field, "", null).isEmpty());
+		assertFalse(arrayValidator.validate(validation, field, null, null).isEmpty());
+
+	}
+	
+	@Test
+	public void testArrayLengthValidator() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("max", 10);
+		map.put("min", 1);
+
+		IValidation validation = ApplicationValidation.builder()
+				.type("array-length")
+				.params(map)
+				.build();
+		//field require true
+		IApplicationField field = ApplicationField.builder().required(true).build();
+
+		String[] arr = {"1","2","3","4","5"};
+		assertNull(arrayLengthValidator.validate(validation, field, arr, null));
+
+		int arr_1[]=new int[0];
+		assertFalse(arrayLengthValidator.validate(validation, field, arr_1, null).isEmpty());
+		assertFalse(arrayLengthValidator.validate(validation, field, null, null).isEmpty());
+		assertFalse(arrayLengthValidator.validate(validation, field, "", null).isEmpty());
+
+		//field require false
+		field = ApplicationField.builder().required(false).build();
+		assertNull(arrayLengthValidator.validate(validation, field, arr, null));
+		assertFalse(arrayLengthValidator.validate(validation, field, arr_1, null).isEmpty());
+		
+		assertNull(arrayLengthValidator.validate(validation, field, null, null));
+		assertNull(arrayLengthValidator.validate(validation, field, "", null));
 	}
 }
