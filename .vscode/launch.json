@@ -6,23 +6,23 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Debug (Launch) - Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "Debug (Launch)-CSPropertyApplication<cs-property-service>",
+            "name": "Rented Properties Debug",
             "request": "launch",
             "mainClass": "org.egov.cpt.CSPropertyApplication",
             "projectName": "cs-property-service"
         },
         {
             "type": "java",
-            "name": "Debug (Launch)-PropertyServiceApplication<property-service>",
+            "name": "Estate Properties Debug",
             "request": "launch",
             "mainClass": "org.egov.ps.PropertyServiceApplication",
             "projectName": "property-service"
-        }
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
     ]
 }
