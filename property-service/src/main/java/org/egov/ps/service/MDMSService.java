@@ -35,12 +35,11 @@ public class MDMSService {
 //		TODO: change in mdms-data config
 		tenantId = tenantId.split("\\.")[0];
 		MdmsCriteriaReq mdmsCriteriaReq = util.prepareMdMsRequest(tenantId, PSConstants.MDMS_PS_MODULE_NAME,
-				Arrays.asList(PSConstants.MDMS_PS_FIELDS), null, requestInfo);
-		StringBuilder url = getMdmsSearchUrl(tenantId, applicationType);
+				Arrays.asList(applicationType), PSConstants.MDMS_PS_FIELD_FILTER, requestInfo);
+		StringBuilder url = getMdmsSearchUrl(tenantId, applicationType, PSConstants.MDMS_PS_MODULE_NAME);
 		Object response = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
 
-		String MDMSResponsePath = "$.MdmsRes." + PSConstants.MDMS_PS_MODULE_NAME + "." + applicationType
-				+ ".*.fields.*";
+		String MDMSResponsePath = "$.MdmsRes." + PSConstants.MDMS_PS_MODULE_NAME + "." + applicationType;
 
 		List<Map<String, Object>> fieldConfigurations = JsonPath.read(response, MDMSResponsePath);
 		return fieldConfigurations;
@@ -51,10 +50,27 @@ public class MDMSService {
 	 *
 	 * @return MDMS Search URL
 	 */
-	private StringBuilder getMdmsSearchUrl(@NotNull final String tenantId, @NotNull final String masterName) {
+	public StringBuilder getMdmsSearchUrl(@NotNull final String tenantId, @NotNull final String moduleName, @NotNull final String masterName) {
 		return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsSearchEndpoint())
-				.append("?tenantId=").append(tenantId).append("&moduleName=").append(PSConstants.MDMS_PS_MODULE_NAME)
+				.append("?tenantId=").append(tenantId).append("&moduleName=").append(moduleName)
 				.append("&masterName=").append(masterName);
+	}
+
+	public List<String> getMdmsFields(String moduleName, String masterName, String filter) {
+		String tenantId = PSConstants.TENENT_ID;
+		RequestInfo requestInfo = RequestInfo.builder().authToken("authToken").build();
+
+		tenantId = tenantId.split("\\.")[0];
+		MdmsCriteriaReq mdmsCriteriaReq = util.prepareMdMsRequest(tenantId, moduleName, Arrays.asList(masterName),
+				PSConstants.MDMS_PS_CODE_FILTER, requestInfo);
+		StringBuilder url = getMdmsSearchUrl(tenantId, moduleName, masterName);
+		Object response = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
+		
+		String MDMSResponsePath = "$.MdmsRes." + moduleName + "." + masterName;
+
+		List<String> allowedValues = JsonPath.read(response, MDMSResponsePath);
+		
+		return allowedValues;
 	}
 
 }
