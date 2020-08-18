@@ -16,16 +16,37 @@ import org.springframework.stereotype.Component;
 public class PhoneNumberValidator implements IApplicationValidator {
 	private static final String phoneRegex = "(0/91)?[7-9][0-9]{9}";
 
-	private static String DEFAULT_ERROR_FORMAT = "Valid phone number expected for path %s but found %s";
+	private static String DEFAULT_FORMAT = "Valid phone number expected for path %s but found %s";
+
+	private List<String> formatErrorMessage(String format, Object value, String path) {
+		if (format == null) {
+			format = DEFAULT_FORMAT;
+		}
+		return Arrays.asList(String.format(format, value, path));
+	}
 
 	@Override
 	public List<String> validate(IValidation validation, IApplicationField field, Object value, Object parent) {
-		String phoneNumber = value.toString();
-		Pattern pattern = Pattern.compile(phoneRegex);
-		Matcher matcher = pattern.matcher(phoneNumber);
-		if (!matcher.matches()) {
-			return Arrays.asList(String.format(DEFAULT_ERROR_FORMAT, field.getPath(), value));
+		boolean isEmpty = value == null || value.toString().trim().length() == 0;
+		if (!field.isRequired() && isEmpty) {
+			return null;
+		}
+
+		String trimmedValue = isEmpty ? null : value.toString().trim();
+		if (!isValid(trimmedValue)) {
+			return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
 		}
 		return null;
+	}
+
+	private boolean isValid(String phoneNumber) {
+		if (null != phoneNumber && !phoneNumber.isEmpty()) {
+			Pattern pattern = Pattern.compile(phoneRegex);
+			Matcher matcher = pattern.matcher(phoneNumber);
+			return matcher.matches();
+		}else {
+			return false;
+		}
+
 	}
 }
