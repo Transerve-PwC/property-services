@@ -240,7 +240,7 @@ public class ValidatorTests {
 		assertNull(dateRangeValidator.validate(validation, field, "01-Oct-2020", null));
 
 		//case : not pass date start and end 
-		assertFalse(dateRangeValidator.validate(validation_2, field, "", null).isEmpty());
+		assertFalse(dateRangeValidator.validate(validation_2, field, "", null).isEmpty()); 
 		assertFalse(dateRangeValidator.validate(validation_2, field, null, null).isEmpty());
 		
 		//case : pass date start and end - negative test case start > end.. 
