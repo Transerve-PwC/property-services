@@ -286,6 +286,12 @@ public class PropertyQueryBuilder {
 			builder.append("pt.id = :id");
 			preparedStmtList.put("id", criteria.getPropertyId());
 		}
+		
+		if (null != criteria.getPropertyNumber()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("pt.property_number = :ptNumber");
+			preparedStmtList.put("ptNumber", criteria.getPropertyNumber());
+		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}

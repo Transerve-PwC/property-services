@@ -55,6 +55,9 @@ public class DuplicateCopy {
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
 	
+	@JsonProperty("allotmentNumber")
+	private String allotmentNumber;
+	
 	@JsonProperty("assignee")
 	private List<String> assignee = null;
 
