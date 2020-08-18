@@ -23,11 +23,13 @@ public class DuplicateCopyQueryBuilder {
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY dcModifiedTime desc) offset_ FROM " + "({})" + " result) result_offset "
 			+ "WHERE offset_ > :start AND offset_ <= :end";
 
-	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,pt.*,address.*,"
+	private static final String DUPLICATE_COPY_SEARCH_QUERY = SELECT + "dca.*,ap.*,doc.*,pt.*,address.*,ownership.*,"
 			+ " dca.id as appid, dca.property_id, dca.tenantid as pttenantid, dca.state, dca.action,"
 			+ " dca.application_number as app_number,dca.modified_time as dcModifiedTime,"
 
 			+ " pt.id as pid, pt.transit_number,pt.colony,pt.modified_date as pmodified_date,"
+			
+			+ " ownership.allotmen_number as owner_allot_number,"
 
 			+ " address.pincode, address.area,"
 
@@ -40,6 +42,7 @@ public class DuplicateCopyQueryBuilder {
 			+ " FROM cs_pt_duplicate_ownership_application dca " + INNER_JOIN
 			+ " cs_pt_property_v1 pt on dca.property_id=pt.id " + INNER_JOIN
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
+			+ " cs_pt_ownership_v1 ownership ON dca.property_id = ownership.property_id "+LEFT_JOIN
 			+ " cs_pt_duplicatecopy_applicant ap ON dca.id =ap.application_id " + LEFT_JOIN
 			+ " cs_pt_documents_v1 doc ON doc.reference_id =  dca.id";
 

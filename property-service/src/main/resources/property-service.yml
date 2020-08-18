@@ -840,7 +840,7 @@ serviceMaps:
     isTransaction: true
     queryMaps:
     
-    - query: INSERT INTO cs_pm_application_v1 (id, tenantid, property_id, application_number, branch_type, module_type, application_type, comments, hardcopy_received_date, additional_details, state, action, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pm_application_v1 (id, tenantid, property_id, application_number, branch_type, module_type, application_type, comments, hardcopy_received_date, application_details, state, action, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?, ?, ?);
       basePath: Applications.*
       jsonMaps:
 
@@ -848,7 +848,7 @@ serviceMaps:
 
       - jsonPath: $.Applications.*.tenantId
       
-      - jsonPath: $.Applications.*.propertyId
+      - jsonPath: $.Applications.*.property.id
 
       - jsonPath: $.Applications.*.applicationNumber
       
@@ -862,7 +862,7 @@ serviceMaps:
       
       - jsonPath: $.Applications.*.hardcopyReceivedDate
       
-      - jsonPath: $.Applications.*.additionalDetails 
+      - jsonPath: $.Applications.*.applicationDetails 
       
       - jsonPath: $.Applications.*.state 
       
@@ -877,7 +877,7 @@ serviceMaps:
       - jsonPath: $.Applications.*.auditDetails.lastModifiedTime
             
       
-    - query: INSERT INTO cs_pm_applicant_v1 (id, tenantid, property_id, application_id, mobile_number, first_name, last_name, user_id, additional_details, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pm_applicant_v1 (id, tenantid, property_id, application_id, mobile_number, first_name, last_name, user_id, applicant_details, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?);
       basePath: Applications.*.applicant
       jsonMaps:
 
@@ -885,7 +885,7 @@ serviceMaps:
 
       - jsonPath: $.Applications.*.applicant.tenantId
       
-      - jsonPath: $.Applications.*.applicant.propertyId
+      - jsonPath: $.Applications.*.applicant.property.id
 
       - jsonPath: $.Applications.*.applicant.applicationId
 
@@ -897,7 +897,7 @@ serviceMaps:
       
       - jsonPath: $.Applications.*.applicant.userId 
       
-      - jsonPath: $.Applications.*.applicant.additionalDetails 
+      - jsonPath: $.Applications.*.applicant.applicantDetails 
       
       - jsonPath: $.Applications.*.applicant.auditDetails.createdBy
 
