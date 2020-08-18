@@ -16,6 +16,6 @@ public class PSConstants {
 
 	public static final String MDMS_PS_FIELDS = "EstateBranch_OwnershipTransfer_SaleDeed";
 
-	public static final String MDMS_PS_PATH_FILTER = "$.*.path";
+	public static final String MDMS_PS_PATH_FILTER = "$.*.code";
 
 }

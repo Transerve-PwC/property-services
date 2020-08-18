@@ -21,10 +21,6 @@ import com.jayway.jsonpath.JsonPath;
 @Service
 public class MDMSService {
 
-	private final String MODULE_NAME = PSConstants.MDMS_PS_MODULE_NAME;
-
-//	private final String MDMSResponsePath = "$.MdmsRes." + MODULE_NAME + ".EstateBranch_OwnershipTransfer_SaleDeed"+ ".*.fields.*";
-
 	@Autowired
 	Configuration config;
 
@@ -38,12 +34,13 @@ public class MDMSService {
 			String tenantId) throws JSONException {
 //		TODO: change in mdms-data config
 		tenantId = tenantId.split("\\.")[0];
-		MdmsCriteriaReq mdmsCriteriaReq = util.prepareMdMsRequest(tenantId, MODULE_NAME,
+		MdmsCriteriaReq mdmsCriteriaReq = util.prepareMdMsRequest(tenantId, PSConstants.MDMS_PS_MODULE_NAME,
 				Arrays.asList(PSConstants.MDMS_PS_FIELDS), null, requestInfo);
 		StringBuilder url = getMdmsSearchUrl(tenantId, applicationType);
 		Object response = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
 
-		String MDMSResponsePath = "$.MdmsRes." + MODULE_NAME + "." + applicationType + ".*.fields.*";
+		String MDMSResponsePath = "$.MdmsRes." + PSConstants.MDMS_PS_MODULE_NAME + "." + applicationType
+				+ ".*.fields.*";
 
 		List<Map<String, Object>> fieldConfigurations = JsonPath.read(response, MDMSResponsePath);
 		return fieldConfigurations;
@@ -56,8 +53,8 @@ public class MDMSService {
 	 */
 	private StringBuilder getMdmsSearchUrl(@NotNull final String tenantId, @NotNull final String masterName) {
 		return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsSearchEndpoint())
-				.append("?tenantId=").append(tenantId).append("&moduleName=").append(MODULE_NAME).append("&masterName=")
-				.append(masterName);
+				.append("?tenantId=").append(tenantId).append("&moduleName=").append(PSConstants.MDMS_PS_MODULE_NAME)
+				.append("&masterName=").append(masterName);
 	}
 
 }

@@ -83,32 +83,17 @@ public class ApplicationValidatorService {
 				String applicationDetailsString = this.objectMapper.writeValueAsString(applicationDetails);
 				Configuration conf = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS);
 				DocumentContext applicationObjectContext = JsonPath.using(conf).parse(applicationDetailsString);
-				String moduleNameString = application.getBranchType()+"_"+application.getModuleType()+"_"+application.getApplicationType();
-				this.performValidationsFromMDMS(moduleNameString, applicationObjectContext,
-						request.getRequestInfo(), application.getTenantId());
+				String moduleNameString = application.getBranchType() + "_" + application.getModuleType() + "_"
+						+ application.getApplicationType();
+				this.performValidationsFromMDMS(moduleNameString, applicationObjectContext, request.getRequestInfo(),
+						application.getTenantId());
 			} catch (JsonProcessingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-//			mdmsValidations(request, application);
 		});
 	}
-
-//	private void mdmsValidations(ApplicationRequest request, Application application) {
-//		Map<String, Object> params = new HashMap<String, Object>();
-//		Object moduleName = PSConstants.MDMS_PS_MODULE_NAME;
-//		Object masterName = application.getBranchType()+"_"+application.getModuleType()+"_"+application.getApplicationType();
-//		params.put("moduleName", moduleName);
-//		params.put("masterName", masterName);
-//		params.put("tenantId", application.getTenantId());
-//		params.put("requestInfo", request.getRequestInfo());
-//    	
-//		IValidation validation = ApplicationValidation.builder().type("mdms").params(params).build();
-//		IApplicationField field = ApplicationField.builder().required(true).build();
-//		
-//		mdmsValidator.validate(validation, field, application, null);
-//	}
 
 	private void validatePropertyExists(RequestInfo requestInfo, String propertyId) {
 		Property property = propertyRepository.findPropertyById(propertyId);
