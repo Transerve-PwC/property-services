@@ -13,6 +13,7 @@ import org.egov.ps.validator.DateField;
 import org.egov.ps.validator.IApplicationField;
 import org.egov.ps.validator.IValidation;
 import org.egov.ps.validator.application.DateRangeValidator;
+import org.egov.ps.validator.application.DateValidator;
 import org.egov.ps.validator.application.EmailValidator;
 import org.egov.ps.validator.application.LengthValidator;
 import org.egov.ps.validator.application.MinMaxValidator;
@@ -47,6 +48,9 @@ public class ValidatorTests {
 	
 	@Autowired
 	NumericValidator numericValidator;
+	
+	@Autowired
+	DateValidator dateValidator;
 
 	@Test
 	public void testEmailValidator() {
@@ -317,4 +321,26 @@ public class ValidatorTests {
 		assertFalse(numericValidator.validate(validation, field, "123456te", null).isEmpty());
 		assertFalse(numericValidator.validate(validation, field, "97a", null).isEmpty());
 	}
+	
+	@Test
+    public void testDateValidator() {
+		// Date Format Should be --   dd-MMM-yyyy 
+        IValidation validation = ApplicationValidation.builder().type("date").build();
+        IApplicationField field = ApplicationField.builder().required(true).build();
+
+        assertNull(dateValidator.validate(validation, field, "16-aug-2020", null));
+        assertNull(dateValidator.validate(validation, field, "01-jan-2020", null));
+        
+
+        assertFalse(dateValidator.validate(validation, field, "12/29/2016", null).isEmpty());
+        assertFalse(dateValidator.validate(validation, field, "2019-02-28", null).isEmpty());
+        
+        //field require false
+      	field = ApplicationField.builder().required(false).build();
+      	assertNull(dateValidator.validate(validation, field, "16-aug-2020", null));
+        assertNull(dateValidator.validate(validation, field, "01-jan-2020", null));
+        assertNull(dateValidator.validate(validation, field, "12/29/2016", null));
+        assertNull(dateValidator.validate(validation, field, "2019-02-28", null));
+      	
+    }
 }
