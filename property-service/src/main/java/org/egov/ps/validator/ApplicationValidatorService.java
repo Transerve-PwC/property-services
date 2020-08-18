@@ -13,6 +13,7 @@ import org.egov.ps.model.Property;
 import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.service.MDMSService;
 import org.egov.ps.util.PSConstants;
+import org.egov.ps.validator.application.MDMSValidator;
 import org.egov.ps.web.contracts.ApplicationRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +49,16 @@ public class ApplicationValidatorService {
 	ObjectMapper objectMapper;
 
 	@Autowired
+	MDMSValidator mdmsValidator;
+
+	@Autowired
 	ApplicationValidatorService(ApplicationContext context, MDMSService mdmsService,
 			PropertyRepository propertyRepository, ObjectMapper objectMapper) {
 		this.context = context;
 		this.mdmsService = mdmsService;
 		this.propertyRepository = propertyRepository;
 		this.objectMapper = objectMapper;
+//		this.mdmsValidator = mdmsValidator;
 		Map<String, Object> beans = this.context.getBeansWithAnnotation(ApplicationValidator.class);
 
 		/**
@@ -78,14 +83,32 @@ public class ApplicationValidatorService {
 				String applicationDetailsString = this.objectMapper.writeValueAsString(applicationDetails);
 				Configuration conf = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS);
 				DocumentContext applicationObjectContext = JsonPath.using(conf).parse(applicationDetailsString);
-				this.performValidationsFromMDMS(application.getApplicationType(), applicationObjectContext,
+				String moduleNameString = application.getBranchType()+"_"+application.getModuleType()+"_"+application.getApplicationType();
+				this.performValidationsFromMDMS(moduleNameString, applicationObjectContext,
 						request.getRequestInfo(), application.getTenantId());
 			} catch (JsonProcessingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+//			mdmsValidations(request, application);
 		});
 	}
+
+//	private void mdmsValidations(ApplicationRequest request, Application application) {
+//		Map<String, Object> params = new HashMap<String, Object>();
+//		Object moduleName = PSConstants.MDMS_PS_MODULE_NAME;
+//		Object masterName = application.getBranchType()+"_"+application.getModuleType()+"_"+application.getApplicationType();
+//		params.put("moduleName", moduleName);
+//		params.put("masterName", masterName);
+//		params.put("tenantId", application.getTenantId());
+//		params.put("requestInfo", request.getRequestInfo());
+//    	
+//		IValidation validation = ApplicationValidation.builder().type("mdms").params(params).build();
+//		IApplicationField field = ApplicationField.builder().required(true).build();
+//		
+//		mdmsValidator.validate(validation, field, application, null);
+//	}
 
 	private void validatePropertyExists(RequestInfo requestInfo, String propertyId) {
 		Property property = propertyRepository.findPropertyById(propertyId);

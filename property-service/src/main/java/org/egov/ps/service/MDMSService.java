@@ -6,8 +6,6 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
-import com.jayway.jsonpath.JsonPath;
-
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.ps.config.Configuration;
@@ -18,12 +16,14 @@ import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.jayway.jsonpath.JsonPath;
+
 @Service
 public class MDMSService {
 
-	private final String MODULE_NAME = "EstateBranch_OwnershipTransfer_SaleDeed";
+	private final String MODULE_NAME = PSConstants.MDMS_PS_MODULE_NAME;
 
-	private final String MDMSResponsePath = "$.MdmsRes." + MODULE_NAME+".fields";
+//	private final String MDMSResponsePath = "$.MdmsRes." + MODULE_NAME + ".EstateBranch_OwnershipTransfer_SaleDeed"+ ".*.fields.*";
 
 	@Autowired
 	Configuration config;
@@ -41,8 +41,11 @@ public class MDMSService {
 		MdmsCriteriaReq mdmsCriteriaReq = util.prepareMdMsRequest(tenantId, MODULE_NAME,
 				Arrays.asList(PSConstants.MDMS_PS_FIELDS), null, requestInfo);
 		StringBuilder url = getMdmsSearchUrl(tenantId, applicationType);
-        Object response = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
-        List<Map<String, Object>> fieldConfigurations = JsonPath.read(response, MDMSResponsePath);
+		Object response = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
+
+		String MDMSResponsePath = "$.MdmsRes." + MODULE_NAME + "." + applicationType + ".*.fields.*";
+
+		List<Map<String, Object>> fieldConfigurations = JsonPath.read(response, MDMSResponsePath);
 		return fieldConfigurations;
 	}
 

@@ -12,9 +12,9 @@ public class PSConstants {
 
 	public static final String JSONPATH_PROPERTY_SERVICE = "$.MdmsRes.OwnershipTransferSaleDeed";
 
-	public static final String MDMS_PS_MODULE_NAME = "OwnershipTransfer";
+	public static final String MDMS_PS_MODULE_NAME = "EstatePropertyService";
 
-	public static final String MDMS_PS_FIELDS = "fields";
+	public static final String MDMS_PS_FIELDS = "EstateBranch_OwnershipTransfer_SaleDeed";
 
 	public static final String MDMS_PS_PATH_FILTER = "$.*.path";
 
