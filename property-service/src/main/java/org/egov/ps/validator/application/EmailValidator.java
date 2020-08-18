@@ -33,7 +33,8 @@ public class EmailValidator implements IApplicationValidator {
 		if (!field.isRequired() && isEmpty) {
 			return null;
 		}
-		String trimmedValue = value.toString().trim();
+
+		String trimmedValue = isEmpty ? null : value.toString().trim();
 		if (!isValid(trimmedValue)) {
 			return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
 		}
@@ -41,16 +42,18 @@ public class EmailValidator implements IApplicationValidator {
 	}
 
 	private boolean isValid(String email) {
-		if (email.split("@").length != 2) {
-			return false;
-		}
 		if (null != email && !email.isEmpty()) {
+			if (email.split("@").length != 2) {
+				return false;
+			}
 			Pattern pattern = Pattern.compile(emailRegex);
 			Matcher matcher = pattern.matcher(email);
 			return matcher.matches();
+
 		} else {
 			return false;
 		}
+
 	}
 
 }
