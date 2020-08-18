@@ -62,11 +62,11 @@ public class MDMSService {
 
 		tenantId = tenantId.split("\\.")[0];
 		MdmsCriteriaReq mdmsCriteriaReq = util.prepareMdMsRequest(tenantId, moduleName, Arrays.asList(masterName),
-				PSConstants.MDMS_PS_CODE_FILTER, requestInfo);
+				null, requestInfo);
 		StringBuilder url = getMdmsSearchUrl(tenantId, moduleName, masterName);
 		Object response = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
 		
-		String MDMSResponsePath = "$.MdmsRes." + moduleName + "." + masterName;
+		String MDMSResponsePath = "$.MdmsRes." + moduleName + "." + filter;
 
 		List<String> allowedValues = JsonPath.read(response, MDMSResponsePath);
 		
