@@ -199,6 +199,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.recoveryType(rs.getString("ng_recoveryType"))
 						.amount(rs.getDouble("ng_amount"))
 						.propertyImageId(rs.getString("ng_p_image_id"))
+						.allotmentNumber(rs.getString("oallotmen_number"))
 						.auditDetails(ngAuditDetails)
 						.build();
 	
