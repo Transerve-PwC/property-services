@@ -34,7 +34,8 @@ public class LengthValidator implements IApplicationValidator {
     		if (!field.isRequired() && isEmpty) {
     			return null;
     		}
-    		String trimmedValue = value.toString().trim();
+    		
+    		String trimmedValue = isEmpty ? null : value.toString().trim();
     		if (!isValid(validation, trimmedValue)) {
     			return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
     		}
@@ -43,13 +44,17 @@ public class LengthValidator implements IApplicationValidator {
     }
     
     private boolean isValid(IValidation validation, String fieldValue) {
-		int max = (int) validation.getParams().get("max");
-		int min = (int) validation.getParams().get("min");
-    	
-    	if(fieldValue.length() < min || fieldValue.length() > max) {
+    	if (null != fieldValue && !fieldValue.isEmpty()) {
+    		int max = (int) validation.getParams().get("max");
+    		int min = (int) validation.getParams().get("min");
+        	
+        	if(fieldValue.length() < min || fieldValue.length() > max) {
+        		return false;
+        	}
+        	return true;
+    	}else {
     		return false;
     	}
-    	return true;
 	}
 
 }
