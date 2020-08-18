@@ -1,7 +1,6 @@
 package org.egov.ps.validator.application;
 
 import java.lang.reflect.Field;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -47,76 +46,90 @@ public class DateRangeValidator implements IApplicationValidator {
 		// TODO Auto-generated method stub
 		if(validation.getType().equalsIgnoreCase("date-range")) {
 			if(null != validation.getParams() && validation.getParams().size() > 0) {
-				if (!isValid(validation, field, value, parent)) {
+
+				boolean isEmpty = value == null || value.toString().trim().length() == 0;
+				if (!field.isRequired() && isEmpty) {
+					return null;
+				}
+
+				String trimmedValue = isEmpty ? null : value.toString().trim();
+				if (!isValid(validation, trimmedValue)) {
 					return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
 				}
 			}else {
 				return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
 			}
-
 		}
 		return null;
 	}
 
-	private boolean isValid(IValidation validation, IApplicationField field, Object value, Object parent) {
-		String startDateStr = null ;
-		String endDateStr = null;
-
-		if(validation.getParams().get("start") instanceof String) {
-			startDateStr = validation.getParams().get("start").toString();
-		}
-		
-		if(validation.getParams().get("end") instanceof String) {
-			endDateStr = validation.getParams().get("end").toString();
-		}
-		
-		if(null == startDateStr && validation.getParams().get("start") instanceof Object) {
-			Object startDt = validation.getParams().get("start");
-			Map<String, Object> values = getFieldNamesAndValues(startDt);
-			startDateStr = calculateDate(values);
-		}
-		
-		if(null == endDateStr && validation.getParams().get("end") instanceof Object) {
-			Object endDt = validation.getParams().get("end");
-			Map<String, Object> values = getFieldNamesAndValues(endDt);
-			endDateStr = calculateDate(values);
-		}
-
-		//###################################
-
-		//checking null of any start or end date then return false.
-		if(null == startDateStr || null == endDateStr ) {
-			return false;
-		}
-
-		//checking start date must be smaller then end date.
+	private boolean isValid(IValidation validation, String fieldValue) {
 		try {
-			Date startDate = formatter.parse(startDateStr);
-			Date endDate = formatter.parse(endDateStr);
-			Date actualDateValidat = value != null ? formatter.parse(value.toString()) : null;
+			if (null != fieldValue && !fieldValue.isEmpty()) {
+				Date actualDateValidat = formatter.parse(fieldValue.toString());
 
-			/* 	start date occurs before end date - if ( startDate.compareTo(endDate) < 0 )
-			 * 	start date occurs after end date - if ( startDate.compareTo(endDate) > 0 )
-			 * 	Both dates are equal dates - if (startDate.compareTo(endDate) == 0  )
-			 */
+				String startDateStr = null ;
+				String endDateStr = null;
 
-			if(null == actualDateValidat) {
+				if(validation.getParams().get("start") instanceof String) {
+					startDateStr = validation.getParams().get("start").toString();
+				}
+
+				if(validation.getParams().get("end") instanceof String) {
+					endDateStr = validation.getParams().get("end").toString();
+				}
+
+				if(null == startDateStr && validation.getParams().get("start") instanceof Object) {
+					Object startDt = validation.getParams().get("start");
+					Map<String, Object> values = getFieldNamesAndValues(startDt);
+					startDateStr = calculateDate(values);
+				}
+
+				if(null == endDateStr && validation.getParams().get("end") instanceof Object) {
+					Object endDt = validation.getParams().get("end");
+					Map<String, Object> values = getFieldNamesAndValues(endDt);
+					endDateStr = calculateDate(values);
+				}
+
+				//###################################
+
+				//checking null of any start or end date then return false.
+				if(null == startDateStr || null == endDateStr ) {
+					return false;
+				}
+
+				//checking start date must be smaller then end date.
+
+				Date startDate = formatter.parse(startDateStr);
+				Date endDate = formatter.parse(endDateStr);
+
+				/* 	start date occurs before end date - if ( startDate.compareTo(endDate) < 0 )
+				 * 	start date occurs after end date - if ( startDate.compareTo(endDate) > 0 )
+				 * 	Both dates are equal dates - if (startDate.compareTo(endDate) == 0  )
+				 */
+
+				if(null == actualDateValidat) {
+					return false;
+				}
+
+				if(startDate.compareTo(endDate) > 0 || startDate.compareTo(endDate) == 0 ) {
+					return false;
+				}
+
+				if(!(startDate.compareTo(actualDateValidat) < 0 && endDate.compareTo(actualDateValidat) > 0 )) {
+					return false;
+				}
+
+				return true;
+			}else {
 				return false;
 			}
-			
-			if(startDate.compareTo(endDate) > 0 || startDate.compareTo(endDate) == 0 ) {
-				return false;
-			}
-			
-			if(!(startDate.compareTo(actualDateValidat) < 0 && endDate.compareTo(actualDateValidat) > 0 )) {
-				return false;
-			}
-		} catch (ParseException e) {
+
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
-		return true;
 	}
 
 	private String calculateDate(Map<String, Object> values) {
@@ -125,7 +138,7 @@ public class DateRangeValidator implements IApplicationValidator {
 		if(null != values.get("unit")) {
 			String unit = values.get("unit").toString();
 			int val = Integer.parseInt(values.get("value").toString());
-			
+
 			if(unit.equalsIgnoreCase("month")) {
 				d = diffDate(Calendar.MONTH, val);
 			}else if(unit.equalsIgnoreCase("year")) {
@@ -136,7 +149,7 @@ public class DateRangeValidator implements IApplicationValidator {
 				d = diffDate(Calendar.SECOND, val);
 			}
 		}
-		
+
 		if(null != d) {
 			return formatter.format(d);
 		}
@@ -146,7 +159,7 @@ public class DateRangeValidator implements IApplicationValidator {
 	private Date diffDate(int month, int val) {
 		Calendar c = Calendar.getInstance(); 
 		c.add(Calendar.MONTH, val);
-		
+
 		return c.getTime();
 	}
 
@@ -169,7 +182,7 @@ public class DateRangeValidator implements IApplicationValidator {
 		}
 		return map;
 	}
-	
+
 	public static void main(String arg[]) {
 		Calendar c = Calendar.getInstance(); 
 		c.add(Calendar.MONTH, -6);

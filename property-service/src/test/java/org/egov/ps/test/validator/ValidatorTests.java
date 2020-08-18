@@ -1,13 +1,11 @@
 package org.egov.ps.test.validator;
 
-import static org.junit.Assert.assertNull;
-
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.egov.ps.validator.ApplicationField;
 import org.egov.ps.validator.ApplicationValidation;
@@ -26,9 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 @ActiveProfiles("test")
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -157,8 +152,7 @@ public class ValidatorTests {
 	public void testDateRangeValidator() {
 		IApplicationField field = ApplicationField.builder().required(true).build();
 
-		//
-
+		/**************************************field require true********************************************/
 		DateField startDate = DateField.builder()
 				.unit("month")
 				.value("-6")
@@ -169,52 +163,92 @@ public class ValidatorTests {
 				.value("0")
 				.build();
 
-		Map<String, Object> map_2= new HashMap<String, Object>();
-		map_2.put("start", startDate);
-		map_2.put("end", endDate);
+		Map<String, Object> map_1= new HashMap<String, Object>();
+		map_1.put("start", startDate);
+		map_1.put("end", endDate);
 
-		IValidation validation_2 = ApplicationValidation.builder()
+		IValidation validation_1 = ApplicationValidation.builder()
 				.type("date-range")
-				.params(map_2)
+				.params(map_1)
 				.build();
 
-		assertNull(dateRangeValidator.validate(validation_2, field, "16-aug-2020", null));
-		assertNull(dateRangeValidator.validate(validation_2, field, "15-May-2020", null));
-		assertFalse(dateRangeValidator.validate(validation_2, field, "1-jan-2020", null).isEmpty());
-		assertFalse(dateRangeValidator.validate(validation_2, field, "1-Dec-2020", null).isEmpty());
+		assertFalse(dateRangeValidator.validate(validation_1, field, null, null).isEmpty());
+		assertFalse(dateRangeValidator.validate(validation_1, field, "", null).isEmpty());
+		
+		assertNull(dateRangeValidator.validate(validation_1, field, "16-aug-2020", null));
+		assertNull(dateRangeValidator.validate(validation_1, field, "15-May-2020", null));
+		assertFalse(dateRangeValidator.validate(validation_1, field, "1-jan-2020", null).isEmpty());
+		assertFalse(dateRangeValidator.validate(validation_1, field, "1-Dec-2020", null).isEmpty());
 
 
 		//case : pass start date and end date - positive test case start < end
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("start", "01-Jan-2020");
-		map.put("end", "01-Dec-2020");
+		Map<String, Object> map2 = new HashMap<String, Object>();
+		map2.put("start", "01-Jan-2020");
+		map2.put("end", "01-Dec-2020");
 
 		IValidation validation = ApplicationValidation.builder()
 				.type("date-range")
-				.params(map)
+				.params(map2)
 				.build();
+		
+		assertFalse(dateRangeValidator.validate(validation_1, field, null, null).isEmpty());
+		assertFalse(dateRangeValidator.validate(validation_1, field, "", null).isEmpty());
 
 		assertNull(dateRangeValidator.validate(validation, field, "01-Oct-2020", null));
-
+		
 		//case : not pass date start and end 
-		IValidation validation_1 = ApplicationValidation.builder()
+		IValidation validation_2 = ApplicationValidation.builder()
 				.type("date-range")
 				.build();
-		assertNotNull(dateRangeValidator.validate(validation_1, field, "", null));
-		assertNotNull(dateRangeValidator.validate(validation_1, field, null, null));
+		
+		assertFalse(dateRangeValidator.validate(validation_2, field, "", null).isEmpty());
+		assertFalse(dateRangeValidator.validate(validation_2, field, null, null).isEmpty());
 
 
 		//case : pass date start and end - negative test case start > end.. 
-		map = new HashMap<String, Object>();
-		map.put("start", "01-Jan-2021");
-		map.put("end", "01-Dec-2020");
+		map2 = new HashMap<String, Object>();
+		map2.put("start", "01-Jan-2021");
+		map2.put("end", "01-Dec-2020");
 
-		IValidation validation_ = ApplicationValidation.builder()
+		IValidation validation_3 = ApplicationValidation.builder()
 				.type("date-range") 
-				.params(map)
+				.params(map2)
 				.build();
-		assertNotNull(dateRangeValidator.validate(validation_, field, null, null));
-		assertNotNull(dateRangeValidator.validate(validation_, field, "01-Jan-1990", null));
+		assertFalse(dateRangeValidator.validate(validation_1, field, null, null).isEmpty());
+		assertFalse(dateRangeValidator.validate(validation_1, field, "", null).isEmpty());
+		
+		assertNotNull(dateRangeValidator.validate(validation_3, field, "", null));
+		assertNotNull(dateRangeValidator.validate(validation_3, field, null, null));
+		assertNotNull(dateRangeValidator.validate(validation_3, field, "01-Jan-1990", null));
+		
+		/**************************************field require false********************************************/
+
+		field = ApplicationField.builder().required(false).build();
+		assertNull(dateRangeValidator.validate(validation_1, field, "", null));
+		assertNull(dateRangeValidator.validate(validation_1, field, null, null));
+		
+		assertNull(dateRangeValidator.validate(validation_1, field, "16-aug-2020", null));
+		assertNull(dateRangeValidator.validate(validation_1, field, "15-May-2020", null));
+		assertFalse(dateRangeValidator.validate(validation_1, field, "1-jan-2020", null).isEmpty());
+		assertFalse(dateRangeValidator.validate(validation_1, field, "1-Dec-2020", null).isEmpty());
+
+
+		//case : pass start date and end date - positive test case start < end
+		assertNull(dateRangeValidator.validate(validation, field, "", null));
+		assertNull(dateRangeValidator.validate(validation, field, null, null));
+		
+		assertNull(dateRangeValidator.validate(validation, field, "01-Oct-2020", null));
+
+		//case : not pass date start and end 
+		assertFalse(dateRangeValidator.validate(validation_2, field, "", null).isEmpty());
+		assertFalse(dateRangeValidator.validate(validation_2, field, null, null).isEmpty());
+		
+		//case : pass date start and end - negative test case start > end.. 
+		assertNull(dateRangeValidator.validate(validation_3, field, "", null));
+		assertNull(dateRangeValidator.validate(validation_3, field, null, null));
+		
+		assertNull(dateRangeValidator.validate(validation_3, field, null, null));
+		assertFalse(dateRangeValidator.validate(validation_3, field, "01-Jan-1990", null).isEmpty());
 
 	}
 
