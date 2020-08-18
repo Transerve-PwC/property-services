@@ -12,12 +12,14 @@ import org.egov.ps.validator.ApplicationValidation;
 import org.egov.ps.validator.DateField;
 import org.egov.ps.validator.IApplicationField;
 import org.egov.ps.validator.IValidation;
+import org.egov.ps.validator.application.BooleanValidator;
 import org.egov.ps.validator.application.DateRangeValidator;
 import org.egov.ps.validator.application.DateValidator;
 import org.egov.ps.validator.application.EmailValidator;
 import org.egov.ps.validator.application.LengthValidator;
 import org.egov.ps.validator.application.MinMaxValidator;
 import org.egov.ps.validator.application.NumericValidator;
+import org.egov.ps.validator.application.ObjectValidator;
 import org.egov.ps.validator.application.PhoneNumberValidator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,12 +47,18 @@ public class ValidatorTests {
 
 	@Autowired
 	MinMaxValidator minMaxValidator;
-	
+
 	@Autowired
 	NumericValidator numericValidator;
-	
+
 	@Autowired
 	DateValidator dateValidator;
+
+	@Autowired
+	ObjectValidator objectValidator;
+
+	@Autowired
+	BooleanValidator booleanValidator;
 
 	@Test
 	public void testEmailValidator() {
@@ -178,7 +186,7 @@ public class ValidatorTests {
 
 		assertFalse(dateRangeValidator.validate(validation_1, field, null, null).isEmpty());
 		assertFalse(dateRangeValidator.validate(validation_1, field, "", null).isEmpty());
-		
+
 		assertNull(dateRangeValidator.validate(validation_1, field, "16-aug-2020", null));
 		assertNull(dateRangeValidator.validate(validation_1, field, "15-May-2020", null));
 		assertFalse(dateRangeValidator.validate(validation_1, field, "1-jan-2020", null).isEmpty());
@@ -194,17 +202,17 @@ public class ValidatorTests {
 				.type("date-range")
 				.params(map2)
 				.build();
-		
+
 		assertFalse(dateRangeValidator.validate(validation_1, field, null, null).isEmpty());
 		assertFalse(dateRangeValidator.validate(validation_1, field, "", null).isEmpty());
 
 		assertNull(dateRangeValidator.validate(validation, field, "01-Oct-2020", null));
-		
+
 		//case : not pass date start and end 
 		IValidation validation_2 = ApplicationValidation.builder()
 				.type("date-range")
 				.build();
-		
+
 		assertFalse(dateRangeValidator.validate(validation_2, field, "", null).isEmpty());
 		assertFalse(dateRangeValidator.validate(validation_2, field, null, null).isEmpty());
 
@@ -220,17 +228,17 @@ public class ValidatorTests {
 				.build();
 		assertFalse(dateRangeValidator.validate(validation_1, field, null, null).isEmpty());
 		assertFalse(dateRangeValidator.validate(validation_1, field, "", null).isEmpty());
-		
+
 		assertNotNull(dateRangeValidator.validate(validation_3, field, "", null));
 		assertNotNull(dateRangeValidator.validate(validation_3, field, null, null));
 		assertNotNull(dateRangeValidator.validate(validation_3, field, "01-Jan-1990", null));
-		
+
 		/**************************************field require false********************************************/
 
 		field = ApplicationField.builder().required(false).build();
 		assertNull(dateRangeValidator.validate(validation_1, field, "", null));
 		assertNull(dateRangeValidator.validate(validation_1, field, null, null));
-		
+
 		assertNull(dateRangeValidator.validate(validation_1, field, "16-aug-2020", null));
 		assertNull(dateRangeValidator.validate(validation_1, field, "15-May-2020", null));
 		assertFalse(dateRangeValidator.validate(validation_1, field, "1-jan-2020", null).isEmpty());
@@ -240,17 +248,17 @@ public class ValidatorTests {
 		//case : pass start date and end date - positive test case start < end
 		assertNull(dateRangeValidator.validate(validation, field, "", null));
 		assertNull(dateRangeValidator.validate(validation, field, null, null));
-		
+
 		assertNull(dateRangeValidator.validate(validation, field, "01-Oct-2020", null));
 
 		//case : not pass date start and end 
 		assertFalse(dateRangeValidator.validate(validation_2, field, "", null).isEmpty()); 
 		assertFalse(dateRangeValidator.validate(validation_2, field, null, null).isEmpty());
-		
+
 		//case : pass date start and end - negative test case start > end.. 
 		assertNull(dateRangeValidator.validate(validation_3, field, "", null));
 		assertNull(dateRangeValidator.validate(validation_3, field, null, null));
-		
+
 		assertNull(dateRangeValidator.validate(validation_3, field, null, null));
 		assertFalse(dateRangeValidator.validate(validation_3, field, "01-Jan-1990", null).isEmpty());
 
@@ -294,7 +302,7 @@ public class ValidatorTests {
 	@Test
 	public void testNumericValidator() {
 		IValidation validation = ApplicationValidation.builder().type("numeric").build();
-		
+
 		//field require true 
 		IApplicationField field = ApplicationField.builder().required(true).build(); 
 
@@ -303,11 +311,11 @@ public class ValidatorTests {
 
 		assertFalse(numericValidator.validate(validation, field, null, null).isEmpty());
 		assertFalse(numericValidator.validate(validation, field, "", null).isEmpty());
-		
+
 		assertFalse(numericValidator.validate(validation, field, "test", null).isEmpty());
 		assertFalse(numericValidator.validate(validation, field, "123456te", null).isEmpty());
 		assertFalse(numericValidator.validate(validation, field, "97a", null).isEmpty());
-		
+
 		//field require false
 		field = ApplicationField.builder().required(false).build();
 
@@ -316,31 +324,93 @@ public class ValidatorTests {
 
 		assertNull(numericValidator.validate(validation, field, null, null));
 		assertNull(numericValidator.validate(validation, field, "", null));
-		
+
 		assertFalse(numericValidator.validate(validation, field, "test", null).isEmpty());
 		assertFalse(numericValidator.validate(validation, field, "123456te", null).isEmpty());
 		assertFalse(numericValidator.validate(validation, field, "97a", null).isEmpty());
 	}
-	
+
 	@Test
-    public void testDateValidator() {
+	public void testDateValidator() {
 		// Date Format Should be --   dd-MMM-yyyy 
-        IValidation validation = ApplicationValidation.builder().type("date").build();
-        IApplicationField field = ApplicationField.builder().required(true).build();
+		IValidation validation = ApplicationValidation.builder().type("date").build();
+		IApplicationField field = ApplicationField.builder().required(true).build();
 
-        assertNull(dateValidator.validate(validation, field, "16-aug-2020", null));
-        assertNull(dateValidator.validate(validation, field, "01-jan-2020", null));
-        
+		assertNull(dateValidator.validate(validation, field, "16-aug-2020", null));
+		assertNull(dateValidator.validate(validation, field, "01-jan-2020", null));
 
-        assertFalse(dateValidator.validate(validation, field, "12/29/2016", null).isEmpty());
-        assertFalse(dateValidator.validate(validation, field, "2019-02-28", null).isEmpty());
-        
-        //field require false
-      	field = ApplicationField.builder().required(false).build();
-      	assertNull(dateValidator.validate(validation, field, "16-aug-2020", null));
-        assertNull(dateValidator.validate(validation, field, "01-jan-2020", null));
-        assertNull(dateValidator.validate(validation, field, "12/29/2016", null));
-        assertNull(dateValidator.validate(validation, field, "2019-02-28", null));
-      	
-    }
+
+		assertFalse(dateValidator.validate(validation, field, "12/29/2016", null).isEmpty());
+		assertFalse(dateValidator.validate(validation, field, "2019-02-28", null).isEmpty());
+
+		//field require false
+		field = ApplicationField.builder().required(false).build();
+		assertNull(dateValidator.validate(validation, field, "16-aug-2020", null));
+		assertNull(dateValidator.validate(validation, field, "01-jan-2020", null));
+		assertNull(dateValidator.validate(validation, field, "12/29/2016", null));
+		assertNull(dateValidator.validate(validation, field, "2019-02-28", null));
+	}
+
+	@Test
+	public void testBooleanValidator() {
+		IValidation validation = ApplicationValidation.builder().type("boolean").build();
+		//field require true
+		IApplicationField field = ApplicationField.builder().required(true).build();
+
+		assertNull(booleanValidator.validate(validation, field, "true", null));
+		assertNull(booleanValidator.validate(validation, field, "false", null));
+		assertNull(booleanValidator.validate(validation, field, true, null));
+		assertNull(booleanValidator.validate(validation, field, false, null));
+		assertNull(booleanValidator.validate(validation, field, "0", null));
+		assertNull(booleanValidator.validate(validation, field, "1", null));
+
+		assertFalse(booleanValidator.validate(validation, field, "", null).isEmpty());
+		assertFalse(booleanValidator.validate(validation, field, null, null).isEmpty());
+		assertFalse(booleanValidator.validate(validation, field, "12", null).isEmpty());
+		assertFalse(booleanValidator.validate(validation, field, "test", null).isEmpty());
+
+
+		//field require false
+		field = ApplicationField.builder().required(false).build();
+		assertNull(booleanValidator.validate(validation, field, "true", null));
+		assertNull(booleanValidator.validate(validation, field, "false", null));
+		assertNull(booleanValidator.validate(validation, field, true, null));
+		assertNull(booleanValidator.validate(validation, field, false, null));
+		assertNull(booleanValidator.validate(validation, field, "0", null));
+		assertNull(booleanValidator.validate(validation, field, "1", null));
+
+		assertNull(booleanValidator.validate(validation, field, "", null));
+		assertNull(booleanValidator.validate(validation, field, null, null));
+		assertFalse(booleanValidator.validate(validation, field, "12", null).isEmpty());
+		assertFalse(booleanValidator.validate(validation, field, "test", null).isEmpty());
+	}
+
+	@Test
+	public void testObjectValidator() {
+		IValidation validation = ApplicationValidation.builder().type("object").build();
+		//field require true
+		IApplicationField field = ApplicationField.builder().required(true).build();
+
+		assertNull(objectValidator.validate(validation, field, "any string", null));
+
+		Map<String, Object> mapObject = new HashMap<String, Object>();
+		mapObject.put("temp", 6);
+		mapObject.put("test", 3);
+		assertNull(objectValidator.validate(validation, field, mapObject, null));
+		assertNull(objectValidator.validate(validation, field, 123, null));
+
+		assertFalse(objectValidator.validate(validation, field, null, null).isEmpty());
+		assertFalse(objectValidator.validate(validation, field, "", null).isEmpty());
+
+
+		//field require false
+		field = ApplicationField.builder().required(false).build();
+		assertNull(objectValidator.validate(validation, field, "string", null));
+		assertNull(objectValidator.validate(validation, field, mapObject, null));
+
+		assertNull(objectValidator.validate(validation, field, null, null));
+		assertNull(objectValidator.validate(validation, field, "", null));
+
+		assertNull(objectValidator.validate(validation, field, 123, null));
+	}
 }
