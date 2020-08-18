@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RentCollectionService {
-	List<RentCollection> collections = new ArrayList<RentCollection>();
+        	List<RentCollection> collections = new ArrayList<RentCollection>();
 	Set<RentDemand> processedDemand=new LinkedHashSet<RentDemand>();
 	
 /**
@@ -43,7 +43,7 @@ public List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, RentP
 			// Start the interest calculation
 			//Date generationDate = new Date(rentDemand.getGenerationDate());
 
-			float daysBetween = ((payment.getDateOfPayment() - rentDemand.getGenerationDate()) / (1000 * 60 * 60 * 24)) + 1-rentDemand.getInitialGracePeriod();
+			float daysBetween = ((payment.getDateOfPayment() - rentDemand.getGenerationDate()) / (1000 * 60 * 60 * 24)) + 1;
 			// If days cross the gross period then the interest is applicable
 			if (daysBetween > rentDemand.getInitialGracePeriod()) {
 				double interest = ((rentDemand.getRemainingPrincipal()* interestRate) / 100) * (daysBetween / 365);
@@ -180,6 +180,32 @@ public Map getCollectionsForPayment(List<RentDemand> demands, List<RentPayment> 
                 responseMap.put("colection", collections);
 	 return responseMap;	
 	}
+    
+
+
+ public void paymentSummary(List<RentDemand> demands,RentAccount rentAccount) {
+	 double balancePrincipal =0;
+	 double balanceInterest =0;
+	 double balanceAmount =0;
+	 final double interestRate = 24;
+	 
+	 
+	 for(RentDemand rentDemand:demands) {
+		 double interest=0;
+		 float daysBetween = ((new Date().getTime()- rentDemand.getGenerationDate()) / (1000 * 60 * 60 * 24)) + 1;
+			// If days cross the gross period then the interest is applicable
+			if (daysBetween > rentDemand.getInitialGracePeriod()) {
+				 interest = ((rentDemand.getRemainingPrincipal()* interestRate) / 100) * (daysBetween / 365);
+			}
+			balanceInterest+=interest;
+			balancePrincipal+=rentDemand.getRemainingPrincipal();	
+		 
+		 
+	 }
+	 balanceAmount=rentAccount.getRemainingAmount();
+	 
+	 
+ }
 
 
 }
