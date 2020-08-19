@@ -1,7 +1,5 @@
 package org.egov.cpt.models;
 
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;

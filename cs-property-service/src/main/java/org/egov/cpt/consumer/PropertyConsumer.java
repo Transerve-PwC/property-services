@@ -2,11 +2,8 @@ package org.egov.cpt.consumer;
 
 import java.util.HashMap;
 
-import org.egov.cpt.service.OwnershipTransferService;
-import org.egov.cpt.service.PropertyService;
 import org.egov.cpt.service.notification.PropertyNotificationService;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
-import org.egov.cpt.web.contracts.PropertyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -23,27 +20,21 @@ public class PropertyConsumer {
 
 	private PropertyNotificationService notificationService;
 	
-	private PropertyService propertyService;
-	
-	private OwnershipTransferService ownershipTransferService;
-	
 	@Autowired
-	public PropertyConsumer(PropertyNotificationService notificationService, PropertyService propertyService, OwnershipTransferService ownershipTransferService) {
+	public PropertyConsumer(PropertyNotificationService notificationService) {
 		this.notificationService = notificationService;
-		this.propertyService = propertyService;
-		this.ownershipTransferService = ownershipTransferService;
 	}
 	
 	@KafkaListener(topics = {"${ownership.transfer.save.topic}", "${ownership.transfer.update.topic}"})
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-		ObjectMapper mapper = new ObjectMapper();
-		OwnershipTransferRequest ownershipTransferRequest = new OwnershipTransferRequest();
 		try {
+			ObjectMapper mapper = new ObjectMapper();
+			OwnershipTransferRequest ownershipTransferRequest = new OwnershipTransferRequest();
 			log.info("Consuming record: " + record);
 			ownershipTransferRequest = mapper.convertValue(record, OwnershipTransferRequest.class);
+			notificationService.process(ownershipTransferRequest);
 		} catch (Exception e) {
 			log.error("Error while listening to value: " + record + " on topic " + topic + ": " + e);
 		}
-		notificationService.process(ownershipTransferRequest);
 	}
 }
