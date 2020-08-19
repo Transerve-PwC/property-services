@@ -72,7 +72,7 @@ public class DateRangeValidator implements IApplicationValidator {
 	private boolean isValid(IValidation validation, Long fieldValue) {
 		try {
 			if (null != fieldValue) {
-				Date actualDateValidat = new Date((long)1597827021*1000);
+				Date actualDateValidat = new Date((long)fieldValue*1000);
 
 				String startDateStr = null ;
 				String endDateStr = null;
