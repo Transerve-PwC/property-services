@@ -56,6 +56,21 @@ public class PropertyValidator {
 
 		List<Property> property = request.getProperties();
 
+		property.stream()
+			.filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners()))
+			.forEach(p -> p.getPropertyDetails().getOwners().stream()
+					.filter( o -> {
+						if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
+							errorMap.put("INVALID MOBILE NUMBER",
+									"MobileNumber is not valid for user : " + o.getOwnerDetails().getOwnerName());
+							return false;
+						}else {
+							return true;
+						}
+					}));
+		
+		
+		/* Old code ::
 		property.forEach(properties -> {
 			if (!CollectionUtils.isEmpty(properties.getPropertyDetails().getOwners())) {
 				properties.getPropertyDetails().getOwners().forEach(owner -> {
@@ -65,7 +80,7 @@ public class PropertyValidator {
 					}
 				});
 			}
-		});
+		});*/
 	}
 
 	private boolean isMobileNumberValid(String mobileNumber) {
