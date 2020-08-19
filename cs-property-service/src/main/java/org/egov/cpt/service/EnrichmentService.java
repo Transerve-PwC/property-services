@@ -105,20 +105,6 @@ public class EnrichmentService {
 				}
 			});
 		}
-		setPropertyIdgenIds(request);
-	}
-
-	private void setPropertyIdgenIds(PropertyRequest request) {
-		RequestInfo requestInfo = request.getRequestInfo();
-		String tenantId = request.getProperties().get(0).getTenantId();
-		List<Property> properties = request.getProperties();
-
-		List<String> propertyNumbers = setIdgenIds(requestInfo, tenantId, properties.size(),
-				config.getPropertyNumberIdgenNamePM(), config.getPropertyNumberIdgenFormatPM());
-		ListIterator<String> itr = propertyNumbers.listIterator();
-		properties.forEach(property -> {
-			property.setPropertyNumber(itr.next());
-		});
 	}
 
 	private OwnerDetails getOwnerShipDetails(Owner owner, Property property, RequestInfo requestInfo,

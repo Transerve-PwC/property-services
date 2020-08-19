@@ -262,14 +262,14 @@ public class PropertyValidator {
 		/**
 		 * A property that is rejected can be recreated.
 		 */
-		String tenantId = properties.get(0).getTenantId();
+		/*String tenantId = properties.get(0).getTenantId();
 		BusinessService otBusinessService = workflowService.getBusinessService(tenantId, request.getRequestInfo(), PTConstants.BUSINESS_SERVICE_PM);
 		List<State> stateList= otBusinessService.getStates();
 		List<String> states = stateList.stream()
 			.map(State::getState)
 			.filter(s -> !s.equalsIgnoreCase(PTConstants.PM_REJECTED))
 			.collect(Collectors.toList());
-		log.info("states:"+states);
+		log.info("states:"+states);*/
 		
 		/**
 		 * Search for existing properties with the same transit number.
@@ -278,7 +278,6 @@ public class PropertyValidator {
 			.map(Property::getTransitNumber)
 			.filter(transitNumber -> !repository.getProperties(
 					PropertyCriteria.builder()
-						.state(states)
 						.transitNumber(transitNumber)
 						.build()
 				).isEmpty()
