@@ -77,7 +77,7 @@ public class ApplicationValidatorService {
 		List<Application> applications = request.getApplications();
 		applications.stream().forEach(application -> {
 			String propertyId = application.getProperty().getId();
-			// validatePropertyExists(request.getRequestInfo(), propertyId);
+			validatePropertyExists(request.getRequestInfo(), propertyId);
 			JsonNode applicationDetails = application.getApplicationDetails();
 			try {
 				String applicationDetailsString = this.objectMapper.writeValueAsString(applicationDetails);
@@ -85,10 +85,13 @@ public class ApplicationValidatorService {
 				DocumentContext applicationObjectContext = JsonPath.using(conf).parse(applicationDetailsString);
 				String moduleNameString = application.getBranchType() + "_" + application.getModuleType() + "_"
 						+ application.getApplicationType();
-				this.performValidationsFromMDMS(moduleNameString, applicationObjectContext, request.getRequestInfo(),
+				Map<String, List<String>> errorMap = this.performValidationsFromMDMS(moduleNameString, applicationObjectContext, request.getRequestInfo(),
 						application.getTenantId());
+				
+				if (!errorMap.isEmpty()) {
+					throw new CustomException("INVALID_FIELDS", "Please enter the valid fields " +errorMap.toString());
+				}
 			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -97,7 +100,7 @@ public class ApplicationValidatorService {
 
 	private void validatePropertyExists(RequestInfo requestInfo, String propertyId) {
 		Property property = propertyRepository.findPropertyById(propertyId);
-		if (property == null || property.getState() != PSConstants.PM_APPROVED) {
+		if (property == null || !property.getState().contentEquals(PSConstants.PM_APPROVED)) {
 			throw new CustomException("INVALID_PROPERTY", "Could not find property with the given id");
 		}
 	}
