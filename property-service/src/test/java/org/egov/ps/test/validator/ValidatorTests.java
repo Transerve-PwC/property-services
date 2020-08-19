@@ -64,7 +64,7 @@ public class ValidatorTests {
 
 	@Autowired
 	ArrayValidator arrayValidator;
-	
+
 	@Autowired
 	ArrayLengthValidator arrayLengthValidator;
 
@@ -195,11 +195,12 @@ public class ValidatorTests {
 		assertFalse(dateRangeValidator.validate(validation_1, field, null, null).isEmpty());
 		assertFalse(dateRangeValidator.validate(validation_1, field, "", null).isEmpty());
 
-		assertNull(dateRangeValidator.validate(validation_1, field, "16-aug-2020", null));
-		assertNull(dateRangeValidator.validate(validation_1, field, "15-May-2020", null));
+		assertNull(dateRangeValidator.validate(validation_1, field, 1597827021, null));
+		assertNull(dateRangeValidator.validate(validation_1, field, "1597827021", null));
+
+		assertFalse(dateRangeValidator.validate(validation_1, field, "15-May-2020", null).isEmpty());
 		assertFalse(dateRangeValidator.validate(validation_1, field, "1-jan-2020", null).isEmpty());
 		assertFalse(dateRangeValidator.validate(validation_1, field, "1-Dec-2020", null).isEmpty());
-
 
 		//case : pass start date and end date - positive test case start < end
 		Map<String, Object> map2 = new HashMap<String, Object>();
@@ -214,7 +215,10 @@ public class ValidatorTests {
 		assertFalse(dateRangeValidator.validate(validation_1, field, null, null).isEmpty());
 		assertFalse(dateRangeValidator.validate(validation_1, field, "", null).isEmpty());
 
-		assertNull(dateRangeValidator.validate(validation, field, "01-Oct-2020", null));
+		assertNull(dateRangeValidator.validate(validation_1, field, 1597827021, null));
+		assertNull(dateRangeValidator.validate(validation_1, field, "1597827021", null));
+
+		assertFalse(dateRangeValidator.validate(validation, field, "01-Oct-2020", null).isEmpty());
 
 		//case : not pass date start and end 
 		IValidation validation_2 = ApplicationValidation.builder()
@@ -223,7 +227,6 @@ public class ValidatorTests {
 
 		assertFalse(dateRangeValidator.validate(validation_2, field, "", null).isEmpty());
 		assertFalse(dateRangeValidator.validate(validation_2, field, null, null).isEmpty());
-
 
 		//case : pass date start and end - negative test case start > end.. 
 		map2 = new HashMap<String, Object>();
@@ -234,8 +237,6 @@ public class ValidatorTests {
 				.type("date-range") 
 				.params(map2)
 				.build();
-		assertFalse(dateRangeValidator.validate(validation_1, field, null, null).isEmpty());
-		assertFalse(dateRangeValidator.validate(validation_1, field, "", null).isEmpty());
 
 		assertNotNull(dateRangeValidator.validate(validation_3, field, "", null));
 		assertNotNull(dateRangeValidator.validate(validation_3, field, null, null));
@@ -247,17 +248,20 @@ public class ValidatorTests {
 		assertNull(dateRangeValidator.validate(validation_1, field, "", null));
 		assertNull(dateRangeValidator.validate(validation_1, field, null, null));
 
-		assertNull(dateRangeValidator.validate(validation_1, field, "16-aug-2020", null));
-		assertNull(dateRangeValidator.validate(validation_1, field, "15-May-2020", null));
+		assertNull(dateRangeValidator.validate(validation_1, field, 1597827021, null));
+		assertNull(dateRangeValidator.validate(validation_1, field, "1597827021", null));
+
 		assertFalse(dateRangeValidator.validate(validation_1, field, "1-jan-2020", null).isEmpty());
 		assertFalse(dateRangeValidator.validate(validation_1, field, "1-Dec-2020", null).isEmpty());
-
 
 		//case : pass start date and end date - positive test case start < end
 		assertNull(dateRangeValidator.validate(validation, field, "", null));
 		assertNull(dateRangeValidator.validate(validation, field, null, null));
 
-		assertNull(dateRangeValidator.validate(validation, field, "01-Oct-2020", null));
+		assertNull(dateRangeValidator.validate(validation_1, field, 1597827021, null));
+		assertNull(dateRangeValidator.validate(validation_1, field, "1597827021", null));
+
+		assertFalse(dateRangeValidator.validate(validation, field, "01-Oct-2020", null).isEmpty());
 
 		//case : not pass date start and end 
 		assertFalse(dateRangeValidator.validate(validation_2, field, "", null).isEmpty()); 
@@ -285,7 +289,9 @@ public class ValidatorTests {
 				.build();
 
 		IApplicationField field = ApplicationField.builder().required(true).build();
-		assertNull(minMaxValidator.validate(validation, field, "tested", null));
+		assertNull(minMaxValidator.validate(validation, field, 5, null));
+
+		assertFalse(minMaxValidator.validate(validation, field, 7, null).isEmpty());
 
 		assertFalse(minMaxValidator.validate(validation, field, "", null).isEmpty());
 		assertFalse(minMaxValidator.validate(validation, field, null, null).isEmpty());
@@ -297,7 +303,11 @@ public class ValidatorTests {
 		//field require false
 
 		field = ApplicationField.builder().required(false).build();
-		assertNull(minMaxValidator.validate(validation, field, "tested", null));
+
+		assertNull(minMaxValidator.validate(validation, field, 5, null));
+
+		assertFalse(minMaxValidator.validate(validation, field, 7, null).isEmpty());
+		assertFalse(minMaxValidator.validate(validation, field, "tested", null).isEmpty());
 
 		assertNull(minMaxValidator.validate(validation, field, "", null));
 		assertNull(minMaxValidator.validate(validation, field, null, null));
@@ -340,23 +350,23 @@ public class ValidatorTests {
 
 	@Test
 	public void testDateValidator() {
-		// Date Format Should be --   dd-MMM-yyyy 
 		IValidation validation = ApplicationValidation.builder().type("date").build();
 		IApplicationField field = ApplicationField.builder().required(true).build();
 
-		assertNull(dateValidator.validate(validation, field, "16-aug-2020", null));
-		assertNull(dateValidator.validate(validation, field, "01-jan-2020", null));
-
-
-		assertFalse(dateValidator.validate(validation, field, "12/29/2016", null).isEmpty());
+		assertNull(dateValidator.validate(validation, field, 1597827021, null));
+		assertNull(dateValidator.validate(validation, field, "1597827021", null));
+		
+		assertFalse(dateValidator.validate(validation, field, "16-aug-2020", null).isEmpty());
 		assertFalse(dateValidator.validate(validation, field, "2019-02-28", null).isEmpty());
-
+		
+		
 		//field require false
-		field = ApplicationField.builder().required(false).build();
-		assertNull(dateValidator.validate(validation, field, "16-aug-2020", null));
-		assertNull(dateValidator.validate(validation, field, "01-jan-2020", null));
-		assertNull(dateValidator.validate(validation, field, "12/29/2016", null));
-		assertNull(dateValidator.validate(validation, field, "2019-02-28", null));
+		assertNull(dateValidator.validate(validation, field, 1597827021, null));
+		assertNull(dateValidator.validate(validation, field, "1597827021", null));
+		
+		assertFalse(dateValidator.validate(validation, field, "16-aug-2020", null).isEmpty());
+		assertFalse(dateValidator.validate(validation, field, "2019-02-28", null).isEmpty());
+		
 	}
 
 	@Test
@@ -440,12 +450,12 @@ public class ValidatorTests {
 		//field require true
 		field = ApplicationField.builder().required(true).build();
 		assertNull(arrayValidator.validate(validation, field, arr, null));
-		
+
 		assertFalse(arrayValidator.validate(validation, field, "", null).isEmpty());
 		assertFalse(arrayValidator.validate(validation, field, null, null).isEmpty());
 
 	}
-	
+
 	@Test
 	public void testArrayLengthValidator() {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -471,7 +481,7 @@ public class ValidatorTests {
 		field = ApplicationField.builder().required(false).build();
 		assertNull(arrayLengthValidator.validate(validation, field, arr, null));
 		assertFalse(arrayLengthValidator.validate(validation, field, arr_1, null).isEmpty());
-		
+
 		assertNull(arrayLengthValidator.validate(validation, field, null, null));
 		assertNull(arrayLengthValidator.validate(validation, field, "", null));
 	}

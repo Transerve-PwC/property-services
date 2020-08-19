@@ -34,7 +34,13 @@ public class MinMaxValidator implements IApplicationValidator {
 				return null;
 			}
 
-			String trimmedValue = isEmpty ? null : value.toString().trim();
+			Integer trimmedValue = null;
+			try {
+				trimmedValue = isEmpty ? null : Integer.parseInt(value.toString().trim());
+			}catch (Exception e) {
+				return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
+			}
+			
 			if (!isValid(validation, trimmedValue)) {
 				return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
 			}
@@ -42,12 +48,12 @@ public class MinMaxValidator implements IApplicationValidator {
 		return null;
 	}
 
-	private boolean isValid(IValidation validation, String fieldValue) {
-		if (null != fieldValue && !fieldValue.isEmpty()) {
+	private boolean isValid(IValidation validation, Integer fieldValue) {
+		if (null != fieldValue) {
 			int max = (int) validation.getParams().get("max");
 			int min = (int) validation.getParams().get("min");
 
-			if(fieldValue.length() < min || fieldValue.length() > max) {
+			if(fieldValue < min || fieldValue > max) {
 				return false;
 			}
 			return true;
