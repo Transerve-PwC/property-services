@@ -9,7 +9,9 @@ import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.repository.ServiceRequestRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,18 +39,22 @@ public class WorkflowService {
 	 * @param requestInfo The RequestInfo object of the request
 	 * @return BusinessService for the the given tenantId
 	 */
+	@Cacheable(value = "businessServices", key = "#tenantId, #businessServiceName")
 	public BusinessService getBusinessService(String tenantId, RequestInfo requestInfo, String businessServiceName) {
 
 		StringBuilder url = getSearchURLWithParams(tenantId, businessServiceName);
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
-		BusinessServiceResponse response = null;
 		try {
+			BusinessServiceResponse response = null;
 			response = mapper.convertValue(result, BusinessServiceResponse.class);
+			if (CollectionUtils.isEmpty(response.getBusinessServices())) {
+				throw new CustomException("NO BUSINESS SERVICE", String.format("No business service found with name %s", businessServiceName));
+			}
+			return response.getBusinessServices().get(0);
 		} catch (IllegalArgumentException e) {
 			throw new CustomException("PARSING ERROR", "Failed to parse response of calculate");
 		}
-		return response.getBusinessServices().get(0);
 	}
 
 	/**

@@ -2,10 +2,13 @@ package org.egov.cpt.validator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
@@ -78,6 +81,9 @@ public class PropertyValidator {
 	public void validateCreateRequest(PropertyRequest request) {
 
 		Map<String, String> errorMap = new HashMap<>();
+		if (CollectionUtils.isEmpty(request.getProperties())) {
+			throw new CustomException(Collections.singletonMap("NO PROPERTIES FOUND", "Please provide atleast property that is to be created"));
+		}
 
 		validateTransitNumber(request, errorMap);
 		validateOwner(request, errorMap);
@@ -241,30 +247,46 @@ public class PropertyValidator {
 
 	private void validateTransitNumber(PropertyRequest request, Map<String, String> errorMap) {
 
-		List<Property> prop = request.getProperties();
-		prop.forEach(properties -> {
-			if (properties.getTransitNumber().length() < 4 || properties.getTransitNumber().length() > 25) {
-				errorMap.put("INVALID TRANSIT NUMBER", "Transit number is not valid ");
-			}
-		});
+		/**
+		 * Make sure we have a valid transit number.
+		 */
+		List<Property> properties = request.getProperties();
+		Optional<Property> propertyWithInvalidTransitNumber = properties.stream().filter(property -> property.getTransitNumber() == null 
+				|| property.getTransitNumber().length() < 4 
+				|| property.getTransitNumber().length() > 25)
+			.findAny();
+		if (propertyWithInvalidTransitNumber.isPresent()) {
+			throw new CustomException(Collections.singletonMap("INVALID TRANSIT NUMBER", String.format("Invalid transit number '%s' found", propertyWithInvalidTransitNumber.get().getTransitNumber())));
+		}
 
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
+		/**
+		 * A property that is rejected can be recreated.
+		 */
+		String tenantId = properties.get(0).getTenantId();
+		BusinessService otBusinessService = workflowService.getBusinessService(tenantId, request.getRequestInfo(), PTConstants.BUSINESS_SERVICE_PM);
+		List<State> stateList= otBusinessService.getStates();
+		List<String> states = stateList.stream()
+			.map(State::getState)
+			.filter(s -> !s.equalsIgnoreCase(PTConstants.PM_REJECTED))
+			.collect(Collectors.toList());
+		log.info("states:"+states);
+		
+		/**
+		 * Search for existing properties with the same transit number.
+		 */
+		Optional<String> existingTransitNumberOptional = properties.stream()
+			.map(Property::getTransitNumber)
+			.filter(transitNumber -> !repository.getProperties(
+					PropertyCriteria.builder()
+						.state(states)
+						.transitNumber(transitNumber)
+						.build()
+				).isEmpty()
+			).findAny();
 
-		PropertyCriteria criteria = new PropertyCriteria();
-//      criteria.setTransitNumber(request.getProperties().get(0).getTransitNumber()); // TODO loop it array later
-
-		List<Property> properties = repository.getProperties(criteria);
-
-		properties.forEach(property -> {
-			request.getProperties().forEach(transit -> {
-				if (property.getTransitNumber().equalsIgnoreCase(transit.getTransitNumber())) {
-					errorMap.put("INVALID TRANSIT NUMBER", "Transit number already exist");
-				}
-			});
-
-		});
-
+		if (existingTransitNumberOptional.isPresent()) {
+			throw new CustomException(Collections.singletonMap("INVALID TRANSIT NUMBER", String.format("Transit number '%s' already exists", existingTransitNumberOptional.get())));
+		}
 	}
 
 	/**

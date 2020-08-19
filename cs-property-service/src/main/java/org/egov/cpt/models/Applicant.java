@@ -1,9 +1,6 @@
 package org.egov.cpt.models;
 
 import java.math.BigDecimal;
-import java.util.List;
-
-import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -48,15 +45,14 @@ public class Applicant {
 
 	@JsonProperty("adhaarNumber")
 	private String adhaarNumber;
-	
+
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
-	
+
 	@JsonProperty("feeAmount")
 	private BigDecimal feeAmount;
 
 	@JsonProperty("aproCharge")
 	private BigDecimal aproCharge;
-
 
 }

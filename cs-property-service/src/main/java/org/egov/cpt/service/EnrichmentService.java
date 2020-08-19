@@ -3,6 +3,7 @@ package org.egov.cpt.service;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -104,6 +105,20 @@ public class EnrichmentService {
 				}
 			});
 		}
+		setPropertyIdgenIds(request);
+	}
+
+	private void setPropertyIdgenIds(PropertyRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		String tenantId = request.getProperties().get(0).getTenantId();
+		List<Property> properties = request.getProperties();
+
+		List<String> propertyNumbers = setIdgenIds(requestInfo, tenantId, properties.size(),
+				config.getPropertyNumberIdgenNamePM(), config.getPropertyNumberIdgenFormatPM());
+		ListIterator<String> itr = propertyNumbers.listIterator();
+		properties.forEach(property -> {
+			property.setPropertyNumber(itr.next());
+		});
 	}
 
 	private OwnerDetails getOwnerShipDetails(Owner owner, Property property, RequestInfo requestInfo,
@@ -754,7 +769,7 @@ public class EnrichmentService {
 	 * 
 	 * meu or applications separate allotment date
 	 */
-	public void postStatusEnrichment(OwnershipTransferRequest ownershipTransferRequest, List<String> endstates) {
+	public void postStatusEnrichment(OwnershipTransferRequest ownershipTransferRequest) {
 		ownershipTransferRequest.getOwners().forEach(latestOwner -> {
 
 			PropertyCriteria criteria = getPropertyCriteriaForOT(ownershipTransferRequest);
@@ -803,6 +818,9 @@ public class EnrichmentService {
 			request.getOwners().forEach(owner -> {
 				if (owner.getProperty().getId() != null)
 					propertyCriteria.setPropertyId(owner.getProperty().getId());
+					ArrayList<String> relations = new ArrayList<String>();
+					relations.add(PTConstants.RELATION_OWNER);
+					propertyCriteria.setRelations(relations);
 			});
 		}
 		return propertyCriteria;

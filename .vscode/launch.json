@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Rented Properties Debug",
+            "request": "launch",
+            "mainClass": "org.egov.cpt.CSPropertyApplication",
+            "projectName": "cs-property-service"
+        },
+        {
+            "type": "java",
+            "name": "Estate Properties Debug",
+            "request": "launch",
+            "mainClass": "org.egov.ps.PropertyServiceApplication",
+            "projectName": "property-service"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+    ]
+}

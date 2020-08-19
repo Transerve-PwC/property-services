@@ -9,24 +9,14 @@ import java.util.Map;
 
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Document;
-import org.egov.cpt.models.DuplicateCopyDocument;
-import org.egov.cpt.models.Mortgage;
-import org.egov.cpt.models.MortgageApplicant;
-import org.egov.cpt.models.MortgageApprovedGrantDetails;
 import org.egov.cpt.models.NoticeGeneration;
 import org.egov.cpt.models.Property;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Component
 public class NoticeRowMapper implements ResultSetExtractor<List<NoticeGeneration>> {
-
-	@Autowired
-	private ObjectMapper mapper;
 
 	@Override
 	public List<NoticeGeneration> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -67,8 +57,6 @@ public class NoticeRowMapper implements ResultSetExtractor<List<NoticeGeneration
 	}
 
 	private void addChildrenToProperty(ResultSet rs, NoticeGeneration currentapplication) throws SQLException {
-		Map<String, MortgageApplicant> applicantMap = new HashMap<>();
-		NoticeGeneration applicant = null;
 
 		AuditDetails auditDetails = AuditDetails.builder().createdBy(rs.getString("created_by"))
 				.createdTime(rs.getLong("created_time")).lastModifiedBy(rs.getString("modified_by"))

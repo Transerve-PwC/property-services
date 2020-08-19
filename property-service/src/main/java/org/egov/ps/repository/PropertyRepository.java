@@ -20,28 +20,28 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Repository
 public class PropertyRepository {
-	
+
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	private Producer producer;
-	
+
 	@Autowired
 	private PropertyQueryBuilder queryBuilder;
-	
+
 	@Autowired
 	private PropertyRowMapper rowMapper;
-	
+
 	@Autowired
 	private Configuration config;
-	
+
 	@Autowired
 	WorkflowIntegrator workflowIntegrator;
-	
+
 	@Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-	
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
 	public List<Property> getProperties(PropertyCriteria criteria) {
 
 		Map<String, Object> preparedStmtList = new HashMap<>();
@@ -49,4 +49,12 @@ public class PropertyRepository {
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, rowMapper);
 	}
 
+	public Property findPropertyById(String propertyId) {
+		PropertyCriteria propertySearchCriteria = PropertyCriteria.builder().propertyId(propertyId).build();
+		List<Property> properties = this.getProperties(propertySearchCriteria);
+		if (properties == null || properties.isEmpty()) {
+			return null;
+		}
+		return properties.get(0);
+	}
 }

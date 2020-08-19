@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.config.Configuration;
-import org.egov.ps.model.Applicant;
 import org.egov.ps.model.Application;
 import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
@@ -312,28 +311,12 @@ public class EnrichmentService {
 			applications.forEach(application -> {
 				String gen_application_id = UUID.randomUUID().toString();
 				AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-				Applicant applicant = getApplicant(application, requestInfo, gen_application_id, auditDetails);
 
 				application.setId(gen_application_id);
 				application.setAuditDetails(auditDetails);
-				application.setApplicant(applicant);
 			});
 			setIdgenIds(request);
 		}
-	}
-
-	private Applicant getApplicant(Application application, RequestInfo requestInfo, String gen_application_id, AuditDetails auditDetails) {
-		Applicant applicant = application.getApplicant();
-		String gen_applicant_id = UUID.randomUUID().toString();
-		
-		applicant.setId(gen_applicant_id);
-		applicant.setTenantId(application.getTenantId());
-		applicant.setPropertyId(application.getPropertyId());
-		applicant.setApplicationId(gen_application_id);
-		applicant.setUserId(requestInfo.getUserInfo().getUuid());
-		applicant.setAuditDetails(auditDetails);
-		
-		return applicant;
 	}
 
 	/**

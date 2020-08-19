@@ -124,7 +124,7 @@ public class PaymentUpdateService {
 						List<String> endStates = Collections.nCopies(updateRequest.getOwners().size(),
 								PTConstants.STATUS_APPROVED);
 
-						enrichmentService.postStatusEnrichment(updateRequest, endStates);
+//						enrichmentService.postStatusEnrichment(updateRequest, endStates);
 
 						Map<String, Boolean> idToIsStateUpdatableMap = util
 								.getIdToIsStateUpdatableMap(otBusinessService, owners);
@@ -159,8 +159,7 @@ public class PaymentUpdateService {
 						List<String> dcEndStates = Collections.nCopies(
 								updateDCRequest.getDuplicateCopyApplications().size(), PTConstants.STATUS_APPROVED);
 
-//						TODO: add enrichment
-						enrichmentService.postStatusEnrichmentDC(updateDCRequest, dcEndStates);
+//						enrichmentService.postStatusEnrichmentDC(updateDCRequest, dcEndStates);
 
 						Map<String, Boolean> idToIsStateUpdatableMapDc = util
 								.getIdToIsStateUpdatableMapDc(dcBusinessService, dcApplications);

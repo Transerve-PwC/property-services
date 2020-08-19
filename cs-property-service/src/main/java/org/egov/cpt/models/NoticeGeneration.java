@@ -47,6 +47,9 @@ public class NoticeGeneration {
 	@JsonProperty("memoNumber")
 	private String memoNumber;
 	
+	@JsonProperty("allotmentNumber")
+	private String allotmentNumber;
+	
 	@JsonProperty("memoDate")
 	private Long memoDate;
 	

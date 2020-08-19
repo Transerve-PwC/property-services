@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 	@Override
 	public List<DuplicateCopy> extractData(ResultSet rs) throws SQLException, DataAccessException {
 
-		Map<String, DuplicateCopy> applicationMap = new HashMap<>();
+		LinkedHashMap<String, DuplicateCopy> applicationMap = new LinkedHashMap<>();
 		while (rs.next()) {
 			String applicationId = rs.getString("appid");
 			DuplicateCopy currentapplication = applicationMap.get(applicationId);
@@ -46,7 +47,9 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 
 				currentapplication = DuplicateCopy.builder().id(applicationId).property(property)
 						.tenantId(rs.getString("tenantid")).state(rs.getString("state")).action(rs.getString("action"))
-						.applicationNumber(rs.getString("app_number")).auditDetails(auditdetails).build();
+						.applicationNumber(rs.getString("app_number"))
+						.allotmentNumber(rs.getString("owner_allot_number"))
+						.auditDetails(auditdetails).build();
 				applicationMap.put(applicationId, currentapplication);
 			}
 			addChildrenToProperty(rs, currentapplication);

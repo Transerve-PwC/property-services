@@ -1,9 +1,5 @@
 package org.egov.cpt.models;
 
-import java.util.Date;
-
-import org.egov.cpt.models.RentDemand.ModeEnum;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;

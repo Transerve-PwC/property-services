@@ -7,7 +7,7 @@ serviceMaps:
     isTransaction: true
     queryMaps:
 
-    - query: INSERT INTO cs_pt_property_v1 (id, transit_number, tenantid, colony, master_data_state, master_data_action, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_property_v1 (id, transit_number, tenantid, colony, master_data_state, master_data_action,property_number, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: Properties.*
       jsonMaps:
 
@@ -22,6 +22,8 @@ serviceMaps:
       - jsonPath: $.Properties.*.masterDataState
 
       - jsonPath: $.Properties.*.masterDataAction 
+      
+      - jsonPath: $.Properties.*.propertyNumber
       
       - jsonPath: $.Properties.*.auditDetails.createdBy
 
