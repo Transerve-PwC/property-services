@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.annotation.ApplicationValidator;
 import org.egov.ps.model.Application;
+import org.egov.ps.model.ApplicationCriteria;
 import org.egov.ps.model.Property;
 import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.service.MDMSService;
@@ -19,6 +20,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -85,11 +87,11 @@ public class ApplicationValidatorService {
 				DocumentContext applicationObjectContext = JsonPath.using(conf).parse(applicationDetailsString);
 				String moduleNameString = application.getBranchType() + "_" + application.getModuleType() + "_"
 						+ application.getApplicationType();
-				Map<String, List<String>> errorMap = this.performValidationsFromMDMS(moduleNameString, applicationObjectContext, request.getRequestInfo(),
-						application.getTenantId());
-				
+				Map<String, List<String>> errorMap = this.performValidationsFromMDMS(moduleNameString,
+						applicationObjectContext, request.getRequestInfo(), application.getTenantId());
+
 				if (!errorMap.isEmpty()) {
-					throw new CustomException("INVALID_FIELDS", "Please enter the valid fields " +errorMap.toString());
+					throw new CustomException("INVALID_FIELDS", "Please enter the valid fields " + errorMap.toString());
 				}
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
@@ -191,5 +193,32 @@ public class ApplicationValidatorService {
 					a.addAll(b);
 					return a;
 				});
+	}
+
+	public List<Application> getApplications(ApplicationRequest applicationRequest) {
+		ApplicationCriteria criteria = getApplicationCriteria(applicationRequest);
+		List<Application> applications = propertyRepository.getApplications(criteria);
+
+		boolean ifApplicationExists = ApplicationExists(applications);
+		if (!ifApplicationExists) {
+			throw new CustomException("APPLICATION NOT FOUND", "The application to be updated does not exist");
+		} else {
+			return applications;
+		}
+	}
+
+	private boolean ApplicationExists(List<Application> applicationRequest) {
+		return (!CollectionUtils.isEmpty(applicationRequest) && applicationRequest.size() == 1);
+	}
+
+	private ApplicationCriteria getApplicationCriteria(ApplicationRequest request) {
+		ApplicationCriteria applicationCriteria = new ApplicationCriteria();
+		if (!CollectionUtils.isEmpty(request.getApplications())) {
+			request.getApplications().forEach(application -> {
+				if (application.getId() != null)
+					applicationCriteria.setApplicationId(application.getId());
+			});
+		}
+		return applicationCriteria;
 	}
 }

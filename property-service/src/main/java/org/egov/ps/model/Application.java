@@ -1,5 +1,8 @@
 package org.egov.ps.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.egov.ps.util.PropertySerializer;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.springframework.validation.annotation.Validated;
@@ -40,7 +43,7 @@ public class Application {
 	/**
 	 * Property for which we are trying to create this application for.
 	 */
-  @JsonSerialize(using = PropertySerializer.class)
+	@JsonSerialize(using = PropertySerializer.class)
 	@JsonProperty("property")
 	private Property property;
 
@@ -85,7 +88,7 @@ public class Application {
 	 * A JSON string that contains all the application details.
 	 */
 	@JsonProperty("applicationDetails")
-	private JsonNode applicationDetails;
+	private JsonNode applicationDetails = null;
 
 	/**
 	 * The current workflow status of application.
@@ -104,5 +107,24 @@ public class Application {
 	 */
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+	
+	/**
+	 * Documents uploaded for this application.
+	 */
+	@JsonProperty("applicationDocuments")
+	private List<Document> applicationDocuments;
+	
+	public Application addApplicationDocumentsItem(Document applicationDocumentItem) {
+		if (this.applicationDocuments == null) {
+			this.applicationDocuments = new ArrayList<>();
+		}
+		for (Document ownerDocument : applicationDocuments) {
+			if (ownerDocument.getId().equalsIgnoreCase(applicationDocumentItem.getId())) {
+				return this;
+			}
+		}
+		this.applicationDocuments.add(applicationDocumentItem);
+		return this;
+	}
 
 }

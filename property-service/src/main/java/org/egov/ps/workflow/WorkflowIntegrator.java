@@ -7,7 +7,9 @@ import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.config.Configuration;
+import org.egov.ps.model.Application;
 import org.egov.ps.model.Property;
+import org.egov.ps.web.contracts.ApplicationRequest;
 import org.egov.ps.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,7 @@ public class WorkflowIntegrator {
 
 	private static final String UUIDKEY = "uuid";
 
-	private static final String MODULENAMEVALUE = "csp";
+	private static final String MODULENAMEVALUE = "EP";
 
 	private static final String BPAMODULENAMEVALUE = "BPAREG";
 
@@ -137,6 +139,32 @@ public class WorkflowIntegrator {
 		// setting the status back to Property object from wf response
 		request.getProperties().forEach(property -> {
 			property.setState(idStatusMap.get(property.getFileNumber()));
+		});
+	}
+
+	public void callApplicationWorkFlow(ApplicationRequest request) {
+
+		String wfTenantId = request.getApplications().get(0).getTenantId();
+		JSONArray array = new JSONArray();
+		for (Application application : request.getApplications()) {
+			JSONObject obj = new JSONObject();
+			List<Map<String, String>> uuidmaps = new LinkedList<>();
+			List<Map<String, String>> assigneeUuidmaps = new LinkedList<>();
+
+			obj.put(TENANTIDKEY, wfTenantId);
+			obj.put(BUSINESSSERVICEKEY, config.getEbOtSdBusinessServiceValue());
+			obj.put(BUSINESSIDKEY, application.getApplicationNumber());
+			obj.put(ACTIONKEY, application.getAction());
+			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
+			obj.put(AUDITDETAILSKEY, application.getAuditDetails());
+
+			array.add(obj);
+		}
+		Map<String, String> idStatusMap = callCommonWorkflow(array, request.getRequestInfo());
+
+		// setting the status back to Property object from wf response
+		request.getApplications().forEach(application -> {
+			application.setState(idStatusMap.get(application.getApplicationNumber()));
 		});
 	}
 

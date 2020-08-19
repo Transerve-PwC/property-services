@@ -4,14 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.ps.config.Configuration;
+import org.egov.ps.model.Application;
+import org.egov.ps.model.ApplicationCriteria;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyCriteria;
-import org.egov.ps.producer.Producer;
 import org.egov.ps.workflow.WorkflowIntegrator;
-import org.javers.repository.jql.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -22,19 +20,16 @@ import lombok.extern.slf4j.Slf4j;
 public class PropertyRepository {
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private PropertyQueryBuilder propertyQueryBuilder;
 
 	@Autowired
-	private Producer producer;
+	private PropertyRowMapper propertyRowMapper;
+	
+	@Autowired
+	private ApplicationQueryBuilder applicationQueryBuilder;
 
 	@Autowired
-	private PropertyQueryBuilder queryBuilder;
-
-	@Autowired
-	private PropertyRowMapper rowMapper;
-
-	@Autowired
-	private Configuration config;
+	private ApplicationRowMapper applicationRowMapper;
 
 	@Autowired
 	WorkflowIntegrator workflowIntegrator;
@@ -45,8 +40,8 @@ public class PropertyRepository {
 	public List<Property> getProperties(PropertyCriteria criteria) {
 
 		Map<String, Object> preparedStmtList = new HashMap<>();
-		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
-		return namedParameterJdbcTemplate.query(query, preparedStmtList, rowMapper);
+		String query = propertyQueryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, propertyRowMapper);
 	}
 
 	public Property findPropertyById(String propertyId) {
@@ -56,5 +51,11 @@ public class PropertyRepository {
 			return null;
 		}
 		return properties.get(0);
+	}
+
+	public List<Application> getApplications(ApplicationCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = applicationQueryBuilder.getApplicationSearchQuery(criteria, preparedStmtList);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, applicationRowMapper);
 	}
 }
