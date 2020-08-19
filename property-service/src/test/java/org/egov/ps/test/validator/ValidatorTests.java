@@ -285,7 +285,9 @@ public class ValidatorTests {
 				.build();
 
 		IApplicationField field = ApplicationField.builder().required(true).build();
-		assertNull(minMaxValidator.validate(validation, field, "tested", null));
+		assertNull(minMaxValidator.validate(validation, field, 5, null));
+		
+		assertFalse(minMaxValidator.validate(validation, field, 7, null).isEmpty());
 
 		assertFalse(minMaxValidator.validate(validation, field, "", null).isEmpty());
 		assertFalse(minMaxValidator.validate(validation, field, null, null).isEmpty());
@@ -297,8 +299,12 @@ public class ValidatorTests {
 		//field require false
 
 		field = ApplicationField.builder().required(false).build();
-		assertNull(minMaxValidator.validate(validation, field, "tested", null));
-
+		
+		assertNull(minMaxValidator.validate(validation, field, 5, null));
+		
+		assertFalse(minMaxValidator.validate(validation, field, 7, null).isEmpty());
+		assertFalse(minMaxValidator.validate(validation, field, "tested", null).isEmpty());
+		
 		assertNull(minMaxValidator.validate(validation, field, "", null));
 		assertNull(minMaxValidator.validate(validation, field, null, null));
 

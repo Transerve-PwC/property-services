@@ -4,9 +4,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
+import org.egov.ps.model.Owner;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyCriteria;
 import org.egov.ps.repository.PropertyRepository;
@@ -54,9 +57,21 @@ public class PropertyValidator {
 
 	private void validateOwner(PropertyRequest request, Map<String, String> errorMap) {
 
-		List<Property> property = request.getProperties();
+		List<Property> propertyList = request.getProperties().stream()
+				.filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners()))
+				.collect(Collectors.toList());
 
-		property.stream()
+		propertyList.stream()
+		.forEach(p -> p.getPropertyDetails().getOwners().stream()
+				.forEach( o -> {
+					if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
+						errorMap.put("INVALID MOBILE NUMBER",
+								"MobileNumber is not valid for user : " + o.getOwnerDetails().getOwnerName());
+					}
+				}));
+
+		/*
+		 property.stream()
 			.filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners()))
 			.forEach(p -> p.getPropertyDetails().getOwners().stream()
 					.filter( o -> {
@@ -68,8 +83,8 @@ public class PropertyValidator {
 							return true;
 						}
 					}));
-		
-		
+		 */
+
 		/* Old code ::
 		property.forEach(properties -> {
 			if (!CollectionUtils.isEmpty(properties.getPropertyDetails().getOwners())) {
@@ -161,7 +176,7 @@ public class PropertyValidator {
 
 								if (!values1.get("fields")
 										.contains(application.getApplicationDetails().get(value).asText())) {
-//									errorMap.put("INVALID ModeOfTransfer", "value will only access types 'SALE', 'GIFT'");
+									//									errorMap.put("INVALID ModeOfTransfer", "value will only access types 'SALE', 'GIFT'");
 									System.out.println("error");
 									String errorFilter = "$.*.[?(@.name=='" + value + "')].validations.*.errorMessage";
 									Map<String, List<String>> error = getAttributeValues(tenantId.split("\\.")[0],
@@ -175,23 +190,23 @@ public class PropertyValidator {
 				}
 			}
 
-//			String modeOfTransferValue = application.getApplicationDetails().get("modeOfTransfer").asText();
-//			if (fields.get(PSConstants.MDMS_PS_FIELDS).contains("modeOfTransfer")) {
-//
-//				String validationFilter = "$.*.[?(@.name=='" + "modeOfTransfer" + "')].validations.*.type";
-//				Map<String, List<String>> validations = getAttributeValues(tenantId.split("\\.")[0], moduleName,
-//						Arrays.asList("fields"), validationFilter, jsonPath, requestInfo);
-//
-//				if (validations.get("fields").contains("enum")) {
-//					String valuesFilter = "$.*.[?(@.name=='" + "modeOfTransfer" + "')].validations.*.values.*";
-//					Map<String, List<String>> values = getAttributeValues(tenantId.split("\\.")[0], moduleName,
-//							Arrays.asList("fields"), valuesFilter, jsonPath, requestInfo);
-//
-//					if (!values.get("fields").contains(modeOfTransferValue)) {
-//						errorMap.put("INVALID ModeOfTransfer", "modeOfTransfer will only access types 'SALE', 'GIFT'");
-//					}
-//				}
-//			}
+			//			String modeOfTransferValue = application.getApplicationDetails().get("modeOfTransfer").asText();
+			//			if (fields.get(PSConstants.MDMS_PS_FIELDS).contains("modeOfTransfer")) {
+			//
+			//				String validationFilter = "$.*.[?(@.name=='" + "modeOfTransfer" + "')].validations.*.type";
+			//				Map<String, List<String>> validations = getAttributeValues(tenantId.split("\\.")[0], moduleName,
+			//						Arrays.asList("fields"), validationFilter, jsonPath, requestInfo);
+			//
+			//				if (validations.get("fields").contains("enum")) {
+			//					String valuesFilter = "$.*.[?(@.name=='" + "modeOfTransfer" + "')].validations.*.values.*";
+			//					Map<String, List<String>> values = getAttributeValues(tenantId.split("\\.")[0], moduleName,
+			//							Arrays.asList("fields"), valuesFilter, jsonPath, requestInfo);
+			//
+			//					if (!values.get("fields").contains(modeOfTransferValue)) {
+			//						errorMap.put("INVALID ModeOfTransfer", "modeOfTransfer will only access types 'SALE', 'GIFT'");
+			//					}
+			//				}
+			//			}
 
 		});
 	}
