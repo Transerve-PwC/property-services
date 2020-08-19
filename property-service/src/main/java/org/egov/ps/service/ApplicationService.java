@@ -27,8 +27,8 @@ public class ApplicationService {
 
 	public List<Application> createApplication(ApplicationRequest request) {
 		validator.validateCreateRequest(request);
-		// enrichmentService.enrichCreateApplication(request);
-		// producer.push(config.getSaveApplicationTopic(), request);
+		enrichmentService.enrichCreateApplication(request);
+		producer.push(config.getSaveApplicationTopic(), request);
 		return request.getApplications();
 	}
 }

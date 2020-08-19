@@ -105,9 +105,4 @@ public class Application {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 
-	/**
-	 * User who is applying for this application(service).
-	 */
-	@JsonProperty("applicant")
-	private Applicant applicant;
 }
