@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 public class DateRangeValidator implements IApplicationValidator {
 
 	private static final String DEFAULT_FORMAT = "Invalid Date Range '%s' at path '%s'";
-	SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+	SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
 
 	private List<String> formatErrorMessage(String format, Object value, String path) {
 		if (format == null) {
@@ -52,7 +52,13 @@ public class DateRangeValidator implements IApplicationValidator {
 					return null;
 				}
 
-				String trimmedValue = isEmpty ? null : value.toString().trim();
+				Long trimmedValue = null;
+				try {
+					 trimmedValue = isEmpty ? null : Long.parseLong(value.toString().trim());
+				}catch (Exception e) {
+					return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
+				}
+				
 				if (!isValid(validation, trimmedValue)) {
 					return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
 				}
@@ -63,10 +69,10 @@ public class DateRangeValidator implements IApplicationValidator {
 		return null;
 	}
 
-	private boolean isValid(IValidation validation, String fieldValue) {
+	private boolean isValid(IValidation validation, Long fieldValue) {
 		try {
-			if (null != fieldValue && !fieldValue.isEmpty()) {
-				Date actualDateValidat = formatter.parse(fieldValue.toString());
+			if (null != fieldValue) {
+				Date actualDateValidat = new Date((long)1597827021*1000);
 
 				String startDateStr = null ;
 				String endDateStr = null;
@@ -187,5 +193,7 @@ public class DateRangeValidator implements IApplicationValidator {
 		Calendar c = Calendar.getInstance(); 
 		c.add(Calendar.MONTH, -6);
 		System.out.println(c.getTime());
+		
+		System.out.println(new Date((long)1597827021*1000));
 	}
 }

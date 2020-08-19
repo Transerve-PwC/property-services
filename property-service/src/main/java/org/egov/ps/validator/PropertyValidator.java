@@ -1,9 +1,11 @@
 package org.egov.ps.validator;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -57,6 +59,20 @@ public class PropertyValidator {
 
 	private void validateOwner(PropertyRequest request, Map<String, String> errorMap) {
 
+
+		Optional<Property> property_Optional = request.getProperties().stream().filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners()))
+				.findAny();
+		if (property_Optional.isPresent()) {
+			property_Optional.get().getPropertyDetails().getOwners().stream()
+				.forEach(o -> {
+					if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
+						throw new CustomException(Collections.singletonMap("INVALID MOBILE NUMBER", String.format("MobileNumber is not valid for user :"+o.getOwnerDetails().getOwnerName(), o.getOwnerDetails().getOwnerName() )));
+					}
+				});
+		}
+
+
+		/*
 		List<Property> propertyList = request.getProperties().stream()
 				.filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners()))
 				.collect(Collectors.toList());
@@ -69,6 +85,8 @@ public class PropertyValidator {
 								"MobileNumber is not valid for user : " + o.getOwnerDetails().getOwnerName());
 					}
 				}));
+				
+		*/
 
 		/*
 		 property.stream()
