@@ -1,7 +1,5 @@
 package org.egov.ps.validator.application;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 public class DateValidator implements IApplicationValidator {
 
 	private static final String DEFAULT_FORMAT = "Invalid Date  '%s' at path '%s'";
-	private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MMM-yyyy");
 	
 	private List<String> formatErrorMessage(String format, Object value, String path) {
 		if (format == null) {
@@ -35,7 +32,13 @@ public class DateValidator implements IApplicationValidator {
 			if (!field.isRequired() || isEmpty) {
 				return null;
 			}
-			String trimmedValue = isEmpty ? null : value.toString().trim();
+			Long trimmedValue = null;
+			try {
+				 trimmedValue = isEmpty ? null : Long.parseLong(value.toString().trim());
+			}catch (Exception e) {
+				return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
+			}
+			
 			if (!isValid(trimmedValue)) {
 				return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
 			}
@@ -43,27 +46,12 @@ public class DateValidator implements IApplicationValidator {
 		return null;
 	}
 	
-	private static boolean isValid (String strDate) {
-		if (null != strDate && !strDate.isEmpty()) {
-			try{
-				dateFormatter.parse(strDate); 
-			}catch (ParseException e){
-				return false;
-			}
+	private static boolean isValid (Long strDate) {
+		if (null != strDate) {
+			return true;
 		}else {
 			return false;
 		}
-		return true;		
-		
-	}
-	
-	public static void main(String arg[]) {
-		System.err.println(isValid("12/29/2016"));
-		System.err.println(isValid("16-aug-2020"));
-		System.err.println(isValid("01-jan-2020"));
-		System.err.println(isValid("01-JAN-2020"));
-		System.err.println(isValid(""));
-		
 	}
 
 }

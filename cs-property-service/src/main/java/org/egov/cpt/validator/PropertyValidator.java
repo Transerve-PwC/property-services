@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
@@ -61,14 +59,8 @@ public class PropertyValidator {
 	private OwnershipTransferRepository OTRepository;
 
 	@Autowired
-	private PropertyConfiguration propertyConfiguration;
-
-	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 
-	@Autowired
-	private PropertyConfiguration configs;
-	
 	@Autowired
 	private WorkflowService workflowService;
 
@@ -82,7 +74,7 @@ public class PropertyValidator {
 
 		Map<String, String> errorMap = new HashMap<>();
 		if (CollectionUtils.isEmpty(request.getProperties())) {
-			throw new CustomException(Collections.singletonMap("NO PROPERTIES FOUND", "Please provide atleast property that is to be created"));
+			throw new CustomException(Collections.singletonMap("NO PROPERTIES FOUND", "No properties to create"));
 		}
 
 		validateTransitNumber(request, errorMap);
@@ -262,14 +254,14 @@ public class PropertyValidator {
 		/**
 		 * A property that is rejected can be recreated.
 		 */
-		String tenantId = properties.get(0).getTenantId();
+		/*String tenantId = properties.get(0).getTenantId();
 		BusinessService otBusinessService = workflowService.getBusinessService(tenantId, request.getRequestInfo(), PTConstants.BUSINESS_SERVICE_PM);
 		List<State> stateList= otBusinessService.getStates();
 		List<String> states = stateList.stream()
 			.map(State::getState)
 			.filter(s -> !s.equalsIgnoreCase(PTConstants.PM_REJECTED))
 			.collect(Collectors.toList());
-		log.info("states:"+states);
+		log.info("states:"+states);*/
 		
 		/**
 		 * Search for existing properties with the same transit number.
@@ -278,7 +270,6 @@ public class PropertyValidator {
 			.map(Property::getTransitNumber)
 			.filter(transitNumber -> !repository.getProperties(
 					PropertyCriteria.builder()
-						.state(states)
 						.transitNumber(transitNumber)
 						.build()
 				).isEmpty()
@@ -299,6 +290,9 @@ public class PropertyValidator {
 
 		Map<String, String> errorMap = new HashMap<>();
 
+		if (CollectionUtils.isEmpty(request.getProperties())) {
+			throw new CustomException(Collections.singletonMap("NO PROPERTIES FOUND", "No properties to update"));
+		}
 		validateIds(request, errorMap);
 
 		validateOwner(request, errorMap);
@@ -418,25 +412,14 @@ public class PropertyValidator {
 	}
 
 	private void validateIds(PropertyRequest request, Map<String, String> errorMap) {
-		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().forEach(property -> {
-				if (!(property.getId() != null))
-					errorMap.put("INVALID PROPERTY", "Property cannot be updated without propertyId");
-				if (!errorMap.isEmpty())
-					throw new CustomException(errorMap);
-			});
+		if (request.getProperties().stream().filter(property -> property.getId() == null).findAny().isPresent()) {
+			throw new CustomException(Collections.singletonMap("INVALID PROPERTY", "Property cannot be updated without propertyId"));
 		}
 	}
 
 	public PropertyCriteria getPropertyCriteriaForSearch(PropertyRequest request) {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
-		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().forEach(property -> {
-				if (property.getId() != null)
-					propertyCriteria.setPropertyId(property.getId());
-				
-			});
-		}
+		propertyCriteria.setPropertyId(request.getProperties().stream().map(Property::getId).findAny().get());
 		return propertyCriteria;
 	}
 
@@ -582,7 +565,7 @@ public class PropertyValidator {
 		Map<String, String> errorMap = new HashMap<>();
 		request.getDuplicateCopyApplications().forEach(application -> {
 
-			if ((!application.getState().equalsIgnoreCase(DuplicateCopyConstants.STATUS_INITIATED))) {
+			if (!application.getState().equalsIgnoreCase(DuplicateCopyConstants.STATUS_INITIATED)) {
 				if (application.getId() == null)
 					errorMap.put("INVALID UPDATE", "Id of property cannot be null");
 				/*
@@ -715,18 +698,20 @@ public class PropertyValidator {
 	}
 
 	private void validateDuplicateDocuments(DuplicateCopyRequest request) {
-		List<String> documentFileStoreIds = new LinkedList();
-		request.getDuplicateCopyApplications().forEach(application -> {
-			if (application.getApplicationDocuments() != null) {
-				application.getApplicationDocuments().forEach(document -> {
-					if (documentFileStoreIds.contains(document.getFileStoreId()))
-						throw new CustomException("DUPLICATE_DOCUMENT ERROR",
+		request.getDuplicateCopyApplications()
+			.stream()
+			.map(DuplicateCopy::getApplicationDocuments)
+			.forEach(documents -> _validateDuplicateDocuments(documents));
+	}
+
+	private void _validateDuplicateDocuments(List<Document> documents) {
+		if (CollectionUtils.isEmpty(documents)) {
+			return;
+		}
+		if (!(documents.stream().map(Document::getFileStoreId).distinct().count() == documents.size())) {
+			throw new CustomException("DUPLICATE_DOCUMENT ERROR",
 								"Same document cannot be used multiple times");
-					else
-						documentFileStoreIds.add(document.getFileStoreId());
-				});
-			}
-		});
+		}
 	}
 
 	public void validateDuplicateUpdate(DuplicateCopyRequest duplicateCopyRequest) {
@@ -977,19 +962,10 @@ public class PropertyValidator {
 	}
 
 	private void validateDuplicateDocuments(MortgageRequest request) {
-		List<String> documentFileStoreIds = new LinkedList();
-		request.getMortgageApplications().forEach(application -> {
-			if (application.getApplicationDocuments() != null) {
-				application.getApplicationDocuments().forEach(document -> {
-					if (documentFileStoreIds.contains(document.getFileStoreId()))
-						throw new CustomException("DUPLICATE_DOCUMENT ERROR",
-								"Same document cannot be used multiple times");
-					else
-						documentFileStoreIds.add(document.getFileStoreId());
-				});
-			}
-		});
-
+		request.getMortgageApplications()
+			.stream()
+			.map(Mortgage::getApplicationDocuments)
+			.forEach(documents -> _validateDuplicateDocuments(documents));
 	}
 
 	public List<NoticeGeneration> validateNoticeUpdateRequest(NoticeGenerationRequest noticeGenerationRequest) {
@@ -1039,19 +1015,10 @@ public class PropertyValidator {
 	}
 
 	private void validateDuplicateDocuments(NoticeGenerationRequest request) {
-		List<String> documentFileStoreIds = new LinkedList();
-		request.getNoticeApplications().forEach(notice -> {
-			if (notice.getApplicationDocuments() != null) {
-				notice.getApplicationDocuments().forEach(document -> {
-					if (documentFileStoreIds.contains(document.getFileStoreId()))
-						throw new CustomException("DUPLICATE_DOCUMENT ERROR",
-								"Same document cannot be used multiple times");
-					else
-						documentFileStoreIds.add(document.getFileStoreId());
-				});
-			}
-		});
-		
+		request.getNoticeApplications()
+			.stream()
+			.map(NoticeGeneration::getApplicationDocuments)
+			.forEach(documents -> _validateDuplicateDocuments(documents));
 	}
 
 }
