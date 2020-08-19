@@ -37,8 +37,6 @@ public class PropertyCriteria {
 
 	private String propertyId;
 	
-	private String propertyNumber;
-	
 	private List<String> relations;
 	
 	@Builder.Default
@@ -47,7 +45,7 @@ public class PropertyCriteria {
 	public boolean isEmpty() {
 		return (this.transitNumber == null && this.colony == null && this.phone == null
 				&& this.name == null && this.state == null && this.offset == null
-				&& this.limit == null && this.propertyId == null && this.propertyNumber==null);
+				&& this.limit == null && this.propertyId == null);
 	}
 	
 

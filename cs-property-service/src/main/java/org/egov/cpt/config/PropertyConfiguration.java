@@ -289,12 +289,6 @@ public class PropertyConfiguration {
 	@Value("${egov.idgen.ng.memoNum.format}")
 	private String memoNumbeIdgenFormatNG;
 	
-	@Value("${egov.idgen.pm.propertyNum.name}")
-	private String propertyNumberIdgenNamePM;
-
-	@Value("${egov.idgen.pm.propertyNum.format}")
-	private String propertyNumberIdgenFormatPM;
-
 //	BilllingService generating demand 
 
 	@Value("${egov.billingservice.host}")
