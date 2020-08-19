@@ -350,23 +350,23 @@ public class ValidatorTests {
 
 	@Test
 	public void testDateValidator() {
-		// Date Format Should be --   dd-MMM-yyyy 
 		IValidation validation = ApplicationValidation.builder().type("date").build();
 		IApplicationField field = ApplicationField.builder().required(true).build();
 
-		assertNull(dateValidator.validate(validation, field, "16-aug-2020", null));
-		assertNull(dateValidator.validate(validation, field, "01-jan-2020", null));
-
-
-		assertFalse(dateValidator.validate(validation, field, "12/29/2016", null).isEmpty());
+		assertNull(dateValidator.validate(validation, field, 1597827021, null));
+		assertNull(dateValidator.validate(validation, field, "1597827021", null));
+		
+		assertFalse(dateValidator.validate(validation, field, "16-aug-2020", null).isEmpty());
 		assertFalse(dateValidator.validate(validation, field, "2019-02-28", null).isEmpty());
-
+		
+		
 		//field require false
-		field = ApplicationField.builder().required(false).build();
-		assertNull(dateValidator.validate(validation, field, "16-aug-2020", null));
-		assertNull(dateValidator.validate(validation, field, "01-jan-2020", null));
-		assertNull(dateValidator.validate(validation, field, "12/29/2016", null));
-		assertNull(dateValidator.validate(validation, field, "2019-02-28", null));
+		assertNull(dateValidator.validate(validation, field, 1597827021, null));
+		assertNull(dateValidator.validate(validation, field, "1597827021", null));
+		
+		assertFalse(dateValidator.validate(validation, field, "16-aug-2020", null).isEmpty());
+		assertFalse(dateValidator.validate(validation, field, "2019-02-28", null).isEmpty());
+		
 	}
 
 	@Test
