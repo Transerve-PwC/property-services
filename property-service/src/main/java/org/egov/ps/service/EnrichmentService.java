@@ -407,10 +407,8 @@ public class EnrichmentService {
 					});
 					applicationDocs.addAll(applicationDocuments);
 				}
-				
 			});
 		}
-		
 	}
 
 }

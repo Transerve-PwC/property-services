@@ -152,7 +152,7 @@ public class WorkflowIntegrator {
 			List<Map<String, String>> assigneeUuidmaps = new LinkedList<>();
 
 			obj.put(TENANTIDKEY, wfTenantId);
-			obj.put(BUSINESSSERVICEKEY, config.getEbOtSdBusinessServiceValue());
+			obj.put(BUSINESSSERVICEKEY, config.getEbOtSdBusinessServiceValue()); // TODO need to change based on work flow
 			obj.put(BUSINESSIDKEY, application.getApplicationNumber());
 			obj.put(ACTIONKEY, application.getAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);

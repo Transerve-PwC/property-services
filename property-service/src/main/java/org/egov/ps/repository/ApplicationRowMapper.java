@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.egov.ps.model.Application;
+import org.egov.ps.model.Document;
 import org.egov.ps.model.Property;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.postgresql.util.PGobject;
@@ -68,10 +69,41 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 					applicationMap.put(applicationId, currentApplication);
 				}
 			}
+			addChildrenToApplication(rs, currentApplication, applicationMap);
 		}
 
 		return new ArrayList<>(applicationMap.values());
 
+	}
+
+	private void addChildrenToApplication(ResultSet rs, Application currentApplication,
+			LinkedHashMap<String, Application> applicationMap) throws SQLException {
+		
+		if (hasColumn(rs, "docid")) {
+			String docApplicationId = rs.getString("docapplication_id");
+			
+			try {
+				if (rs.getString("docid") != null && rs.getBoolean("docis_active")
+						&& docApplicationId.equals(currentApplication.getId())) {
+
+					AuditDetails docAuditdetails = AuditDetails.builder().createdBy(rs.getString("dcreated_by"))
+							.createdTime(rs.getLong("dcreated_time"))
+							.lastModifiedBy(rs.getString("dmodified_by"))
+							.lastModifiedTime(rs.getLong("dmodified_time")).build();
+
+					Document applicationDocuments = Document.builder().id(rs.getString("docid"))
+							.referenceId(docApplicationId)
+							.tenantId(rs.getString("doctenantid")).isActive(rs.getBoolean("docis_active"))
+							.documentType(rs.getString("document_type"))
+							.fileStoreId(rs.getString("file_store_id"))
+							.propertyId(rs.getString("docproperty_id")).auditDetails(docAuditdetails).build();
+					currentApplication.addApplicationDocumentsItem(applicationDocuments);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}
 
 	public static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {

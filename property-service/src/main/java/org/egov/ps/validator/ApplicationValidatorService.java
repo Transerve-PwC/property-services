@@ -203,7 +203,7 @@ public class ApplicationValidatorService {
 		if (!ifApplicationExists) {
 			throw new CustomException("APPLICATION NOT FOUND", "The application to be updated does not exist");
 		} else {
-			return applications;
+			return null;
 		}
 	}
 

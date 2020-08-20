@@ -23,7 +23,7 @@ public class ApplicationQueryBuilder {
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY applast_modified_time desc) offset_ FROM " + "({})"
 			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
 
-	private static final String APPLICATION_SEARCH_QUERY = SELECT + "app.*,"
+	private static final String APPLICATION_SEARCH_QUERY = SELECT + "app.*, pt.*, doc.*,"
 
 			+ " app.id as appid, app.tenantid as apptenantid, app.property_id as appproperty_id,"
 			+ " app.application_number as appapplication_number,"
@@ -36,9 +36,14 @@ public class ApplicationQueryBuilder {
 			+ " app.created_by as appcreated_by, app.last_modified_by as applast_modified_by,"
 			+ " app.created_time as appcreated_time, app.last_modified_time as applast_modified_time,"
 
-			+ " pt.id as ptid, pt.file_number as ptfile_number"
+			+ " pt.id as ptid, pt.file_number as ptfile_number,"
 
-			+ " FROM cs_pm_application_v1 app " + INNER_JOIN + " cs_pm_property_v1 pt on app.property_id = pt.id ";
+			+ " doc.id as docid, doc.reference_id as docapplication_id, doc.tenantid as doctenantid,"
+			+ " doc.is_active as docis_active, doc.document_type, doc.file_store_id, doc.property_id as docproperty_id,"
+			+ " doc.created_by as dcreated_by, doc.created_time as dcreated_time, doc.last_modified_by as dmodified_by, doc.last_modified_time as dmodified_time"
+
+			+ " FROM cs_pm_application_v1 app " + INNER_JOIN + " cs_pm_property_v1 pt on app.property_id = pt.id "
+			+ LEFT_JOIN + " cs_pm_documents_v1 doc ON app.id=doc.reference_id ";
 
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList,
 			ApplicationCriteria criteria) {

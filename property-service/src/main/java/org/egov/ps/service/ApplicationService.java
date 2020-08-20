@@ -53,14 +53,13 @@ public class ApplicationService {
 	}
 
 	public List<Application> updateApplication(ApplicationRequest applicationRequest) {
-		List<Application> applicationsFromSearch = validator.getApplications(applicationRequest);
-		
+		validator.getApplications(applicationRequest);
 		enrichmentService.enrichUpdateApplication(applicationRequest);
 		String action = applicationRequest.getApplications().get(0).getAction();
-//		if (config.getIsWorkflowEnabled() && !action.contentEquals("")) {
+		if (config.getIsWorkflowEnabled() && !action.contentEquals("")) {
 			wfIntegrator.callApplicationWorkFlow(applicationRequest);
-//		}
-//		producer.push(config.getUpdateApplicationTopic(), applicationRequest);
+		}
+		producer.push(config.getUpdateApplicationTopic(), applicationRequest);
 
 		return applicationRequest.getApplications();
 	}
