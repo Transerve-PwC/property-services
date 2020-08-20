@@ -39,6 +39,8 @@ private  List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, Ren
 		
 		Map<String, RentCollection> mapColletedInterest = new HashMap<String, RentCollection>();
 		for (RentDemand rentDemand : demands) {
+			if(rentDemand.getRemainingPrincipal()<=0)
+				continue;
 			RentCollection rentalCollection = new RentCollection();
 			// Start the interest calculation
 			//Date generationDate = new Date(rentDemand.getGenerationDate());
@@ -82,6 +84,8 @@ private  List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, Ren
 		}
 		// start the calculation
 		for (RentDemand rentDemand : demands) {
+			if(rentDemand.getRemainingPrincipal()<=0)
+				continue;
 			RentCollection rentalCollection = mapColletedInterest.get(rentDemand.getId());
                         rentalCollection.setDemandId(rentDemand.getId());
                         rentalCollection.setPaymentId(payment.getId());
@@ -130,7 +134,7 @@ private  List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, Ren
                 if(paidAmount>0)
                     rentAccount.setRemainingAmount(rentAccount.getRemainingAmount()+paidAmount);
                 
-                
+        payment.setProceed(true);         
 		return paidDemand;
 
 	}
@@ -147,15 +151,21 @@ private  List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, Ren
  */
 @Override
 
-public List<RentCollection> getCollectionsForPayment(List<RentDemand> demands, List<RentPayment> payments,RentAccount rentAccount) {
+public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled,RentAccount account) 
+//public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled, RentAccount account)
+{
 	//	Map<String,Collection> responseMap=new HashMap<String,Collection>();
 		List<RentDemand> lstRentDemandProcess;
-		for(RentPayment rentPayment:payments) {
+		for(RentPayment rentPayment:paymentsToBeSettled) {
+			if(rentPayment.isProceed())
+				continue;
 			
 			lstRentDemandProcess=new ArrayList<RentDemand>();
 			Date paymentDate = new Date(rentPayment.getDateOfPayment());
 			
-			for(RentDemand rentDemand:demands) {
+			for(RentDemand rentDemand:demandsToBeSettled) {
+				if(rentDemand.getRemainingPrincipal()<=0)
+					continue;
 				Date demandDate = new Date(rentDemand.getGenerationDate());
                                 //filter out the demands which have earlier date than payment 
 				if(demandDate.compareTo(paymentDate)<0) {
@@ -163,26 +173,25 @@ public List<RentCollection> getCollectionsForPayment(List<RentDemand> demands, L
 				}
 			}
                         //call the function to proceed demand against payment 
-			List<RentDemand> paidDemands=getCollectionsForPayment(lstRentDemandProcess,rentPayment,rentAccount);
-		    demands.removeAll(paidDemands);
+			List<RentDemand> paidDemands=getCollectionsForPayment(lstRentDemandProcess,rentPayment,account);
+			
+			demandsToBeSettled.removeAll(paidDemands);
                         
 		}
                 // cron job
-                if(demands.size()>0 && rentAccount.getRemainingAmount()>0){
+                if(demandsToBeSettled.size()>0 && account.getRemainingAmount()>0){
                     RentPayment payment1 = new RentPayment();
                         payment1.setId("payment");
-                        payment1.setAmountPaid(rentAccount.getRemainingAmount());
+                        payment1.setAmountPaid(account.getRemainingAmount());
                         payment1.setDateOfPayment(new Date().getTime());
                         payment1.setReceiptNo("Receipt" );
-                        rentAccount.setRemainingAmount(0.0);
-                        List<RentDemand> paidDemands=getCollectionsForPayment(demands,payment1,rentAccount);
-			            demands.removeAll(paidDemands);
+                        account.setRemainingAmount(0.0);
+                        List<RentDemand> paidDemands=getCollectionsForPayment(demandsToBeSettled,payment1,account);
+                        demandsToBeSettled.removeAll(paidDemands);
                         
                 }
-             //   responseMap.put("demand", processedDemand);
-               // responseMap.put("colection", collections);
-                demands.clear();
-               demands.addAll(processedDemand);
+                demandsToBeSettled.clear();
+                demandsToBeSettled.addAll(processedDemand);
 	 return collections;	
 	}
     
