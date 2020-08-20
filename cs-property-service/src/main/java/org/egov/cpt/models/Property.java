@@ -92,6 +92,14 @@ public class Property {
 	@JsonProperty
 	private List<RentPayment> payments;
 	
+	@Valid
+	@JsonProperty
+	private List<RentAccount> rentAccount;
+	
+	@Valid
+	@JsonProperty
+	private List<RentCollection> rentCollections;
+	
 
 	public Property addDocumentItem(DuplicateCopy newDuplicateCopyItem) {
 		if (this.duplicateCopys == null) {

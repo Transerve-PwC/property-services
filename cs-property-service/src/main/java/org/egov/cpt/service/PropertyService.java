@@ -52,6 +52,9 @@ public class PropertyService {
 	
 	@Autowired
 	private RentEnrichmentService rentEnrichmentService;
+	
+	@Autowired
+	private RentCollectionService rentCollectionService;
 
 	public List<Property> createProperty(PropertyRequest request) {
 
@@ -74,7 +77,12 @@ public class PropertyService {
 	public List<Property> updateProperty(PropertyRequest request) {
 		List<Property> propertyFromSearch = propertyValidator.validateUpdateRequest(request);
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
-		rentEnrichmentService.enrichDemandsPayments(request);
+		if (!CollectionUtils.isEmpty(request.getProperties())) {
+			request.getProperties().forEach(property -> {
+//				property.setRentCollections(rentCollectionService.getCollectionsForPayment(property.getDemands(), property.getPayments(), property.getRentAccount()));
+			});
+		}
+		rentEnrichmentService.enrichRentDetails(request);
 		userService.createUser(request);
 		if (config.getIsWorkflowEnabled() && !request.getProperties().get(0).getMasterDataAction().equalsIgnoreCase("")) {
 			wfIntegrator.callWorkFlow(request);

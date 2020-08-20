@@ -21,7 +21,7 @@ public class RentEnrichmentService {
 	@Autowired
 	PropertyUtil propertyutil;
 	
-	public void enrichDemandsPayments(PropertyRequest request){
+	public void enrichRentDetails(PropertyRequest request){
 		RequestInfo requestInfo = request.getRequestInfo();
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
@@ -53,7 +53,25 @@ public class RentEnrichmentService {
 
 					});
 					
+					property.getRentAccount().forEach(account -> {
+						if (account.getId() == null) {
+							AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							account.setId(UUID.randomUUID().toString());
+							account.setTenantId(property.getTenantId());
+							account.setAuditDetails(rentAuditDetails);
+						}
 
+					});
+					
+					property.getRentCollections().forEach(collection -> {
+						if (collection.getId() == null) {
+							AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							collection.setId(UUID.randomUUID().toString());
+							collection.setTenantId(property.getTenantId());
+							collection.setAuditDetails(rentAuditDetails);
+						}
+
+					});
 				}
 			});
 		}
