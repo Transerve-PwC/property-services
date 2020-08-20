@@ -1,0 +1,269 @@
+{
+  "tenantId": "ch",
+  "businessService": "<sample>",
+  "business": "EstateProperties",
+  "businessServiceSla": 86400000,
+  "states": [
+    {
+      "actions": [
+        {
+          "action": "SUBMIT",
+          "currentState": "",
+          "nextState": "PENDING_DS_VERIFICATION",
+          "roles": ["CITIZEN"]
+        }
+      ],
+      "sla": 2,
+      "state": "",
+      "applicationStatus": "",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": false,
+      "isStateUpdatable": true
+    },
+    {
+      "actions": [
+        {
+          "action": "FORWARD",
+          "currentState": "PENDING_DS_VERIFICATION",
+          "nextState": "PENDING_DA_VERIFICATION",
+          "roles": ["CPS_DS"]
+        },
+        {
+            "action": "SENTBACK",
+            "currentState": "PENDING_DS_VERIFICATION",
+            "nextState": "PENDING_CLARIFICATION",
+            "roles": ["CPS_DS"]
+          }
+      ],
+      "sla": 2,
+      "state": "PENDING_DS_VERIFICATION",
+      "applicationStatus": "PENDING_DS_VERIFICATION",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": false,
+      "isStateUpdatable": true
+    },
+    {
+      "actions": [
+        {
+          "action": "SUBMIT",
+          "currentState": "PENDING_CLARIFICATION",
+          "nextState": "PENDING_DS_VERIFICATION",
+          "roles": ["CITIZEN"]
+        },
+        {
+          "action": "MODIFY",
+          "currentState": "PENDING_CLARIFICATION",
+          "nextState": "PENDING_CLARIFICATION",
+          "roles": ["CITIZEN"]
+        }
+      ],
+      "sla": 86400000,
+      "state": "PENDING_CLARIFICATION",
+      "applicationStatus": "PENDING_CLARIFICATION",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": false,
+      "isStateUpdatable": true
+    },
+    {
+      "actions": [
+        {
+          "action": "FORWARD",
+          "currentState": "PENDING_DA_VERIFICATION",
+          "nextState": "PENDING_SRA_VERIFICATION",
+          "roles": ["CPS_DA"]
+        },
+        {
+            "action": "SENTBACK",
+            "currentState": "PENDING_DA_VERIFICATION",
+            "nextState": "PENDING_DS_VERIFICATION",
+            "roles": ["CPS_DA"]
+          }
+      ],
+      "sla": 2,
+      "state": "PENDING_DA_VERIFICATION",
+      "applicationStatus": "PENDING_DA_VERIFICATION",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": false,
+      "isStateUpdatable": true
+    },
+    {
+      "actions": [
+        {
+          "action": "FORWARD",
+          "currentState": "PENDING_SRA_VERIFICATION",
+          "nextState": "PENDING_SO_VERIFICATION",
+          "roles": ["CPS_SRA"]
+        },
+        {
+            "action": "SENTBACK",
+            "currentState": "PENDING_SRA_VERIFICATION",
+            "nextState": "PENDING_DA_VERIFICATION",
+            "roles": ["CPS_SRA"]
+          }
+      ],
+      "sla": 2,
+      "state": "PENDING_SRA_VERIFICATION",
+      "applicationStatus": "PENDING_SRA_VERIFICATION",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": false,
+      "isStateUpdatable": true
+    },
+    {
+      "actions": [
+        {
+          "action": "FORWARD",
+          "currentState": "PENDING_SO_VERIFICATION",
+          "nextState": "PENDING_AC_APPROVAL",
+          "roles": ["CPS_SO"]
+        },
+        {
+            "action": "SENTBACK",
+            "currentState": "PENDING_SO_VERIFICATION",
+            "nextState": "PENDING_SRA_VERIFICATION",
+            "roles": ["CPS_SO"]
+          }
+      ],
+      "sla": 2,
+      "state": "PENDING_SO_VERIFICATION",
+      "applicationStatus": "PENDING_SO_VERIFICATION",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": false,
+      "isStateUpdatable": true
+    },
+    {
+      "actions": [
+        {
+          "action": "REJECT",
+          "currentState": "PENDING_AC_APPROVAL",
+          "nextState": "REJECTED",
+          "roles": ["CPS_AC"]
+        },
+        {
+          "action": "APPROVE",
+          "currentState": "PENDING_AC_APPROVAL",
+          "nextState": "PENDING_DA_FEE",
+          "roles": ["CPS_AC"]
+        },
+        {
+            "action": "SENTBACK",
+            "currentState": "PENDING_AC_APPROVAL",
+            "nextState": "PENDING_SO_VERIFICATION",
+            "roles": ["CPS_AC"]
+          }
+      ],
+      "sla": 2,
+      "state": "PENDING_AC_APPROVAL",
+      "applicationStatus": "PENDING_AC_APPROVAL",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": false,
+      "isStateUpdatable": true
+    },
+    {
+      "actions": [
+        {
+          "action": "FORWARD",
+          "currentState": "PENDING_DA_FEE",
+          "nextState": "PENDING_PAYMENT",
+          "roles": ["CPS_DA"]
+        },
+        {
+            "action": "SENTBACK",
+            "currentState": "PENDING_DA_FEE",
+            "nextState": "PENDING_AC_APPROVAL",
+            "roles": ["CPS_DA"]
+          }
+      ],
+      "sla": 2,
+      "state": "PENDING_DA_FEE",
+      "applicationStatus": "PENDING_DA_FEE",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": false,
+      "isStateUpdatable": true
+    },
+    {
+      "actions": [
+        {
+          "action": "PAY",
+          "currentState": "PENDING_PAYMENT",
+          "nextState": "PENDING_DA_PREPARE_LETTER",
+          "roles": ["CITIZEN"]
+        }
+      ],
+      "sla": 2,
+      "state": "PENDING_PAYMENT",
+      "applicationStatus": "PENDING_PAYMENT",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": false,
+      "isStateUpdatable": true
+    },
+    {
+      "actions": [
+        {
+          "action": "FORWARD",
+          "currentState": "PENDING_DA_PREPARE_LETTER",
+          "nextState": "PENDING_SO_APPROVAL",
+          "roles": ["CPS_DA"]
+        }
+      ],
+      "sla": 2,
+      "state": "PENDING_DA_PREPARE_LETTER",
+      "applicationStatus": "PENDING_DA_PREPARE_LETTER",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": false,
+      "isStateUpdatable": true
+    },
+    {
+      "actions": [
+        {
+          "action": "APPROVE",
+          "currentState": "PENDING_SO_APPROVAL",
+          "nextState": "APPROVED",
+          "roles": ["CPS_SO"]
+        },
+        {
+          "action": "SENTBACK",
+          "currentState": "PENDING_SO_APPROVAL",
+          "nextState": "PENDING_DA_PREPARE_LETTER",
+          "roles": ["CPS_SO"]
+        }
+      ],
+      "sla": 2,
+      "state": "PENDING_SO_APPROVAL",
+      "applicationStatus": "PENDING_SO_APPROVAL",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": false,
+      "isStateUpdatable": true
+    },
+    {
+      "actions": null,
+      "sla": 2,
+      "state": "APPROVED",
+      "applicationStatus": "APPROVED",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": true,
+      "isStateUpdatable": false
+    },
+    {
+      "actions": null,
+      "sla": 2,
+      "state": "REJECTED",
+      "applicationStatus": "REJECTED",
+      "docUploadRequired": false,
+      "isStartState": false,
+      "isTerminateState": true,
+      "isStateUpdatable": false
+    }
+  ]
+}
