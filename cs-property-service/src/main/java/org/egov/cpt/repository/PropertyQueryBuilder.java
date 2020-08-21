@@ -27,7 +27,7 @@ public class PropertyQueryBuilder {
 	private static final String PI_ALL = " pi.*,pidoc.*, ";
 	private static final String NOTICE_ALL = " ng.*,ngdoc.*, ";
 	private static final String GD_ALL =" gd.*,"; 
-	private static final String FINANCE_ALL =" demand.*,payment.*, "; 
+	private static final String FINANCE_ALL =" demand.*,payment.*,account.*,collection.*, "; 
 	
 	
 	private static final String PT_COLUMNS = " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,"
@@ -84,8 +84,16 @@ public class PropertyQueryBuilder {
 											
 											+ "payment.id as payment_id, payment.property_id as payment_pid,payment.receiptNo as payment_receiptNo,payment.amountPaid as payment_amtPaid,"
 											+ "payment.dateOfPayment as payment_dateOfPayment,payment.mode as payment_mode,payment.created_by as payment_created_by, payment.created_date as payment_created_date,"
-											+ "payment.modified_by as payment_modified_by,payment.modified_date as payment_modified_date ";
-				
+											+ "payment.modified_by as payment_modified_by,payment.modified_date as payment_modified_date,"
+											
+											+ "account.id as account_id,account.property_id as account_pid,account.remainingAmount as account_remainingAmount,account.tenantid as account_tenantid,"
+											+ "account.created_by as account_created_by, account.created_date as account_created_date,"
+											+ "account.modified_by as account_modified_by,account.modified_date as account_modified_date,"
+											
+											+ "collection.id as collection_id ,collection.demand_id as collection_demand_id,collection.payment_id as collection_payment_id,"
+											+ "collection.interestCollected as collection_intCollected,collection.principalCollected as collection_principalCollected,collection.tenantid as collection_tenantid,"
+											+ "collection.created_by as collection_created_by, collection.created_date as collection_created_date,"
+											+ "collection.modified_by as collection_modified_by,collection.modified_date as collection_modified_date ";
 			
 	private static final String PT_TABLE = " FROM cs_pt_property_v1 pt " + INNER_JOIN + " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id "+LEFT_JOIN
 											+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
@@ -103,7 +111,9 @@ public class PropertyQueryBuilder {
 	private static final String GD_TABLE = " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id ";
 	
 	private static final String FINANCE_TABLE = " cs_pt_demand demand ON pt.id=demand.property_id "+LEFT_JOIN
-											+ " cs_pt_payment payment ON pt.id=payment.property_id" ;
+											+ " cs_pt_payment payment ON pt.id=payment.property_id "+LEFT_JOIN
+											+ " cs_pt_account account ON pt.id=account.property_id "+LEFT_JOIN
+											+ " cs_pt_collection collection ON demand.id=collection.demand_id"+" and "+"payment.id=collection.payment_id";
 	
 			
 	private final String paginationWrapper = "SELECT * FROM "

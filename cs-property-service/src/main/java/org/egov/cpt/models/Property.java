@@ -92,6 +92,18 @@ public class Property {
 	@JsonProperty
 	private List<RentPayment> payments;
 	
+	@Valid
+	@JsonProperty
+	private List<RentCollection> rentCollections;
+	
+	@Valid
+	@JsonProperty
+	private RentAccount rentAccount;
+	
+	@Valid
+	@JsonProperty
+	private RentSummary rentSummary;
+	
 
 	public Property addDocumentItem(DuplicateCopy newDuplicateCopyItem) {
 		if (this.duplicateCopys == null) {
@@ -181,6 +193,19 @@ public class Property {
 			}
 		}
 		this.payments.add(newPaymentItem);
+		return this;
+	}
+	
+	public Property addCollectionItem(RentCollection newCollectionItem) {
+		if (this.rentCollections == null) {
+			this.rentCollections = new ArrayList<>();
+		}
+		for (RentCollection rentCollection : rentCollections) {
+			if (rentCollection.getId().equalsIgnoreCase(newCollectionItem.getId())) {
+				return this;
+			}
+		}
+		this.rentCollections.add(newCollectionItem);
 		return this;
 	}
 	
