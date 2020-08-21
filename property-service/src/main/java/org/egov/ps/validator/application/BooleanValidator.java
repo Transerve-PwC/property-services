@@ -50,14 +50,5 @@ public class BooleanValidator implements IApplicationValidator {
 		}
 		
 	}
-	
-	public static void main(String arg[]) {
-		System.err.println(isValid("true"));
-		System.err.println(isValid("false"));
-		System.err.println(isValid("test"));
-		System.err.println(isValid("12"));
-		System.err.println(isValid("0"));
-		
-	}
 
 }
