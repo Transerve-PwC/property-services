@@ -45,6 +45,8 @@ public class WorkflowCreationService {
 	@Value("${workflow.businessservice.create.path}")
 	private String workflowBusinessServiceCreateApi;
 
+	Gson gson = new Gson();
+	
 	private static Map<String, List<ApplicationType>> templateMapping = new HashMap<String, List<ApplicationType>>(0);
 
 	public WorkflowCreationService() {
@@ -66,18 +68,15 @@ public class WorkflowCreationService {
 				));
 	}
 
-	public void createWorkflows(RequestInfo requestInfo) throws Exception {
-		List<BusinessService> lst = new ArrayList<BusinessService>(0);
+	public List<WorkFlowResponseDetails> createWorkflows(RequestInfo requestInfo) throws Exception {
+		List<WorkFlowResponseDetails> workFlowResponseDetailsLst = new ArrayList<WorkFlowResponseDetails>(0);
+		String url = workflowContextPath+"/"+workflowBusinessServiceCreateApi;
 
 		templateMapping.entrySet().stream().forEach(e -> {
 			try {
 				String workflowJson = getFileContents("workflows/"+e.getKey()+".json");
-
-				//2. convert JSON String to work flow details ....
-				Gson gson = new Gson();
-				System.out.println(workflowJson);
-
 				e.getValue().stream().forEach(applicationType -> {
+					//2. convert JSON String to work flow details ....
 					BusinessService businessService = gson.fromJson(workflowJson, BusinessService.class);
 					businessService.setBusinessService(applicationType.getName());
 
@@ -94,26 +93,46 @@ public class WorkflowCreationService {
 						});
 					}
 
+					List<BusinessService> lst = new ArrayList<BusinessService>(0);
 					lst.add(businessService);
+
+					//3. Build Request object for rest template ..start
+					BusinessServiceRequest requestObj  = BusinessServiceRequest.builder()
+							.businessServices(lst)
+							.requestInfo(requestInfo)
+							.build();
+
+					//4. Rest Template  call
+					//System.out.println(new Gson().toJson(requestObj));
+					try {
+						BusinessServiceResponse response = restTemplate.postForObject( url, requestObj, BusinessServiceResponse.class);
+						workFlowResponseDetailsLst.add(WorkFlowResponseDetails.builder()
+															.workFlowName(businessService.getBusinessService())
+															.created(true)
+															.message(response.getResponseInfo().getStatus().toString())
+															.build());
+
+					} catch (Exception e2) {
+						e2.printStackTrace();
+						workFlowResponseDetailsLst.add(WorkFlowResponseDetails.builder()
+								.workFlowName(businessService.getBusinessService())
+								.created(false)
+								.message(e2.toString())
+								.build());
+					}
 				});
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				workFlowResponseDetailsLst.add(WorkFlowResponseDetails.builder()
+						.workFlowName(null)
+						.created(false)
+						.message(e1.getMessage().toString())
+						.build());
 			}
 		});
-
-		//3. Build Request object for rest template ..start
-
-		BusinessServiceRequest requestObj  = BusinessServiceRequest.builder()
-				.businessServices(lst)
-				.requestInfo(requestInfo)
-				.build();
-
-		//Rest Template  call
-		String url = workflowContextPath+"/"+workflowBusinessServiceCreateApi;
-		//System.out.println(new Gson().toJson(requestObj));
-		BusinessServiceResponse response = restTemplate.postForObject( url, requestObj, BusinessServiceResponse.class);
-		//System.out.println(response.getResponseInfo().getStatus());
+		//System.out.println("size() ::"+workFlowResponseDetailsLst.size());
+		return workFlowResponseDetailsLst;
 	}
 
 	public static String getFileContents(String fileName) {
@@ -133,3 +152,13 @@ class ApplicationType {
 	private String prefix;
 	private String name;
 }
+
+
+@Builder
+@Getter
+@Setter
+class WorkFlowResponseDetails {
+	private String workFlowName;
+	private boolean created;
+	private String message;
+} 
