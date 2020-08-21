@@ -196,6 +196,19 @@ public class Property {
 		return this;
 	}
 	
+	public Property addCollectionItem(RentCollection newCollectionItem) {
+		if (this.rentCollections == null) {
+			this.rentCollections = new ArrayList<>();
+		}
+		for (RentCollection rentCollection : rentCollections) {
+			if (rentCollection.getId().equalsIgnoreCase(newCollectionItem.getId())) {
+				return this;
+			}
+		}
+		this.rentCollections.add(newCollectionItem);
+		return this;
+	}
+	
 	
 	@JsonProperty("pincode")
 	private String pincode;

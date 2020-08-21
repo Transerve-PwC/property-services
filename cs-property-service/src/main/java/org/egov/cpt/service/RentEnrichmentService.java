@@ -38,9 +38,9 @@ public class RentEnrichmentService {
 							demand.setTenantId(property.getTenantId());
 							demand.setAuditDetails(demandAuditDetails);
 						}
-
 					});
-					
+				}	
+				if (!CollectionUtils.isEmpty(property.getPayments())) {
 					property.getPayments().forEach(payment -> {
 						if (payment.getId() == null) {
 							AuditDetails paymentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
@@ -52,7 +52,8 @@ public class RentEnrichmentService {
 						}
 
 					});
-					
+				}
+				if (property.getRentAccount()!=null) {
 					if (property.getRentAccount().getId() == null) {
 						AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 						property.getRentAccount().setId(UUID.randomUUID().toString());
