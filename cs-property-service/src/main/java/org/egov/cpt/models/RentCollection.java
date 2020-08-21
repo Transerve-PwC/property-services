@@ -30,10 +30,45 @@ public class RentCollection {
 	 */
 	private String demandId;
 	
+	
+	@Builder.Default
+	private CollectionAgainst collectionAgainst = CollectionAgainst.PAYMENT;
+	
+	/**
+	 * Interest collected.
+	 */
 	@Builder.Default
 	private Double interestCollected = 0.0;
 	
+	/**
+	 * Principal collected.
+	 */
 	@Builder.Default
 	private Double principalCollected = 0.0;
 	
+	public enum CollectionAgainst {
+		PAYMENT("PAYMENT"),
+
+		ACCOUNTBALANCE("ACCOUNTBALANCE");
+
+		private String value;
+
+		CollectionAgainst(String value) {
+			this.value = value;
+		}
+
+		@Override
+		public String toString() {
+			return String.valueOf(value);
+		}
+
+		public static CollectionAgainst fromValue(String text) {
+			for (CollectionAgainst b : CollectionAgainst.values()) {
+				if (String.valueOf(b.value).equalsIgnoreCase(text)) {
+					return b;
+				}
+			}
+			return null;
+		}
+	}
 }
