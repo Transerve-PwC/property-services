@@ -17,6 +17,8 @@ import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.PropertyImages;
+import org.egov.cpt.models.RentAccount;
+import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -286,6 +288,36 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.auditDetails(paymentAuditDetails)
 						.build();
 				property.addPaymentItem(rentPayment);
+			}
+			
+	//Account
+			if (rs.getString("account_id") != null) {
+				AuditDetails accountAuditDetails = AuditDetails.builder().createdBy(rs.getString("account_created_by"))
+						.createdTime(rs.getLong("account_created_date")).lastModifiedBy(rs.getString("account_modified_by"))
+						.lastModifiedTime(rs.getLong("account_modified_date")).build();
+				RentAccount rentAccount = RentAccount.builder().id(rs.getString("account_id"))
+						.propertyId("account_pid")
+						.remainingAmount(rs.getDouble("account_remainingAmount"))
+						.tenantId(rs.getString("account_tenantid"))
+						.auditDetails(accountAuditDetails)
+						.build();
+				property.setRentAccount(rentAccount);
+			}
+			
+	//Collection
+			if (rs.getString("collection_id") != null) {
+				AuditDetails collectionAuditDetails = AuditDetails.builder().createdBy(rs.getString("collection_created_by"))
+						.createdTime(rs.getLong("collection_created_date")).lastModifiedBy(rs.getString("collection_modified_by"))
+						.lastModifiedTime(rs.getLong("collection_modified_date")).build();
+				RentCollection rentCollection = RentCollection.builder().id(rs.getString("collection_id"))
+						.paymentId(rs.getString("collection_payment_id"))
+						.demandId(rs.getString("collection_demand_id"))
+						.interestCollected(rs.getDouble("collection_intCollected"))
+						.principalCollected(rs.getDouble("collection_principalCollected"))
+						.tenantId(rs.getString("collection_tenantid"))
+						.auditDetails(collectionAuditDetails)
+						.build();
+				property.addCollectionItem(rentCollection);
 			}
 		}
 	}
