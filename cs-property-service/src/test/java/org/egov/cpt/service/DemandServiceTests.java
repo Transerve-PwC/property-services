@@ -83,45 +83,46 @@ public class DemandServiceTests {
 	public void testSimpleDemand() throws ParseException {
 	
 		System.out.println("Here");
-		Map response = this.rentCollectionService.getCollectionsForPayment(this.initialDemands, this.initialPayments,this.rentAccount);
-		List<RentCollection> collections=(ArrayList)response.get("colection");
-		List<RentDemand> processedDemands=new ArrayList((HashSet)response.get("demand"));
+		List<RentCollection> collections = this.rentCollectionService.settle(this.initialDemands, this.initialPayments,this.rentAccount);
+	//	List<RentCollection> collections=(ArrayList)response.get("colection");
+		//List<RentDemand> processedDemands=new ArrayList((HashSet)response.get("demand"));
 		//List<RentCollection> secondCollections = this.rentCollectionService.getCollectionsForPayment(this.initialDemands.subList(3, 6), payment1,this.remainingAmount);
 				
-		assertEquals(collections.get(0).getInterestCollected(), 9.04, 0.01);
+		assertEquals(collections.get(0).getInterestCollected(), 10.68, 0.01);
 		assertEquals(collections.get(0).getPrincipalCollected(), 250, 0.01);
-		assertEquals(collections.get(1).getInterestCollected(), 4.27, 0.01);
+		assertEquals(collections.get(1).getInterestCollected(), 5.91, 0.01);
 		assertEquals(collections.get(1).getPrincipalCollected(), 250, 0.01);
 		assertEquals(collections.get(2).getInterestCollected(), 0, 0.01);
-		assertEquals(collections.get(2).getPrincipalCollected(), 236.68, 0.01);
-		assertEquals(collections.get(3).getInterestCollected(), 0.21, 0.01);
-		assertEquals(collections.get(3).getPrincipalCollected(), 13.31, 0.01);
+		assertEquals(collections.get(2).getPrincipalCollected(), 233.39, 0.01);
+		assertEquals(collections.get(3).getInterestCollected(), 0.38, 0.01);
+		assertEquals(collections.get(3).getPrincipalCollected(), 16.60, 0.01);
 		
 		assertEquals(collections.get(4).getInterestCollected(), 0.0, 0.01);
 		assertEquals(collections.get(4).getPrincipalCollected(), 250, 0.01);
 		
-		assertEquals(collections.get(5).getInterestCollected(), 11.34, 0.01);
+		assertEquals(collections.get(5).getInterestCollected(), 13.15, 0.01);
 		assertEquals(collections.get(5).getPrincipalCollected(), 250, 0.01);
 		
-		assertEquals(collections.get(6).getInterestCollected(), 6.41, 0.01);
+		assertEquals(collections.get(6).getInterestCollected(), 8.21, 0.01);
 		assertEquals(collections.get(6).getPrincipalCollected(), 250, 0.01);
-		assertEquals(collections.get(7).getInterestCollected(), 0.0, 0.01);
-		assertEquals(collections.get(7).getPrincipalCollected(), 118.71, 0.01);
+		assertEquals(collections.get(7).getInterestCollected(), 3.12, 0.01);
+		assertEquals(collections.get(7).getPrincipalCollected(), 108.52, 0.01);
 		
 				
-		assertEquals(processedDemands.get(0).getRemainingPrincipal(), 0, 0.01);
-		assertEquals(processedDemands.get(1).getRemainingPrincipal(), 0, 0.01);
-		assertEquals(processedDemands.get(2).getRemainingPrincipal(), 0, 0.01);
-		assertEquals(processedDemands.get(3).getRemainingPrincipal(), 0, 0.01);
-		assertEquals(processedDemands.get(4).getRemainingPrincipal(), 0, 0.01);
-		assertEquals(processedDemands.get(5).getRemainingPrincipal(), 0, 0.01);
-		assertEquals(processedDemands.get(6).getRemainingPrincipal(), 0, 0.01);
-		assertEquals(processedDemands.get(7).getRemainingPrincipal(), 131.28, 0.01);
+		assertEquals(initialDemands.get(0).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(initialDemands.get(1).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(initialDemands.get(2).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(initialDemands.get(3).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(initialDemands.get(4).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(initialDemands.get(5).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(initialDemands.get(6).getRemainingPrincipal(), 0, 0.01);
+		assertEquals(initialDemands.get(7).getRemainingPrincipal(), 141.47, 0.01);
 		
 		
 		
-		}
+	}
 
+	
 	
 	private static final String DATE_FORMAT = "dd MM yyyy";
 	private static final SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT); 

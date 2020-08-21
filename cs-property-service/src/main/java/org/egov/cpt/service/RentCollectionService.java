@@ -14,12 +14,12 @@ import org.egov.cpt.models.RentAccount;
 import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
-
+import org.egov.cpt.models.RentSummary;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RentCollectionService {
-        	List<RentCollection> collections = new ArrayList<RentCollection>();
+public class RentCollectionService implements IRentCollectionService{
+    List<RentCollection> collections = new ArrayList<RentCollection>();
 	Set<RentDemand> processedDemand=new LinkedHashSet<RentDemand>();
 	
 /**
@@ -31,14 +31,16 @@ public class RentCollectionService {
  * @param rentAccount
  * @return List<RentDemand>
  */
-public List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, RentPayment payment,
-			RentAccount rentAccount) {
+	
+private  List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, RentPayment payment,RentAccount rentAccount) {
 		List<RentDemand> paidDemand=new ArrayList<RentDemand>();
 		double interestRate = 24;
 		Double paidAmount = payment.getAmountPaid();
 		
 		Map<String, RentCollection> mapColletedInterest = new HashMap<String, RentCollection>();
 		for (RentDemand rentDemand : demands) {
+			if(rentDemand.getRemainingPrincipal()<=0)
+				continue;
 			RentCollection rentalCollection = new RentCollection();
 			// Start the interest calculation
 			//Date generationDate = new Date(rentDemand.getGenerationDate());
@@ -82,6 +84,8 @@ public List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, RentP
 		}
 		// start the calculation
 		for (RentDemand rentDemand : demands) {
+			if(rentDemand.getRemainingPrincipal()<=0)
+				continue;
 			RentCollection rentalCollection = mapColletedInterest.get(rentDemand.getId());
                         rentalCollection.setDemandId(rentDemand.getId());
                         rentalCollection.setPaymentId(payment.getId());
@@ -130,29 +134,38 @@ public List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, RentP
                 if(paidAmount>0)
                     rentAccount.setRemainingAmount(rentAccount.getRemainingAmount()+paidAmount);
                 
-                
+        payment.setProceed(true);         
 		return paidDemand;
 
 	}
 
 	
 /**
- * This method accept the rent demands and payments and call the method to process the demand
+ * Get the list of collections for the given demand and payments for the same property.
+ * 
+ * @apiNote When a new set of demands are saved in the database on every _update.
+ * @apiNote This might change demand objects. This will create new Collection objects.
  * @param demands
- * @param payments
- * @param rentAccount
- * @return List<RentDemand>
+ * @param payment
+ * @return List<RentCollection> Collections to be saved in the database.
  */
-public Map getCollectionsForPayment(List<RentDemand> demands, List<RentPayment> payments,
-			RentAccount rentAccount) {
-		Map<String,Collection> responseMap=new HashMap<String,Collection>();
+@Override
+
+public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled,RentAccount account) 
+//public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled, RentAccount account)
+{
+	//	Map<String,Collection> responseMap=new HashMap<String,Collection>();
 		List<RentDemand> lstRentDemandProcess;
-		for(RentPayment rentPayment:payments) {
+		for(RentPayment rentPayment:paymentsToBeSettled) {
+			if(rentPayment.isProceed())
+				continue;
 			
 			lstRentDemandProcess=new ArrayList<RentDemand>();
 			Date paymentDate = new Date(rentPayment.getDateOfPayment());
 			
-			for(RentDemand rentDemand:demands) {
+			for(RentDemand rentDemand:demandsToBeSettled) {
+				if(rentDemand.getRemainingPrincipal()<=0)
+					continue;
 				Date demandDate = new Date(rentDemand.getGenerationDate());
                                 //filter out the demands which have earlier date than payment 
 				if(demandDate.compareTo(paymentDate)<0) {
@@ -160,34 +173,47 @@ public Map getCollectionsForPayment(List<RentDemand> demands, List<RentPayment> 
 				}
 			}
                         //call the function to proceed demand against payment 
-			List<RentDemand> paidDemands=getCollectionsForPayment(lstRentDemandProcess,rentPayment,rentAccount);
-		    demands.removeAll(paidDemands);
+			List<RentDemand> paidDemands=getCollectionsForPayment(lstRentDemandProcess,rentPayment,account);
+			
+			demandsToBeSettled.removeAll(paidDemands);
                         
 		}
                 // cron job
-                if(demands.size()>0 && rentAccount.getRemainingAmount()>0){
+                if(demandsToBeSettled.size()>0 && account.getRemainingAmount()>0){
                     RentPayment payment1 = new RentPayment();
                         payment1.setId("payment");
-                        payment1.setAmountPaid(rentAccount.getRemainingAmount());
+                        payment1.setAmountPaid(account.getRemainingAmount());
                         payment1.setDateOfPayment(new Date().getTime());
                         payment1.setReceiptNo("Receipt" );
-                        rentAccount.setRemainingAmount(0.0);
-                        List<RentDemand> paidDemands=getCollectionsForPayment(demands,payment1,rentAccount);
-			            demands.removeAll(paidDemands);
+                        account.setRemainingAmount(0.0);
+                        List<RentDemand> paidDemands=getCollectionsForPayment(demandsToBeSettled,payment1,account);
+                        demandsToBeSettled.removeAll(paidDemands);
                         
                 }
-                responseMap.put("demand", processedDemand);
-                responseMap.put("colection", collections);
-	 return responseMap;	
+                demandsToBeSettled.clear();
+                demandsToBeSettled.addAll(processedDemand);
+	 return collections;	
 	}
     
 
 
- public void paymentSummary(List<RentDemand> demands,RentAccount rentAccount) {
+/**
+ * Get the current rent summary by calculating from the given demands and collections for the same property.
+ * 
+ * @apiNote This is called every time we return a property in search.
+ * @apiNote This will not change the database in anyway.
+ * @param demands
+ * @param collections
+ * @param payment
+ * @return
+ */
+
+ public RentSummary paymentSummary(List<RentDemand> demands,RentAccount rentAccount) {
 	 double balancePrincipal =0;
 	 double balanceInterest =0;
 	 double balanceAmount =0;
 	 final double interestRate = 24;
+	 RentSummary rentSummary=new RentSummary();
 	 
 	 
 	 for(RentDemand rentDemand:demands) {
@@ -203,9 +229,34 @@ public Map getCollectionsForPayment(List<RentDemand> demands, List<RentPayment> 
 		 
 	 }
 	 balanceAmount=rentAccount.getRemainingAmount();
+	 rentSummary.setBalanceAmount(rentAccount.getRemainingAmount());
+	 rentSummary.setBalanceInterest(balanceInterest);
+	 rentSummary.setBalancePrincipal(balancePrincipal);
+	 return rentSummary;
+	 
 	 
 	 
  }
+ 
+ 
+ /**
+	 * Process the incoming payment.
+	 * 
+	 * @apiNote This will generate new collections that will be saved and will also modify existing demand objects.
+	 * @apiNote This will be called from PaymentKafkaConsumer
+	 * @param demands
+	 * @param collections
+	 * @param payment
+	 * @return List<RentCollection> Generated collection objects for the new payment.
+	 */
+	public List<RentCollection> processNewPayment(List<RentDemand> demands, RentPayment payment,RentAccount rentAccount){
+		getCollectionsForPayment(demands,payment,rentAccount);
+		
+		demands.clear();
+        demands.addAll(processedDemand);
+		return collections;
+	}
+	
 
 
 }

@@ -84,5 +84,10 @@ public class RentPayment {
 	    
 	    @JsonProperty("tenantId")
 	    private String tenantId;
+	    
+	    /**
+	     * boolean indicates whether payment is proceed or not
+	     */
+	    private boolean proceed;
 
 }
