@@ -1,6 +1,5 @@
 package org.egov.ps.service;
 
-import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 
@@ -42,9 +41,6 @@ public class WorkflowCreationServiceTest {
 		 
 		workflowCreationService.createWorkflows(requestInfo);
 		
-		//doNothing().when(workflowCreationService).createWorkflows(requestInfo);
-		
-		assertNull(null, null);
 		
 	}
 
