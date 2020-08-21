@@ -3,13 +3,11 @@ package org.egov.ps.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.egov.ps.util.PropertySerializer;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -43,7 +41,7 @@ public class Application {
 	/**
 	 * Property for which we are trying to create this application for.
 	 */
-	@JsonSerialize(using = PropertySerializer.class)
+//	@JsonSerialize(using = PropertySerializer.class)
 	@JsonProperty("property")
 	private Property property;
 

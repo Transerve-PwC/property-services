@@ -863,6 +863,8 @@ serviceMaps:
       - jsonPath: $.Applications.*.hardcopyReceivedDate
       
       - jsonPath: $.Applications.*.applicationDetails 
+        dbType: JSONB
+        type: JSON
       
       - jsonPath: $.Applications.*.state 
       
@@ -900,6 +902,8 @@ serviceMaps:
       - jsonPath: $.Applications.*.hardcopyReceivedDate
       
       - jsonPath: $.Applications.*.applicationDetails 
+        dbType: JSONB
+        type: JSON
       
       - jsonPath: $.Applications.*.state 
       
