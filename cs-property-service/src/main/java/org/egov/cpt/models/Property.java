@@ -94,11 +94,15 @@ public class Property {
 	
 	@Valid
 	@JsonProperty
-	private List<RentAccount> rentAccount;
+	private List<RentCollection> rentCollections;
 	
 	@Valid
 	@JsonProperty
-	private List<RentCollection> rentCollections;
+	private RentAccount rentAccount;
+	
+	@Valid
+	@JsonProperty
+	private RentSummary rentSummary;
 	
 
 	public Property addDocumentItem(DuplicateCopy newDuplicateCopyItem) {

@@ -54,7 +54,7 @@ public class PropertyService {
 	private RentEnrichmentService rentEnrichmentService;
 	
 	@Autowired
-	private RentCollectionService rentCollectionService;
+	private IRentCollectionService rentCollectionService;
 
 	public List<Property> createProperty(PropertyRequest request) {
 
@@ -77,17 +77,21 @@ public class PropertyService {
 	public List<Property> updateProperty(PropertyRequest request) {
 		List<Property> propertyFromSearch = propertyValidator.validateUpdateRequest(request);
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
+		rentEnrichmentService.enrichRentdata(request);
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
-//				property.setRentCollections(rentCollectionService.getCollectionsForPayment(property.getDemands(), property.getPayments(), property.getRentAccount()));
+				property.setRentCollections(rentCollectionService.getCollectionsForPayment(property.getDemands(), property.getPayments(), property.getRentAccount()));
 			});
 		}
-		rentEnrichmentService.enrichRentDetails(request);
+		rentEnrichmentService.enrichCollection(request);
 		userService.createUser(request);
 		if (config.getIsWorkflowEnabled() && !request.getProperties().get(0).getMasterDataAction().equalsIgnoreCase("")) {
 			wfIntegrator.callWorkFlow(request);
 		}
 		producer.push(config.getUpdatePropertyTopic(), request);
+		request.getProperties().forEach(property -> {
+			property.setRentSummary(rentCollectionService.paymentSummary(property.getDemands(),property.getRentAccount()));
+		});
 		return request.getProperties();
 	}
 
@@ -115,6 +119,9 @@ public class PropertyService {
 		List<Property> properties = repository.getProperties(criteria);
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
+		properties.forEach(property -> {
+			property.setRentSummary(rentCollectionService.paymentSummary(property.getDemands(),property.getRentAccount()));
+		});
 		return properties;
 	}
 }

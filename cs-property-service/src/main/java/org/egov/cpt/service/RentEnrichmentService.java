@@ -21,7 +21,7 @@ public class RentEnrichmentService {
 	@Autowired
 	PropertyUtil propertyutil;
 	
-	public void enrichRentDetails(PropertyRequest request){
+	public void enrichRentdata(PropertyRequest request){
 		RequestInfo requestInfo = request.getRequestInfo();
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
@@ -53,16 +53,25 @@ public class RentEnrichmentService {
 
 					});
 					
-					property.getRentAccount().forEach(account -> {
-						if (account.getId() == null) {
-							AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							account.setId(UUID.randomUUID().toString());
-							account.setTenantId(property.getTenantId());
-							account.setAuditDetails(rentAuditDetails);
-						}
+					if (property.getRentAccount().getId() == null) {
+						AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+						property.getRentAccount().setId(UUID.randomUUID().toString());
+						property.getRentAccount().setPropertyId(property.getId());
+						property.getRentAccount().setTenantId(property.getTenantId());
+						property.getRentAccount().setAuditDetails(rentAuditDetails);
+					}
+				}
+			});
+		}
+		
+	}
 
-					});
-					
+	public void enrichCollection(PropertyRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		if (!CollectionUtils.isEmpty(request.getProperties())) {
+			request.getProperties().forEach(property -> {
+				
+				if (!CollectionUtils.isEmpty(property.getRentCollections())) {
 					property.getRentCollections().forEach(collection -> {
 						if (collection.getId() == null) {
 							AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
