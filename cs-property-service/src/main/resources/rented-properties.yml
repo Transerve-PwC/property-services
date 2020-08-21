@@ -584,7 +584,7 @@ serviceMaps:
         - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedTime
         
         
-    - query : DELETE FROM cs_pt_collection WHERE demand_id=? and payment_id=? and tenantid=?;
+    - query : DELETE FROM cs_pt_collection WHERE demand_id=? and payment_id=? and tenantid=? and collectionAgainst=?;
       basePath: $.Properties.*.rentCollections.*
       jsonMaps:
        - jsonPath: $.Properties.*.rentCollections.*.demandId
@@ -592,9 +592,11 @@ serviceMaps:
        - jsonPath: $.Properties.*.rentCollections.*.paymentId
        
        - jsonPath: $.Properties.*.rentCollections.*.tenantId
+       
+       - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
 
     
-    - query : INSERT INTO cs_pt_collection(id, demandId, paymentId, interestCollected, principalCollected,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query : INSERT INTO cs_pt_collection(id, demandId, paymentId, interestCollected, principalCollected,tenantid,created_by, modified_by, created_date, modified_date,collectionAgainst) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
       basePath: $.Properties.*.rentCollections.*
       jsonMaps:
         - jsonPath: $.Properties.*.rentCollections.*.id 
@@ -616,6 +618,8 @@ serviceMaps:
         - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdTime
         
         - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedTime
+        
+        - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
         
         
     - query : DELETE FROM cs_pt_account WHERE property_id=? and tenantid=?;

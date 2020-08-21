@@ -37,6 +37,7 @@ public class RentCollection {
 	
 	
 	@Builder.Default
+	@JsonProperty("collectionAgainst")
 	private CollectionAgainst collectionAgainst = CollectionAgainst.PAYMENT;
 	
 	/**
