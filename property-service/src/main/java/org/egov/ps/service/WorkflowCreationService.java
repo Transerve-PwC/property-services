@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.model.BusinessServiceRequest;
+import org.egov.ps.model.WorkFlowResponseDetails;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.BusinessService;
 import org.egov.ps.web.contracts.BusinessServiceResponse;
@@ -152,13 +153,3 @@ class ApplicationType {
 	private String prefix;
 	private String name;
 }
-
-
-@Builder
-@Getter
-@Setter
-class WorkFlowResponseDetails {
-	private String workFlowName;
-	private boolean created;
-	private String message;
-} 
