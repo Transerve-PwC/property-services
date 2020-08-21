@@ -37,6 +37,8 @@ import lombok.ToString;
 @EqualsAndHashCode(of = { "tenantId", "businessService" })
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BusinessService {
+	
+	
 
 	@Size(max = 256)
 	@JsonProperty("tenantId")
