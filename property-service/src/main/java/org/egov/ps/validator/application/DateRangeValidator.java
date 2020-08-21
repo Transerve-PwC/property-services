@@ -188,12 +188,5 @@ public class DateRangeValidator implements IApplicationValidator {
 		}
 		return map;
 	}
-
-	public static void main(String arg[]) {
-		Calendar c = Calendar.getInstance(); 
-		c.add(Calendar.MONTH, -6);
-		System.out.println(c.getTime());
-		
-		System.out.println(new Date((long)1597827021*1000));
-	}
+	
 }

@@ -863,6 +863,8 @@ serviceMaps:
       - jsonPath: $.Applications.*.hardcopyReceivedDate
       
       - jsonPath: $.Applications.*.applicationDetails 
+        dbType: JSONB
+        type: JSON
       
       - jsonPath: $.Applications.*.state 
       
@@ -876,34 +878,80 @@ serviceMaps:
 
       - jsonPath: $.Applications.*.auditDetails.lastModifiedTime
             
+
       
-    - query: INSERT INTO cs_pm_applicant_v1 (id, tenantid, property_id, application_id, mobile_number, first_name, last_name, user_id, applicant_details, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?);
-      basePath: Applications.*.applicant
+        
+  - version: 1.0
+    description: Persists Application details in cs_pm_application_v1 table
+    fromTopic: update-application-topic
+    isTransaction: true
+    queryMaps:
+    
+    - query: UPDATE cs_pm_application_v1 SET branch_type = ?, module_type = ?, application_type = ?, comments = ?, hardcopy_received_date = ?, application_details = ?::jsonb, state = ?, action = ?, last_modified_by = ?, last_modified_time = ? WHERE id = ?;
+      basePath: Applications.*
+      jsonMaps:
+      
+      - jsonPath: $.Applications.*.branchType
+
+      - jsonPath: $.Applications.*.moduleType
+      
+      - jsonPath: $.Applications.*.applicationType
+
+      - jsonPath: $.Applications.*.comments 
+      
+      - jsonPath: $.Applications.*.hardcopyReceivedDate
+      
+      - jsonPath: $.Applications.*.applicationDetails 
+        dbType: JSONB
+        type: JSON
+      
+      - jsonPath: $.Applications.*.state 
+      
+      - jsonPath: $.Applications.*.action 
+      
+      - jsonPath: $.Applications.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Applications.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.Applications.*.id
+            
+      
+
+    - query: INSERT INTO cs_pm_documents_v1 (id, tenantid, reference_id, is_active, document_type, file_store_id, property_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type = ?, file_store_id = ?, last_modified_by = ?, last_modified_time = ?;
+      basePath: $.Applications.*.applicationDocuments.*
       jsonMaps:
 
-      - jsonPath: $.Applications.*.applicant.id
+      - jsonPath: $.Applications.*.applicationDocuments.*.id
 
-      - jsonPath: $.Applications.*.applicant.tenantId
+      - jsonPath: $.Applications.*.applicationDocuments.*.tenantId
       
-      - jsonPath: $.Applications.*.applicant.property.id
+      - jsonPath: $.Applications.*.applicationDocuments.*.referenceId
 
-      - jsonPath: $.Applications.*.applicant.applicationId
+      - jsonPath: $.Applications.*.applicationDocuments.*.isActive
 
-      - jsonPath: $.Applications.*.applicant.mobileNumber
+      - jsonPath: $.Applications.*.applicationDocuments.*.documentType
 
-      - jsonPath: $.Applications.*.applicant.firstName 
-            
-      - jsonPath: $.Applications.*.applicant.lastName 
+      - jsonPath: $.Applications.*.applicationDocuments.*.fileStoreId
       
-      - jsonPath: $.Applications.*.applicant.userId 
+      - jsonPath: $.Applications.*.applicationDocuments.*.propertyId
+
+      - jsonPath: $.Applications.*.applicationDocuments.*.auditDetails.createdBy
+
+      - jsonPath: $.Applications.*.applicationDocuments.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Applications.*.applicationDocuments.*.auditDetails.createdTime
+
+      - jsonPath: $.Applications.*.applicationDocuments.*.auditDetails.lastModifiedTime 
       
-      - jsonPath: $.Applications.*.applicant.applicantDetails 
+      - jsonPath: $.Applications.*.applicationDocuments.*.isActive
+
+      - jsonPath: $.Applications.*.applicationDocuments.*.documentType
+
+      - jsonPath: $.Applications.*.applicationDocuments.*.fileStoreId
+
+      - jsonPath: $.Applications.*.applicationDocuments.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Applications.*.applicationDocuments.*.auditDetails.lastModifiedTime
       
-      - jsonPath: $.Applications.*.applicant.auditDetails.createdBy
-
-      - jsonPath: $.Applications.*.applicant.auditDetails.lastModifiedBy
-
-      - jsonPath: $.Applications.*.applicant.auditDetails.createdTime
-
-      - jsonPath: $.Applications.*.applicant.auditDetails.lastModifiedTime
+                  
             

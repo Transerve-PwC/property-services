@@ -34,6 +34,8 @@ public class PropertySerializer extends StdSerializer<Property> {
 		generator.writeStartObject();
 		generator.writeFieldName("id");
 		generator.writeString(property.getId());
+		generator.writeFieldName("fileNumber");
+		generator.writeString(property.getFileNumber());
 		generator.writeEndObject();
 	}
 }

@@ -379,4 +379,36 @@ public class EnrichmentService {
 		return applicationNumbers;
 	}
 
+	public void enrichUpdateApplication(ApplicationRequest request) {
+		
+		RequestInfo requestInfo = request.getRequestInfo();
+		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
+
+		if (!CollectionUtils.isEmpty(request.getApplications())) {
+			request.getApplications().forEach(application -> {
+				AuditDetails modifyAuditDetails = application.getAuditDetails();
+				modifyAuditDetails.setLastModifiedBy(auditDetails.getLastModifiedBy());
+				modifyAuditDetails.setLastModifiedTime(auditDetails.getLastModifiedTime());
+				application.setAuditDetails(modifyAuditDetails);
+				
+				List<Document> applicationDocs = new ArrayList<>();
+				List<Document> applicationDocuments = application.getApplicationDocuments();
+				if (!CollectionUtils.isEmpty(applicationDocuments)) {
+					AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+					applicationDocuments.forEach(document -> {
+						if (document.getId() == null) {
+							String gen_doc_id = UUID.randomUUID().toString();
+							document.setId(gen_doc_id);
+							document.setTenantId(application.getTenantId());
+							document.setReferenceId(application.getId());
+							document.setPropertyId(application.getProperty().getId());
+						}
+						document.setAuditDetails(docAuditDetails);
+					});
+					applicationDocs.addAll(applicationDocuments);
+				}
+			});
+		}
+	}
+
 }
