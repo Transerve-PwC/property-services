@@ -582,6 +582,68 @@ serviceMaps:
         - jsonPath: $.Properties.*.payments.*.auditDetails.createdTime
         
         - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedTime
+        
+        
+    - query : DELETE FROM cs_pt_collection WHERE demand_id=? and payment_id=? and tenantid=?;
+      basePath: $.Properties.*.rentCollections.*
+      jsonMaps:
+       - jsonPath: $.Properties.*.rentCollections.*.demandId
+       
+       - jsonPath: $.Properties.*.rentCollections.*.paymentId
+       
+       - jsonPath: $.Properties.*.rentCollections.*.tenantId
+
+    
+    - query : INSERT INTO cs_pt_collection(id, demandId, paymentId, interestCollected, principalCollected,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.Properties.*.rentCollections.*
+      jsonMaps:
+        - jsonPath: $.Properties.*.rentCollections.*.id 
+      
+        - jsonPath: $.Properties.*.rentCollections.*.demandId
+
+        - jsonPath: $.Properties.*.rentCollections.*.paymentId
+       
+        - jsonPath: $.Properties.*.rentCollections.*.interestCollected
+  
+        - jsonPath: $.Properties.*.rentCollections.*.principalCollected
+
+        - jsonPath: $.Properties.*.rentCollections.*.tenantId
+       
+        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdBy
+  
+        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedBy
+
+        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdTime
+        
+        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedTime
+        
+        
+    - query : DELETE FROM cs_pt_account WHERE property_id=? and tenantid=?;
+      basePath: $.Properties.*.rentAccount.*
+      jsonMaps:
+       - jsonPath: $.Properties.*.rentAccount.*.propertyId
+       
+       - jsonPath: $.Properties.*.rentAccount.*.tenantId
+
+    
+    - query : INSERT INTO cs_pt_account(id, property_id, remainingAmount,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.Properties.*.rentAccount.*
+      jsonMaps:
+        - jsonPath: $.Properties.*.rentAccount.*.id 
+      
+        - jsonPath: $.Properties.*.rentAccount.*.propertyId
+
+        - jsonPath: $.Properties.*.rentAccount.*.remainingAmount
+       
+        - jsonPath: $.Properties.*.rentAccount.*.tenantId
+  
+        - jsonPath: $.Properties.*.rentAccount.*.auditDetails.createdBy
+  
+        - jsonPath: $.Properties.*.rentAccount.*.auditDetails.lastModifiedBy
+
+        - jsonPath: $.Properties.*.rentAccount.*.auditDetails.createdTime
+        
+        - jsonPath: $.Properties.*.rentAccount.*.auditDetails.lastModifiedTime
     
     
   - version: 1.0

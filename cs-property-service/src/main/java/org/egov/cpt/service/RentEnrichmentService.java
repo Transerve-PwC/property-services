@@ -21,7 +21,7 @@ public class RentEnrichmentService {
 	@Autowired
 	PropertyUtil propertyutil;
 	
-	public void enrichDemandsPayments(PropertyRequest request){
+	public void enrichRentdata(PropertyRequest request){
 		RequestInfo requestInfo = request.getRequestInfo();
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
@@ -38,9 +38,9 @@ public class RentEnrichmentService {
 							demand.setTenantId(property.getTenantId());
 							demand.setAuditDetails(demandAuditDetails);
 						}
-
 					});
-					
+				}	
+				if (!CollectionUtils.isEmpty(property.getPayments())) {
 					property.getPayments().forEach(payment -> {
 						if (payment.getId() == null) {
 							AuditDetails paymentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
@@ -52,8 +52,36 @@ public class RentEnrichmentService {
 						}
 
 					});
-					
+				}
+				if (property.getRentAccount()!=null) {
+					if (property.getRentAccount().getId() == null) {
+						AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+						property.getRentAccount().setId(UUID.randomUUID().toString());
+						property.getRentAccount().setPropertyId(property.getId());
+						property.getRentAccount().setTenantId(property.getTenantId());
+						property.getRentAccount().setAuditDetails(rentAuditDetails);
+					}
+				}
+			});
+		}
+		
+	}
 
+	public void enrichCollection(PropertyRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		if (!CollectionUtils.isEmpty(request.getProperties())) {
+			request.getProperties().forEach(property -> {
+				
+				if (!CollectionUtils.isEmpty(property.getRentCollections())) {
+					property.getRentCollections().forEach(collection -> {
+						if (collection.getId() == null) {
+							AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+							collection.setId(UUID.randomUUID().toString());
+							collection.setTenantId(property.getTenantId());
+							collection.setAuditDetails(rentAuditDetails);
+						}
+
+					});
 				}
 			});
 		}
