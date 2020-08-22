@@ -12,7 +12,9 @@ import java.util.Set;
 
 import org.egov.cpt.models.RentAccount;
 import org.egov.cpt.models.RentCollection;
+import org.egov.cpt.models.RentCollection.CollectionAgainst;
 import org.egov.cpt.models.RentDemand;
+import org.egov.cpt.models.RentDemand.ModeEnum;
 import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.models.RentSummary;
 import org.springframework.stereotype.Service;
@@ -127,6 +129,7 @@ private  List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, Ren
 				
 				
 			}
+//rentalCollection.setCollectionAgainst(CollectionAgainst.ACCOUNTBALANCE);
 			collections.add(rentalCollection);
                         rentDemand.setInterestSince(payment.getDateOfPayment());
                         processedDemand.add(rentDemand);    
@@ -181,10 +184,11 @@ public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<Ren
                 // cron job
                 if(demandsToBeSettled.size()>0 && account.getRemainingAmount()>0){
                     RentPayment payment1 = new RentPayment();
-                        payment1.setId("payment");
+                        //payment1.setId("payment");
                         payment1.setAmountPaid(account.getRemainingAmount());
                         payment1.setDateOfPayment(new Date().getTime());
-                        payment1.setReceiptNo("Receipt" );
+                       // payment1.setReceiptNo("Receipt" );
+                     //   payment1.setMode(org.egov.cpt.models.RentPayment.Mod);
                         account.setRemainingAmount(0.0);
                         List<RentDemand> paidDemands=getCollectionsForPayment(demandsToBeSettled,payment1,account);
                         demandsToBeSettled.removeAll(paidDemands);

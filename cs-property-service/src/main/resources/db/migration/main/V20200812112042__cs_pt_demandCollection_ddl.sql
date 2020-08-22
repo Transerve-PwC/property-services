@@ -50,10 +50,11 @@ CREATE TABLE cs_pt_payment (
 CREATE TABLE cs_pt_collection (
    id           		CHARACTER VARYING (256) NOT NULL,
    demand_id            CHARACTER VARYING (256) NOT NULL,
-   payment_id   		CHARACTER VARYING (256) NOT NULL,
+   payment_id   		CHARACTER VARYING (256) ,
    interestCollected    numeric(13,6),
    principalCollected   numeric(13,6),
    tenantid			    CHARACTER VARYING (256),
+   collectionAgainst    CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128),
    created_date         bigint,
