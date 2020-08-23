@@ -43,7 +43,7 @@ public class ReadExcelController {
 		try {
 			String filePath = fileStoreUtils.fetchFileStoreUrl(searchCriteria);
 			if (!"".equals(filePath))
-				data = readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream());
+				data = readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream(), 0);
 			log.info("End controller method readExcel");
 		} catch (Exception e) {
 			log.error("Error occur during runnig controller method readExcel():" + e.getMessage());
