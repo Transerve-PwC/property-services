@@ -95,6 +95,7 @@ public class EnrichmentService {
 						ownerProperty.setTransitNumber(property.getTransitNumber());
 						String gen_owner_id = UUID.randomUUID().toString();
 						owner.setId(gen_owner_id);
+						owner.setIsPrimaryOwner(PTConstants.false_value);
 						owner.setProperty(ownerProperty);
 						owner.setTenantId(property.getTenantId());
 						owner.setAuditDetails(propertyAuditDetails);
@@ -116,6 +117,7 @@ public class EnrichmentService {
 		ownerDetails.setPropertyId(property.getId());
 		ownerDetails.setOwnerId(owner.getId());
 		ownerDetails.setTenantId(property.getTenantId());
+		ownerDetails.setPermanent(false);
 		ownerDetails.setAuditDetails(ownerAuditDetails);
 //		log.info("owner detail id: " + gen_owner_details_id);
 		return ownerDetails;
@@ -138,6 +140,7 @@ public class EnrichmentService {
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
 					property.getOwners().forEach(owner -> {
+						owner.setIsPrimaryOwner(PTConstants.false_value);
 						owner.setAuditDetails(modifyAuditDetails);
 						owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
 					});
@@ -188,13 +191,13 @@ public class EnrichmentService {
 				gen_property_id);
 		propertyDetail.setApplicationDocuments(applicationDocuments);
 
-		if (!CollectionUtils.isEmpty(property.getOwners())) {
+		/*if (!CollectionUtils.isEmpty(property.getOwners())) {
 			property.getOwners().forEach(owner -> {
 				if (owner.getActiveState()) {
 					propertyDetail.setCurrentOwner(owner.getOwnerDetails().getName());
 				}
 			});
-		}
+		}*/
 
 		propertyDetail.setAuditDetails(propertyAuditDetails);
 		return propertyDetail;
@@ -272,6 +275,7 @@ public class EnrichmentService {
 				String gen_owner_id = UUID.randomUUID().toString();
 				owner.setId(gen_owner_id);
 				owner.setTenantId(foundProperty.getTenantId());
+				owner.setIsPrimaryOwner(PTConstants.false_value);
 				owner.setAuditDetails(propertyAuditDetails);
 				OwnerDetails ownerDetails = updateOwnerShipDetails(owner, foundProperty, requestInfo, gen_owner_id);
 				owner.setOwnerDetails(ownerDetails);
@@ -293,7 +297,8 @@ public class EnrichmentService {
 				AuditDetails modifyAuditDetails = owner.getAuditDetails();
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
 				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
-
+				
+				owner.setIsPrimaryOwner(PTConstants.false_value);
 				owner.setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setOwnershipTransferDocuments(ownershipTransferDocuments);
@@ -762,7 +767,7 @@ public class EnrichmentService {
 			List<Property> properties = propertyRepository.getProperties(criteria);
 
 			properties.forEach(property -> {
-				property.getPropertyDetails().setCurrentOwner(latestOwner.getOwnerDetails().getName());
+				property.getPropertyDetails().setCurrentOwner(latestOwner.getId());
 
 				property.getOwners().forEach(existingOwner -> {
 					if (existingOwner.getId().contentEquals(latestOwner.getId())) {
@@ -781,6 +786,18 @@ public class EnrichmentService {
 			propertyRequest.setProperties(properties);
 			producer.push(config.getUpdatePropertyTopic(), propertyRequest);
 		});
+	}
+	
+	
+	public void propertyStatusEnrichment(PropertyRequest request) {
+		request.getProperties().forEach(approvedProperty -> {
+			approvedProperty.getOwners().forEach(propertyOwner->{
+				approvedProperty.getPropertyDetails().setCurrentOwner(propertyOwner.getId());
+				propertyOwner.setIsPrimaryOwner("true");
+				propertyOwner.getOwnerDetails().setPermanent(true);
+			});
+		});
+		
 	}
 
 	public Long getCurrentTimeEpoch() {
@@ -949,5 +966,6 @@ public class EnrichmentService {
 			});
 		}
 	}
+
 	
 }

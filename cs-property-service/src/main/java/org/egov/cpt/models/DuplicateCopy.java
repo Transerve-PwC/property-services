@@ -86,12 +86,16 @@ public class DuplicateCopy {
 	@JsonProperty("calculation")
 	Calculation calculation;
 
-	public DuplicateCopy addApplicationDocumentsItem(Document applicationDocumentsItem) {
+	public DuplicateCopy addApplicationDocumentsItem(Document newApplicationDocumentsItem) {
 		if (this.applicationDocuments == null) {
 			this.applicationDocuments = new ArrayList<>();
 		}
-		if (!this.applicationDocuments.contains(applicationDocumentsItem))
-			this.applicationDocuments.add(applicationDocumentsItem);
+		for (Document applicationDocument : applicationDocuments) {
+			if (applicationDocument.getId().equalsIgnoreCase(newApplicationDocumentsItem.getId())) {
+				return this;
+			}
+		}
+		this.applicationDocuments.add(newApplicationDocumentsItem);
 		return this;
 	}
 

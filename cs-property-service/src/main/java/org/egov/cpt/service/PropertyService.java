@@ -60,24 +60,24 @@ public class PropertyService {
 
 		propertyValidator.validateCreateRequest(request); // TODO add validations as per requirement
 		enrichmentService.enrichCreateRequest(request);
-		/*rentEnrichmentService.enrichRentdata(request);
+		rentEnrichmentService.enrichRentdata(request);
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
 				if(property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
 					property.setRentCollections(rentCollectionService.settle(property.getDemands(), property.getPayments(), property.getRentAccount()));
 			});
 		}
-		rentEnrichmentService.enrichCollection(request);*/
+		rentEnrichmentService.enrichCollection(request);
 		userService.createUser(request); // TODO create user as owner of the property if does not exists
 		/*if (config.getIsWorkflowEnabled()) {
 			wfIntegrator.callWorkFlow(request);
 		}*/
 		producer.push(config.getSavePropertyTopic(), request);
 		
-		/*request.getProperties().forEach(property -> {
-		 * if(property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
+		request.getProperties().forEach(property -> {
+			if(property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
 				property.setRentSummary(rentCollectionService.paymentSummary(property.getDemands(),property.getRentAccount()));
-		});*/
+		});
 		return request.getProperties();
 	}
 
@@ -102,7 +102,11 @@ public class PropertyService {
 		if (config.getIsWorkflowEnabled() && !request.getProperties().get(0).getMasterDataAction().equalsIgnoreCase("")) {
 			wfIntegrator.callWorkFlow(request);
 		}
+		if (request.getProperties().get(0).getMasterDataState().equalsIgnoreCase(PTConstants.PM_STATUS_APPROVED)) {
+			enrichmentService.propertyStatusEnrichment(request);
+		}
 		producer.push(config.getUpdatePropertyTopic(), request);
+		
 		
 		//TO get payment Summary
 		request.getProperties().forEach(property -> {
@@ -132,7 +136,7 @@ public class PropertyService {
 			if(!CollectionUtils.isEmpty(criteria.getState())&&criteria.getState().contains(PTConstants.PM_DRAFTED))
 				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
 		}
-		
+		criteria.setPermanet(PTConstants.true_value);
 		List<Property> properties = repository.getProperties(criteria);
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
