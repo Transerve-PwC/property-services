@@ -143,7 +143,7 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 			String ownerDetailId = rs.getString("odid");
 			String OwnerPropertyDetailId = rs.getString("oproperty_details_id");
 
-			if (ownerId != null && ownerId.contentEquals(applicationOwnerId)) {
+			if (applicationOwnerId != null && ownerId != null && ownerId.contentEquals(applicationOwnerId)) {
 				OwnerDetails ownerDetails = OwnerDetails.builder().id(ownerDetailId).ownerId(rs.getString("odowner_id"))
 						.ownerName(rs.getString("odowner_name")).tenantId(rs.getString("odtenantid"))
 						.guardianName(rs.getString("odguardian_name"))
