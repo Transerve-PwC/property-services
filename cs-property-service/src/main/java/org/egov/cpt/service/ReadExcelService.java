@@ -118,9 +118,13 @@ public class ReadExcelService {
 							 */
 							String lastCellData = String.valueOf(getValueFromCell(
 									currentRow.getCell(CELL_RECEIPT_NO, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-							String[] components = lastCellData.split("%s");
-							if (components.length == 1) {
+							String[] components = lastCellData.split("\\s+");
+							if (components.length == 0 || components[0].trim().length() == 0) {
+								payment.setReceiptNo("");
+								payment.setDateOfPayment(demand.getGenerationDate());
+							} else if (components.length == 1) {
 								payment.setReceiptNo(components[0]);
+								payment.setDateOfPayment(demand.getGenerationDate());
 							} else if (components.length > 1) {
 								try {
 									int date = this.extractFirstNumericPart(components[1]);
@@ -148,10 +152,10 @@ public class ReadExcelService {
 	}
 
 	private int extractFirstNumericPart(String str) throws NumberFormatException {
-		Pattern pattern = Pattern.compile("'(.*?)'");
+		Pattern pattern = Pattern.compile("^\\d*");
 		Matcher matcher = pattern.matcher(str);
 		if (matcher.find()) {
-			return Integer.parseInt(matcher.group(1));
+			return Integer.parseInt(matcher.group());
 		}
 		throw new NumberFormatException("Could not exract numeric part from " + str);
 	}
