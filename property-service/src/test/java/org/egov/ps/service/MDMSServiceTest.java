@@ -36,7 +36,6 @@ public class MDMSServiceTest {
 		RequestInfo requestInfo = new Gson().fromJson(json, RequestInfo.class);
 		
 		MDMSService service = new MDMSService(config, serviceRequestRepository, util);
-		
 		assertNotNull(service.getDocumentConfig("documents", requestInfo, "ch"));
 	}
 }
