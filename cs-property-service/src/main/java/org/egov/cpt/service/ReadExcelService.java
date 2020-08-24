@@ -57,7 +57,6 @@ public class ReadExcelService {
 			Sheet sheet = workbook.getSheetAt(sheetIndex);
 			Iterator<Row> rowIterator = sheet.iterator();
 			boolean shouldParseRows = false;
-
 			while (rowIterator.hasNext()) {				
 				Row currentRow = rowIterator.next();
 				
@@ -82,7 +81,7 @@ public class ReadExcelService {
 					 * First cell as month year.
 					 */
 					Object generationDateCell = getValueFromCell(currentRow.getCell(CELL_DATE, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-					if(generationDateCell instanceof String) {
+					if(generationDateCell instanceof String && !generationDateCell.toString().isEmpty()) {
 						log.debug("Parsing first cell with value {} as date", generationDateCell);
 						try {
 							demand.setGenerationDate(extractDateFromString(generationDateCell.toString()));
@@ -90,7 +89,7 @@ public class ReadExcelService {
 							log.debug(exception.getLocalizedMessage());
 							continue;
 						}
-					} else {
+					} else if(!generationDateCell.toString().isEmpty()){
 						demand.setGenerationDate((Long) generationDateCell);
 					}
 
@@ -163,7 +162,7 @@ public class ReadExcelService {
 		Matcher monthMatcher = monthPattern.matcher(str);
 		if(monthMatcher.find()) {
 			String month = monthMatcher.group().toUpperCase();
-			int monthIndex = Arrays.asList(MONTHS).indexOf(month);
+			int monthIndex = Arrays.asList(MONTHS).indexOf(month.substring(0, 3));
 			if (monthIndex < 0 ) {
 				throw new DateTimeParseException("Cannot parse "+ str + " as a date.", null, 0);
 			}
