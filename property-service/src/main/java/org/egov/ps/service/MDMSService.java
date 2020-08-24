@@ -29,25 +29,13 @@ public class MDMSService {
 
 	@Autowired
 	private Util util;
-	
-
-	public MDMSService() {
-		super();
-	}
-
-	public MDMSService(Configuration config, ServiceRequestRepository serviceRequestRepository, Util util) {
-		super();
-		this.config = config;
-		this.serviceRequestRepository = serviceRequestRepository;
-		this.util = util;
-	}
 
 	public List<Map<String, Object>> getApplicationConfig(String applicationType, RequestInfo requestInfo,
 			String tenantId) throws JSONException {
 //		TODO: change in mdms-data config
 		tenantId = tenantId.split("\\.")[0];
 		MdmsCriteriaReq mdmsCriteriaReq = util.prepareMdMsRequest(tenantId, PSConstants.MDMS_PS_MODULE_NAME,
-				Arrays.asList(applicationType), PSConstants.MDMS_DOCUMENT_FIELD_FILTER, requestInfo);
+				Arrays.asList(applicationType), PSConstants.MDMS_PS_FIELD_FILTER, requestInfo);
 		StringBuilder url = getMdmsSearchUrl(tenantId, applicationType, PSConstants.MDMS_PS_MODULE_NAME);
 		Object response = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
 
@@ -56,7 +44,7 @@ public class MDMSService {
 		List<Map<String, Object>> fieldConfigurations = JsonPath.read(response, MDMSResponsePath);
 		return fieldConfigurations;
 	}
-	
+
 	public List<Map<String, Object>> getDocumentConfig(String applicationType, RequestInfo requestInfo,
 			String tenantId) throws JSONException {
 //		TODO: change in mdms-data config
@@ -72,6 +60,7 @@ public class MDMSService {
 		return fieldConfigurations;
 	}
 
+	
 	/**
 	 * Creates and returns the url for mdms search endpoint
 	 *
