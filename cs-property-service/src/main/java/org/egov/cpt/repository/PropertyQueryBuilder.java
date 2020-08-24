@@ -51,7 +51,7 @@ public class PropertyQueryBuilder {
 											+ " ownership.created_by as ocreated_by, ownership.created_date as ocreated_date, ownership.modified_by as omodified_by, ownership.modified_date as omodified_date,"
 								
 											+ " od.id as odid, od.property_id as odproperty_id," + " od.owner_id odowner_id, od.tenantid as odtenantid,"
-											+ " od.name, od.email, od.phone," + " od.gender, od.date_of_birth, od.aadhaar_number,"
+											+ " od.name, od.email, od.phone," + " od.gender, od.date_of_birth, od.aadhaar_number,od.permanent as od_permanent,"
 											+ " od.allotment_startdate, od.allotment_enddate," + " od.posession_startdate, od.posession_enddate,"
 											+ " od.monthly_rent, od.revision_period, od.revision_percentage, od.father_or_husband, od.relation, od.application_number as odapplication_number ";
 											
