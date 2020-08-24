@@ -46,10 +46,10 @@ public class DemandServiceTests {
         rentAccount.setRemainingAmount(0.0);
 		
 		
-	    String[] dynamicDates = {"01 02 2020","01 03 2020","01 04 2020","01 05 2020","01 06 2020","01 07 2020","01 08 2020"};
-		Double[] dynamicCollectionPrincipal = {250.0,250.0,250.0,250.0,250.0,250.0,250.0};
-		String[] paymentDates = {"05 04 2020","05 05 2020"};
-		Double[] paymentAmount = {750.0,900.0};
+	    String[] dynamicDates = {"13 08 2020","13 08 2020"};
+		Double[] dynamicCollectionPrincipal = {400.0,490.0};
+		String[] paymentDates = {"13 08 2020","13 08 2020"};
+		Double[] paymentAmount = {700.0,900.0};
 		
 	
 
