@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 @SpringBootTest
 public class MDMSServiceTest {
 	@Autowired
-	MDMSService mDMSService;
+	MDMSService mDMSService; 
 	
 	@Test
 	public void getDocumentConfig() throws Exception {
