@@ -300,6 +300,7 @@ public class PropertyValidator {
 		validateColony(request, errorMap);
 		validateArea(request, errorMap);
 
+		validateDocuments(request, errorMap);
 		// TODO Commenting for temporary. Uncomment for payment validations
 //		validatePayment(request, errorMap);
 
@@ -1021,4 +1022,33 @@ public class PropertyValidator {
 			.forEach(documents -> _validateDuplicateDocuments(documents));
 	}
 
+	private void validateDocuments(PropertyRequest request, Map<String, String> errorMap) {
+
+		String tenantId = request.getProperties().get(0).getTenantId();
+		RequestInfo requestInfo = request.getRequestInfo();
+
+		String filter = "[?(@.code=='MasterRP')].documentList..code";
+		Map<String, List<String>> documents = getAttributeValues(tenantId.split("\\.")[0],
+				PTConstants.MDMS_PT_EGF_PROPERTY_SERVICE, Arrays.asList("applications"), filter,
+				"$.MdmsRes.PropertyServices", requestInfo);
+		List<String> type = new ArrayList<>();
+		request.getProperties().forEach(property -> {
+
+			property.getPropertyDetails().getApplicationDocuments().forEach(doc -> {
+				type.add(doc.getDocumentType());
+			});
+
+			documents.entrySet().stream().forEach(obj -> {
+				List<String> l = obj.getValue();
+				for (int i = 0; i < l.size(); i++) {
+					if (!type.contains(l.get(i))) {
+						errorMap.put("INVALID NUMBER OF DOCUMENTS" + i,
+								"The document '" + l.get(i) + "' is not present");
+					}
+				}
+			});
+
+		});
+
+	}
 }
