@@ -42,8 +42,9 @@ public class Owner {
 	@JsonProperty("activeState")
 	private Boolean activeState;
 
+	@Builder.Default
 	@JsonProperty("isPrimaryOwner")
-	private String isPrimaryOwner;
+	private String isPrimaryOwner="false";
 
 	@JsonProperty("ownerDetails")
 	private OwnerDetails ownerDetails;

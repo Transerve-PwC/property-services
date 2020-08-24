@@ -102,7 +102,11 @@ public class PropertyService {
 		if (config.getIsWorkflowEnabled() && !request.getProperties().get(0).getMasterDataAction().equalsIgnoreCase("")) {
 			wfIntegrator.callWorkFlow(request);
 		}
+		if (request.getProperties().get(0).getMasterDataState().equalsIgnoreCase(PTConstants.PM_STATUS_APPROVED)) {
+			enrichmentService.propertyStatusEnrichment(request);
+		}
 		producer.push(config.getUpdatePropertyTopic(), request);
+		
 		
 		//TO get payment Summary
 		request.getProperties().forEach(property -> {
@@ -132,7 +136,7 @@ public class PropertyService {
 			if(!CollectionUtils.isEmpty(criteria.getState())&&criteria.getState().contains(PTConstants.PM_DRAFTED))
 				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
 		}
-		
+		criteria.setPermanet(PTConstants.true_value);
 		List<Property> properties = repository.getProperties(criteria);
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();

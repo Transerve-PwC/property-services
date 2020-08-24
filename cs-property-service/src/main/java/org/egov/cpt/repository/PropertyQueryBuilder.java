@@ -265,6 +265,11 @@ public class PropertyQueryBuilder {
 			builder.append("od.phone = :phone");
 			preparedStmtList.put("phone", criteria.getPhone());
 		}
+		if (null != criteria.getPermanet()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("od.permanent = :permanent");
+			preparedStmtList.put("permanent", criteria.getPermanet());
+		}
 
 		if (null != criteria.getState()) {
 			if(criteria.getState().contains(PTConstants.PM_DRAFTED)){

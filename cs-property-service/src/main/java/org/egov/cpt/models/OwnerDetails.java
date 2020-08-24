@@ -129,8 +129,9 @@ public class OwnerDetails {
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
 
+	@Builder.Default
 	@JsonProperty("permanent")
-	private Boolean permanent;
+	private Boolean permanent=false;
 
 	@Valid
 	@JsonProperty("ownershipTransferDocuments")
