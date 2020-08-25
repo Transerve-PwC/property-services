@@ -265,10 +265,10 @@ public class PropertyQueryBuilder {
 			builder.append("od.phone = :phone");
 			preparedStmtList.put("phone", criteria.getPhone());
 		}
-		if (null != criteria.getPermanet()) {
+		if (null != criteria.getPermanent()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("od.permanent = :permanent");
-			preparedStmtList.put("permanent", criteria.getPermanet());
+			preparedStmtList.put("permanent", criteria.getPermanent());
 		}
 
 		if (null != criteria.getState()) {

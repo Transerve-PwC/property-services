@@ -39,7 +39,7 @@ public class PropertyCriteria {
 	
 	private List<String> relations;
 	
-	private String permanet;
+	private Boolean permanent;
 	
 	@Builder.Default
 	private String createdBy="";

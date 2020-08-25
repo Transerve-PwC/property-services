@@ -59,7 +59,7 @@ public class Owner {
 	 */
 	@Builder.Default
 	@JsonProperty("isPrimaryOwner")
-	private String isPrimaryOwner="false";
+	private Boolean isPrimaryOwner=false;
 
 	/**
 	 * This represents currently active owner.
