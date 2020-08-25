@@ -6,7 +6,7 @@ public class PSConstants {
 
 	public static final String PM_DRAFTED = "PM_DRAFTED";
 
-	public static final String PM_APPROVED = "PM_APPROVED";
+	public static final String PM_APPROVED = "PS_PM_APPROVED";
 
 	public static final String BUSINESS_SERVICE_PM = "PropertyMaster";
 

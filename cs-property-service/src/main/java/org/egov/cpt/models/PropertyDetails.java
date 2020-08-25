@@ -32,6 +32,37 @@ import lombok.ToString;
 @Builder
 public class PropertyDetails {
 
+	/**
+	 * Current interest rate per year.
+	 * This will not change and is constant.
+	 * 
+	 * Vikas Nagar Mauli Jagran (Sites 1-2765) - 0
+	 * Sector 52-53 - 0
+	 * Milk Colony Maloya - 24%
+	 * Kumhar Colony Maloya - 24%
+	 */
+	private Double interestRate;
+
+	/**
+	 * How much the monthly rent increases once the period ends.
+	 * 
+	 * Vikas Nagar Mauli Jagran (Sites 1-2765) - 5%
+	 * Sector 52-53 - 5%
+	 * Milk Colony Maloya - 25%
+	 * Kumhar Colony Maloya - 25%
+	 */
+	private Double rentIncrementPercentage;
+
+	/**
+	 * How often does the monthly rent amount increase.
+	 * 
+	 * Vikas Nagar Mauli Jagran (Sites 1-2765) - 1
+	 * Sector 52-53 - 1
+	 * Milk Colony Maloya - 5
+	 * Kumhar Colony Maloya - 5
+	 */
+	private Double rentIncrementPeriod;
+
 	@JsonProperty("id")
 	private String id;
 
@@ -50,6 +81,11 @@ public class PropertyDetails {
 	@JsonProperty("rentPerSqyd")
 	private String rentPerSqyd;
 
+	/**
+	 * The id of the currently owning user.
+	 * During property master this will be set.
+	 * During ownership transfer, new value should be also set here.
+	 */
 	@JsonProperty("currentOwner")
 	private String currentOwner;
 

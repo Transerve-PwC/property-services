@@ -241,5 +241,9 @@ public class PTConstants {
 	public static final String RELATION_FINANCE = "finance";
 
 	public static final String OT_STATUS_APPROVED = "OT_APPROVED";
+	public static final String PM_STATUS_APPROVED = "PM_APPROVED";
+	
+	public static final String false_value = "false";
+	public static final String true_value = "true";
 
 }

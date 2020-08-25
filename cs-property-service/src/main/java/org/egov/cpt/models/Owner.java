@@ -39,15 +39,10 @@ public class Owner {
 	@JsonProperty("allotmenNumber")
 	private String allotmenNumber;
 
-	@JsonProperty("activeState")
-	private Boolean activeState;
-
-	@JsonProperty("isPrimaryOwner")
-	private String isPrimaryOwner;
-
 	@JsonProperty("ownerDetails")
 	private OwnerDetails ownerDetails;
 	
+	@Builder.Default
 	@JsonProperty("assignee")
 	private List<String> assignee = null;
 
@@ -58,12 +53,31 @@ public class Owner {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
+	/**
+	 * This will be the first allotee.
+	 * During property master, this becomes true.
+	 */
+	@Builder.Default
+	@JsonProperty("isPrimaryOwner")
+	private Boolean isPrimaryOwner=false;
+
+	/**
+	 * This represents currently active owner.
+	 * During property master, this should be true.
+	 */
+	@JsonProperty("activeState")
+	private Boolean activeState;
+
+	/**
+	 * This will indicate the application status.
+	 */
 	@JsonProperty("applicationState")
 	private String applicationState;
 
 	@JsonProperty("applicationAction")
 	private String applicationAction;
 
+	@Builder.Default
 	@JsonProperty("businessService")
 	private String businessService = PTConstants.BUSINESS_SERVICE_OT;
 

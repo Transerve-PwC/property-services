@@ -171,7 +171,7 @@ public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<Ren
 					continue;
 				Date demandDate = new Date(rentDemand.getGenerationDate());
                                 //filter out the demands which have earlier date than payment 
-				if(demandDate.compareTo(paymentDate)<0) {
+				if(demandDate.compareTo(paymentDate)<=0) {
 					lstRentDemandProcess.add(rentDemand);
 				}
 			}
