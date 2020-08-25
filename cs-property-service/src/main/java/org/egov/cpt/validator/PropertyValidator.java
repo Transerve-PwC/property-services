@@ -135,7 +135,7 @@ public class PropertyValidator {
 					errorMap.put("INVALID OWNER NAME", "Owner Name is not valid");
 				}
 
-				if (!isValid(owner.getOwnerDetails().getMonthlyRent(), 3, 20)) {
+				/*if (!isValid(owner.getOwnerDetails().getMonthlyRent(), 3, 20)) {
 					errorMap.put("INVALID MONTHLY RENT", "Monthly Rent is not valid");
 				}
 
@@ -145,7 +145,7 @@ public class PropertyValidator {
 
 				if (!isValid(owner.getOwnerDetails().getRevisionPercentage(), 1, 5)) {
 					errorMap.put("INVALID REVISION PERCENTAGE", "Revision Percentage is not valid");
-				}
+				}*/
 
 				if (!isNotNullValid(owner.getOwnerDetails().getPosessionStartdate())) {
 					errorMap.put("INVALID POSESSION START DATE",
