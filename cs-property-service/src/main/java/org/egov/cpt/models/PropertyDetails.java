@@ -81,6 +81,11 @@ public class PropertyDetails {
 	@JsonProperty("rentPerSqyd")
 	private String rentPerSqyd;
 
+	/**
+	 * The id of the currently owning user.
+	 * During property master this will be set.
+	 * During ownership transfer, new value should be also set here.
+	 */
 	@JsonProperty("currentOwner")
 	private String currentOwner;
 

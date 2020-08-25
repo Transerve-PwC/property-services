@@ -117,8 +117,21 @@ public class OwnerDetails {
 		}
 	}
 
+	/**
+	 * This value will tell us if this got added as part of property masters or via ownership transfer application.
+	 * This should be either MasterEntry or CitizenApplication.
+	 * This 
+	 */
+	@Builder.Default
 	@JsonProperty("applicationType")
-	private ApplicationTypeEnum applicationType = null;
+	private ApplicationTypeEnum applicationType = ApplicationTypeEnum.NEW;
+
+	/**
+	 * After approval of application this owner becomes permanent.
+	 */
+	@Builder.Default
+	@JsonProperty("permanent")
+	private Boolean permanent=false;
 
 	@JsonProperty("relationWithDeceasedAllottee")
 	private String relationWithDeceasedAllottee;
@@ -128,10 +141,6 @@ public class OwnerDetails {
 
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
-
-	@Builder.Default
-	@JsonProperty("permanent")
-	private Boolean permanent=false;
 
 	@Valid
 	@JsonProperty("ownershipTransferDocuments")

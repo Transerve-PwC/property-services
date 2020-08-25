@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -737,50 +738,73 @@ public class EnrichmentService {
 	 * 
 	 * @param ownershipTransferRequest The update request
 	 */
-
-//	TODO
+	
 	/**
-	 * 1. property.propertyDetails.currentOwner (how to change this) unnecessary
-	 * column
+	 * 1. property.propertyDetails.currentOwner 
 	 * 
-	 * for this owner
+	 * For current owner
 	 * 
-	 * 2. owner.activeState (true) // present 3. owner.isPrimaryOwner (?) 4.
-	 * owner.ownerDetails.allotmentStartdate (current) 5.
-	 * owner.ownerDetails.allotmentEnddate (from current) 6.
-	 * owner.ownerDetails.permanent (true) // meu or
+	 * 1. owner.activeState (true) 
+	 * 2. owner.ownerDetails.allotmentStartdate (current)
+	 * 3. owner.ownerDetails.permanent (true)
 	 * 
-	 * for other owners of this property (how to access this)
-	 * 
-	 * 7. owner.activeState (false) 8. owner.isPrimaryOwner (?) 9.
-	 * owner.ownerDetails.allotmentStartdate (it already exists)
-	 * 10.owner.ownerDetails.allotmentEnddate (current)
-	 * 11.owner.ownerDetails.permanent (true)
-	 * 
+	 * For previous owner.
+	 * 1. Make sure allotmentEndDate is set to current date.
+	 * 2. active is false.
 	 * 
 	 * meu or applications separate allotment date
 	 */
 	public void postStatusEnrichment(OwnershipTransferRequest ownershipTransferRequest) {
 		ownershipTransferRequest.getOwners().forEach(latestOwner -> {
 
+			/**
+			 * Get the property for the current ownership transfer request.
+			 */
 			PropertyCriteria criteria = getPropertyCriteriaForOT(ownershipTransferRequest);
+			criteria.setLimit(1L);
 			List<Property> properties = propertyRepository.getProperties(criteria);
+			if (CollectionUtils.isEmpty(properties)) {
+				throw new CustomException("OWNERSHIP TRANSFER INCOMPLETE", "Could not find property for this ownership transfer enrichment");
+			}
+			Property property = properties.get(0);
+			property.getPropertyDetails().setCurrentOwner(latestOwner.getId());
 
-			properties.forEach(property -> {
-				property.getPropertyDetails().setCurrentOwner(latestOwner.getId());
+			/*
+			 * Modify the previous owner.
+			 * 1. Make sure allotmentEndDate is set to current date.
+	 		 * 2. active is false.
+			 */
+			Optional<Owner> previousOwner = property.getOwners().stream()
+				.filter(Owner::getActiveState)
+				.findAny();
+			if (!previousOwner.isPresent()) {
+				log.error("NO EXISTING OWNER FOUND", "No existing owner with isActive = true found in property "+property.getId());
+			} else {
+				previousOwner.get().setActiveState(false);
+				previousOwner.get().getOwnerDetails().setAllotmentEnddate(getCurrentTimeEpoch());
+			}
 
-				property.getOwners().forEach(existingOwner -> {
-					if (existingOwner.getId().contentEquals(latestOwner.getId())) {
-						latestOwner.setActiveState(true);
-						latestOwner.getOwnerDetails().setPermanent(true);
-						latestOwner.getOwnerDetails().setAllotmentStartdate(getCurrentTimeEpoch());
-					} else if (!existingOwner.getId().contentEquals(latestOwner.getId())) {
-						existingOwner.setActiveState(false);
-						existingOwner.getOwnerDetails().setPermanent(false);
-					}
-				});
-			});
+			/**
+			 * Get the current owner. 
+			 * 1. owner.activeState (true) 
+			 * 2. owner.ownerDetails.allotmentStartdate (current)
+			 * 3. owner.ownerDetails.permanent (true)
+			 */
+			Optional<Owner> currentOwner = property.getOwners().stream()
+				.filter(owner -> owner.getId().equalsIgnoreCase(latestOwner.getId()))
+				.findAny();
 
+			if (!currentOwner.isPresent()) {
+				throw new CustomException("OWNERSHIP TRANSFER INCOMPLETE", "Could not find owner with id "+ latestOwner.getId() + " for property "+ property.getId());
+			} else {
+				currentOwner.get().setActiveState(true);
+				currentOwner.get().getOwnerDetails().setPermanent(true);
+				currentOwner.get().getOwnerDetails().setAllotmentStartdate(getCurrentTimeEpoch());
+			}
+			
+			/**
+			 * Update the property by sending to the persistor.
+			 */
 			PropertyRequest propertyRequest = new PropertyRequest();
 			propertyRequest.setRequestInfo(ownershipTransferRequest.getRequestInfo());
 			propertyRequest.setProperties(properties);
