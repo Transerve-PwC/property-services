@@ -25,6 +25,7 @@ import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.NoticeGeneration;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
+import org.egov.cpt.models.OwnerDetails.ApplicationTypeEnum;
 import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
@@ -87,6 +88,7 @@ public class EnrichmentService {
 				property.setAuditDetails(propertyAuditDetails);
 				property.setPropertyDetails(propertyDetail);
 				property.setMasterDataState(PTConstants.PM_DRAFTED);
+				
 //				log.info("property id: " + gen_property_id);
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
@@ -96,12 +98,15 @@ public class EnrichmentService {
 						ownerProperty.setTransitNumber(property.getTransitNumber());
 						String gen_owner_id = UUID.randomUUID().toString();
 						owner.setId(gen_owner_id);
-						owner.setIsPrimaryOwner(PTConstants.false_value);
 						owner.setProperty(ownerProperty);
 						owner.setTenantId(property.getTenantId());
 						owner.setAuditDetails(propertyAuditDetails);
 						OwnerDetails ownerDetails = getOwnerShipDetails(owner, property, requestInfo, gen_property_id);
 						owner.setOwnerDetails(ownerDetails);
+						property.getPropertyDetails().setCurrentOwner(owner.getId());
+						owner.setIsPrimaryOwner(true);
+						owner.getOwnerDetails().setPermanent(true);
+						
 //						log.info("owner id: " + gen_owner_id);
 					});
 				}
@@ -120,6 +125,7 @@ public class EnrichmentService {
 		ownerDetails.setTenantId(property.getTenantId());
 		ownerDetails.setPermanent(false);
 		ownerDetails.setAuditDetails(ownerAuditDetails);
+		ownerDetails.setApplicationType(ApplicationTypeEnum.MASTERRP);
 //		log.info("owner detail id: " + gen_owner_details_id);
 		return ownerDetails;
 	}
@@ -141,7 +147,6 @@ public class EnrichmentService {
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
 					property.getOwners().forEach(owner -> {
-						owner.setIsPrimaryOwner(PTConstants.false_value);
 						owner.setAuditDetails(modifyAuditDetails);
 						owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
 					});
@@ -276,7 +281,7 @@ public class EnrichmentService {
 				String gen_owner_id = UUID.randomUUID().toString();
 				owner.setId(gen_owner_id);
 				owner.setTenantId(foundProperty.getTenantId());
-				owner.setIsPrimaryOwner(PTConstants.false_value);
+				owner.setIsPrimaryOwner(false);
 				owner.setAuditDetails(propertyAuditDetails);
 				OwnerDetails ownerDetails = updateOwnerShipDetails(owner, foundProperty, requestInfo, gen_owner_id);
 				owner.setOwnerDetails(ownerDetails);
@@ -299,7 +304,7 @@ public class EnrichmentService {
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
 				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
 				
-				owner.setIsPrimaryOwner(PTConstants.false_value);
+				owner.setIsPrimaryOwner(false);
 				owner.setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setOwnershipTransferDocuments(ownershipTransferDocuments);
@@ -812,18 +817,6 @@ public class EnrichmentService {
 		});
 	}
 	
-	
-	public void propertyStatusEnrichment(PropertyRequest request) {
-		request.getProperties().forEach(approvedProperty -> {
-			approvedProperty.getOwners().forEach(propertyOwner->{
-				approvedProperty.getPropertyDetails().setCurrentOwner(propertyOwner.getId());
-				propertyOwner.setIsPrimaryOwner("true");
-				propertyOwner.getOwnerDetails().setPermanent(true);
-			});
-		});
-		
-	}
-
 	public Long getCurrentTimeEpoch() {
 		long epochTime = 0;
 		Date today = Calendar.getInstance().getTime();

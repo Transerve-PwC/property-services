@@ -90,9 +90,9 @@ public class OwnerDetails {
 	private String relation;
 
 	public enum ApplicationTypeEnum {
-		NEW("MasterEntry"),
+		MASTERRP("MasterEntry"),
 
-		RENEW("CitizenApplication");
+		CITIZENRP("CitizenApplication");
 
 		private String value;
 
@@ -124,7 +124,7 @@ public class OwnerDetails {
 	 */
 	@Builder.Default
 	@JsonProperty("applicationType")
-	private ApplicationTypeEnum applicationType = ApplicationTypeEnum.NEW;
+	private ApplicationTypeEnum applicationType = ApplicationTypeEnum.MASTERRP;
 
 	/**
 	 * After approval of application this owner becomes permanent.
