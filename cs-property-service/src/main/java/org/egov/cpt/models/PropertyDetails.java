@@ -41,6 +41,7 @@ public class PropertyDetails {
 	 * Milk Colony Maloya - 24%
 	 * Kumhar Colony Maloya - 24%
 	 */
+	@JsonProperty("interestRate")
 	private Double interestRate;
 
 	/**
@@ -51,6 +52,7 @@ public class PropertyDetails {
 	 * Milk Colony Maloya - 25%
 	 * Kumhar Colony Maloya - 25%
 	 */
+	@JsonProperty("rentIncrementPercentage")
 	private Double rentIncrementPercentage;
 
 	/**
@@ -61,7 +63,8 @@ public class PropertyDetails {
 	 * Milk Colony Maloya - 5
 	 * Kumhar Colony Maloya - 5
 	 */
-	private Double rentIncrementPeriod;
+	@JsonProperty("rentIncrementPeriod")
+	private int rentIncrementPeriod;
 
 	@JsonProperty("id")
 	private String id;

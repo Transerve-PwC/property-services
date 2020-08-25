@@ -32,7 +32,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_pt_propertydetails_v1 (id, property_id, transit_number, tenantid, area, rent_per_sqyd, current_owner, floors, additional_details, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_propertydetails_v1 (id, property_id, transit_number, tenantid, area, rent_per_sqyd, current_owner, floors, additional_details,interest_rate,rent_increment_percentage,rent_increment_period, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: Properties.*.propertyDetails
       jsonMaps:
 
@@ -53,6 +53,12 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.floors
 
       - jsonPath: $.Properties.*.propertyDetails.additionalDetails
+      
+      - jsonPath: $.Properties.*.propertyDetails.interestRate
+
+      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPercentage
+
+      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPeriod
 
       - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdBy
 
@@ -233,7 +239,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_pt_propertydetails_audit_v1 (id, property_id, transit_number, tenantid, area, rent_per_sqyd, current_owner, floors, additional_details, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_pt_propertydetails_audit_v1 (id, property_id, transit_number, tenantid, area, rent_per_sqyd, current_owner, floors, additional_details,interest_rate,rent_increment_percentage,rent_increment_period, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: Properties.*.propertyDetails
       jsonMaps:
 
@@ -254,6 +260,12 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.floors
 
       - jsonPath: $.Properties.*.propertyDetails.additionalDetails
+      
+      - jsonPath: $.Properties.*.propertyDetails.interestRate
+
+      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPercentage
+
+      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPeriod
 
       - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdBy
 
@@ -512,7 +524,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.transitNumber
 
 
-    - query: UPDATE cs_pt_propertydetails_v1 SET tenantid=?, area=?, rent_per_sqyd=?, current_owner=?, floors=?, additional_details=?, modified_by=?, modified_date=? where id=? AND property_id=? AND transit_number=?;
+    - query: UPDATE cs_pt_propertydetails_v1 SET tenantid=?, area=?, rent_per_sqyd=?, current_owner=?, floors=?, additional_details=?,interest_rate=?,rent_increment_percentage=?,rent_increment_period=?, modified_by=?, modified_date=? where id=? AND property_id=? AND transit_number=?;
       basePath: Properties.*
       jsonMaps:
 
@@ -527,6 +539,12 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.floors
 
       - jsonPath: $.Properties.*.propertyDetails.additionalDetails
+      
+      - jsonPath: $.Properties.*.propertyDetails.interestRate
+
+      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPercentage
+
+      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPeriod
 
       - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
 
