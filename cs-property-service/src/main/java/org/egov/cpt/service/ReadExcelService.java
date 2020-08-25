@@ -177,7 +177,7 @@ public class ReadExcelService {
 			String month = monthMatcher.group().toUpperCase();
 			int monthIndex = Arrays.asList(MONTHS).indexOf(month.substring(0, 3));
 			if (monthIndex < 0) {
-				throw new DateTimeParseException("Cannot parse " + str + " as a date.", null, 0);
+				throw new DateTimeParseException("Cannot parse " + str + " as a date.", "", 0);
 			}
 			Pattern datePattern = Pattern.compile("\\d*$");
 			Matcher dateMatcher = datePattern.matcher(str);
@@ -185,7 +185,7 @@ public class ReadExcelService {
 				String twoYearDate = dateMatcher.group();
 				int twoYearDateInt = Integer.parseInt(twoYearDate);
 				if (twoYearDateInt >= 100) {
-					throw new DateTimeParseException("Cannot parse " + str + " as a date.", null, 0);
+					throw new DateTimeParseException("Cannot parse " + str + " as a date.", "", 0);
 				}
 				int year = twoYearDateInt < 50 ? 2000 + twoYearDateInt : 1900 + twoYearDateInt;
 				Calendar calendar = Calendar.getInstance();
@@ -193,7 +193,7 @@ public class ReadExcelService {
 				return calendar.getTimeInMillis();
 			}
 		}
-		throw new DateTimeParseException("Cannot parse " + str + " as a date.", null, 0);
+		throw new DateTimeParseException("Cannot parse " + str + " as a date.", "", 0);
 	}
 
 	private Object getValueFromCell(Cell cell1) {
