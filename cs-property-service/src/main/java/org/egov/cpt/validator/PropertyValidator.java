@@ -394,14 +394,14 @@ public class PropertyValidator {
 	public List<Owner> validateUpdateRequest(OwnershipTransferRequest request) {
 
 		Map<String, String> errorMap = new HashMap<>();
-
+		
 		DuplicateCopySearchCriteria criteria = getOTSearchCriteria(request);
 		List<Owner> ownersFromSearchResponse = OTRepository.searchOwnershipTransfer(criteria);
 		boolean ifOwnerExists = OwnerExists(ownersFromSearchResponse);
 		if (!ifOwnerExists) {
 			throw new CustomException("OWNER NOT FOUND", "The owner to be updated does not exist");
 		}
-
+		validateOwnershipTransferDocuments(request, errorMap);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 
@@ -534,7 +534,7 @@ public class PropertyValidator {
 
 		validateDocument(duplicateCopyRequest);
 		validateIds(duplicateCopyRequest);
-
+		validateDuplicateCopyDocuments(duplicateCopyRequest, errorMap);
 		// validateIds(duplicateCopyRequest, errorMap);
 		String propertyId = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
@@ -900,7 +900,7 @@ public class PropertyValidator {
 
 		validateDocument(mortgageRequest);
 		validateIds(mortgageRequest);
-
+		validateMortgageDocuments(mortgageRequest, errorMap);
 		// validateIds(duplicateCopyRequest, errorMap);
 		String propertyId = mortgageRequest.getMortgageApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
@@ -1070,5 +1070,23 @@ public class PropertyValidator {
 					errorMap.put("REQUIRED DOCUMENT NOT FOUND", "The document type '" + documentCode + "' is required but it is not present");
 				}
 			});
+	}
+
+	private void validateMortgageDocuments(MortgageRequest request, Map<String, String> errorMap) {
+		request.getMortgageApplications().forEach(mortgage -> {
+			this.validateDocumentsOnType(request.getRequestInfo(), mortgage.getTenantId(), mortgage.getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_MG_RP);
+		});
+	}
+
+	private void validateDuplicateCopyDocuments(DuplicateCopyRequest request, Map<String, String> errorMap) {
+		request.getDuplicateCopyApplications().forEach(duplicateCopy -> {
+			this.validateDocumentsOnType(request.getRequestInfo(), duplicateCopy.getTenantId(), duplicateCopy.getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_DC_RP);
+		});
+	}
+
+	private void validateOwnershipTransferDocuments(OwnershipTransferRequest request, Map<String, String> errorMap) {
+		request.getOwners().forEach(owner -> {
+			this.validateDocumentsOnType(request.getRequestInfo(), owner.getTenantId(), owner.getOwnerDetails().getOwnershipTransferDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_FL_RP);
+		});
 	}
 }
