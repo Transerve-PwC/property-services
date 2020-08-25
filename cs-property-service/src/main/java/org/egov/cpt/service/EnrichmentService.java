@@ -282,6 +282,7 @@ public class EnrichmentService {
 				owner.setId(gen_owner_id);
 				owner.setTenantId(foundProperty.getTenantId());
 				owner.setIsPrimaryOwner(false);
+				owner.setActiveState(false);
 				owner.setAuditDetails(propertyAuditDetails);
 				OwnerDetails ownerDetails = updateOwnerShipDetails(owner, foundProperty, requestInfo, gen_owner_id);
 				owner.setOwnerDetails(ownerDetails);
@@ -305,6 +306,7 @@ public class EnrichmentService {
 				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
 				
 				owner.setIsPrimaryOwner(false);
+				owner.setActiveState(false);
 				owner.setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setOwnershipTransferDocuments(ownershipTransferDocuments);
