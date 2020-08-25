@@ -68,9 +68,6 @@ public class PropertyValidator {
 		Optional<Property> property_Optional = request.getProperties().stream().filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners()))
 				.findAny();
 		if (property_Optional.isPresent()) {
-			
-			List<Map<String, Object>> fieldConfigurations = mdmsservice.getDocumentConfig("documents", request.getRequestInfo(), "ch");
-			
 			property_Optional.get().getPropertyDetails().getOwners().stream()
 				.forEach(o -> {
 					if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
@@ -84,21 +81,7 @@ public class PropertyValidator {
 					 */
 					
 					if(null != o.getOwnerDetails() && null != o.getOwnerDetails().getOwnerDocuments()) {
-						fieldConfigurations.stream().forEach(field -> {
-							
-							// condition 1 :: check Master json document is present with in owner document list , if not then error, all documents are mandatory
-							if(o.getOwnerDetails().getOwnerDocuments().contains(Document.builder().code(field.get("code").toString()).build())) {
-								
-								// condition 2 :: check owner document have same extention as per master json define , if not then error needed for same document
-								Document ownerDocument_ = o.getOwnerDetails().getOwnerDocuments().get(o.getOwnerDetails().getOwnerDocuments().indexOf(Document.builder().code(field.get("code").toString()).build()));
-								List<String> typeDocuemnt = Arrays.asList(field.get("accept").toString().split(","));
-								if(!typeDocuemnt.contains(ownerDocument_.getDocumentType())) {
-									throw new CustomException(Collections.singletonMap("Document Extension Not correct", String.format("Attachment Document Extension Not correct "+ ownerDocument_.getDocumentType()+" for user :"+o.getOwnerDetails().getOwnerName(), o.getOwnerDetails().getOwnerName())));
-								}
-							}else {
-								throw new CustomException(Collections.singletonMap("Missing Document", String.format("Missing attachment "+field.get("code").toString()+" for user :"+o.getOwnerDetails().getOwnerName(), o.getOwnerDetails().getOwnerName())));
-							}
-						});
+						validateDocumentsOnType(request.getRequestInfo(), property_Optional.get().getTenantId(), o.getOwnerDetails().getOwnerDocuments(), errorMap, "", o);
 					}
 					
 				});
@@ -147,6 +130,31 @@ public class PropertyValidator {
 				});
 			}
 		});*/
+	}
+	
+	private void validateDocumentsOnType(RequestInfo requestInfo, String tenantId, List<Document> documents, Map<String, String> errorMap, String code, Owner o) {
+		
+		List<Map<String, Object>> fieldConfigurations = mdmsservice.getDocumentConfig("documents", requestInfo, tenantId);
+		
+		fieldConfigurations.stream().forEach(field -> {
+			
+			// condition 1 :: check Master json document is present with in owner document list , if not then error, all documents are mandatory
+			if(documents.contains(Document.builder().code(field.get("code").toString()).build())) {
+				
+				// condition 2 :: check owner document have same extention as per master json define , if not then error needed for same document
+				Document ownerDocument_ = documents.get(documents.indexOf(Document.builder().code(field.get("code").toString()).build()));
+				List<String> typeDocuemnt = Arrays.asList(field.get("accept").toString().split(","));
+				if(!typeDocuemnt.contains(ownerDocument_.getDocumentType())) {
+					errorMap.put("INVALID DOCUMENT",
+							"Document is not valid for user : " + o.getOwnerDetails().getOwnerName());
+				}
+			}else {
+				errorMap.put("INVALID DOCUMENT",
+						"Document is not valid for user : " + o.getOwnerDetails().getOwnerName());
+			}
+		});
+		
+		
 	}
 
 	private boolean isMobileNumberValid(String mobileNumber) {

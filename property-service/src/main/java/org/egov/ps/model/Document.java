@@ -38,7 +38,7 @@ public class Document {
 	private String referenceId;
 
 	@EqualsAndHashCode.Include
-	@JsonProperty("documentType")
+	@JsonProperty("code")
 	private String code;
 	
 	@JsonProperty("documentType")

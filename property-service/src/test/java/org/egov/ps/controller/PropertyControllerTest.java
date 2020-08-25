@@ -37,7 +37,7 @@ public class PropertyControllerTest {
 	PropertyController propertyController;
 
 
-	@Test(expected = CustomException.class)
+	@Test
 	public void createTest() throws Exception {
 		String requestInfoJson = "{\"apiId\":\"Rainmaker\",\"ver\":\"01\",\"action\":\"_create\",\"key\":\"\",\"msgId\":\"20170310130900|en_IN\",\"authToken\":\"833b0a57-bbc5-4194-a961-bdb3794fa284\",\"userInfo\":{\"tenantId\":\"ch\",\"id\":8,\"username\":\"any\",\"mobile\":\"8866581197\",\"email\":\"mineshbhadeshia@gmail.com\" }}";
 		RequestInfo requestInfo = new Gson().fromJson(requestInfoJson, RequestInfo.class);
