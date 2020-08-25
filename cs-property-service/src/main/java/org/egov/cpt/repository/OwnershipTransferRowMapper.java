@@ -61,7 +61,7 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 
 				currentOwner = Owner.builder().id(rs.getString("oid")).property(property)
 						.tenantId(rs.getString("otenantid")).allotmenNumber(rs.getString("oallotmen_number"))
-						.activeState(rs.getBoolean("oactive_state")).isPrimaryOwner(rs.getString("ois_primary_owner"))
+						.activeState(rs.getBoolean("oactive_state")).isPrimaryOwner(rs.getBoolean("ois_primary_owner"))
 						.applicationState(rs.getString("application_state"))
 						.applicationAction(rs.getString("application_action")).ownerDetails(ownerDetails)
 						.auditDetails(auditdetails).build();
