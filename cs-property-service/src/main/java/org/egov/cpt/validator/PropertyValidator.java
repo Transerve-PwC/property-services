@@ -86,12 +86,25 @@ public class PropertyValidator {
 
 		validateColony(request, errorMap);
 		validateArea(request, errorMap);
+		validateRentDetails(request, errorMap);
 
-		// TODO Commenting for temporary. Uncomment for payment validations
 //		validatePayment(request, errorMap);
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
+	}
+
+	private void validateRentDetails(PropertyRequest request, Map<String, String> errorMap) {
+		List<Property> property = request.getProperties();
+		property.forEach(properties -> {
+			if (properties.getPropertyDetails().getRentIncrementPercentage()<0 || properties.getPropertyDetails().getRentIncrementPercentage()>=100) {
+				errorMap.put("INVALID INCREMENT PERCENTAGE", "Increment precentage is not valid");
+			}
+
+			if (properties.getPropertyDetails().getInterestRate()<0 || properties.getPropertyDetails().getInterestRate()>=100) {
+				errorMap.put("INVALID INTEREST RATE", "Interest rate is not valid");
+			}
+		});
 	}
 
 	private void validatePayment(PropertyRequest request, Map<String, String> errorMap) {
@@ -122,7 +135,7 @@ public class PropertyValidator {
 					errorMap.put("INVALID OWNER NAME", "Owner Name is not valid");
 				}
 
-				if (!isValid(owner.getOwnerDetails().getMonthlyRent(), 3, 20)) {
+				/*if (!isValid(owner.getOwnerDetails().getMonthlyRent(), 3, 20)) {
 					errorMap.put("INVALID MONTHLY RENT", "Monthly Rent is not valid");
 				}
 
@@ -132,7 +145,7 @@ public class PropertyValidator {
 
 				if (!isValid(owner.getOwnerDetails().getRevisionPercentage(), 1, 5)) {
 					errorMap.put("INVALID REVISION PERCENTAGE", "Revision Percentage is not valid");
-				}
+				}*/
 
 				if (!isNotNullValid(owner.getOwnerDetails().getPosessionStartdate())) {
 					errorMap.put("INVALID POSESSION START DATE",
@@ -303,10 +316,10 @@ public class PropertyValidator {
 
 		validateColony(request, errorMap);
 		validateArea(request, errorMap);
+		validateRentDetails(request, errorMap);
 
 		validatePropertyDocuments(request, errorMap);
 
-		// TODO Commenting for temporary. Uncomment for payment validations
 //		validatePayment(request, errorMap);
 
 		List<Property> prop = request.getProperties();

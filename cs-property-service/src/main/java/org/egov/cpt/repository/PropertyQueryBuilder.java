@@ -34,6 +34,7 @@ public class PropertyQueryBuilder {
 											+ " pt.created_by as pcreated_by, pt.created_date as pcreated_date, pt.modified_by as pmodified_by, pt.modified_date as pmodified_date,"
 
 											+ " ptdl.id as pdid, ptdl.property_id as pdproperty_id, ptdl.transit_number as pdtransit_number,"
+											+ " ptdl.interest_rate as pd_int_rate,ptdl.rent_increment_percentage as pd_rent_inc_pg,ptdl.rent_increment_period as pd_rent_inc_period,"
 											+ " ptdl.tenantid as pdtenantid, ptdl.area, ptdl.rent_per_sqyd, ptdl.current_owner, ptdl.floors, ptdl.additional_details, "
 
 											+ " address.id as aid, address.property_id as aproperty_id, address.transit_number as atransit_number,"
