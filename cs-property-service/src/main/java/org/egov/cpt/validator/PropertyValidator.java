@@ -381,14 +381,14 @@ public class PropertyValidator {
 	public List<Owner> validateUpdateRequest(OwnershipTransferRequest request) {
 
 		Map<String, String> errorMap = new HashMap<>();
-
+		
 		DuplicateCopySearchCriteria criteria = getOTSearchCriteria(request);
 		List<Owner> ownersFromSearchResponse = OTRepository.searchOwnershipTransfer(criteria);
 		boolean ifOwnerExists = OwnerExists(ownersFromSearchResponse);
 		if (!ifOwnerExists) {
 			throw new CustomException("OWNER NOT FOUND", "The owner to be updated does not exist");
 		}
-
+		validateOwnershipTransferDocuments(request, errorMap);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 
@@ -1061,14 +1061,19 @@ public class PropertyValidator {
 
 	private void validateMortgageDocuments(MortgageRequest request, Map<String, String> errorMap) {
 		request.getMortgageApplications().forEach(mortgage -> {
-			this.validateDocumentsOnType(request.getRequestInfo(), mortgage.getTenantId(), mortgage.getApplicationDocuments(), errorMap, "MortgageRP");
+			this.validateDocumentsOnType(request.getRequestInfo(), mortgage.getTenantId(), mortgage.getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_MG_RP);
 		});
 	}
 
 	private void validateDuplicateCopyDocuments(DuplicateCopyRequest request, Map<String, String> errorMap) {
 		request.getDuplicateCopyApplications().forEach(duplicateCopy -> {
-			this.validateDocumentsOnType(request.getRequestInfo(), duplicateCopy.getTenantId(), duplicateCopy.getApplicationDocuments(), errorMap, "DuplicateCopyOfAllotmentLetterRP");
+			this.validateDocumentsOnType(request.getRequestInfo(), duplicateCopy.getTenantId(), duplicateCopy.getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_DC_RP);
 		});
 	}
 
+	private void validateOwnershipTransferDocuments(OwnershipTransferRequest request, Map<String, String> errorMap) {
+		request.getOwners().forEach(owner -> {
+			this.validateDocumentsOnType(request.getRequestInfo(), owner.getTenantId(), owner.getOwnerDetails().getOwnershipTransferDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_FL_RP);
+		});
+	}
 }
