@@ -76,7 +76,7 @@ public class NoticeNotificationService {
 	            }*/
 	        	
 	        	Owner ownerDtl = propertiesFromDb.get(0).getOwners().stream().filter(owner -> {
-					return owner.getOwnerDetails().getName().equalsIgnoreCase(propertiesFromDb.get(0).getPropertyDetails().getCurrentOwner());
+					return owner.getId().equalsIgnoreCase(propertiesFromDb.get(0).getPropertyDetails().getCurrentOwner());
 			}).findFirst().get();
 	        	
 	        	if(ownerDtl.getOwnerDetails().getEmail() !=null){
@@ -105,7 +105,7 @@ public class NoticeNotificationService {
 			String localizationMessages;
 
 			Owner ownerDtl = propertiesFromDb.get(0).getOwners().stream().filter(owner -> {
-				return owner.getOwnerDetails().getName().equalsIgnoreCase(propertiesFromDb.get(0).getPropertyDetails().getCurrentOwner());
+				return owner.getId().equalsIgnoreCase(propertiesFromDb.get(0).getPropertyDetails().getCurrentOwner());
 			}).findFirst().get();
 			
 			localizationMessages = util.getLocalizationMessages(tenantId, request.getRequestInfo());
