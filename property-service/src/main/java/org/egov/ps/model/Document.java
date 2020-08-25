@@ -25,7 +25,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Document {
 
 	@JsonProperty("id")
@@ -37,6 +37,10 @@ public class Document {
 	@JsonProperty("referenceId")
 	private String referenceId;
 
+	@EqualsAndHashCode.Include
+	@JsonProperty("documentType")
+	private String code;
+	
 	@JsonProperty("documentType")
 	private String documentType;
 
