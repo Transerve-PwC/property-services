@@ -1,6 +1,5 @@
 package org.egov.cpt.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.cpt.models.RentAccount;
