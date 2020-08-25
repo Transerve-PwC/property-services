@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.ps.model.Document;
+import org.egov.ps.model.EstateDocumentList;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyCriteria;
@@ -28,6 +29,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -73,51 +76,13 @@ public class PropertyValidator {
 					if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
 						throw new CustomException(Collections.singletonMap("INVALID MOBILE NUMBER", String.format("MobileNumber is not valid for user :"+o.getOwnerDetails().getOwnerName(), o.getOwnerDetails().getOwnerName() )));
 					}
-					
 					//Document Validation
-					/*
-					 * condition 1 : owner document list must be same as master json [code must be match ]
-					 * condition 2 : owner document type must be match with master json accpet file [extention must be validate]
-					 */
-					
 					if(null != o.getOwnerDetails() && null != o.getOwnerDetails().getOwnerDocuments()) {
-						validateDocumentsOnType(request.getRequestInfo(), property_Optional.get().getTenantId(), o.getOwnerDetails().getOwnerDocuments(), errorMap, "", o);
+						validateDocumentsOnType(request.getRequestInfo(), property_Optional.get().getTenantId(), o, errorMap, "");
 					}
 					
 				});
 		}
-
-
-		/*
-		List<Property> propertyList = request.getProperties().stream()
-				.filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners()))
-				.collect(Collectors.toList());
-
-		propertyList.stream()
-		.forEach(p -> p.getPropertyDetails().getOwners().stream()
-				.forEach( o -> {
-					if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
-						errorMap.put("INVALID MOBILE NUMBER",
-								"MobileNumber is not valid for user : " + o.getOwnerDetails().getOwnerName());
-					}
-				}));
-				
-		*/
-
-		/*
-		 property.stream()
-			.filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners()))
-			.forEach(p -> p.getPropertyDetails().getOwners().stream()
-					.filter( o -> {
-						if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
-							errorMap.put("INVALID MOBILE NUMBER",
-									"MobileNumber is not valid for user : " + o.getOwnerDetails().getOwnerName());
-							return false;
-						}else {
-							return true;
-						}
-					}));
-		 */
 
 		/* Old code ::
 		property.forEach(properties -> {
@@ -132,29 +97,20 @@ public class PropertyValidator {
 		});*/
 	}
 	
-	private void validateDocumentsOnType(RequestInfo requestInfo, String tenantId, List<Document> documents, Map<String, String> errorMap, String code, Owner o) {
+	private void validateDocumentsOnType(RequestInfo requestInfo, String tenantId, Owner owner, Map<String, String> errorMap, String code) {
 		
 		List<Map<String, Object>> fieldConfigurations = mdmsservice.getDocumentConfig("documents", requestInfo, tenantId);
+		ObjectMapper mapper = new ObjectMapper();
+		List<EstateDocumentList> documentTypeList = mapper.convertValue(fieldConfigurations, new TypeReference<List<EstateDocumentList>>() { });
+		System.out.println(documentTypeList.size());
 		
-		fieldConfigurations.stream().forEach(field -> {
-			
-			// condition 1 :: check Master json document is present with in owner document list , if not then error, all documents are mandatory
-			if(documents.contains(Document.builder().code(field.get("code").toString()).build())) {
-				
-				// condition 2 :: check owner document have same extention as per master json define , if not then error needed for same document
-				Document ownerDocument_ = documents.get(documents.indexOf(Document.builder().code(field.get("code").toString()).build()));
-				List<String> typeDocuemnt = Arrays.asList(field.get("accept").toString().split(","));
-				if(!typeDocuemnt.contains(ownerDocument_.getDocumentType())) {
-					errorMap.put("INVALID DOCUMENT",
-							"Document is not valid for user : " + o.getOwnerDetails().getOwnerName());
-				}
-			}else {
+		
+		owner.getOwnerDetails().getOwnerDocuments().stream().forEach(document -> {
+			if(!documentTypeList.contains(EstateDocumentList.builder().code(document.getDocumentType()).build())) {
 				errorMap.put("INVALID DOCUMENT",
-						"Document is not valid for user : " + o.getOwnerDetails().getOwnerName());
+						"Document is not valid for user : " + owner.getOwnerDetails().getOwnerName());
 			}
 		});
-		
-		
 	}
 
 	private boolean isMobileNumberValid(String mobileNumber) {

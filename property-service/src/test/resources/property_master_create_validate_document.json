@@ -71,8 +71,7 @@
 						"id": 123,
 						"tenantId": "ch",
 						"referenceId": "referenceId",
-						"code": "CERTIFIED_COPY_LEASE",
-						"documentType": "application/msword",
+						"documentType": "CERTIFIEDsss_COPY_LEASE",
 						"fileStoreId": "fileStoreId",
 						"isActive": true,
 						"propertyId": "propertyId"

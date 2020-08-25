@@ -6,12 +6,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.ps.model.Document;
+import org.egov.ps.model.EstateDocumentList;
+import org.egov.ps.service.MDMSService;
 import org.egov.ps.service.WorkflowCreationService;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.PropertyRequest;
@@ -23,6 +29,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import io.swagger.models.properties.Property;
@@ -36,6 +44,8 @@ public class PropertyControllerTest {
 	@Autowired
 	PropertyController propertyController;
 
+	@Autowired
+	MDMSService mdmsservice;
 
 	@Test
 	public void createTest() throws Exception {
