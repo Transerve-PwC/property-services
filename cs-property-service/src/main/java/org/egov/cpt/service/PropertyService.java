@@ -58,24 +58,24 @@ public class PropertyService {
 
 	public List<Property> createProperty(PropertyRequest request) {
 
-		propertyValidator.validateCreateRequest(request); // TODO add validations as per requirement
+		propertyValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
 		rentEnrichmentService.enrichRentdata(request);
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().forEach(property -> {
-				if(property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
-					property.setRentCollections(rentCollectionService.settle(property.getDemands(), property.getPayments(), property.getRentAccount()));
+			request.getProperties().stream()
+				.filter(property -> property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
+				.forEach(property -> {
+					property.setRentCollections(rentCollectionService.settle(property.getDemands(), property.getPayments(), property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
 			});
 		}
 		rentEnrichmentService.enrichCollection(request);
-		userService.createUser(request); // TODO create user as owner of the property if does not exists
-		/*if (config.getIsWorkflowEnabled()) {
-			wfIntegrator.callWorkFlow(request);
-		}*/
+		userService.createUser(request);
+		
 		producer.push(config.getSavePropertyTopic(), request);
 		
-		request.getProperties().forEach(property -> {
-			if(property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
+		request.getProperties().stream()
+			.filter(property -> property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
+			.forEach(property -> {
 				property.setRentSummary(rentCollectionService.paymentSummary(property.getDemands(),property.getRentAccount()));
 		});
 		return request.getProperties();
@@ -92,9 +92,10 @@ public class PropertyService {
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		rentEnrichmentService.enrichRentdata(request);
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().forEach(property -> {
-				if(property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
-					property.setRentCollections(rentCollectionService.settle(property.getDemands(), property.getPayments(), property.getRentAccount()));
+			request.getProperties().stream()
+				.filter(property -> property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
+				.forEach(property -> {
+					property.setRentCollections(rentCollectionService.settle(property.getDemands(), property.getPayments(), property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
 			});
 		}
 		rentEnrichmentService.enrichCollection(request);
@@ -106,8 +107,9 @@ public class PropertyService {
 		
 		
 		//TO get payment Summary
-		request.getProperties().forEach(property -> {
-			if(property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
+		request.getProperties().stream()
+			.filter(property -> property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
+			.forEach(property -> {
 				property.setRentSummary(rentCollectionService.paymentSummary(property.getDemands(),property.getRentAccount()));
 		});
 		return request.getProperties();
@@ -139,8 +141,9 @@ public class PropertyService {
 			return Collections.emptyList();
 		
 		//TO get payment Summary
-		properties.forEach(property -> {
-			if(property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
+		properties.stream()
+			.filter(property -> property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
+			.forEach(property -> {
 				property.setRentSummary(rentCollectionService.paymentSummary(property.getDemands(),property.getRentAccount()));
 		});
 		return properties;

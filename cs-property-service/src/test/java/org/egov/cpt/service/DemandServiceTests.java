@@ -82,8 +82,7 @@ public class DemandServiceTests {
 	@Test
 	public void testSimpleDemand() throws ParseException {
 	
-		System.out.println("Here");
-		List<RentCollection> collections = this.rentCollectionService.settle(this.initialDemands, this.initialPayments,this.rentAccount);
+		List<RentCollection> collections = this.rentCollectionService.settle(this.initialDemands, this.initialPayments,this.rentAccount, 24.0);
 	//	List<RentCollection> collections=(ArrayList)response.get("colection");
 		//List<RentDemand> processedDemands=new ArrayList((HashSet)response.get("demand"));
 		//List<RentCollection> secondCollections = this.rentCollectionService.getCollectionsForPayment(this.initialDemands.subList(3, 6), payment1,this.remainingAmount);

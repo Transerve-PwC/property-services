@@ -41,8 +41,9 @@ public class PropertyDetails {
 	 * Milk Colony Maloya - 24%
 	 * Kumhar Colony Maloya - 24%
 	 */
+	@Builder.Default
 	@JsonProperty("interestRate")
-	private Double interestRate;
+	private Double interestRate = 0.0;
 
 	/**
 	 * How much the monthly rent increases once the period ends.

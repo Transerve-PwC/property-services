@@ -21,7 +21,7 @@ public interface IRentCollectionService {
 	 * @param payment
 	 * @return List<RentCollection> Collections to be saved in the database.
 	 */
-	public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled,RentAccount account) ;
+	public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled,RentAccount account, double interestRate) ;
 	
 	/**
 	 * Get the current rent summary by calculating from the given demands and collections for the same property.
