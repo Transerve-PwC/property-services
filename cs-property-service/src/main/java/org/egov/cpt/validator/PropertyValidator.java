@@ -521,7 +521,7 @@ public class PropertyValidator {
 
 		validateDocument(duplicateCopyRequest);
 		validateIds(duplicateCopyRequest);
-
+		validateDuplicateCopyDocuments(duplicateCopyRequest, errorMap);
 		// validateIds(duplicateCopyRequest, errorMap);
 		String propertyId = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
@@ -887,7 +887,7 @@ public class PropertyValidator {
 
 		validateDocument(mortgageRequest);
 		validateIds(mortgageRequest);
-
+		validateMortgageDocuments(mortgageRequest, errorMap);
 		// validateIds(duplicateCopyRequest, errorMap);
 		String propertyId = mortgageRequest.getMortgageApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
@@ -1058,4 +1058,17 @@ public class PropertyValidator {
 				}
 			});
 	}
+
+	private void validateMortgageDocuments(MortgageRequest request, Map<String, String> errorMap) {
+		request.getMortgageApplications().forEach(mortgage -> {
+			this.validateDocumentsOnType(request.getRequestInfo(), mortgage.getTenantId(), mortgage.getApplicationDocuments(), errorMap, "MortgageRP");
+		});
+	}
+
+	private void validateDuplicateCopyDocuments(DuplicateCopyRequest request, Map<String, String> errorMap) {
+		request.getDuplicateCopyApplications().forEach(duplicateCopy -> {
+			this.validateDocumentsOnType(request.getRequestInfo(), duplicateCopy.getTenantId(), duplicateCopy.getApplicationDocuments(), errorMap, "DuplicateCopyOfAllotmentLetterRP");
+		});
+	}
+
 }
