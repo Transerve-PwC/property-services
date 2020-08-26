@@ -155,7 +155,7 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 
 				Owner owners = Owner.builder().id(ownerId).propertyDetailsId(OwnerPropertyDetailId)
 						.tenantId(rs.getString("otenantid")).serialNumber(rs.getString("oserial_number"))
-						.share(rs.getString("oshare")).cpNumber(rs.getString("ocp_number")).ownerDetails(ownerDetails)
+						.share(rs.getInt("oshare")).cpNumber(rs.getString("ocp_number")).ownerDetails(ownerDetails)
 						.build();
 
 				ownersList.add(owners);

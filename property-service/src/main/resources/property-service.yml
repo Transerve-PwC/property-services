@@ -170,6 +170,33 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedTime  
       
+      
+    - query: INSERT INTO cs_pm_documents_v1 (id, tenantid, reference_id, is_active, document_type, file_store_id, property_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.Properties.*.propertyDetails.purchaseDetails.*.purchaserDocuments.*
+      jsonMaps:
+
+      - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.purchaserDocuments.*.id
+
+      - jsonPath: $.Properties.*.tenantId
+      
+      - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.purchaserDocuments.*.referenceId
+
+      - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.purchaserDocuments.*.isActive
+
+      - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.purchaserDocuments.*.documentType
+
+      - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.purchaserDocuments.*.fileStoreId
+      
+      - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.purchaserDocuments.*.propertyId
+
+      - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.purchaserDocuments.*.auditDetails.createdBy
+
+      - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.purchaserDocuments.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.purchaserDocuments.*.auditDetails.createdTime
+
+      - jsonPath: $.Properties.*.propertyDetails.purchaseDetails.*.purchaserDocuments.*.auditDetails.lastModifiedTime 
+      
          
     - query: INSERT INTO cs_pm_court_case_v1 (id, property_details_id, tenantid, estate_officer_court, commissioners_court, chief_administartors_court, advisor_to_admin_court, honorable_district_court, honorable_high_court, honorable_supreme_court, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $.Properties.*.propertyDetails.courtCases.*

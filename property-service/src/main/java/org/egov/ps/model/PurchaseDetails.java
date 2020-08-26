@@ -1,5 +1,8 @@
 package org.egov.ps.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.egov.ps.web.contracts.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
@@ -69,5 +72,21 @@ public class PurchaseDetails {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+	
+	@JsonProperty("purchaserDocuments")
+	private List<Document> purchaserDocuments;
+
+	public PurchaseDetails addPurchaserDocumentsItem(Document purchaserDocumentItem) {
+		if (this.purchaserDocuments == null) {
+			this.purchaserDocuments = new ArrayList<>();
+		}
+		for (Document purchaserDocument : purchaserDocuments) {
+			if (purchaserDocument.getId().equalsIgnoreCase(purchaserDocumentItem.getId())) {
+				return this;
+			}
+		}
+		this.purchaserDocuments.add(purchaserDocumentItem);
+		return this;
+	}
 
 }

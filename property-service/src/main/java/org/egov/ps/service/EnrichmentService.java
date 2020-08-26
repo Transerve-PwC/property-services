@@ -250,6 +250,8 @@ public class EnrichmentService {
 				if (purchaseDetail.getId() == null) {
 					List<PurchaseDetails> purchaseDetails = getPurchaseDetails(property, requestInfo,
 							propertyDetail.getId());
+					updatePurchaserDocs(propertyDetail, property, requestInfo);
+					
 					propertyDetail.setPurchaseDetails(purchaseDetails);
 				}
 			});
@@ -278,6 +280,28 @@ public class EnrichmentService {
 			}
 		});
 		return ownerDocs;
+	}
+	
+	private List<Document> updatePurchaserDocs(PropertyDetails propertyDetail, Property property, RequestInfo requestInfo) {
+		List<Document> purchaserDocs = new ArrayList<>();
+		propertyDetail.getPurchaseDetails().forEach(purchaser -> {
+			List<Document> purchaserDocuments = purchaser.getPurchaserDocuments();
+			if (!CollectionUtils.isEmpty(purchaserDocuments)) {
+				AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				purchaserDocuments.forEach(document -> {
+					if (document.getId() == null) {
+						String gen_doc_id = UUID.randomUUID().toString();
+						document.setId(gen_doc_id);
+						document.setTenantId(property.getTenantId());
+						document.setReferenceId(purchaser.getId());
+						document.setPropertyId(property.getId());
+					}
+					document.setAuditDetails(docAuditDetails);
+				});
+				purchaserDocs.addAll(purchaserDocuments);
+			}
+		});
+		return purchaserDocs;
 	}
 
 	private List<Payment> updatePaymentDetails(PropertyDetails propertyDetail, Property property,
