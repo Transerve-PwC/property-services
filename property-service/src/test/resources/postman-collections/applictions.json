@@ -1,0 +1,230 @@
+{
+    "info": {
+      "_postman_id": "39c4cf32-0ac9-4860-ac94-c5b0eb512ff8",
+      "name": "property-service",
+      "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "PS_create",
+        "_postman_id": "407f5bb4-7d5a-4fb5-acfb-da8f12fdc2b4",
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"RequestInfo\": {\n        \"apiId\": \"Rainmaker\",\n        \"ver\": \".01\",\n        \"ts\": \"\",\n        \"action\": \"_create\",\n        \"did\": \"1\",\n        \"key\": \"\",\n        \"msgId\": \"20170310130900|en_IN\",\n        \"authToken\": \"54e82fae-14b4-4b97-9834-f99f323541cc\"\n    },\n    \"Properties\": [\n       {\n            \"tenantId\": \"ch\",\n            \"fileNumber\": \"ds1_file3\",\n            \"category\": \"cat\",\n            \"subCategory\": \"sub cat\",\n            \"siteNumber\": \"site1\",\n            \"sectorNumber\": \"sec1\",\n            \"state\": \"\",\n            \"action\": \"DRAFT\",\n            \"propertyDetails\": {\n                \"propertyType\": \"type\",\n                \"typeOfAllocation\": \"allocation type\",\n                \"modeOfAuction\": \"offline\",\n                \"schemeName\": \"schm1\",\n                \"dateOfAuction\": 1592979121518,\n                \"areaSqft\": \"150sqf\",\n                \"ratePerSqft\": \"300\",\n                \"lastNocDate\": 1592979121518,\n                \"serviceCategory\": \"serv cat\",\n                \"owners\": [\n                    {\n                        \"serialNumber\": \"pm1\",\n                        \"share\": true,\n                        \"cpNumber\": \"cp1\",\n                        \"state\": \"\",\n                        \"action\": \"DRAFT\",\n                        \"ownerDetails\": {\n                            \"ownerName\": \"sriraj1\",\n                            \"guardianName\": \"kumar1\",\n                            \"guardianRelation\": \"father\",\n                            \"mobileNumber\": \"8686571377\",\n                            \"allotmentNumber\": \"12345678\",\n                            \"dateOfAllotment\": 1592979121518,\n                            \"possesionDate\": 1592979121518,\n                            \"isCurrentOwner\": true,\n                            \"isMasterEntry\": true,\n                            \"dueAmount\": 100,\n                            \"address\": \"earth\",\n                            \"paymentDetails\": [\n                                {\n                                    \"grDueDateOfPayment\": 1592979121518,\n                                    \"grPayable\": 0,\n                                    \"grAmountOfGr\": 0,\n                                    \"grTotalGr\": 0,\n                                    \"grDateOfDeposit\": 1592979121518,\n                                    \"grDelayInPayment\": 0,\n                                    \"grInterestForDelay\": 0,\n                                    \"grTotalAmountDueWithInterest\": 0,\n                                    \"grAmountDepositedGr\": 0,\n                                    \"grAmountDepositedIntt\": 0,\n                                    \"grBalanceGr\": 0,\n                                    \"grBalanceIntt\": 0,\n                                    \"grTotalDue\": 0,\n                                    \"grReceiptNumber\": \"receipt-gr-123\",\n                                    \"grReceiptDate\": 1592979121518,\n                                    \"stRateOfStGst\": 0,\n                                    \"stAmountOfGst\": 0,\n                                    \"stAmountDue\": 0,\n                                    \"stDateOfDeposit\": 1592979121518,\n                                    \"stDelayInPayment\": 0,\n                                    \"stInterestForDelay\": 0,\n                                    \"stTotalAmountDueWithInterest\": 0,\n                                    \"stAmountDepositedStGst\": 0,\n                                    \"stAmountDepositedIntt\": 0,\n                                    \"stBalanceStGst\": 0,\n                                    \"stBalanceIntt\": 0,\n                                    \"stTotalDue\": 0,\n                                    \"stReceiptNumber\": \"recepit-st-123\",\n                                    \"stReceiptDate\": 1592979121518,\n                                    \"stPaymentMadeBy\": \"test owner\"\n                                }\n                            ]\n                        }\n                    }\n                ],\n                \"courtCases\": [\n                    {\n                        \"estateOfficerCourt\": \"eoc1\",\n                        \"commissionersCourt\": true,\n                        \"chiefAdministartorsCourt\": \"cac1\",\n                        \"advisorToAdminCourt\": \"atac1\",\n                        \"honorableDistrictCourt\": \"hdc1\",\n                        \"honorableHighCourt\": \"hhc1\",\n                        \"honorableSupremeCourt\": \"hsc1\"\n                    }\n                ],\n                \"purchaseDetails\": [\n                    {\n                        \"newOwnerName\": \"sriraj11\",\n                        \"newOwnerFatherName\": true,\n                        \"newOwnerAddress\": \"earth\",\n                        \"newOwnerMobileNumber\": \"8686571377\",\n                        \"sellerName\": \"sriraj11\",\n                        \"sellerFatherName\": \"kumar11\",\n                        \"percentageOfShare\": \"50\",\n                        \"modeOfTransfer\": \"offline\",\n                        \"registrationNumber\": \"121\",\n                        \"dateOfRegistration\": 1592979121518\n                    }\n                ]\n            }\n        }\n    ]\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": "http://localhost:8083/est-services/property-master/_create"
+        },
+        "response": []
+      },
+      {
+        "name": "PS_search",
+        "_postman_id": "40b24f7f-8548-4091-802e-41f8e44f20a5",
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"RequestInfo\": {\n    \"apiId\": \"Rainmaker\",\n    \"ver\": \".01\",\n    \"ts\": \"\",\n    \"action\": \"_create\",\n    \"did\": \"1\",\n    \"key\": \"\",\n    \"msgId\": \"20170310130900|en_IN\",\n    \"authToken\": \"54e82fae-14b4-4b97-9834-f99f323541cc\"\n  }\n\t\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "http://localhost:8083/est-services/property-master/_search?fileNumber=ds1_file3",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "8083",
+            "path": [
+              "est-services",
+              "property-master",
+              "_search"
+            ],
+            "query": [
+              {
+                "key": "category",
+                "value": "cat",
+                "disabled": true
+              },
+              {
+                "key": "mobileNumber",
+                "value": "8500123455",
+                "disabled": true
+              },
+              {
+                "key": "ownerName",
+                "value": "sriraj 007",
+                "disabled": true
+              },
+              {
+                "key": "offset",
+                "value": "0",
+                "disabled": true
+              },
+              {
+                "key": "limit",
+                "value": "3",
+                "disabled": true
+              },
+              {
+                "key": "state",
+                "value": "PM_DRAFTED",
+                "disabled": true
+              },
+              {
+                "key": "propertyId",
+                "value": null,
+                "disabled": true
+              },
+              {
+                "key": "fileNumber",
+                "value": "ds1_file3"
+              },
+              {
+                "key": "relations",
+                "value": "purchase",
+                "disabled": true
+              }
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "PS_update",
+        "_postman_id": "8ac961c0-a0d6-4ad9-98ec-d4294c40a180",
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"RequestInfo\": {\n        \"apiId\": \"Rainmaker\",\n        \"ver\": \".01\",\n        \"ts\": \"\",\n        \"action\": \"_create\",\n        \"did\": \"1\",\n        \"key\": \"\",\n        \"msgId\": \"20170310130900|en_IN\",\n        \"authToken\": \"54e82fae-14b4-4b97-9834-f99f323541cc\"\n    },\n    \"Properties\": [\n        {\n            \"id\": \"6a053b16-e453-4659-8366-d54f92202f31\",\n            \"tenantId\": \"ch\",\n            \"fileNumber\": \"ds1_file3\",\n            \"category\": \"cat\",\n            \"subCategory\": \"sub cat\",\n            \"siteNumber\": \"site3\",\n            \"sectorNumber\": \"sec3\",\n            \"state\": \"PM_DRAFTED\",\n            \"action\": \"\",\n            \"propertyDetails\": {\n                \"id\": \"ee5d027e-89c3-48e6-9459-e4608eebe427\",\n                \"tenantId\": \"ch\",\n                \"propertyId\": \"6a053b16-e453-4659-8366-d54f92202f31\",\n                \"propertyType\": \"type\",\n                \"typeOfAllocation\": \"allocation type\",\n                \"modeOfAuction\": \"offline\",\n                \"schemeName\": \"schm1\",\n                \"dateOfAuction\": 1592979121518,\n                \"areaSqft\": \"150sqf\",\n                \"ratePerSqft\": \"300\",\n                \"lastNocDate\": 1592979121518,\n                \"serviceCategory\": \"serv cat\",\n                \"owners\": [\n                    {\n                        \"id\": \"a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffb\",\n                        \"tenantId\": \"ch\",\n                        \"propertyDetailsId\": \"ee5d027e-89c3-48e6-9459-e4608eebe427\",\n                        \"serialNumber\": \"pm1\",\n                        \"share\": \"true\",\n                        \"cpNumber\": \"cp1\",\n                        \"state\": \"\",\n                        \"action\": \"DRAFT\",\n                        \"ownerDetails\": {\n                            \"id\": \"f3df14a2-8df2-48ef-b6fa-ab8e6e21c22b\",\n                            \"tenantId\": \"ch\",\n                            \"ownerId\": \"a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffb\",\n                            \"ownerName\": \"sriraj1\",\n                            \"guardianName\": \"kumar1\",\n                            \"guardianRelation\": \"father\",\n                            \"mobileNumber\": \"8686571377\",\n                            \"allotmentNumber\": \"12345678\",\n                            \"dateOfAllotment\": 1592979121518,\n                            \"possesionDate\": 1592979121518,\n                            \"isCurrentOwner\": true,\n                            \"isMasterEntry\": true,\n                            \"dueAmount\": 100.00,\n                            \"address\": \"earth\",\n                            \"ownerDocuments\": null,\n                            \"auditDetails\": {\n                                \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                                \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                                \"createdTime\": 1598249296811,\n                                \"lastModifiedTime\": 1598249296811\n                            },\n                            \"paymentDetails\": [\n                                {\n                                    \"id\": \"d7847562-8484-439d-883d-b09f31275f26\",\n                                    \"tenantId\": \"ch\",\n                                    \"ownerDetailsId\": \"f3df14a2-8df2-48ef-b6fa-ab8e6e21c22b\",\n                                    \"grDueDateOfPayment\": 1592979121518,\n                                    \"grPayable\": 0.00,\n                                    \"grAmountOfGr\": 0.00,\n                                    \"grTotalGr\": 0.00,\n                                    \"grDateOfDeposit\": 1592979121518,\n                                    \"grDelayInPayment\": 0.00,\n                                    \"grInterestForDelay\": 0.00,\n                                    \"grTotalAmountDueWithInterest\": 0.00,\n                                    \"grAmountDepositedGr\": 0.00,\n                                    \"grAmountDepositedIntt\": 0.00,\n                                    \"grBalanceGr\": 0.00,\n                                    \"grBalanceIntt\": 0.00,\n                                    \"grTotalDue\": 0.00,\n                                    \"grReceiptNumber\": \"receipt-gr-123\",\n                                    \"grReceiptDate\": 1592979121518,\n                                    \"stRateOfStGst\": 0.00,\n                                    \"stAmountOfGst\": 0.00,\n                                    \"stAmountDue\": 0.00,\n                                    \"stDateOfDeposit\": 1592979121518,\n                                    \"stDelayInPayment\": 0.00,\n                                    \"stInterestForDelay\": 0.00,\n                                    \"stTotalAmountDueWithInterest\": 0.00,\n                                    \"stAmountDepositedStGst\": 0.00,\n                                    \"stAmountDepositedIntt\": 0.00,\n                                    \"stBalanceStGst\": 0.00,\n                                    \"stBalanceIntt\": 0.00,\n                                    \"stTotalDue\": 0.00,\n                                    \"stReceiptNumber\": \"recepit-st-123\",\n                                    \"stReceiptDate\": 1592979121518,\n                                    \"stPaymentMadeBy\": \"test owner\",\n                                    \"auditDetails\": {\n                                        \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                                        \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                                        \"createdTime\": 1598249296814,\n                                        \"lastModifiedTime\": 1598249296814\n                                    }\n                                }\n                            ]\n                        },\n                        \"auditDetails\": {\n                            \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"createdTime\": 1598249296811,\n                            \"lastModifiedTime\": 1598249296811\n                        }\n                    }\n                ],\n                \"courtCases\": [\n                    {\n                        \"id\": \"d30428c8-bbc9-48af-a537-376dcaaff7a1\",\n                        \"tenantId\": \"ch\",\n                        \"propertyDetailsId\": \"ee5d027e-89c3-48e6-9459-e4608eebe427\",\n                        \"estateOfficerCourt\": \"eoc1\",\n                        \"commissionersCourt\": \"true\",\n                        \"chiefAdministartorsCourt\": \"cac1\",\n                        \"advisorToAdminCourt\": \"atac1\",\n                        \"honorableDistrictCourt\": \"hdc1\",\n                        \"honorableHighCourt\": \"hhc1\",\n                        \"honorableSupremeCourt\": \"hsc1\",\n                        \"auditDetails\": {\n                            \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"createdTime\": 1598249296816,\n                            \"lastModifiedTime\": 1598249296816\n                        }\n                    }\n                ],\n                \"purchaseDetails\": [\n                    {\n                        \"id\": \"957f9ff1-46db-48a1-b529-49672efdb96b\",\n                        \"tenantId\": \"ch\",\n                        \"propertyDetailsId\": \"ee5d027e-89c3-48e6-9459-e4608eebe427\",\n                        \"newOwnerName\": \"sriraj11\",\n                        \"newOwnerFatherName\": \"true\",\n                        \"newOwnerAddress\": \"earth\",\n                        \"newOwnerMobileNumber\": \"8686571377\",\n                        \"sellerName\": \"sriraj11\",\n                        \"sellerFatherName\": \"kumar11\",\n                        \"percentageOfShare\": \"50\",\n                        \"modeOfTransfer\": \"offline\",\n                        \"registrationNumber\": \"121\",\n                        \"dateOfRegistration\": 1592979121518,\n                        \"auditDetails\": {\n                            \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"createdTime\": 1598249296816,\n                            \"lastModifiedTime\": 1598249296816\n                        }\n                    }\n                ],\n                \"auditDetails\": {\n                    \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                    \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                    \"createdTime\": 1598249296807,\n                    \"lastModifiedTime\": 1598249296807\n                }\n            },\n            \"auditDetails\": {\n                \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                \"createdTime\": 1598249296807,\n                \"lastModifiedTime\": 1598249296807\n            }\n        },\n        {\n            \"id\": \"8ae39497-7e8d-46ef-a71a-160978ec7bea\",\n            \"tenantId\": \"ch\",\n            \"fileNumber\": \"ds1_file3\",\n            \"category\": \"cat\",\n            \"subCategory\": \"sub cat\",\n            \"siteNumber\": \"site1\",\n            \"sectorNumber\": \"sec1\",\n            \"state\": \"PS_PM_APPROVED\",\n            \"action\": \"DRAFT\",\n            \"propertyDetails\": {\n                \"id\": \"6cf4b89a-9f9e-447d-8278-7b3291ff3520\",\n                \"tenantId\": \"ch\",\n                \"propertyId\": \"8ae39497-7e8d-46ef-a71a-160978ec7bea\",\n                \"propertyType\": \"type\",\n                \"typeOfAllocation\": \"allocation type\",\n                \"modeOfAuction\": \"offline\",\n                \"schemeName\": \"schm1\",\n                \"dateOfAuction\": 1592979121518,\n                \"areaSqft\": \"150sqf\",\n                \"ratePerSqft\": \"300\",\n                \"lastNocDate\": 1592979121518,\n                \"serviceCategory\": \"serv cat\",\n                \"owners\": [\n                    {\n                        \"id\": \"6c556da5-63a4-498f-bdf7-25e440fa2274\",\n                        \"tenantId\": \"ch\",\n                        \"propertyDetailsId\": \"6cf4b89a-9f9e-447d-8278-7b3291ff3520\",\n                        \"serialNumber\": \"pm1\",\n                        \"share\": \"true\",\n                        \"cpNumber\": \"cp1\",\n                        \"state\": \"\",\n                        \"action\": \"DRAFT\",\n                        \"ownerDetails\": {\n                            \"id\": \"f55ae779-5b2d-4739-a0d8-9b68b6775043\",\n                            \"tenantId\": \"ch\",\n                            \"ownerId\": \"6c556da5-63a4-498f-bdf7-25e440fa2274\",\n                            \"ownerName\": \"sriraj1\",\n                            \"guardianName\": \"kumar1\",\n                            \"guardianRelation\": \"father\",\n                            \"mobileNumber\": \"8686571377\",\n                            \"allotmentNumber\": \"12345678\",\n                            \"dateOfAllotment\": 1592979121518,\n                            \"possesionDate\": 1592979121518,\n                            \"isCurrentOwner\": true,\n                            \"isMasterEntry\": true,\n                            \"dueAmount\": 100.00,\n                            \"address\": \"earth\",\n                            \"ownerDocuments\": null,\n                            \"auditDetails\": {\n                                \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                                \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                                \"createdTime\": 1597814124409,\n                                \"lastModifiedTime\": 1597814124409\n                            },\n                            \"paymentDetails\": [\n                                {\n                                    \"id\": \"6ba12ef2-16c9-4060-a140-c6e7b6b7d79d\",\n                                    \"tenantId\": \"ch\",\n                                    \"ownerDetailsId\": \"f55ae779-5b2d-4739-a0d8-9b68b6775043\",\n                                    \"grDueDateOfPayment\": 1592979121518,\n                                    \"grPayable\": 0.00,\n                                    \"grAmountOfGr\": 0.00,\n                                    \"grTotalGr\": 0.00,\n                                    \"grDateOfDeposit\": 1592979121518,\n                                    \"grDelayInPayment\": 0.00,\n                                    \"grInterestForDelay\": 0.00,\n                                    \"grTotalAmountDueWithInterest\": 0.00,\n                                    \"grAmountDepositedGr\": 0.00,\n                                    \"grAmountDepositedIntt\": 0.00,\n                                    \"grBalanceGr\": 0.00,\n                                    \"grBalanceIntt\": 0.00,\n                                    \"grTotalDue\": 0.00,\n                                    \"grReceiptNumber\": \"receipt-gr-123\",\n                                    \"grReceiptDate\": 1592979121518,\n                                    \"stRateOfStGst\": 0.00,\n                                    \"stAmountOfGst\": 0.00,\n                                    \"stAmountDue\": 0.00,\n                                    \"stDateOfDeposit\": 1592979121518,\n                                    \"stDelayInPayment\": 0.00,\n                                    \"stInterestForDelay\": 0.00,\n                                    \"stTotalAmountDueWithInterest\": 0.00,\n                                    \"stAmountDepositedStGst\": 0.00,\n                                    \"stAmountDepositedIntt\": 0.00,\n                                    \"stBalanceStGst\": 0.00,\n                                    \"stBalanceIntt\": 0.00,\n                                    \"stTotalDue\": 0.00,\n                                    \"stReceiptNumber\": \"recepit-st-123\",\n                                    \"stReceiptDate\": 1592979121518,\n                                    \"stPaymentMadeBy\": \"test owner\",\n                                    \"auditDetails\": {\n                                        \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                                        \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                                        \"createdTime\": 1597814124414,\n                                        \"lastModifiedTime\": 1597814124414\n                                    }\n                                }\n                            ]\n                        },\n                        \"auditDetails\": {\n                            \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"createdTime\": 1597814124409,\n                            \"lastModifiedTime\": 1597814124409\n                        }\n                    }\n                ],\n                \"courtCases\": [\n                    {\n                        \"id\": \"15bf67f9-d576-412d-9a7b-739028c39142\",\n                        \"tenantId\": \"ch\",\n                        \"propertyDetailsId\": \"6cf4b89a-9f9e-447d-8278-7b3291ff3520\",\n                        \"estateOfficerCourt\": \"eoc1\",\n                        \"commissionersCourt\": \"true\",\n                        \"chiefAdministartorsCourt\": \"cac1\",\n                        \"advisorToAdminCourt\": \"atac1\",\n                        \"honorableDistrictCourt\": \"hdc1\",\n                        \"honorableHighCourt\": \"hhc1\",\n                        \"honorableSupremeCourt\": \"hsc1\",\n                        \"auditDetails\": {\n                            \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"createdTime\": 1597814124416,\n                            \"lastModifiedTime\": 1597814124416\n                        }\n                    }\n                ],\n                \"purchaseDetails\": [\n                    {\n                        \"id\": \"9f759ecf-e6e2-4844-a982-b560e2f80215\",\n                        \"tenantId\": \"ch\",\n                        \"propertyDetailsId\": \"6cf4b89a-9f9e-447d-8278-7b3291ff3520\",\n                        \"newOwnerName\": \"sriraj11\",\n                        \"newOwnerFatherName\": \"true\",\n                        \"newOwnerAddress\": \"earth\",\n                        \"newOwnerMobileNumber\": \"8686571377\",\n                        \"sellerName\": \"sriraj11\",\n                        \"sellerFatherName\": \"kumar11\",\n                        \"percentageOfShare\": \"50\",\n                        \"modeOfTransfer\": \"offline\",\n                        \"registrationNumber\": \"121\",\n                        \"dateOfRegistration\": 1592979121518,\n                        \"auditDetails\": {\n                            \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                            \"createdTime\": 1597814124416,\n                            \"lastModifiedTime\": 1597814124416\n                        }\n                    }\n                ],\n                \"auditDetails\": {\n                    \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                    \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                    \"createdTime\": 1597814124404,\n                    \"lastModifiedTime\": 1597814124404\n                }\n            },\n            \"auditDetails\": {\n                \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6501\",\n                \"createdTime\": 1597814124404,\n                \"lastModifiedTime\": 1597814124404\n            }\n        }\n    ]\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": "http://localhost:8083/est-services/property-master/_update"
+        },
+        "response": []
+      },
+      {
+        "name": "application_create",
+        "_postman_id": "c3d7e31e-ae21-48df-a875-1ce835ef4117",
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"RequestInfo\": {\n        \"apiId\": \"Rainmaker\",\n        \"ver\": \".01\",\n        \"ts\": \"\",\n        \"action\": \"_create\",\n        \"did\": \"1\",\n        \"key\": \"\",\n        \"msgId\": \"20170310130900|en_IN\",\n        \"authToken\": \"54e82fae-14b4-4b97-9834-f99f323541cc\"\n    },\n    \"Applications\": [\n        {\n            \"tenantId\": \"ch.chandigarh\",\n            \"property\": {\n                \"id\": \"6a053b16-e453-4659-8366-d54f92202f31\"\n            },\n            \"branchType\": \"EstateBranch\",\n            \"moduleType\": \"OwnershipTransfer\",\n            \"applicationType\": \"SaleDeed\",\n            \"comments\": \" \",\n            \"hardcopyReceivedDate\": 0,\n            \"applicationDetails\": {\n                \"modeOfTransfer\": \"MODE_OF_TRANSFER.SALEDEED\",\n                \"registrationNumber\": \"reg\",\n                \"owner\": {\n                    \"id\": \"a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffb\"\n                },\n                \"purchaser\": {\n                    \"name\": \"purchaser name 2\",\n                    \"fatherOrHusbandName\": \"purchaser father name 2\",\n                    \"relation\": \"FATHER\",\n                    \"address\": \"purchaser address 2\",\n                    \"mobileNo\": \"9876954322\",\n                    \"percentageOfShareTransferred\": 100\n                }\n            },\n            \"state\": \"\",\n            \"action\": \"\"\n        }\n    ]\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": "http://localhost:8083/est-services/application/_create"
+        },
+        "response": []
+      },
+      {
+        "name": "application_search",
+        "_postman_id": "aa9c1667-f6a8-4b82-af67-8fd74cb64a6b",
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"RequestInfo\": {\n    \"apiId\": \"Rainmaker\",\n    \"ver\": \".01\",\n    \"ts\": \"\",\n    \"action\": \"_create\",\n    \"did\": \"1\",\n    \"key\": \"\",\n    \"msgId\": \"20170310130900|en_IN\",\n    \"authToken\": \"54e82fae-14b4-4b97-9834-f99f323541cc\"\n  }\n\t\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "http://localhost:8083/est-services/application/_search?applicationNumber=CH-EP-APPL-2020-08-24-000084",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "8083",
+            "path": [
+              "est-services",
+              "application",
+              "_search"
+            ],
+            "query": [
+              {
+                "key": "propertyId",
+                "value": "8ae39497-7e8d-46ef-a71a-160978ec7bea",
+                "disabled": true
+              },
+              {
+                "key": "applicationId",
+                "value": "aa8973ee-9c0e-443b-b9ba-9e5de7987ec7",
+                "disabled": true
+              },
+              {
+                "key": "tenantId",
+                "value": "ch.chandigarh",
+                "disabled": true
+              },
+              {
+                "key": "fileNumber",
+                "value": "ds1_file3",
+                "disabled": true
+              },
+              {
+                "key": "applicationNumber",
+                "value": "CH-EP-APPL-2020-08-24-000084"
+              },
+              {
+                "key": "state",
+                "value": "PM_DRAFTED",
+                "disabled": true
+              },
+              {
+                "key": "",
+                "value": "",
+                "disabled": true
+              }
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "application_update",
+        "_postman_id": "3a6e3781-36ac-4a72-978e-e4c7176ddc20",
+        "request": {
+          "method": "POST",
+          "header": [],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"RequestInfo\": {\n        \"apiId\": \"Rainmaker\",\n        \"ver\": \".01\",\n        \"ts\": \"\",\n        \"action\": \"_create\",\n        \"did\": \"1\",\n        \"key\": \"\",\n        \"msgId\": \"20170310130900|en_IN\",\n        \"authToken\": \"54e82fae-14b4-4b97-9834-f99f323541cc\"\n    },\n    \"Applications\": [\n        {\n            \"id\": \"537c6c8e-efbc-46da-b91a-d82f8d6eb046\",\n            \"tenantId\": \"ch.chandigarh\",\n            \"property\": {\n                \"id\": \"6a053b16-e453-4659-8366-d54f92202f31\",\n                \"tenantId\": \"ch\",\n                \"fileNumber\": \"ds1_file3\",\n                \"category\": \"cat\",\n                \"subCategory\": \"sub cat\",\n                \"siteNumber\": \"site3\",\n                \"sectorNumber\": \"sec3\",\n                \"state\": null,\n                \"action\": null,\n                \"propertyDetails\": {\n                    \"id\": \"ee5d027e-89c3-48e6-9459-e4608eebe427\",\n                    \"tenantId\": \"ch\",\n                    \"propertyId\": \"6a053b16-e453-4659-8366-d54f92202f31\",\n                    \"propertyType\": \"type\",\n                    \"typeOfAllocation\": \"allocation type\",\n                    \"modeOfAuction\": null,\n                    \"schemeName\": null,\n                    \"dateOfAuction\": null,\n                    \"areaSqft\": null,\n                    \"ratePerSqft\": null,\n                    \"lastNocDate\": null,\n                    \"serviceCategory\": \"serv cat\",\n                    \"owners\": [\n                        {\n                            \"id\": \"a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffb\",\n                            \"tenantId\": \"ch\",\n                            \"propertyDetailsId\": \"ee5d027e-89c3-48e6-9459-e4608eebe427\",\n                            \"serialNumber\": \"pm1\",\n                            \"share\": \"true\",\n                            \"cpNumber\": \"cp1\",\n                            \"state\": null,\n                            \"action\": null,\n                            \"ownerDetails\": {\n                                \"id\": \"f3df14a2-8df2-48ef-b6fa-ab8e6e21c22b\",\n                                \"tenantId\": \"ch\",\n                                \"ownerId\": \"a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffb\",\n                                \"ownerName\": \"sriraj1\",\n                                \"guardianName\": \"kumar1\",\n                                \"guardianRelation\": \"father\",\n                                \"mobileNumber\": \"8686571377\",\n                                \"allotmentNumber\": \"12345678\",\n                                \"dateOfAllotment\": 1592979121518,\n                                \"possesionDate\": null,\n                                \"isCurrentOwner\": null,\n                                \"isMasterEntry\": null,\n                                \"dueAmount\": 100.00,\n                                \"address\": \"earth\",\n                                \"ownerDocuments\": null,\n                                \"auditDetails\": null,\n                                \"paymentDetails\": null\n                            },\n                            \"auditDetails\": null\n                        }\n                    ],\n                    \"courtCases\": null,\n                    \"purchaseDetails\": null,\n                    \"auditDetails\": null\n                },\n                \"auditDetails\": null\n            },\n            \"applicationNumber\": \"CH-EP-APPL-2020-08-24-000084\",\n            \"branchType\": \"EstateBranch\",\n            \"moduleType\": \"OwnershipTransfer\",\n            \"applicationType\": \"SaleDeed\",\n            \"comments\": \" \",\n            \"hardcopyReceivedDate\": 0,\n            \"applicationDetails\": {\n                \"owner\": {\n                    \"id\": \"a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffb\"\n                },\n                \"purchaser\": {\n                    \"name\": \"purchaser name 2\",\n                    \"address\": \"purchaser address 2\",\n                    \"mobileNo\": \"9876954322\",\n                    \"relation\": \"FATHER\",\n                    \"fatherOrHusbandName\": \"purchaser father name 2\",\n                    \"percentageOfShareTransferred\": 100\n                },\n                \"modeOfTransfer\": \"MODE_OF_TRANSFER.SALEDEED\",\n                \"registrationNumber\": \"reg\"\n            },\n            \"state\": \"\",\n            \"action\": \"\",\n            \"auditDetails\": {\n                \"createdBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6436\",\n                \"lastModifiedBy\": \"2743bf22-6499-4029-bd26-79e5d0ce6436\",\n                \"createdTime\": 1598249772546,\n                \"lastModifiedTime\": 1598249772546\n            },\n            \"applicationDocuments\": [\n                {\n                    \"isActive\": true,\n                    \"documentType\": \"pdf\",\n                    \"fileStoreId\": \"filestoretest5501\"\n                },\n                {\n                    \"isActive\": true,\n                    \"documentType\": \"pdf\",\n                    \"fileStoreId\": \"filestoretest5502\"\n                }\n            ]\n        }\n    ]\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": "http://localhost:8083/est-services/application/_update"
+        },
+        "response": []
+      }
+    ],
+    "protocolProfileBehavior": {}
+  }
