@@ -1,7 +1,6 @@
 package org.egov.cpt.validator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,11 +22,9 @@ import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.repository.OwnershipTransferRepository;
 import org.egov.cpt.repository.PropertyRepository;
-import org.egov.cpt.repository.ServiceRequestRepository;
 import org.egov.cpt.service.MDMSService;
 import org.egov.cpt.util.DuplicateCopyConstants;
 import org.egov.cpt.util.PTConstants;
-import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.NoticeGenerationRequest;
@@ -35,14 +32,11 @@ import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.web.contracts.PropertyImagesRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.cpt.workflow.WorkflowService;
-import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
-import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,16 +45,10 @@ import lombok.extern.slf4j.Slf4j;
 public class PropertyValidator {
 
 	@Autowired
-	private PropertyUtil propertyUtil;
-
-	@Autowired
 	private PropertyRepository repository;
 
 	@Autowired
 	private OwnershipTransferRepository OTRepository;
-
-	@Autowired
-	private ServiceRequestRepository serviceRequestRepository;
 
 	@Autowired
 	private WorkflowService workflowService;
