@@ -27,7 +27,7 @@ public class PropertyQueryBuilder {
 	private static final String PI_ALL = " pi.*,pidoc.*, ";
 	private static final String NOTICE_ALL = " ng.*,ngdoc.*, ";
 	private static final String GD_ALL = " gd.*,";
-	private static final String FINANCE_ALL = " demand.*,payment.*,account.*,collection.*, ";
+//	private static final String FINANCE_ALL = " demand.*,payment.*,account.*,collection.*, ";
 
 	private static final String PT_COLUMNS = " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,"
 			+ " pt.created_by as pcreated_by, pt.created_date as pcreated_date, pt.modified_by as pmodified_by, pt.modified_date as pmodified_date,"
@@ -75,7 +75,7 @@ public class PropertyQueryBuilder {
 			+ " gd.sanction_letter_number as gd_sanLetterNum, gd.sanction_date as gd_sanDate, gd.mortgage_end_date as gd_mortgageEndDate,"
 			+ " gd.created_by as gd_createdBy, gd.modified_by as gd_modifiedBy, gd.created_time as gd_createdTime, gd.modified_time as gd_modifiedTime ";
 
-	private static final String FINANCE_COLUMNS = "demand.id as demand_id,demand.property_id as demand_pid,demand.initialGracePeriod as demand_IniGracePeriod, demand.generationDate as demand_genDate,"
+	/*private static final String FINANCE_COLUMNS = "demand.id as demand_id,demand.property_id as demand_pid,demand.initialGracePeriod as demand_IniGracePeriod, demand.generationDate as demand_genDate,"
 			+ "demand.collectionPrincipal as demand_colPrincipal,demand.remainingPrincipal as demand_remPrincipal, demand.interestSince as demand_intSince,"
 			+ "demand.mode as demand_mode, demand.created_by as demand_created_by, demand.created_date as demand_created_date,"
 			+ "demand.modified_by as demand_modified_by,demand.modified_date as demand_modified_date,"
@@ -91,7 +91,7 @@ public class PropertyQueryBuilder {
 			+ "collection.id as collection_id ,collection.demand_id as collection_demand_id,collection.payment_id as collection_payment_id,"
 			+ "collection.interestCollected as collection_intCollected,collection.principalCollected as collection_principalCollected,collection.tenantid as collection_tenantid,"
 			+ "collection.created_by as collection_created_by, collection.created_date as collection_created_date,"
-			+ "collection.modified_by as collection_modified_by,collection.modified_date as collection_modified_date ";
+			+ "collection.modified_by as collection_modified_by,collection.modified_date as collection_modified_date ";*/
 
 	private static final String PT_TABLE = " FROM cs_pt_property_v1 pt " + INNER_JOIN
 			+ " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id " + LEFT_JOIN
@@ -109,11 +109,11 @@ public class PropertyQueryBuilder {
 
 	private static final String GD_TABLE = " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id ";
 
-	private static final String FINANCE_TABLE = " cs_pt_demand demand ON pt.id=demand.property_id " + LEFT_JOIN
+	/*private static final String FINANCE_TABLE = " cs_pt_demand demand ON pt.id=demand.property_id " + LEFT_JOIN
 			+ " cs_pt_payment payment ON pt.id=payment.property_id " + LEFT_JOIN
 			+ " cs_pt_account account ON pt.id=account.property_id " + LEFT_JOIN
 			+ " cs_pt_collection collection ON demand.id=collection.demand_id" + " and "
-			+ "payment.id=collection.payment_id";
+			+ "payment.id=collection.payment_id";*/
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pmodified_date desc) offset_ FROM " + "({})"
@@ -154,11 +154,11 @@ public class PropertyQueryBuilder {
 
 		if (relations == null) {
 			builder = new StringBuilder(SELECT);
-			builder.append(PT_ALL + OWNER_ALL + PI_ALL + NOTICE_ALL + GD_ALL + FINANCE_ALL);
+			builder.append(PT_ALL + OWNER_ALL + PI_ALL + NOTICE_ALL + GD_ALL );
 			builder.append(PT_COLUMNS + "," + OWNER_COLUMNS + "," + PI_COLUMNS + "," + NOTICE_COLUMNS + " , "
-					+ GD_COLUMNS + " , " + FINANCE_COLUMNS);
+					+ GD_COLUMNS);
 			builder.append(PT_TABLE + LEFT_JOIN + OWNER_TABLE + LEFT_JOIN + PI_TABLE + LEFT_JOIN + NOTICE_TABLE
-					+ LEFT_JOIN + GD_TABLE + LEFT_JOIN + FINANCE_TABLE);
+					+ LEFT_JOIN + GD_TABLE);
 		} else {
 
 			builder = new StringBuilder(SELECT);
@@ -186,9 +186,9 @@ public class PropertyQueryBuilder {
 				builder.append(GD_ALL);
 			}
 
-			if (relations.contains(PTConstants.RELATION_FINANCE)) {
+			/*if (relations.contains(PTConstants.RELATION_FINANCE)) {
 				builder.append(FINANCE_ALL);
-			}
+			}*/
 
 			// columns
 			if (relations.contains("owner")) {
@@ -207,9 +207,9 @@ public class PropertyQueryBuilder {
 				columnList.add(GD_COLUMNS);
 			}
 
-			if (relations.contains("finance")) {
+			/*if (relations.contains("finance")) {
 				columnList.add(FINANCE_COLUMNS);
-			}
+			}*/
 
 			String output = columnList.stream().reduce(null, (str1, str2) -> str1 == null ? str2 : str1 + " , " + str2);
 			builder.append(output);
@@ -231,9 +231,9 @@ public class PropertyQueryBuilder {
 				tableList.add(GD_TABLE);
 			}
 
-			if (relations.contains("finance")) {
+			/*if (relations.contains("finance")) {
 				tableList.add(FINANCE_TABLE);
-			}
+			}*/
 			String tableOutput = tableList.stream().reduce(null,
 					(str1, str2) -> str1 == null ? str2 : str1 + LEFT_JOIN + str2);
 			builder.append(tableOutput);

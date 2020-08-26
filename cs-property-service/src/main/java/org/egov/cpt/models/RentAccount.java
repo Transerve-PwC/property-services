@@ -28,6 +28,9 @@ public class RentAccount {
 	
 	@JsonProperty("tenantId")
 	private String tenantId;
+	
+	@JsonProperty("active")
+    private String active;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;

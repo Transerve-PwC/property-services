@@ -3,6 +3,8 @@ package org.egov.cpt.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
@@ -141,9 +143,26 @@ public class PropertyService {
 		List<Property> properties = repository.getProperties(criteria);
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
+		
+		List<Property> propertiesRentDetails = new ArrayList<>();
+		
+		/*List<Property> propertiesRentDetails = repository.getPropertyRentDetails(
+				PropertyCriteria.builder()
+					.propertyId(properties.get(0).getId())
+					.build());*/
+		
+		if(criteria.getRelations().contains(PTConstants.RELATION_FINANCE)){
+			propertiesRentDetails = properties.stream()
+				.filter(property -> !repository.getPropertyRentDetails(
+						PropertyCriteria.builder()
+							.propertyId(property.getId())
+							.build()
+					).isEmpty()
+				).collect(Collectors.toList());
+		}	
 
 		// TO get payment Summary
-		properties.stream().filter(property -> property.getDemands() != null && property.getPayments() != null
+		propertiesRentDetails.stream().filter(property -> property.getDemands() != null && property.getPayments() != null
 				&& property.getRentAccount() != null).forEach(property -> {
 					property.setRentSummary(
 							rentCollectionService.paymentSummary(property.getDemands(), property.getRentAccount()));

@@ -74,6 +74,12 @@ public class PropertyRepository {
 	
 	@Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	
+	@Autowired
+	private RentDetailQueryBuilder rentQueryBuilder;
+	
+	@Autowired
+	private RentDetailRowMapper rentDetailrowMapper;
 
 	public List<Property> getProperties(PropertyCriteria criteria) {
 
@@ -82,6 +88,15 @@ public class PropertyRepository {
 		log.info("query:"+query);
 		log.info("preparedStmtList:"+preparedStmtList);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, rowMapper);
+	}
+	
+	public List<Property> getPropertyRentDetails(PropertyCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = rentQueryBuilder.getPropertyRentSearchQuery(criteria, preparedStmtList);
+		log.info("query:"+query);
+		log.info("preparedStmtList:"+preparedStmtList);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, rentDetailrowMapper);
+		
 	}
 
 	public List<DuplicateCopy> getDuplicateCopyProperties(DuplicateCopySearchCriteria criteria) {
@@ -133,4 +148,5 @@ public class PropertyRepository {
 					new DuplicateCopyRequest(requestInfo, dcApplicationsForUpdate));
 		}
 	}
+
 }
