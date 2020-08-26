@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Service
 public class PropertyService {
@@ -46,13 +47,13 @@ public class PropertyService {
 
 	@Autowired
 	private WorkflowIntegrator wfIntegrator;
-	
+
 	@Autowired
 	private WorkflowService workflowService;
-	
+
 	@Autowired
 	private RentEnrichmentService rentEnrichmentService;
-	
+
 	@Autowired
 	private IRentCollectionService rentCollectionService;
 
@@ -62,22 +63,23 @@ public class PropertyService {
 		enrichmentService.enrichCreateRequest(request);
 		rentEnrichmentService.enrichRentdata(request);
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().stream()
-				.filter(property -> property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
-				.forEach(property -> {
-					property.setRentCollections(rentCollectionService.settle(property.getDemands(), property.getPayments(), property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
-			});
+			request.getProperties().stream().filter(property -> property.getDemands() != null
+					&& property.getPayments() != null && property.getRentAccount() != null).forEach(property -> {
+						property.setRentCollections(
+								rentCollectionService.settle(property.getDemands(), property.getPayments(),
+										property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
+					});
 		}
 		rentEnrichmentService.enrichCollection(request);
 		userService.createUser(request);
-		
+
 		producer.push(config.getSavePropertyTopic(), request);
-		
-		request.getProperties().stream()
-			.filter(property -> property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
-			.forEach(property -> {
-				property.setRentSummary(rentCollectionService.paymentSummary(property.getDemands(),property.getRentAccount()));
-		});
+
+		request.getProperties().stream().filter(property -> property.getDemands() != null
+				&& property.getPayments() != null && property.getRentAccount() != null).forEach(property -> {
+					property.setRentSummary(
+							rentCollectionService.paymentSummary(property.getDemands(), property.getRentAccount()));
+				});
 		return request.getProperties();
 	}
 
@@ -92,60 +94,60 @@ public class PropertyService {
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		rentEnrichmentService.enrichRentdata(request);
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().stream()
-				.filter(property -> property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
-				.forEach(property -> {
-					property.setRentCollections(rentCollectionService.settle(property.getDemands(), property.getPayments(), property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
-			});
+			request.getProperties().stream().filter(property -> property.getDemands() != null
+					&& property.getPayments() != null && property.getRentAccount() != null).forEach(property -> {
+						property.setRentCollections(
+								rentCollectionService.settle(property.getDemands(), property.getPayments(),
+										property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
+					});
 		}
 		rentEnrichmentService.enrichCollection(request);
 		userService.createUser(request);
-		if (config.getIsWorkflowEnabled() && !request.getProperties().get(0).getMasterDataAction().equalsIgnoreCase("")) {
+		if (config.getIsWorkflowEnabled()
+				&& !request.getProperties().get(0).getMasterDataAction().equalsIgnoreCase("")) {
 			wfIntegrator.callWorkFlow(request);
 		}
 		producer.push(config.getUpdatePropertyTopic(), request);
-		
-		
-		//TO get payment Summary
-		request.getProperties().stream()
-			.filter(property -> property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
-			.forEach(property -> {
-				property.setRentSummary(rentCollectionService.paymentSummary(property.getDemands(),property.getRentAccount()));
-		});
+
+		// TO get payment Summary
+		request.getProperties().stream().filter(property -> property.getDemands() != null
+				&& property.getPayments() != null && property.getRentAccount() != null).forEach(property -> {
+					property.setRentSummary(
+							rentCollectionService.paymentSummary(property.getDemands(), property.getRentAccount()));
+				});
 		return request.getProperties();
 	}
 
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
-		if(criteria.isEmpty()){
+		if (criteria.isEmpty()) {
 			String wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_PM;
-			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, wfbusinessServiceName);
-			List<State> stateList= otBusinessService.getStates();
+			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo,
+					wfbusinessServiceName);
+			List<State> stateList = otBusinessService.getStates();
 			List<String> states = new ArrayList<String>();
-			
-			for(State state: stateList){
-					states.add(state.getState());
+
+			for (State state : stateList) {
+				states.add(state.getState());
 			}
 			states.remove("");
 			states.remove(PTConstants.PM_DRAFTED);
-			log.info("states:"+states);
+			log.info("states:" + states);
 			criteria.setState(states);
 			criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
-		}
-		else{
-			if(!CollectionUtils.isEmpty(criteria.getState())&&criteria.getState().contains(PTConstants.PM_DRAFTED))
+		} else {
+			if (!CollectionUtils.isEmpty(criteria.getState()) && criteria.getState().contains(PTConstants.PM_DRAFTED))
 				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
 		}
-		criteria.setPermanent(true);
 		List<Property> properties = repository.getProperties(criteria);
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
-		
-		//TO get payment Summary
-		properties.stream()
-			.filter(property -> property.getDemands()!=null && property.getPayments() !=null && property.getRentAccount()!=null)
-			.forEach(property -> {
-				property.setRentSummary(rentCollectionService.paymentSummary(property.getDemands(),property.getRentAccount()));
-		});
+
+		// TO get payment Summary
+		properties.stream().filter(property -> property.getDemands() != null && property.getPayments() != null
+				&& property.getRentAccount() != null).forEach(property -> {
+					property.setRentSummary(
+							rentCollectionService.paymentSummary(property.getDemands(), property.getRentAccount()));
+				});
 		return properties;
 	}
 }
