@@ -123,18 +123,6 @@ public class PropertyValidator {
 					errorMap.put("INVALID OWNER NAME", "Owner Name is not valid");
 				}
 
-				/*if (!isValid(owner.getOwnerDetails().getMonthlyRent(), 3, 20)) {
-					errorMap.put("INVALID MONTHLY RENT", "Monthly Rent is not valid");
-				}
-
-				if (!isValid(owner.getOwnerDetails().getRevisionPeriod(), 1, 5)) {
-					errorMap.put("INVALID REVISION PERIOD", "Revision Period is not valid");
-				}
-
-				if (!isValid(owner.getOwnerDetails().getRevisionPercentage(), 1, 5)) {
-					errorMap.put("INVALID REVISION PERCENTAGE", "Revision Percentage is not valid");
-				}*/
-
 				if (!isNotNullValid(owner.getOwnerDetails().getPosessionStartdate())) {
 					errorMap.put("INVALID POSESSION START DATE",
 							"Posession Start date is not valid for user : " + owner.getOwnerDetails().getName());
@@ -211,18 +199,6 @@ public class PropertyValidator {
 				errorMap.put("INVALID COLONY", "The Colony '" + property.getColony() + "' is not valid");
 			}
 
-			// If area need to be validated based on colonies(uncomment)
-
-//			else {
-//				String colonyFilter = "$.*.[?(@.code=='"+property.getColony()+"')].area.*.code";
-//				Map<String, List<String>> area = getAttributeValues(tenantId.split("\\.")[0],
-//						PTConstants.MDMS_PT_EGF_PROPERTY_SERVICE, Arrays.asList("colonies"), colonyFilter,
-//						PTConstants.JSONPATH_COLONY, requestInfo);
-//				if (!area.get(PTConstants.MDMS_PT_COLONY).contains(property.getPropertyDetails().getArea())) {
-//					errorMap.put("INVALID AREA", "The Area '" + property.getPropertyDetails().getArea() + "' is not valid");
-//				}
-//			}
-
 		});
 	}
 
@@ -239,18 +215,6 @@ public class PropertyValidator {
 		if (propertyWithInvalidTransitNumber.isPresent()) {
 			throw new CustomException(Collections.singletonMap("INVALID TRANSIT NUMBER", String.format("Invalid transit number '%s' found", propertyWithInvalidTransitNumber.get().getTransitNumber())));
 		}
-
-		/**
-		 * A property that is rejected can be recreated.
-		 */
-		/*String tenantId = properties.get(0).getTenantId();
-		BusinessService otBusinessService = workflowService.getBusinessService(tenantId, request.getRequestInfo(), PTConstants.BUSINESS_SERVICE_PM);
-		List<State> stateList= otBusinessService.getStates();
-		List<String> states = stateList.stream()
-			.map(State::getState)
-			.filter(s -> !s.equalsIgnoreCase(PTConstants.PM_REJECTED))
-			.collect(Collectors.toList());
-		log.info("states:"+states);*/
 		
 		/**
 		 * Search for existing properties with the same transit number.
@@ -494,11 +458,6 @@ public class PropertyValidator {
 	public void validateDuplicateCopySearch(RequestInfo requestInfo, DuplicateCopySearchCriteria criteria) {
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria == null)
 			throw new CustomException("INVALID SEARCH", "Search without any paramters is not allowed");
-		/*
-		 * if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") &&
-		 * criteria.getTransitNumber() == null) throw new
-		 * CustomException("INVALID SEARCH", "Transit number is mandatory in search");
-		 */
 	}
 
 	public List<DuplicateCopy> validateDuplicateCopyUpdateRequest(DuplicateCopyRequest duplicateCopyRequest) {
@@ -507,7 +466,6 @@ public class PropertyValidator {
 		validateDocument(duplicateCopyRequest);
 		validateIds(duplicateCopyRequest);
 		validateDuplicateCopyDocuments(duplicateCopyRequest, errorMap);
-		// validateIds(duplicateCopyRequest, errorMap);
 		String propertyId = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
 				.appId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId()).propertyId(propertyId)
@@ -533,7 +491,6 @@ public class PropertyValidator {
 		validatePIDocument(propertyImagesRequest);
 		validatePIIds(propertyImagesRequest);
 
-		// validateIds(duplicateCopyRequest, errorMap);
 		String propertyId = propertyImagesRequest.getPropertyImagesApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
 				.appId(propertyImagesRequest.getPropertyImagesApplications().get(0).getId()).propertyId(propertyId)
@@ -559,10 +516,6 @@ public class PropertyValidator {
 			if (!application.getState().equalsIgnoreCase(DuplicateCopyConstants.STATUS_INITIATED)) {
 				if (application.getId() == null)
 					errorMap.put("INVALID UPDATE", "Id of property cannot be null");
-				/*
-				 * if(property.getPropertyDetails().getAddress().getId()==null)
-				 * errorMap.put("INVALID UPDATE", "Id of address cannot be null");
-				 */
 				if (application.getApplicant().get(0).getId() == null)
 					errorMap.put("INVALID UPDATE", "Id of Applicant cannot be null");
 				if (application.getProperty().getId() == null)
@@ -578,20 +531,10 @@ public class PropertyValidator {
 		Map<String, String> errorMap = new HashMap<>();
 		propertyImagesRequest.getPropertyImagesApplications().forEach(application -> {
 
-//			if ((!application.getState().equalsIgnoreCase(DuplicateCopyConstants.STATUS_INITIATED))) {
-				if (application.getId() == null)
-					errorMap.put("INVALID UPDATE", "Id of property cannot be null");
-				/*
-				 * if(property.getPropertyDetails().getAddress().getId()==null)
-				 * errorMap.put("INVALID UPDATE", "Id of address cannot be null");
-				 */
-			/*
-			 * if (application.getApplicant().get(0).getId() == null)
-			 * errorMap.put("INVALID UPDATE", "Id of Applicant cannot be null");
-			 */
-				if (application.getProperty().getId() == null)
-					errorMap.put("INVALID UPDATE", "Property Id cannot be null");
-//			}
+			if (application.getId() == null)
+				errorMap.put("INVALID UPDATE", "Id of property cannot be null");
+			if (application.getProperty().getId() == null)
+				errorMap.put("INVALID UPDATE", "Property Id cannot be null");
 		});
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
@@ -607,23 +550,11 @@ public class PropertyValidator {
 
 		duplicateCopyRequest.getDuplicateCopyApplications().forEach(application -> {
 
-			/*
-			 * if (PTConstants.ACTION_INITIATE.equalsIgnoreCase(property.getAction( ))) { if
-			 * (property.getPropertyDetails().getApplicationDocuments() != null)
-			 * errorMap.put("INVALID ACTION",
-			 * "Action should be APPLY when application document are provided"); }
-			 */
 			if (DuplicateCopyConstants.ACTION_SUBMIT.equalsIgnoreCase(application.getAction())) {
 				if (application.getApplicationDocuments() == null)
 					errorMap.put("INVALID ACTION",
 							"Action cannot be changed to SUBMIT. Application document are not provided");
 			}
-			/*
-			 * if (!PTConstants.ACTION_SUBMIT.equalsIgnoreCase(property.getAction()) &&
-			 * !PTConstants.ACTION_INITIATE.equalsIgnoreCase(property.getAction())) {
-			 * errorMap.put("INVALID ACTION",
-			 * "Action can only be SUBMIT or INITIATE during create"); }
-			 */
 
 		});
 
@@ -637,23 +568,8 @@ public class PropertyValidator {
 
 		propertyImagesRequest.getPropertyImagesApplications().forEach(application -> {
 
-			/*
-			 * if (PTConstants.ACTION_INITIATE.equalsIgnoreCase(property.getAction( ))) { if
-			 * (property.getPropertyDetails().getApplicationDocuments() != null)
-			 * errorMap.put("INVALID ACTION",
-			 * "Action should be APPLY when application document are provided"); }
-			 */
-			
-				if (application.getApplicationDocuments() == null)
-					errorMap.put("INVALID ACTION",
-							"Action cannot be done. Application document are not provided");
-				
-			/*
-			 * if (!PTConstants.ACTION_SUBMIT.equalsIgnoreCase(property.getAction()) &&
-			 * !PTConstants.ACTION_INITIATE.equalsIgnoreCase(property.getAction())) {
-			 * errorMap.put("INVALID ACTION",
-			 * "Action can only be SUBMIT or INITIATE during create"); }
-			 */
+			if (application.getApplicationDocuments() == null)
+				errorMap.put("INVALID ACTION", "Action cannot be done. Application document are not provided");
 
 		});
 
@@ -662,8 +578,6 @@ public class PropertyValidator {
 	}
 
 	public void validateDuplicateCreate(DuplicateCopyRequest duplicateCopyRequest) {
-		// valideDates(request, mdmsData);
-		// propertyValidator.validateProperty(request);
 		validateDCSpecificNotNullFields(duplicateCopyRequest);
 		validateDuplicateDocuments(duplicateCopyRequest);
 
@@ -873,7 +787,6 @@ public class PropertyValidator {
 		validateDocument(mortgageRequest);
 		validateIds(mortgageRequest);
 		validateMortgageDocuments(mortgageRequest, errorMap);
-		// validateIds(duplicateCopyRequest, errorMap);
 		String propertyId = mortgageRequest.getMortgageApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
 				.appId(mortgageRequest.getMortgageApplications().get(0).getId()).propertyId(propertyId).build();
@@ -962,9 +875,6 @@ public class PropertyValidator {
 	public List<NoticeGeneration> validateNoticeUpdateRequest(NoticeGenerationRequest noticeGenerationRequest) {
 		Map<String, String> errorMap = new HashMap<>();
 
-//		validateDocument(noticeGenerationRequest);
-//		validateIds(noticeGenerationRequest);
-
 		String propertyId = noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId();
 		NoticeSearchCriteria criteria = NoticeSearchCriteria.builder()
 				.noticeId(noticeGenerationRequest.getNoticeApplications().get(0).getId())
@@ -1046,19 +956,23 @@ public class PropertyValidator {
 
 	private void validateMortgageDocuments(MortgageRequest request, Map<String, String> errorMap) {
 		request.getMortgageApplications().forEach(mortgage -> {
-			this.validateDocumentsOnType(request.getRequestInfo(), mortgage.getTenantId(), mortgage.getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_MG_RP);
+			this.validateDocumentsOnType(request.getRequestInfo(), mortgage.getTenantId(),
+					mortgage.getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_MG_RP);
 		});
 	}
 
 	private void validateDuplicateCopyDocuments(DuplicateCopyRequest request, Map<String, String> errorMap) {
 		request.getDuplicateCopyApplications().forEach(duplicateCopy -> {
-			this.validateDocumentsOnType(request.getRequestInfo(), duplicateCopy.getTenantId(), duplicateCopy.getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_DC_RP);
+			this.validateDocumentsOnType(request.getRequestInfo(), duplicateCopy.getTenantId(),
+					duplicateCopy.getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_DC_RP);
 		});
 	}
 
 	private void validateOwnershipTransferDocuments(OwnershipTransferRequest request, Map<String, String> errorMap) {
 		request.getOwners().forEach(owner -> {
-			this.validateDocumentsOnType(request.getRequestInfo(), owner.getTenantId(), owner.getOwnerDetails().getOwnershipTransferDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_FL_RP);
+			this.validateDocumentsOnType(request.getRequestInfo(), owner.getTenantId(),
+					owner.getOwnerDetails().getOwnershipTransferDocuments(), errorMap,
+					PTConstants.BUSINESS_SERVICE_FL_RP);
 		});
 	}
 }
