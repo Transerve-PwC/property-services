@@ -214,9 +214,10 @@ public class PropertyValidator {
 		request.getProperties().forEach(property -> {
 
 			String filter = "$.*.code";
-			Map<String, List<String>> colonies = getAttributeValues(tenantId.split("\\.")[0],
-					PTConstants.MDMS_PT_EGF_PROPERTY_SERVICE, Arrays.asList("colonies"), filter,
-					PTConstants.JSONPATH_COLONY, requestInfo);
+			Map<String, List<String>> colonies = (Map<String, List<String>>) mdmsService.getMDMSResponse(requestInfo,
+					tenantId.split("\\.")[0], PTConstants.MDMS_PT_EGF_PROPERTY_SERVICE, "colonies", filter,
+					PTConstants.JSONPATH_COLONY);
+
 			if (!colonies.get(PTConstants.MDMS_PT_COLONY).contains(property.getColony())
 					|| (property.getColony().length() < 5 || property.getColony().length() > 45)) {
 				errorMap.put("INVALID COLONY", "The Colony '" + property.getColony() + "' is not valid");
@@ -235,23 +236,6 @@ public class PropertyValidator {
 //			}
 
 		});
-	}
-
-	private Map<String, List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names,
-			String filter, String jsonpath, RequestInfo requestInfo) {
-
-		StringBuilder uri = new StringBuilder(mdmsHost).append(mdmsEndpoint);
-
-		MdmsCriteriaReq criteriaReq = propertyUtil.prepareMdMsRequest(tenantId, moduleName, names, filter, requestInfo);
-
-		try {
-			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
-			return JsonPath.read(result, jsonpath);
-		} catch (Exception e) {
-			log.error("Error while fetching MDMS data", e);
-			throw new CustomException("INVALID TENANT ID ", "No data found for this tenentID");
-		}
-
 	}
 
 	private void validateTransitNumber(PropertyRequest request, Map<String, String> errorMap) {
