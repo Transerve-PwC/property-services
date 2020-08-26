@@ -76,8 +76,6 @@ public class PropertyValidator {
 		validateArea(request, errorMap);
 		validateRentDetails(request, errorMap);
 
-//		validatePayment(request, errorMap);
-
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
@@ -92,24 +90,6 @@ public class PropertyValidator {
 			if (properties.getPropertyDetails().getInterestRate()<0 || properties.getPropertyDetails().getInterestRate()>=100) {
 				errorMap.put("INVALID INTEREST RATE", "Interest rate is not valid");
 			}
-		});
-	}
-
-	private void validatePayment(PropertyRequest request, Map<String, String> errorMap) {
-
-		List<Property> property = request.getProperties();
-		property.forEach(properties -> {
-			properties.getOwners().forEach(owners -> {
-				owners.getOwnerDetails().getPayment().forEach(payment -> {
-					if (!isNotNullValid(payment.getPaymentDate())) {
-						errorMap.put("INVALID PAYMENT DATE", "Payment Date is not valid");
-					}
-
-					if (!isValid(payment.getPaymentMode(), 3, 15)) {
-						errorMap.put("INVALID PAYMENT MODE", "Payment Mode is not valid");
-					}
-				});
-			});
 		});
 	}
 
