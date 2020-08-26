@@ -3,17 +3,23 @@ package org.egov.cpt.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
+import org.egov.cpt.models.RentCollection;
+import org.egov.cpt.models.RentDemand;
+import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.validator.PropertyValidator;
+import org.egov.cpt.web.contracts.AccountStatementResponse;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
 import org.egov.cpt.workflow.WorkflowService;
@@ -116,6 +122,17 @@ public class PropertyService {
 							rentCollectionService.paymentSummary(property.getDemands(), property.getRentAccount()));
 				});
 		return request.getProperties();
+	}
+	
+	public AccountStatementResponse searchPayments(AccountStatementCriteria accountStatementCriteria,RequestInfo requestInfo) {		
+		List<RentPayment> payments = repository.getRentPayments(accountStatementCriteria);
+		accountStatementCriteria.setPaymentids(payments.stream().map(RentPayment::getId).collect(Collectors.toList()));
+		
+		List<RentDemand> demands = repository.getRentDemands(accountStatementCriteria);
+		accountStatementCriteria.setDemandids(demands.stream().map(RentDemand::getId).collect(Collectors.toList()));
+		
+		List<RentCollection> collections = repository.getRentCollections(accountStatementCriteria);
+		return AccountStatementResponse.builder().payments(payments).demands(demands).collections(collections).build();
 	}
 
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {

@@ -1,6 +1,5 @@
 package org.egov.cpt.repository;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
@@ -16,6 +16,9 @@ import org.egov.cpt.models.NoticeSearchCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyImages;
+import org.egov.cpt.models.RentCollection;
+import org.egov.cpt.models.RentDemand;
+import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
@@ -82,6 +85,30 @@ public class PropertyRepository {
 		log.info("query:"+query);
 		log.info("preparedStmtList:"+preparedStmtList);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, rowMapper);
+	}
+	
+	public List<RentPayment> getRentPayments(AccountStatementCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = queryBuilder.getRentPaymentSearchQuery(criteria, preparedStmtList);
+		log.info("query:"+query);
+		log.info("preparedStmtList:"+preparedStmtList);
+		return namedParameterJdbcTemplate.query(query,preparedStmtList, new RentPaymentRowMapper());
+	}
+	
+	public List<RentDemand> getRentDemands(AccountStatementCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = queryBuilder.getRentDemandSearchQuery(criteria, preparedStmtList);
+		log.info("query:"+query);
+		log.info("preparedStmtList:"+preparedStmtList);
+		return namedParameterJdbcTemplate.query(query,preparedStmtList, new RentDemandRowMapper());
+	}
+	
+	public List<RentCollection> getRentCollections(AccountStatementCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = queryBuilder.getRentCollectionSearchQuery(criteria, preparedStmtList);
+		log.info("query:"+query);
+		log.info("preparedStmtList:"+preparedStmtList);
+		return namedParameterJdbcTemplate.query(query,preparedStmtList, new RentCollectionRowMapper());
 	}
 
 	public List<DuplicateCopy> getDuplicateCopyProperties(DuplicateCopySearchCriteria criteria) {

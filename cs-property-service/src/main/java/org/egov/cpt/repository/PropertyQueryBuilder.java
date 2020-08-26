@@ -1,11 +1,16 @@
 package org.egov.cpt.repository;
 
+import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.util.PTConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,6 +143,62 @@ public class PropertyQueryBuilder {
 		preparedStmtList.put("end", limit + offset);
 
 		return finalQuery;
+	}
+
+	/**
+	 * 
+	 * @param criteria
+	 * @param preparedStmtList
+	 * @return
+	 */
+	public String getRentPaymentSearchQuery(AccountStatementCriteria criteria, Map<String, Object> preparedStmtList) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT * FROM cs_pt_payment WHERE ");
+		query.append(" created_date >= :fromdate AND ");
+		query.append(" created_date <= :todate AND ");
+		query.append(" property_id = :propertyid");
+		preparedStmtList.put("fromdate", criteria.getFromDate().getTime());
+		preparedStmtList.put("todate", criteria.getToDate().getTime());
+		preparedStmtList.put("propertyid", criteria.getPropertyid());
+		return query.toString();
+	}
+	
+	/**
+	 * 
+	 * @param criteria
+	 * @param preparedStmtList
+	 * @return
+	 */
+	public String getRentDemandSearchQuery(AccountStatementCriteria criteria, Map<String, Object> preparedStmtList) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT * FROM cs_pt_demand WHERE ");
+		query.append(" created_date >= :fromdate AND ");
+		query.append(" created_date <= :todate AND ");
+		query.append(" property_id = :propertyid");
+		preparedStmtList.put("fromdate", criteria.getFromDate().getTime());
+		preparedStmtList.put("todate", criteria.getToDate().getTime());
+		preparedStmtList.put("propertyid", criteria.getPropertyid());
+		return query.toString();
+	}
+	
+	/**
+	 * 
+	 * @param criteria
+	 * @param preparedStmtList
+	 * @return
+	 */
+	public String getRentCollectionSearchQuery(AccountStatementCriteria criteria, Map<String, Object> preparedStmtList) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT * FROM cs_pt_collection WHERE ");
+		query.append(" created_date >= :fromdate AND ");
+		query.append(" created_date <= :todate AND ");
+		query.append(" payment_id IN (:paymentids) OR ");
+		query.append(" demand_id IN (:demandids) ");
+		preparedStmtList.put("fromdate", criteria.getFromDate().getTime());
+		preparedStmtList.put("todate", criteria.getToDate().getTime());
+		preparedStmtList.put("paymentids", criteria.getPaymentids());
+		preparedStmtList.put("demandids", criteria.getDemandids());
+		return query.toString();
 	}
 
 	/**

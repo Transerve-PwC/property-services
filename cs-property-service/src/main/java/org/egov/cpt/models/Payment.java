@@ -2,6 +2,7 @@ package org.egov.cpt.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,16 +10,17 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@Builder
 public class Payment {
 
 	@JsonProperty("id")
 	private String id;
 
 	@JsonProperty("tenantId")
-	private String tenantId;
+	private String tenantId;	
 
 	@JsonProperty("amountDue")
-	private String amountDue;
+	private String amountDue;	
 
 	@JsonProperty("amountPaid")
 	private String amountPaid;
