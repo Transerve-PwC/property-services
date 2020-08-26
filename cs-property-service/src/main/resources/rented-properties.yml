@@ -1,1128 +1,1062 @@
 serviceMaps:
   serviceName: csp
   mappings:
-  - version: 1.0
-    description: Persists Properties details in cs_pt_property_v1 table
-    fromTopic: save-property-create
-    isTransaction: true
-    queryMaps:
+    - version: 1.0
+      description: Persists Properties details in cs_pt_property_v1 table
+      fromTopic: save-property-create
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO cs_pt_property_v1 (id, transit_number, tenantid, colony, master_data_state, master_data_action, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: Properties.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.id
 
-    - query: INSERT INTO cs_pt_property_v1 (id, transit_number, tenantid, colony, master_data_state, master_data_action, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: Properties.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.transitNumber
 
-      - jsonPath: $.Properties.*.id
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.transitNumber
-      
-      - jsonPath: $.Properties.*.tenantId
+            - jsonPath: $.Properties.*.colony
 
-      - jsonPath: $.Properties.*.colony
+            - jsonPath: $.Properties.*.masterDataState
 
-      - jsonPath: $.Properties.*.masterDataState
+            - jsonPath: $.Properties.*.masterDataAction
 
-      - jsonPath: $.Properties.*.masterDataAction 
-      
-      - jsonPath: $.Properties.*.auditDetails.createdBy
+            - jsonPath: $.Properties.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.auditDetails.createdTime
+            - jsonPath: $.Properties.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
+            - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
 
+        - query: INSERT INTO cs_pt_propertydetails_v1 (id, property_id, transit_number, tenantid, area, rent_per_sqyd, current_owner, floors, additional_details,interest_rate,rent_increment_percentage,rent_increment_period, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: Properties.*.propertyDetails
+          jsonMaps:
+            - jsonPath: $.Properties.*.propertyDetails.id
 
-    - query: INSERT INTO cs_pt_propertydetails_v1 (id, property_id, transit_number, tenantid, area, rent_per_sqyd, current_owner, floors, additional_details,interest_rate,rent_increment_percentage,rent_increment_period, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: Properties.*.propertyDetails
-      jsonMaps:
+            - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.propertyDetails.id
+            - jsonPath: $.Properties.*.transitNumber
 
-      - jsonPath: $.Properties.*.id
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.transitNumber
-      
-      - jsonPath: $.Properties.*.tenantId
+            - jsonPath: $.Properties.*.propertyDetails.area
 
-      - jsonPath: $.Properties.*.propertyDetails.area
+            - jsonPath: $.Properties.*.propertyDetails.rentPerSqyd
 
-      - jsonPath: $.Properties.*.propertyDetails.rentPerSqyd
+            - jsonPath: $.Properties.*.propertyDetails.currentOwner
 
-      - jsonPath: $.Properties.*.propertyDetails.currentOwner
+            - jsonPath: $.Properties.*.propertyDetails.floors
 
-      - jsonPath: $.Properties.*.propertyDetails.floors
+            - jsonPath: $.Properties.*.propertyDetails.additionalDetails
 
-      - jsonPath: $.Properties.*.propertyDetails.additionalDetails
-      
-      - jsonPath: $.Properties.*.propertyDetails.interestRate
+            - jsonPath: $.Properties.*.propertyDetails.interestRate
 
-      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPercentage
+            - jsonPath: $.Properties.*.propertyDetails.rentIncrementPercentage
 
-      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPeriod
+            - jsonPath: $.Properties.*.propertyDetails.rentIncrementPeriod
 
-      - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdBy
+            - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdTime
+            - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
+            - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
 
+        - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.owners.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.owners.*.id
 
-    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.owners.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.owners.*.property.id
 
-      - jsonPath: $.Properties.*.owners.*.id
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.owners.*.property.id
+            - jsonPath: $.Properties.*.owners.*.allotmenNumber
 
-      - jsonPath: $.Properties.*.tenantId
+            - jsonPath: $.Properties.*.owners.*.activeState
 
-      - jsonPath: $.Properties.*.owners.*.allotmenNumber
+            - jsonPath: $.Properties.*.owners.*.isPrimaryOwner
 
-      - jsonPath: $.Properties.*.owners.*.activeState
+            - jsonPath: $.Properties.*.owners.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.owners.*.isPrimaryOwner
+            - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.createdBy
+            - jsonPath: $.Properties.*.owners.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.createdTime
+        - query: INSERT INTO cs_pt_ownershipdetails_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, permanent, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.owners.*.ownerDetails
+          jsonMaps:
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.id
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
-  
-    - query: INSERT INTO cs_pt_ownershipdetails_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.owners.*.ownerDetails
-      jsonMaps:
+            - jsonPath: $.Properties.*.owners.*.property.id
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.id
+            - jsonPath: $.Properties.*.owners.*.id
 
-      - jsonPath: $.Properties.*.owners.*.property.id
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.owners.*.id
-      
-      - jsonPath: $.Properties.*.tenantId
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.name
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.name
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.email
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.email
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.phone
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.gender
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.phone
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfBirth
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.gender
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.aadhaarNumber
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfBirth
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentStartdate
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.aadhaarNumber
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentEnddate
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentStartdate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionStartdate
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentEnddate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionEnddate
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionStartdate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.monthlyRent
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionEnddate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.monthlyRent
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.relationWithDeceasedAllottee
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationNumber
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdBy
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.relationWithDeceasedAllottee
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdTime
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationNumber
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
 
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.permanent
 
-    - query: INSERT INTO cs_pt_address_v1 (id, property_id, transit_number, tenantid, colony, area, district, state, country, pincode, landmark, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.propertyDetails.address.id
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.id
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.transitNumber
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Properties.*.tenantId
+        - query: INSERT INTO cs_pt_address_v1 (id, property_id, transit_number, tenantid, colony, area, district, state, country, pincode, landmark, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.propertyDetails.address.id
 
-      - jsonPath: $.Properties.*.colony
+            - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.propertyDetails.address.area
+            - jsonPath: $.Properties.*.transitNumber
 
-      - jsonPath: $.Properties.*.propertyDetails.address.district
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.propertyDetails.address.state
-      
-      - jsonPath: $.Properties.*.propertyDetails.address.country
+            - jsonPath: $.Properties.*.colony
 
-      - jsonPath: $.Properties.*.propertyDetails.address.pincode
+            - jsonPath: $.Properties.*.propertyDetails.address.area
 
-      - jsonPath: $.Properties.*.propertyDetails.address.landmark
+            - jsonPath: $.Properties.*.propertyDetails.address.district
 
-      - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.createdBy
+            - jsonPath: $.Properties.*.propertyDetails.address.state
 
-      - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.propertyDetails.address.country
 
-      - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.createdTime
+            - jsonPath: $.Properties.*.propertyDetails.address.pincode
 
-      - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.lastModifiedTime
+            - jsonPath: $.Properties.*.propertyDetails.address.landmark
 
+            - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.createdBy
 
-    - query: INSERT INTO cs_pt_documents_v1 (id, reference_id, tenantid, is_active, document_type, fileStore_id, property_id, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.propertyDetails.applicationDocuments.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.id
+            - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.referenceId
+            - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Properties.*.tenantId
+        - query: INSERT INTO cs_pt_documents_v1 (id, reference_id, tenantid, is_active, document_type, fileStore_id, property_id, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.propertyDetails.applicationDocuments.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.id
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.active
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.referenceId
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentType
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.fileStoreId
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.active
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.propertyId
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentType
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdBy
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.fileStoreId
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.propertyId
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdTime
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime      
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedBy
 
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdTime
 
-    - query: INSERT INTO cs_pt_property_audit_v1 (id, transit_number, tenantid, colony, master_data_state, master_data_action, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: Properties.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Properties.*.id
+        - query: INSERT INTO cs_pt_property_audit_v1 (id, transit_number, tenantid, colony, master_data_state, master_data_action, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: Properties.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.transitNumber
+            - jsonPath: $.Properties.*.transitNumber
 
-      - jsonPath: $.Properties.*.tenantId
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.colony
+            - jsonPath: $.Properties.*.colony
 
-      - jsonPath: $.Properties.*.masterDataState
+            - jsonPath: $.Properties.*.masterDataState
 
-      - jsonPath: $.Properties.*.masterDataAction 
+            - jsonPath: $.Properties.*.masterDataAction
 
-      - jsonPath: $.Properties.*.auditDetails.createdBy
+            - jsonPath: $.Properties.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.auditDetails.createdTime
+            - jsonPath: $.Properties.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
+            - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
 
+        - query: INSERT INTO cs_pt_propertydetails_audit_v1 (id, property_id, transit_number, tenantid, area, rent_per_sqyd, current_owner, floors, additional_details,interest_rate,rent_increment_percentage,rent_increment_period, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: Properties.*.propertyDetails
+          jsonMaps:
+            - jsonPath: $.Properties.*.propertyDetails.id
 
-    - query: INSERT INTO cs_pt_propertydetails_audit_v1 (id, property_id, transit_number, tenantid, area, rent_per_sqyd, current_owner, floors, additional_details,interest_rate,rent_increment_percentage,rent_increment_period, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: Properties.*.propertyDetails
-      jsonMaps:
+            - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.propertyDetails.id
+            - jsonPath: $.Properties.*.transitNumber
 
-      - jsonPath: $.Properties.*.id
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.transitNumber
+            - jsonPath: $.Properties.*.propertyDetails.area
 
-      - jsonPath: $.Properties.*.tenantId
+            - jsonPath: $.Properties.*.propertyDetails.rentPerSqyd
 
-      - jsonPath: $.Properties.*.propertyDetails.area
+            - jsonPath: $.Properties.*.propertyDetails.currentOwner
 
-      - jsonPath: $.Properties.*.propertyDetails.rentPerSqyd
+            - jsonPath: $.Properties.*.propertyDetails.floors
 
-      - jsonPath: $.Properties.*.propertyDetails.currentOwner
+            - jsonPath: $.Properties.*.propertyDetails.additionalDetails
 
-      - jsonPath: $.Properties.*.propertyDetails.floors
+            - jsonPath: $.Properties.*.propertyDetails.interestRate
 
-      - jsonPath: $.Properties.*.propertyDetails.additionalDetails
-      
-      - jsonPath: $.Properties.*.propertyDetails.interestRate
+            - jsonPath: $.Properties.*.propertyDetails.rentIncrementPercentage
 
-      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPercentage
+            - jsonPath: $.Properties.*.propertyDetails.rentIncrementPeriod
 
-      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPeriod
+            - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdBy
+            - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdTime
+            - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
+        - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.owners.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.owners.*.id
 
+            - jsonPath: $.Properties.*.owners.*.property.id
 
-    - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.owners.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.owners.*.id
+            - jsonPath: $.Properties.*.owners.*.allotmenNumber
 
-      - jsonPath: $.Properties.*.owners.*.property.id
+            - jsonPath: $.Properties.*.owners.*.activeState
 
-      - jsonPath: $.Properties.*.tenantId
+            - jsonPath: $.Properties.*.owners.*.isPrimaryOwner
 
-      - jsonPath: $.Properties.*.owners.*.allotmenNumber
+            - jsonPath: $.Properties.*.owners.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.owners.*.activeState
+            - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.owners.*.isPrimaryOwner
+            - jsonPath: $.Properties.*.owners.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.createdBy
+            - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedBy
+        - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.owners.*.ownerDetails
+          jsonMaps:
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.id
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.createdTime
+            - jsonPath: $.Properties.*.owners.*.property.id
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
-  
-  
-    - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.owners.*.ownerDetails
-      jsonMaps:
+            - jsonPath: $.Properties.*.owners.*.id
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.id
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.owners.*.property.id
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.name
 
-      - jsonPath: $.Properties.*.owners.*.id
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.email
 
-      - jsonPath: $.Properties.*.tenantId
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.phone
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.name
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.gender
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.email
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfBirth
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.phone
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.aadhaarNumber
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.gender
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentStartdate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfBirth
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentEnddate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.aadhaarNumber
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionStartdate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentStartdate
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionEnddate
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentEnddate
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.monthlyRent
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionStartdate
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionEnddate
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.monthlyRent
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.relationWithDeceasedAllottee
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.relationWithDeceasedAllottee
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationNumber
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationNumber
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdBy
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdTime
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
-      
-      
-    - query : DELETE FROM cs_pt_demand WHERE property_id=? and tenantid=?;
-      basePath: $.Properties.*.demands.*
-      jsonMaps:
-       - jsonPath: $.Properties.*.demands.*.propertyId
-       
-       - jsonPath: $.Properties.*.demands.*.tenantId
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.createdTime
 
-    - query : INSERT INTO cs_pt_demand(id, property_id, initialGracePeriod, generationDate, collectionPrincipal, remainingPrincipal, interestSince,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.demands.*
-      jsonMaps:
-        - jsonPath: $.Properties.*.demands.*.id 
-      
-        - jsonPath: $.Properties.*.demands.*.propertyId
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
 
-        - jsonPath: $.Properties.*.demands.*.initialGracePeriod
-       
-        - jsonPath: $.Properties.*.demands.*.generationDate
-  
-        - jsonPath: $.Properties.*.demands.*.collectionPrincipal
+        - query: DELETE FROM cs_pt_demand WHERE property_id=? and tenantid=?;
+          basePath: $.Properties.*.demands.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.demands.*.propertyId
 
-        - jsonPath: $.Properties.*.demands.*.remainingPrincipal
-        
-        - jsonPath: $.Properties.*.demands.*.interestSince 
-      
-        - jsonPath: $.Properties.*.demands.*.mode
+            - jsonPath: $.Properties.*.demands.*.tenantId
 
-        - jsonPath: $.Properties.*.demands.*.tenantId
-       
-        - jsonPath: $.Properties.*.demands.*.auditDetails.createdBy
-  
-        - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedBy
+        - query: INSERT INTO cs_pt_demand(id, property_id, initialGracePeriod, generationDate, collectionPrincipal, remainingPrincipal, interestSince,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.demands.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.demands.*.id
 
-        - jsonPath: $.Properties.*.demands.*.auditDetails.createdTime
-        
-        - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedTime
-        
-       
-    - query : DELETE FROM cs_pt_payment WHERE property_id=? and tenantid=?;
-      basePath: $.Properties.*.payments.*
-      jsonMaps:
-       - jsonPath: $.Properties.*.payments.*.propertyId
-       
-       - jsonPath: $.Properties.*.payments.*.tenantId
+            - jsonPath: $.Properties.*.demands.*.propertyId
 
-    
-    - query : INSERT INTO cs_pt_payment(id, property_id, receiptNo, amountPaid, dateOfPayment,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.payments.*
-      jsonMaps:
-        - jsonPath: $.Properties.*.payments.*.id 
-      
-        - jsonPath: $.Properties.*.payments.*.propertyId
+            - jsonPath: $.Properties.*.demands.*.initialGracePeriod
 
-        - jsonPath: $.Properties.*.payments.*.receiptNo
-       
-        - jsonPath: $.Properties.*.payments.*.amountPaid
-  
-        - jsonPath: $.Properties.*.payments.*.dateOfPayment
+            - jsonPath: $.Properties.*.demands.*.generationDate
 
-        - jsonPath: $.Properties.*.payments.*.mode
+            - jsonPath: $.Properties.*.demands.*.collectionPrincipal
 
-        - jsonPath: $.Properties.*.payments.*.tenantId
-       
-        - jsonPath: $.Properties.*.payments.*.auditDetails.createdBy
-  
-        - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.demands.*.remainingPrincipal
 
-        - jsonPath: $.Properties.*.payments.*.auditDetails.createdTime
-        
-        - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedTime
-        
-        
-    - query : DELETE FROM cs_pt_account WHERE property_id=? and tenantid=?;
-      basePath: $.Properties.*.rentAccount
-      jsonMaps:
-        - jsonPath: $.Properties.*.rentAccount.propertyId
-       
-        - jsonPath: $.Properties.*.rentAccount.tenantId
+            - jsonPath: $.Properties.*.demands.*.interestSince
 
-    
-    - query : INSERT INTO cs_pt_account(id, property_id, remainingAmount,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.rentAccount
-      jsonMaps:
-        - jsonPath: $.Properties.*.rentAccount.id 
-      
-        - jsonPath: $.Properties.*.rentAccount.propertyId
+            - jsonPath: $.Properties.*.demands.*.mode
 
-        - jsonPath: $.Properties.*.rentAccount.remainingAmount
-       
-        - jsonPath: $.Properties.*.rentAccount.tenantId
-  
-        - jsonPath: $.Properties.*.rentAccount.auditDetails.createdBy
-  
-        - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.demands.*.tenantId
 
-        - jsonPath: $.Properties.*.rentAccount.auditDetails.createdTime
-        
-        - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedTime
-        
-        
-    - query : DELETE FROM cs_pt_collection WHERE demand_id=? and payment_id=? and tenantid=?;
-      basePath: $.Properties.*.rentCollections.*
-      jsonMaps:
-       - jsonPath: $.Properties.*.rentCollections.*.demandId
-       
-       - jsonPath: $.Properties.*.rentCollections.*.paymentId
-       
-       - jsonPath: $.Properties.*.rentCollections.*.tenantId
+            - jsonPath: $.Properties.*.demands.*.auditDetails.createdBy
 
-    
-    - query : INSERT INTO cs_pt_collection(id, demand_id, payment_id, interestCollected, principalCollected,tenantid,collectionAgainst,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.rentCollections.*
-      jsonMaps:
-        - jsonPath: $.Properties.*.rentCollections.*.id 
-      
-        - jsonPath: $.Properties.*.rentCollections.*.demandId
+            - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedBy
 
-        - jsonPath: $.Properties.*.rentCollections.*.paymentId
-       
-        - jsonPath: $.Properties.*.rentCollections.*.interestCollected
-  
-        - jsonPath: $.Properties.*.rentCollections.*.principalCollected
+            - jsonPath: $.Properties.*.demands.*.auditDetails.createdTime
 
-        - jsonPath: $.Properties.*.rentCollections.*.tenantId
-        
-        - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
-       
-        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdBy
-  
-        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedTime
 
-        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdTime
-        
-        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedTime
-        
+        - query: DELETE FROM cs_pt_payment WHERE property_id=? and tenantid=?;
+          basePath: $.Properties.*.payments.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.payments.*.propertyId
 
-    
-    
-  - version: 1.0
-    description: Persists Properties details in cs_pt_property_v1 table
-    fromTopic: update-property-csp
-    isTransaction: true
-    queryMaps:
+            - jsonPath: $.Properties.*.payments.*.tenantId
 
-    - query: UPDATE cs_pt_property_v1 SET tenantid=?, colony=?, master_data_state=?, master_data_action=?, modified_by=?, modified_date=? where id=? AND transit_number=?;
-      basePath: Properties.*
-      jsonMaps:
+        - query: INSERT INTO cs_pt_payment(id, property_id, receiptNo, amountPaid, dateOfPayment,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.payments.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.payments.*.id
 
-      - jsonPath: $.Properties.*.tenantId
+            - jsonPath: $.Properties.*.payments.*.propertyId
 
-      - jsonPath: $.Properties.*.colony
+            - jsonPath: $.Properties.*.payments.*.receiptNo
 
-      - jsonPath: $.Properties.*.masterDataState
+            - jsonPath: $.Properties.*.payments.*.amountPaid
 
-      - jsonPath: $.Properties.*.masterDataAction 
-      
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.payments.*.dateOfPayment
 
-      - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
-      
-      - jsonPath: $.Properties.*.id
+            - jsonPath: $.Properties.*.payments.*.mode
 
-      - jsonPath: $.Properties.*.transitNumber
+            - jsonPath: $.Properties.*.payments.*.tenantId
 
+            - jsonPath: $.Properties.*.payments.*.auditDetails.createdBy
 
-    - query: UPDATE cs_pt_propertydetails_v1 SET tenantid=?, area=?, rent_per_sqyd=?, current_owner=?, floors=?, additional_details=?,interest_rate=?,rent_increment_percentage=?,rent_increment_period=?, modified_by=?, modified_date=? where id=? AND property_id=? AND transit_number=?;
-      basePath: Properties.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.tenantId
+            - jsonPath: $.Properties.*.payments.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.propertyDetails.area
+            - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Properties.*.propertyDetails.rentPerSqyd
+        - query: DELETE FROM cs_pt_account WHERE property_id=? and tenantid=?;
+          basePath: $.Properties.*.rentAccount
+          jsonMaps:
+            - jsonPath: $.Properties.*.rentAccount.propertyId
 
-      - jsonPath: $.Properties.*.propertyDetails.currentOwner
+            - jsonPath: $.Properties.*.rentAccount.tenantId
 
-      - jsonPath: $.Properties.*.propertyDetails.floors
+        - query: INSERT INTO cs_pt_account(id, property_id, remainingAmount,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.rentAccount
+          jsonMaps:
+            - jsonPath: $.Properties.*.rentAccount.id
 
-      - jsonPath: $.Properties.*.propertyDetails.additionalDetails
-      
-      - jsonPath: $.Properties.*.propertyDetails.interestRate
+            - jsonPath: $.Properties.*.rentAccount.propertyId
 
-      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPercentage
+            - jsonPath: $.Properties.*.rentAccount.remainingAmount
 
-      - jsonPath: $.Properties.*.propertyDetails.rentIncrementPeriod
+            - jsonPath: $.Properties.*.rentAccount.tenantId
 
-      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.rentAccount.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
-      
-      - jsonPath: $.Properties.*.propertyDetails.id
+            - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.propertyDetails.propertyId
+            - jsonPath: $.Properties.*.rentAccount.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.propertyDetails.transitNumber
+            - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedTime
 
+        - query: DELETE FROM cs_pt_collection WHERE demand_id=? and payment_id=? and tenantid=?;
+          basePath: $.Properties.*.rentCollections.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.rentCollections.*.demandId
 
-    - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, allotmen_number=?, active_state=?, is_primary_owner=?, modified_by=?, modified_date=? where id=?;
-      basePath: $.Properties.*.owners.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.rentCollections.*.paymentId
 
-      - jsonPath: $.Properties.*.tenantId
-      
-      - jsonPath: $.Properties.*.owners.*.allotmenNumber
+            - jsonPath: $.Properties.*.rentCollections.*.tenantId
 
-      - jsonPath: $.Properties.*.owners.*.activeState
+        - query: INSERT INTO cs_pt_collection(id, demand_id, payment_id, interestCollected, principalCollected,tenantid,collectionAgainst,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.rentCollections.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.rentCollections.*.id
 
-      - jsonPath: $.Properties.*.owners.*.isPrimaryOwner
+            - jsonPath: $.Properties.*.rentCollections.*.demandId
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.rentCollections.*.paymentId
 
-      - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
-            
-      - jsonPath: $.Properties.*.owners.*.id
+            - jsonPath: $.Properties.*.rentCollections.*.interestCollected
 
- 
-    - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, relation_with_deceased_allottee=?, date_of_death_allottee=?, permanent=?, application_type=?, modified_by=?, modified_date=? where id=?;
-      basePath: $.Properties.*.owners.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.rentCollections.*.principalCollected
 
-      - jsonPath: $.Properties.*.owners.*.id
-      
-      - jsonPath: $.Properties.*.tenantId
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.name
+            - jsonPath: $.Properties.*.rentCollections.*.tenantId
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.email
+            - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.phone
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.gender
+            - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdBy
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfBirth
+            - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.aadhaarNumber
+            - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdTime
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentStartdate
+            - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentEnddate
+    - version: 1.0
+      description: Persists Properties details in cs_pt_property_v1 table
+      fromTopic: update-property-csp
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE cs_pt_property_v1 SET tenantid=?, colony=?, master_data_state=?, master_data_action=?, modified_by=?, modified_date=? where id=? AND transit_number=?;
+          basePath: Properties.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionStartdate
+            - jsonPath: $.Properties.*.colony
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionEnddate
+            - jsonPath: $.Properties.*.masterDataState
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.monthlyRent
+            - jsonPath: $.Properties.*.masterDataAction
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
+            - jsonPath: $.Properties.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
+            - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.relationWithDeceasedAllottee
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
+            - jsonPath: $.Properties.*.id
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.permanent
-      
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
+            - jsonPath: $.Properties.*.transitNumber
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
+        - query: UPDATE cs_pt_propertydetails_v1 SET tenantid=?, area=?, rent_per_sqyd=?, current_owner=?, floors=?, additional_details=?,interest_rate=?,rent_increment_percentage=?,rent_increment_period=?, modified_by=?, modified_date=? where id=? AND property_id=? AND transit_number=?;
+          basePath: Properties.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
-            
-      - jsonPath: $.Properties.*.owners.*.ownerDetails.id
-      
-      
-    - query: INSERT INTO cs_pt_documents_v1 (id, reference_id, tenantid, is_active, document_type, fileStore_id, property_id, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, fileStore_id =?,modified_by =?, modified_date =?;
-      basePath: $.Properties.*.propertyDetails.applicationDocuments.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.propertyDetails.area
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.id
+            - jsonPath: $.Properties.*.propertyDetails.rentPerSqyd
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.referenceId
+            - jsonPath: $.Properties.*.propertyDetails.currentOwner
 
-      - jsonPath: $.Properties.*.tenantId
+            - jsonPath: $.Properties.*.propertyDetails.floors
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.active
+            - jsonPath: $.Properties.*.propertyDetails.additionalDetails
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentType
+            - jsonPath: $.Properties.*.propertyDetails.interestRate
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.fileStoreId
+            - jsonPath: $.Properties.*.propertyDetails.rentIncrementPercentage
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.propertyId
+            - jsonPath: $.Properties.*.propertyDetails.rentIncrementPeriod
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdBy
+            - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdTime
+            - jsonPath: $.Properties.*.propertyDetails.id
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime   
-      
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.active
+            - jsonPath: $.Properties.*.propertyDetails.propertyId
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentType
+            - jsonPath: $.Properties.*.propertyDetails.transitNumber
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.fileStoreId
+        - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, allotmen_number=?, active_state=?, is_primary_owner=?, modified_by=?, modified_date=? where id=?;
+          basePath: $.Properties.*.owners.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.owners.*.allotmenNumber
 
-      - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime      
-    
-    
-    - query : DELETE FROM cs_pt_demand WHERE property_id=? and tenantid=?;
-      basePath: $.Properties.*.demands.*
-      jsonMaps:
-       - jsonPath: $.Properties.*.demands.*.propertyId
-       
-       - jsonPath: $.Properties.*.demands.*.tenantId
+            - jsonPath: $.Properties.*.owners.*.activeState
 
-    - query : INSERT INTO cs_pt_demand(id, property_id, initialGracePeriod, generationDate, collectionPrincipal, remainingPrincipal, interestSince,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.demands.*
-      jsonMaps:
-        - jsonPath: $.Properties.*.demands.*.id 
-      
-        - jsonPath: $.Properties.*.demands.*.propertyId
+            - jsonPath: $.Properties.*.owners.*.isPrimaryOwner
 
-        - jsonPath: $.Properties.*.demands.*.initialGracePeriod
-       
-        - jsonPath: $.Properties.*.demands.*.generationDate
-  
-        - jsonPath: $.Properties.*.demands.*.collectionPrincipal
+            - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedBy
 
-        - jsonPath: $.Properties.*.demands.*.remainingPrincipal
-        
-        - jsonPath: $.Properties.*.demands.*.interestSince 
-      
-        - jsonPath: $.Properties.*.demands.*.mode
+            - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
 
-        - jsonPath: $.Properties.*.demands.*.tenantId
-       
-        - jsonPath: $.Properties.*.demands.*.auditDetails.createdBy
-  
-        - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.owners.*.id
 
-        - jsonPath: $.Properties.*.demands.*.auditDetails.createdTime
-        
-        - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedTime
-        
-       
-    - query : DELETE FROM cs_pt_payment WHERE property_id=? and tenantid=?;
-      basePath: $.Properties.*.payments.*
-      jsonMaps:
-       - jsonPath: $.Properties.*.payments.*.propertyId
-       
-       - jsonPath: $.Properties.*.payments.*.tenantId
+        - query: UPDATE cs_pt_ownershipdetails_v1 SET owner_id=?, tenantid=?, name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, relation_with_deceased_allottee=?, date_of_death_allottee=?, permanent=?, application_type=?, modified_by=?, modified_date=? where id=?;
+          basePath: $.Properties.*.owners.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.owners.*.id
 
-    
-    - query : INSERT INTO cs_pt_payment(id, property_id, receiptNo, amountPaid, dateOfPayment,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.payments.*
-      jsonMaps:
-        - jsonPath: $.Properties.*.payments.*.id 
-      
-        - jsonPath: $.Properties.*.payments.*.propertyId
+            - jsonPath: $.Properties.*.tenantId
 
-        - jsonPath: $.Properties.*.payments.*.receiptNo
-       
-        - jsonPath: $.Properties.*.payments.*.amountPaid
-  
-        - jsonPath: $.Properties.*.payments.*.dateOfPayment
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.name
 
-        - jsonPath: $.Properties.*.payments.*.mode
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.email
 
-        - jsonPath: $.Properties.*.payments.*.tenantId
-       
-        - jsonPath: $.Properties.*.payments.*.auditDetails.createdBy
-  
-        - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.phone
 
-        - jsonPath: $.Properties.*.payments.*.auditDetails.createdTime
-        
-        - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedTime
-        
-        
-    - query : DELETE FROM cs_pt_account WHERE property_id=? and tenantid=?;
-      basePath: $.Properties.*.rentAccount
-      jsonMaps:
-        - jsonPath: $.Properties.*.rentAccount.propertyId
-       
-        - jsonPath: $.Properties.*.rentAccount.tenantId
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.gender
 
-    
-    - query : INSERT INTO cs_pt_account(id, property_id, remainingAmount,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.rentAccount
-      jsonMaps:
-        - jsonPath: $.Properties.*.rentAccount.id 
-      
-        - jsonPath: $.Properties.*.rentAccount.propertyId
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfBirth
 
-        - jsonPath: $.Properties.*.rentAccount.remainingAmount
-       
-        - jsonPath: $.Properties.*.rentAccount.tenantId
-  
-        - jsonPath: $.Properties.*.rentAccount.auditDetails.createdBy
-  
-        - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.aadhaarNumber
 
-        - jsonPath: $.Properties.*.rentAccount.auditDetails.createdTime
-        
-        - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedTime
-        
-        
-    - query : DELETE FROM cs_pt_collection WHERE demand_id=? and payment_id=? and tenantid=?;
-      basePath: $.Properties.*.rentCollections.*
-      jsonMaps:
-       - jsonPath: $.Properties.*.rentCollections.*.demandId
-       
-       - jsonPath: $.Properties.*.rentCollections.*.paymentId
-       
-       - jsonPath: $.Properties.*.rentCollections.*.tenantId
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentStartdate
 
-    
-    - query : INSERT INTO cs_pt_collection(id, demand_id, payment_id, interestCollected, principalCollected,tenantid,collectionAgainst,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.rentCollections.*
-      jsonMaps:
-        - jsonPath: $.Properties.*.rentCollections.*.id 
-      
-        - jsonPath: $.Properties.*.rentCollections.*.demandId
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.allotmentEnddate
 
-        - jsonPath: $.Properties.*.rentCollections.*.paymentId
-       
-        - jsonPath: $.Properties.*.rentCollections.*.interestCollected
-  
-        - jsonPath: $.Properties.*.rentCollections.*.principalCollected
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionStartdate
 
-        - jsonPath: $.Properties.*.rentCollections.*.tenantId
-        
-        - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
-       
-        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdBy
-  
-        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.posessionEnddate
 
-        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdTime
-        
-        - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedTime
-        
-        
-    
-  - version: 1.0
-    description: Persists Owners details in cs_pt_ownership_v1 table
-    fromTopic: save-ownership-transfer
-    isTransaction: true
-    queryMaps:
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.monthlyRent
 
-    - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, application_state, application_action, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Owners.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPeriod
 
-      - jsonPath: $.Owners.*.id
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.revisionPercentage
 
-      - jsonPath: $.Owners.*.property.id
-      
-      - jsonPath: $.Owners.*.tenantId
-      
-      - jsonPath: $.Owners.*.allotmenNumber
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.fatherOrHusband
 
-      - jsonPath: $.Owners.*.applicationState
-      
-      - jsonPath: $.Owners.*.applicationAction
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.relation
 
-      - jsonPath: $.Owners.*.activeState
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.relationWithDeceasedAllottee
 
-      - jsonPath: $.Owners.*.isPrimaryOwner
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.dateOfDeathAllottee
 
-      - jsonPath: $.Owners.*.auditDetails.createdBy
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.permanent
 
-      - jsonPath: $.Owners.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.applicationType
 
-      - jsonPath: $.Owners.*.auditDetails.createdTime
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Owners.*.auditDetails.lastModifiedTime
-  
-  
-    - query: INSERT INTO cs_pt_ownershipdetails_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, permanent, created_by, modified_by, created_date, modified_date, due_amount, apro_charge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Owners.*.ownerDetails
-      jsonMaps:
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Owners.*.ownerDetails.id
+            - jsonPath: $.Properties.*.owners.*.ownerDetails.id
 
-      - jsonPath: $.Owners.*.property.id
+        - query: INSERT INTO cs_pt_documents_v1 (id, reference_id, tenantid, is_active, document_type, fileStore_id, property_id, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, fileStore_id =?,modified_by =?, modified_date =?;
+          basePath: $.Properties.*.propertyDetails.applicationDocuments.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.id
 
-      - jsonPath: $.Owners.*.id
-      
-      - jsonPath: $.Owners.*.tenantId
-      
-      - jsonPath: $.Owners.*.ownerDetails.name
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.referenceId
 
-      - jsonPath: $.Owners.*.ownerDetails.email
+            - jsonPath: $.Properties.*.tenantId
 
-      - jsonPath: $.Owners.*.ownerDetails.phone
-      
-      - jsonPath: $.Owners.*.ownerDetails.gender
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.active
 
-      - jsonPath: $.Owners.*.ownerDetails.dateOfBirth
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentType
 
-      - jsonPath: $.Owners.*.ownerDetails.aadhaarNumber
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.fileStoreId
 
-      - jsonPath: $.Owners.*.ownerDetails.allotmentStartdate
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.propertyId
 
-      - jsonPath: $.Owners.*.ownerDetails.allotmentEnddate
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdBy
 
-      - jsonPath: $.Owners.*.ownerDetails.posessionStartdate
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Owners.*.ownerDetails.posessionEnddate
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.createdTime
 
-      - jsonPath: $.Owners.*.ownerDetails.monthlyRent
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Owners.*.ownerDetails.revisionPeriod
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.active
 
-      - jsonPath: $.Owners.*.ownerDetails.revisionPercentage
-      
-      - jsonPath: $.Owners.*.ownerDetails.fatherOrHusband
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.documentType
 
-      - jsonPath: $.Owners.*.ownerDetails.relation
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.fileStoreId
 
-      - jsonPath: $.Owners.*.ownerDetails.relationWithDeceasedAllottee
-      
-      - jsonPath: $.Owners.*.ownerDetails.dateOfDeathAllottee
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Owners.*.ownerDetails.applicationNumber
-      
-      - jsonPath: $.Owners.*.ownerDetails.applicationType
-      
-      - jsonPath: $.Owners.*.ownerDetails.permanent
+            - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdBy
+        - query: DELETE FROM cs_pt_demand WHERE property_id=? and tenantid=?;
+          basePath: $.Properties.*.demands.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.demands.*.propertyId
 
-      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.demands.*.tenantId
 
-      - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdTime
+        - query: INSERT INTO cs_pt_demand(id, property_id, initialGracePeriod, generationDate, collectionPrincipal, remainingPrincipal, interestSince,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.demands.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.demands.*.id
 
-      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
-      
-      - jsonPath: $.Owners.*.ownerDetails.dueAmount
+            - jsonPath: $.Properties.*.demands.*.propertyId
 
-      - jsonPath: $.Owners.*.ownerDetails.aproCharge      
-      
-      
-    - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, application_state, application_action, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Owners.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.demands.*.initialGracePeriod
 
-      - jsonPath: $.Owners.*.id
+            - jsonPath: $.Properties.*.demands.*.generationDate
 
-      - jsonPath: $.Owners.*.property.id
-      
-      - jsonPath: $.Owners.*.tenantId
-      
-      - jsonPath: $.Owners.*.allotmenNumber
+            - jsonPath: $.Properties.*.demands.*.collectionPrincipal
 
-      - jsonPath: $.Owners.*.applicationState
-      
-      - jsonPath: $.Owners.*.applicationAction
+            - jsonPath: $.Properties.*.demands.*.remainingPrincipal
 
-      - jsonPath: $.Owners.*.activeState
+            - jsonPath: $.Properties.*.demands.*.interestSince
 
-      - jsonPath: $.Owners.*.isPrimaryOwner
+            - jsonPath: $.Properties.*.demands.*.mode
 
-      - jsonPath: $.Owners.*.auditDetails.createdBy
+            - jsonPath: $.Properties.*.demands.*.tenantId
 
-      - jsonPath: $.Owners.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.demands.*.auditDetails.createdBy
 
-      - jsonPath: $.Owners.*.auditDetails.createdTime
+            - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Owners.*.auditDetails.lastModifiedTime
-  
-  
-    - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, permanent, created_by, modified_by, created_date, modified_date, due_amount, apro_charge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Owners.*.ownerDetails
-      jsonMaps:
+            - jsonPath: $.Properties.*.demands.*.auditDetails.createdTime
 
-      - jsonPath: $.Owners.*.ownerDetails.id
+            - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Owners.*.property.id
+        - query: DELETE FROM cs_pt_payment WHERE property_id=? and tenantid=?;
+          basePath: $.Properties.*.payments.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.payments.*.propertyId
 
-      - jsonPath: $.Owners.*.id
-      
-      - jsonPath: $.Owners.*.tenantId
-      
-      - jsonPath: $.Owners.*.ownerDetails.name
+            - jsonPath: $.Properties.*.payments.*.tenantId
 
-      - jsonPath: $.Owners.*.ownerDetails.email
+        - query: INSERT INTO cs_pt_payment(id, property_id, receiptNo, amountPaid, dateOfPayment,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.payments.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.payments.*.id
 
-      - jsonPath: $.Owners.*.ownerDetails.phone
-      
-      - jsonPath: $.Owners.*.ownerDetails.gender
+            - jsonPath: $.Properties.*.payments.*.propertyId
 
-      - jsonPath: $.Owners.*.ownerDetails.dateOfBirth
+            - jsonPath: $.Properties.*.payments.*.receiptNo
 
-      - jsonPath: $.Owners.*.ownerDetails.aadhaarNumber
+            - jsonPath: $.Properties.*.payments.*.amountPaid
 
-      - jsonPath: $.Owners.*.ownerDetails.allotmentStartdate
+            - jsonPath: $.Properties.*.payments.*.dateOfPayment
 
-      - jsonPath: $.Owners.*.ownerDetails.allotmentEnddate
+            - jsonPath: $.Properties.*.payments.*.mode
 
-      - jsonPath: $.Owners.*.ownerDetails.posessionStartdate
+            - jsonPath: $.Properties.*.payments.*.tenantId
 
-      - jsonPath: $.Owners.*.ownerDetails.posessionEnddate
+            - jsonPath: $.Properties.*.payments.*.auditDetails.createdBy
 
-      - jsonPath: $.Owners.*.ownerDetails.monthlyRent
+            - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Owners.*.ownerDetails.revisionPeriod
+            - jsonPath: $.Properties.*.payments.*.auditDetails.createdTime
 
-      - jsonPath: $.Owners.*.ownerDetails.revisionPercentage
-      
-      - jsonPath: $.Owners.*.ownerDetails.fatherOrHusband
+            - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Owners.*.ownerDetails.relation
+        - query: DELETE FROM cs_pt_account WHERE property_id=? and tenantid=?;
+          basePath: $.Properties.*.rentAccount
+          jsonMaps:
+            - jsonPath: $.Properties.*.rentAccount.propertyId
 
-      - jsonPath: $.Owners.*.ownerDetails.relationWithDeceasedAllottee
-      
-      - jsonPath: $.Owners.*.ownerDetails.dateOfDeathAllottee
+            - jsonPath: $.Properties.*.rentAccount.tenantId
 
-      - jsonPath: $.Owners.*.ownerDetails.applicationNumber
-      
-      - jsonPath: $.Owners.*.ownerDetails.applicationType
-      
-      - jsonPath: $.Owners.*.ownerDetails.permanent
+        - query: INSERT INTO cs_pt_account(id, property_id, remainingAmount,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.rentAccount
+          jsonMaps:
+            - jsonPath: $.Properties.*.rentAccount.id
 
-      - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdBy
+            - jsonPath: $.Properties.*.rentAccount.propertyId
 
-      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Properties.*.rentAccount.remainingAmount
 
-      - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdTime
+            - jsonPath: $.Properties.*.rentAccount.tenantId
 
-      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
+            - jsonPath: $.Properties.*.rentAccount.auditDetails.createdBy
 
-      - jsonPath: $.Owners.*.ownerDetails.dueAmount
+            - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Owners.*.ownerDetails.aproCharge 
-            
-         
-      
-  - version: 1.0
-    description: Persists Owners details in cs_pt_ownership_v1 table
-    fromTopic: update-rp-ownership-transfer
-    isTransaction: true
-    queryMaps:
-    
-    - query: INSERT INTO cs_pt_ownership_audit_v1 SELECT * FROM cs_pt_ownership_v1 WHERE id = ?;
-      basePath: Owners.*
-      jsonMaps:
-      - jsonPath: $.Owners.*.id
+            - jsonPath: $.Properties.*.rentAccount.auditDetails.createdTime
 
-    - query: UPDATE cs_pt_ownership_v1 SET  allotmen_number=?, active_state=?, is_primary_owner=?, application_state=?, application_action=?, modified_by=?, modified_date=? WHERE id=?;
-      basePath: Owners.*
-      jsonMaps:
+            - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Owners.*.allotmenNumber
+        - query: DELETE FROM cs_pt_collection WHERE demand_id=? and payment_id=? and tenantid=?;
+          basePath: $.Properties.*.rentCollections.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.rentCollections.*.demandId
 
-      - jsonPath: $.Owners.*.activeState
+            - jsonPath: $.Properties.*.rentCollections.*.paymentId
 
-      - jsonPath: $.Owners.*.isPrimaryOwner
-      
-      - jsonPath: $.Owners.*.applicationState
-      
-      - jsonPath: $.Owners.*.applicationAction
+            - jsonPath: $.Properties.*.rentCollections.*.tenantId
 
-      - jsonPath: $.Owners.*.auditDetails.lastModifiedBy
+        - query: INSERT INTO cs_pt_collection(id, demand_id, payment_id, interestCollected, principalCollected,tenantid,collectionAgainst,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.rentCollections.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.rentCollections.*.id
 
-      - jsonPath: $.Owners.*.auditDetails.lastModifiedTime 
-      
-      - jsonPath: $.Owners.*.id
-    
-        
-    - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 SELECT * FROM cs_pt_ownershipdetails_v1 WHERE id = ?;
-      basePath: Owners.*.ownerDetails
-      jsonMaps:
-      - jsonPath: $.Owners.*.ownerDetails.id
-    
-    
-    - query: UPDATE cs_pt_ownershipdetails_v1 SET name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, relation_with_deceased_allottee=?, date_of_death_allottee=?, application_type=?, modified_by=?, modified_date=?, due_amount=?, apro_charge=?, permanent=? where id=?;
-      basePath: $.Owners.*.ownerDetails
-      jsonMaps:
-            
-      - jsonPath: $.Owners.*.ownerDetails.name
+            - jsonPath: $.Properties.*.rentCollections.*.demandId
 
-      - jsonPath: $.Owners.*.ownerDetails.email
+            - jsonPath: $.Properties.*.rentCollections.*.paymentId
 
-      - jsonPath: $.Owners.*.ownerDetails.phone
-      
-      - jsonPath: $.Owners.*.ownerDetails.gender
+            - jsonPath: $.Properties.*.rentCollections.*.interestCollected
 
-      - jsonPath: $.Owners.*.ownerDetails.dateOfBirth
+            - jsonPath: $.Properties.*.rentCollections.*.principalCollected
 
-      - jsonPath: $.Owners.*.ownerDetails.aadhaarNumber
+            - jsonPath: $.Properties.*.rentCollections.*.tenantId
 
-      - jsonPath: $.Owners.*.ownerDetails.allotmentStartdate
+            - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
 
-      - jsonPath: $.Owners.*.ownerDetails.allotmentEnddate
+            - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdBy
 
-      - jsonPath: $.Owners.*.ownerDetails.posessionStartdate
+            - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Owners.*.ownerDetails.posessionEnddate
+            - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdTime
 
-      - jsonPath: $.Owners.*.ownerDetails.monthlyRent
+            - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Owners.*.ownerDetails.revisionPeriod
+    - version: 1.0
+      description: Persists Owners details in cs_pt_ownership_v1 table
+      fromTopic: save-ownership-transfer
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO cs_pt_ownership_v1 (id, property_id, tenantid, allotmen_number, application_state, application_action, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Owners.*
+          jsonMaps:
+            - jsonPath: $.Owners.*.id
 
-      - jsonPath: $.Owners.*.ownerDetails.revisionPercentage
-      
-      - jsonPath: $.Owners.*.ownerDetails.fatherOrHusband
+            - jsonPath: $.Owners.*.property.id
 
-      - jsonPath: $.Owners.*.ownerDetails.relation
-      
-      - jsonPath: $.Owners.*.ownerDetails.relationWithDeceasedAllottee
-      
-      - jsonPath: $.Owners.*.ownerDetails.dateOfDeathAllottee
-      
-      - jsonPath: $.Owners.*.ownerDetails.applicationType
+            - jsonPath: $.Owners.*.tenantId
 
-      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Owners.*.allotmenNumber
 
-      - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
-      
-      - jsonPath: $.Owners.*.ownerDetails.dueAmount
+            - jsonPath: $.Owners.*.applicationState
 
-      - jsonPath: $.Owners.*.ownerDetails.aproCharge
-      
-      - jsonPath: $.Owners.*.ownerDetails.permanent
-            
-      - jsonPath: $.Owners.*.ownerDetails.id     
-      
-      
-    - query: INSERT INTO cs_pt_documents_v1 (id, reference_id, tenantid, is_active, document_type, fileStore_id, property_id, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, fileStore_id =?, modified_by =?, modified_date =?;
-      basePath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*
-      jsonMaps:
+            - jsonPath: $.Owners.*.applicationAction
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.id
+            - jsonPath: $.Owners.*.activeState
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.referenceId
+            - jsonPath: $.Owners.*.isPrimaryOwner
 
-      - jsonPath: $.Owners.*.tenantId
+            - jsonPath: $.Owners.*.auditDetails.createdBy
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.active
+            - jsonPath: $.Owners.*.auditDetails.lastModifiedBy
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.documentType
+            - jsonPath: $.Owners.*.auditDetails.createdTime
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.fileStoreId
+            - jsonPath: $.Owners.*.auditDetails.lastModifiedTime
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.propertyId
+        - query: INSERT INTO cs_pt_ownershipdetails_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, permanent, created_by, modified_by, created_date, modified_date, due_amount, apro_charge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Owners.*.ownerDetails
+          jsonMaps:
+            - jsonPath: $.Owners.*.ownerDetails.id
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.createdBy
+            - jsonPath: $.Owners.*.property.id
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Owners.*.id
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.createdTime
+            - jsonPath: $.Owners.*.tenantId
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.lastModifiedTime   
-      
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.active
+            - jsonPath: $.Owners.*.ownerDetails.name
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.documentType
+            - jsonPath: $.Owners.*.ownerDetails.email
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.fileStoreId
+            - jsonPath: $.Owners.*.ownerDetails.phone
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Owners.*.ownerDetails.gender
 
-      - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.lastModifiedTime  
-      
-            
-      
+            - jsonPath: $.Owners.*.ownerDetails.dateOfBirth
+
+            - jsonPath: $.Owners.*.ownerDetails.aadhaarNumber
+
+            - jsonPath: $.Owners.*.ownerDetails.allotmentStartdate
+
+            - jsonPath: $.Owners.*.ownerDetails.allotmentEnddate
+
+            - jsonPath: $.Owners.*.ownerDetails.posessionStartdate
+
+            - jsonPath: $.Owners.*.ownerDetails.posessionEnddate
+
+            - jsonPath: $.Owners.*.ownerDetails.monthlyRent
+
+            - jsonPath: $.Owners.*.ownerDetails.revisionPeriod
+
+            - jsonPath: $.Owners.*.ownerDetails.revisionPercentage
+
+            - jsonPath: $.Owners.*.ownerDetails.fatherOrHusband
+
+            - jsonPath: $.Owners.*.ownerDetails.relation
+
+            - jsonPath: $.Owners.*.ownerDetails.relationWithDeceasedAllottee
+
+            - jsonPath: $.Owners.*.ownerDetails.dateOfDeathAllottee
+
+            - jsonPath: $.Owners.*.ownerDetails.applicationNumber
+
+            - jsonPath: $.Owners.*.ownerDetails.applicationType
+
+            - jsonPath: $.Owners.*.ownerDetails.permanent
+
+            - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdBy
+
+            - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedBy
+
+            - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdTime
+
+            - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
+
+            - jsonPath: $.Owners.*.ownerDetails.dueAmount
+
+            - jsonPath: $.Owners.*.ownerDetails.aproCharge
+
+        - query: INSERT INTO cs_pt_ownership_audit_v1 (id, property_id, tenantid, allotmen_number, application_state, application_action, active_state, is_primary_owner, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Owners.*
+          jsonMaps:
+            - jsonPath: $.Owners.*.id
+
+            - jsonPath: $.Owners.*.property.id
+
+            - jsonPath: $.Owners.*.tenantId
+
+            - jsonPath: $.Owners.*.allotmenNumber
+
+            - jsonPath: $.Owners.*.applicationState
+
+            - jsonPath: $.Owners.*.applicationAction
+
+            - jsonPath: $.Owners.*.activeState
+
+            - jsonPath: $.Owners.*.isPrimaryOwner
+
+            - jsonPath: $.Owners.*.auditDetails.createdBy
+
+            - jsonPath: $.Owners.*.auditDetails.lastModifiedBy
+
+            - jsonPath: $.Owners.*.auditDetails.createdTime
+
+            - jsonPath: $.Owners.*.auditDetails.lastModifiedTime
+
+        - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 (id, property_id, owner_id, tenantid, name, email, phone, gender, date_of_birth, aadhaar_number, allotment_startdate, allotment_enddate, posession_startdate, posession_enddate, monthly_rent, revision_period, revision_percentage, father_or_husband, relation, relation_with_deceased_allottee, date_of_death_allottee, application_number, application_type, permanent, created_by, modified_by, created_date, modified_date, due_amount, apro_charge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Owners.*.ownerDetails
+          jsonMaps:
+            - jsonPath: $.Owners.*.ownerDetails.id
+
+            - jsonPath: $.Owners.*.property.id
+
+            - jsonPath: $.Owners.*.id
+
+            - jsonPath: $.Owners.*.tenantId
+
+            - jsonPath: $.Owners.*.ownerDetails.name
+
+            - jsonPath: $.Owners.*.ownerDetails.email
+
+            - jsonPath: $.Owners.*.ownerDetails.phone
+
+            - jsonPath: $.Owners.*.ownerDetails.gender
+
+            - jsonPath: $.Owners.*.ownerDetails.dateOfBirth
+
+            - jsonPath: $.Owners.*.ownerDetails.aadhaarNumber
+
+            - jsonPath: $.Owners.*.ownerDetails.allotmentStartdate
+
+            - jsonPath: $.Owners.*.ownerDetails.allotmentEnddate
+
+            - jsonPath: $.Owners.*.ownerDetails.posessionStartdate
+
+            - jsonPath: $.Owners.*.ownerDetails.posessionEnddate
+
+            - jsonPath: $.Owners.*.ownerDetails.monthlyRent
+
+            - jsonPath: $.Owners.*.ownerDetails.revisionPeriod
+
+            - jsonPath: $.Owners.*.ownerDetails.revisionPercentage
+
+            - jsonPath: $.Owners.*.ownerDetails.fatherOrHusband
+
+            - jsonPath: $.Owners.*.ownerDetails.relation
+
+            - jsonPath: $.Owners.*.ownerDetails.relationWithDeceasedAllottee
+
+            - jsonPath: $.Owners.*.ownerDetails.dateOfDeathAllottee
+
+            - jsonPath: $.Owners.*.ownerDetails.applicationNumber
+
+            - jsonPath: $.Owners.*.ownerDetails.applicationType
+
+            - jsonPath: $.Owners.*.ownerDetails.permanent
+
+            - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdBy
+
+            - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedBy
+
+            - jsonPath: $.Owners.*.ownerDetails.auditDetails.createdTime
+
+            - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
+
+            - jsonPath: $.Owners.*.ownerDetails.dueAmount
+
+            - jsonPath: $.Owners.*.ownerDetails.aproCharge
+
+    - version: 1.0
+      description: Persists Owners details in cs_pt_ownership_v1 table
+      fromTopic: update-rp-ownership-transfer
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO cs_pt_ownership_audit_v1 SELECT * FROM cs_pt_ownership_v1 WHERE id = ?;
+          basePath: Owners.*
+          jsonMaps:
+            - jsonPath: $.Owners.*.id
+
+        - query: UPDATE cs_pt_ownership_v1 SET  allotmen_number=?, active_state=?, is_primary_owner=?, application_state=?, application_action=?, modified_by=?, modified_date=? WHERE id=?;
+          basePath: Owners.*
+          jsonMaps:
+            - jsonPath: $.Owners.*.allotmenNumber
+
+            - jsonPath: $.Owners.*.activeState
+
+            - jsonPath: $.Owners.*.isPrimaryOwner
+
+            - jsonPath: $.Owners.*.applicationState
+
+            - jsonPath: $.Owners.*.applicationAction
+
+            - jsonPath: $.Owners.*.auditDetails.lastModifiedBy
+
+            - jsonPath: $.Owners.*.auditDetails.lastModifiedTime
+
+            - jsonPath: $.Owners.*.id
+
+        - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 SELECT * FROM cs_pt_ownershipdetails_v1 WHERE id = ?;
+          basePath: Owners.*.ownerDetails
+          jsonMaps:
+            - jsonPath: $.Owners.*.ownerDetails.id
+
+        - query: UPDATE cs_pt_ownershipdetails_v1 SET name=?, email=?, phone=?, gender=?, date_of_birth=?, aadhaar_number=?, allotment_startdate=?, allotment_enddate=?, posession_startdate=?, posession_enddate=?, monthly_rent=?, revision_period=?, revision_percentage=?, father_or_husband=?, relation=?, relation_with_deceased_allottee=?, date_of_death_allottee=?, application_type=?, modified_by=?, modified_date=?, due_amount=?, apro_charge=?, permanent=? where id=?;
+          basePath: $.Owners.*.ownerDetails
+          jsonMaps:
+            - jsonPath: $.Owners.*.ownerDetails.name
+
+            - jsonPath: $.Owners.*.ownerDetails.email
+
+            - jsonPath: $.Owners.*.ownerDetails.phone
+
+            - jsonPath: $.Owners.*.ownerDetails.gender
+
+            - jsonPath: $.Owners.*.ownerDetails.dateOfBirth
+
+            - jsonPath: $.Owners.*.ownerDetails.aadhaarNumber
+
+            - jsonPath: $.Owners.*.ownerDetails.allotmentStartdate
+
+            - jsonPath: $.Owners.*.ownerDetails.allotmentEnddate
+
+            - jsonPath: $.Owners.*.ownerDetails.posessionStartdate
+
+            - jsonPath: $.Owners.*.ownerDetails.posessionEnddate
+
+            - jsonPath: $.Owners.*.ownerDetails.monthlyRent
+
+            - jsonPath: $.Owners.*.ownerDetails.revisionPeriod
+
+            - jsonPath: $.Owners.*.ownerDetails.revisionPercentage
+
+            - jsonPath: $.Owners.*.ownerDetails.fatherOrHusband
+
+            - jsonPath: $.Owners.*.ownerDetails.relation
+
+            - jsonPath: $.Owners.*.ownerDetails.relationWithDeceasedAllottee
+
+            - jsonPath: $.Owners.*.ownerDetails.dateOfDeathAllottee
+
+            - jsonPath: $.Owners.*.ownerDetails.applicationType
+
+            - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedBy
+
+            - jsonPath: $.Owners.*.ownerDetails.auditDetails.lastModifiedTime
+
+            - jsonPath: $.Owners.*.ownerDetails.dueAmount
+
+            - jsonPath: $.Owners.*.ownerDetails.aproCharge
+
+            - jsonPath: $.Owners.*.ownerDetails.permanent
+
+            - jsonPath: $.Owners.*.ownerDetails.id
+
+        - query: INSERT INTO cs_pt_documents_v1 (id, reference_id, tenantid, is_active, document_type, fileStore_id, property_id, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, fileStore_id =?, modified_by =?, modified_date =?;
+          basePath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*
+          jsonMaps:
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.id
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.referenceId
+
+            - jsonPath: $.Owners.*.tenantId
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.active
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.documentType
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.fileStoreId
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.propertyId
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.createdBy
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.lastModifiedBy
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.createdTime
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.lastModifiedTime
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.active
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.documentType
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.fileStoreId
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.lastModifiedBy
+
+            - jsonPath: $.Owners.*.ownerDetails.ownershipTransferDocuments.*.auditDetails.lastModifiedTime
