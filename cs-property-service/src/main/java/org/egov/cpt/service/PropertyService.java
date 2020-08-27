@@ -10,6 +10,7 @@ import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
+import org.egov.cpt.models.RentAccountStatement;
 import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
@@ -61,7 +62,8 @@ public class PropertyService {
 	private RentEnrichmentService rentEnrichmentService;
 
 	@Autowired
-	private IRentCollectionService rentCollectionService;
+	private IRentCollectionService rentCollectionService;	
+	
 
 	public List<Property> createProperty(PropertyRequest request) {
 
@@ -131,8 +133,10 @@ public class PropertyService {
 		List<RentDemand> demands = repository.getRentDemands(accountStatementCriteria);
 		accountStatementCriteria.setDemandids(demands.stream().map(RentDemand::getId).collect(Collectors.toList()));
 		
-		List<RentCollection> collections = repository.getRentCollections(accountStatementCriteria);
-		return AccountStatementResponse.builder().payments(payments).demands(demands).collections(collections).build();
+		List<RentCollection> collections = repository.getRentCollections(accountStatementCriteria);		
+		return AccountStatementResponse.builder().rentAccountStatements(rentCollectionService.accountStatement(demands, payments, collections)).build();
+		
+		
 	}
 
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {

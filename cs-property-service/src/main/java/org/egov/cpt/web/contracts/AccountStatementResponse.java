@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.cpt.models.RentAccountStatement;
 import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
@@ -21,15 +22,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AccountStatementResponse {
 
-	@JsonProperty("Payments")
+	@JsonProperty("RentAccountStatements")
 	@Valid
-	private List<RentPayment> payments;	
+	private List<RentAccountStatement> rentAccountStatements;	
 	
-	@JsonProperty("Demands")
-	@Valid
-	private List<RentDemand> demands;
-	
-	@JsonProperty("Collections")
-	@Valid
-	private List<RentCollection> collections;
 }
