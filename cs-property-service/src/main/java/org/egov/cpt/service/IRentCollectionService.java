@@ -9,23 +9,26 @@ import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.models.RentSummary;
 
-
-
 public interface IRentCollectionService {
 
 	/**
-	 * Get the list of collections for the given demand and payments for the same property.
+	 * Get the list of collections for the given demand and payments for the same
+	 * property.
 	 * 
-	 * @apiNote When a new set of demands are saved in the database on every _update.
-	 * @apiNote This might change demand objects. This will create new Collection objects.
+	 * @apiNote When a new set of demands are saved in the database on every
+	 *          _update.
+	 * @apiNote This might change demand objects. This will create new Collection
+	 *          objects.
 	 * @param demands
 	 * @param payment
 	 * @return List<RentCollection> Collections to be saved in the database.
 	 */
-	public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled,RentAccount account, double interestRate) ;
-	
+	public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled,
+			RentAccount account, double interestRate);
+
 	/**
-	 * Get the current rent summary by calculating from the given demands and collections for the same property.
+	 * Get the current rent summary by calculating from the given demands and
+	 * collections for the same property.
 	 * 
 	 * @apiNote This is called every time we return a property in search.
 	 * @apiNote This will not change the database in anyway.
@@ -34,9 +37,10 @@ public interface IRentCollectionService {
 	 * @param payment
 	 * @return
 	 */
-	
-	//public RentSummary getRentSummary(ArrayList<RentDemand> demands, List<RentCollection> collections, List<RentPayment> payment);
-	
+
+	// public RentSummary getRentSummary(ArrayList<RentDemand> demands,
+	// List<RentCollection> collections, List<RentPayment> payment);
+
 	// Function parameters changed by Pooja
 	public RentSummary paymentSummary(List<RentDemand> demands,RentAccount rentAccount);
 	/**
@@ -60,6 +64,4 @@ public interface IRentCollectionService {
 	 */
 	public List<RentAccountStatement> accountStatement (List<RentDemand> demands, List<RentPayment> payments,List<RentCollection> lstCollection) ;
 		
-	
-	
 }

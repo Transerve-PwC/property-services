@@ -2,31 +2,46 @@ package org.egov.cpt.repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.RentDemand;
-import org.egov.cpt.models.RentDemand.ModeEnum;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Component;
 
-public class RentDemandRowMapper implements RowMapper<RentDemand>{
+@Component
+public class RentDemandRowMapper implements ResultSetExtractor<List<RentDemand>> {
+
 
 	@Override
-	public RentDemand mapRow(ResultSet rs, int rowNum) throws SQLException {
-		AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("created_by"))
-				.createdTime(rs.getLong("created_date")).lastModifiedBy(rs.getString("modified_by"))
-				.lastModifiedTime(rs.getLong("modified_date")).build();
-		
-		return RentDemand.builder()
-				.auditDetails(auditdetails)
-				.id(rs.getString("id"))
-				.propertyId(rs.getString("property_id"))
-				.initialGracePeriod(rs.getInt("initialgraceperiod"))
-				.generationDate(rs.getLong("generationdate"))
-				.collectionPrincipal(rs.getDouble("collectionprincipal"))
-				.remainingPrincipal(rs.getDouble("remainingprincipal"))
-				.interestSince(rs.getLong("interestsince"))
-				.mode(ModeEnum.fromValue(rs.getString("mode")))
-				.tenantId(rs.getString("tenantid"))
-				.build();
+	public List<RentDemand> extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+		LinkedHashMap<String, RentDemand> demandMap = new LinkedHashMap<>();
+
+		while (rs.next()) {
+				String demandId=rs.getString("demand_id");
+				RentDemand currentapplication = demandMap.get(demandId);
+
+				if (null == currentapplication) {
+				AuditDetails demandAuditDetails = AuditDetails.builder().createdBy(rs.getString("demand_created_by"))
+						.createdTime(rs.getLong("demand_created_date")).lastModifiedBy(rs.getString("demand_modified_by"))
+						.lastModifiedTime(rs.getLong("demand_modified_date")).build();
+				RentDemand rentDemand = RentDemand.builder().id(rs.getString("demand_id"))
+						.propertyId("demand_pid")
+						.initialGracePeriod(rs.getInt("demand_IniGracePeriod"))
+						.generationDate(rs.getLong("demand_genDate"))
+						.collectionPrincipal(rs.getDouble("demand_colPrincipal"))
+						.remainingPrincipal(rs.getDouble("demand_remPrincipal"))
+						.interestSince(rs.getLong("demand_intSince"))
+						.mode(RentDemand.ModeEnum.fromValue(rs.getString("demand_mode")))
+						.auditDetails(demandAuditDetails)
+						.build();
+				demandMap.put(demandId, rentDemand);
+				}
+		}
+		return new ArrayList<>(demandMap.values());
 	}
 }

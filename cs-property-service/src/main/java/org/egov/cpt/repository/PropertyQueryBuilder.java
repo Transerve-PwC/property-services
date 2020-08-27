@@ -1,11 +1,7 @@
 package org.egov.cpt.repository;
 
-import java.math.BigInteger;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +28,6 @@ public class PropertyQueryBuilder {
 	private static final String PI_ALL = " pi.*,pidoc.*, ";
 	private static final String NOTICE_ALL = " ng.*,ngdoc.*, ";
 	private static final String GD_ALL = " gd.*,";
-	private static final String FINANCE_ALL = " demand.*,payment.*,account.*,collection.*, ";
 
 	private static final String PT_COLUMNS = " pt.id as pid, pt.transit_number, pt.tenantid as pttenantid, pt.colony, pt.master_data_state, pt.master_data_action,"
 			+ " pt.created_by as pcreated_by, pt.created_date as pcreated_date, pt.modified_by as pmodified_by, pt.modified_date as pmodified_date,"
@@ -80,24 +75,6 @@ public class PropertyQueryBuilder {
 			+ " gd.sanction_letter_number as gd_sanLetterNum, gd.sanction_date as gd_sanDate, gd.mortgage_end_date as gd_mortgageEndDate,"
 			+ " gd.created_by as gd_createdBy, gd.modified_by as gd_modifiedBy, gd.created_time as gd_createdTime, gd.modified_time as gd_modifiedTime ";
 
-	private static final String FINANCE_COLUMNS = "demand.id as demand_id,demand.property_id as demand_pid,demand.initialGracePeriod as demand_IniGracePeriod, demand.generationDate as demand_genDate,"
-			+ "demand.collectionPrincipal as demand_colPrincipal,demand.remainingPrincipal as demand_remPrincipal, demand.interestSince as demand_intSince,"
-			+ "demand.mode as demand_mode, demand.created_by as demand_created_by, demand.created_date as demand_created_date,"
-			+ "demand.modified_by as demand_modified_by,demand.modified_date as demand_modified_date,"
-
-			+ "payment.id as payment_id, payment.property_id as payment_pid,payment.receiptNo as payment_receiptNo,payment.amountPaid as payment_amtPaid,"
-			+ "payment.dateOfPayment as payment_dateOfPayment,payment.mode as payment_mode,payment.created_by as payment_created_by, payment.created_date as payment_created_date,"
-			+ "payment.modified_by as payment_modified_by,payment.modified_date as payment_modified_date,"
-
-			+ "account.id as account_id,account.property_id as account_pid,account.remainingAmount as account_remainingAmount,account.tenantid as account_tenantid,"
-			+ "account.created_by as account_created_by, account.created_date as account_created_date,"
-			+ "account.modified_by as account_modified_by,account.modified_date as account_modified_date,"
-
-			+ "collection.id as collection_id ,collection.demand_id as collection_demand_id,collection.payment_id as collection_payment_id,"
-			+ "collection.interestCollected as collection_intCollected,collection.principalCollected as collection_principalCollected,collection.tenantid as collection_tenantid,"
-			+ "collection.created_by as collection_created_by, collection.created_date as collection_created_date,"
-			+ "collection.modified_by as collection_modified_by,collection.modified_date as collection_modified_date ";
-
 	private static final String PT_TABLE = " FROM cs_pt_property_v1 pt " + INNER_JOIN
 			+ " cs_pt_propertydetails_v1 ptdl ON pt.id =ptdl.property_id " + LEFT_JOIN
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
@@ -114,15 +91,22 @@ public class PropertyQueryBuilder {
 
 	private static final String GD_TABLE = " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id ";
 
-	private static final String FINANCE_TABLE = " cs_pt_demand demand ON pt.id=demand.property_id " + LEFT_JOIN
-			+ " cs_pt_payment payment ON pt.id=payment.property_id " + LEFT_JOIN
-			+ " cs_pt_account account ON pt.id=account.property_id " + LEFT_JOIN
-			+ " cs_pt_collection collection ON demand.id=collection.demand_id" + " and "
-			+ "payment.id=collection.payment_id";
-
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pmodified_date desc) offset_ FROM " + "({})"
 			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
+	
+	private static final String PAYMENT_SEARCH_QUERY = SELECT +" payment.*,"
+			+ " payment.id as payment_id, payment.property_id as payment_pid,payment.receiptNo as payment_receiptNo,payment.amountPaid as payment_amtPaid,"
+			+ " payment.dateOfPayment as payment_dateOfPayment,payment.mode as payment_mode,payment.created_by as payment_created_by, payment.created_date as payment_created_date,"
+			+ " payment.modified_by as payment_modified_by,payment.modified_date as payment_modified_date "
+			+ " FROM cs_pt_payment payment ";
+	
+	private static final String DEMAND_SEARCH_QUERY = SELECT + " demand.*,"
+			+ " demand.id as demand_id,demand.property_id as demand_pid,demand.initialGracePeriod as demand_IniGracePeriod, demand.generationDate as demand_genDate,"
+			+ " demand.collectionPrincipal as demand_colPrincipal,demand.remainingPrincipal as demand_remPrincipal, demand.interestSince as demand_intSince,"
+			+ " demand.mode as demand_mode, demand.created_by as demand_created_by, demand.created_date as demand_created_date,"
+			+ " demand.modified_by as demand_modified_by,demand.modified_date as demand_modified_date "
+			+ " FROM  cs_pt_demand demand ";
 
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList, PropertyCriteria criteria) {
 
@@ -153,10 +137,10 @@ public class PropertyQueryBuilder {
 	 */
 	public String getRentPaymentSearchQuery(AccountStatementCriteria criteria, Map<String, Object> preparedStmtList) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM cs_pt_payment WHERE ");
-		query.append(" created_date >= :fromdate AND ");
-		query.append(" created_date <= :todate AND ");
-		query.append(" property_id = :propertyid");
+		query.append(PAYMENT_SEARCH_QUERY + " WHERE ");
+		query.append(" payment.created_date >= :fromdate AND ");
+		query.append(" payment.created_date <= :todate AND ");
+		query.append(" payment.property_id = :propertyid");
 		preparedStmtList.put("fromdate", criteria.getFromDate().getTime());
 		preparedStmtList.put("todate", criteria.getToDate().getTime());
 		preparedStmtList.put("propertyid", criteria.getPropertyid());
@@ -171,10 +155,10 @@ public class PropertyQueryBuilder {
 	 */
 	public String getRentDemandSearchQuery(AccountStatementCriteria criteria, Map<String, Object> preparedStmtList) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM cs_pt_demand WHERE ");
-		query.append(" created_date >= :fromdate AND ");
-		query.append(" created_date <= :todate AND ");
-		query.append(" property_id = :propertyid");
+		query.append(DEMAND_SEARCH_QUERY+" WHERE ");
+		query.append(" demand.created_date >= :fromdate AND ");
+		query.append(" demand.created_date <= :todate AND ");
+		query.append(" demand.property_id = :propertyid");
 		preparedStmtList.put("fromdate", criteria.getFromDate().getTime());
 		preparedStmtList.put("todate", criteria.getToDate().getTime());
 		preparedStmtList.put("propertyid", criteria.getPropertyid());
@@ -200,7 +184,7 @@ public class PropertyQueryBuilder {
 		preparedStmtList.put("demandids", criteria.getDemandids());
 		return query.toString();
 	}
-
+	
 	/**
 	 * 
 	 * @param criteria
@@ -215,11 +199,11 @@ public class PropertyQueryBuilder {
 
 		if (relations == null) {
 			builder = new StringBuilder(SELECT);
-			builder.append(PT_ALL + OWNER_ALL + PI_ALL + NOTICE_ALL + GD_ALL + FINANCE_ALL);
-			builder.append(PT_COLUMNS + "," + OWNER_COLUMNS + "," + PI_COLUMNS + "," + NOTICE_COLUMNS + " , "
-					+ GD_COLUMNS + " , " + FINANCE_COLUMNS);
+			builder.append(PT_ALL + OWNER_ALL + PI_ALL + NOTICE_ALL + GD_ALL);
+			builder.append(
+					PT_COLUMNS + "," + OWNER_COLUMNS + "," + PI_COLUMNS + "," + NOTICE_COLUMNS + " , " + GD_COLUMNS);
 			builder.append(PT_TABLE + LEFT_JOIN + OWNER_TABLE + LEFT_JOIN + PI_TABLE + LEFT_JOIN + NOTICE_TABLE
-					+ LEFT_JOIN + GD_TABLE + LEFT_JOIN + FINANCE_TABLE);
+					+ LEFT_JOIN + GD_TABLE);
 		} else {
 
 			builder = new StringBuilder(SELECT);
@@ -247,10 +231,6 @@ public class PropertyQueryBuilder {
 				builder.append(GD_ALL);
 			}
 
-			if (relations.contains(PTConstants.RELATION_FINANCE)) {
-				builder.append(FINANCE_ALL);
-			}
-
 			// columns
 			if (relations.contains("owner")) {
 				columnList.add(OWNER_COLUMNS);
@@ -266,10 +246,6 @@ public class PropertyQueryBuilder {
 
 			if (relations.contains("grantDetail")) {
 				columnList.add(GD_COLUMNS);
-			}
-
-			if (relations.contains("finance")) {
-				columnList.add(FINANCE_COLUMNS);
 			}
 
 			String output = columnList.stream().reduce(null, (str1, str2) -> str1 == null ? str2 : str1 + " , " + str2);
@@ -292,9 +268,6 @@ public class PropertyQueryBuilder {
 				tableList.add(GD_TABLE);
 			}
 
-			if (relations.contains("finance")) {
-				tableList.add(FINANCE_TABLE);
-			}
 			String tableOutput = tableList.stream().reduce(null,
 					(str1, str2) -> str1 == null ? str2 : str1 + LEFT_JOIN + str2);
 			builder.append(tableOutput);
@@ -341,12 +314,6 @@ public class PropertyQueryBuilder {
 				preparedStmtList.put("createdBy", criteria.getCreatedBy());
 			}
 		}
-
-		/*
-		 * if (null != criteria.getCreatedBy()) { addClauseIfRequired(preparedStmtList,
-		 * builder); builder.append("pt.created_by =:createdBy");
-		 * preparedStmtList.put("createdBy", criteria.getCreatedBy()); }
-		 */
 
 		if (null != criteria.getPropertyId()) {
 			addClauseIfRequired(preparedStmtList, builder);

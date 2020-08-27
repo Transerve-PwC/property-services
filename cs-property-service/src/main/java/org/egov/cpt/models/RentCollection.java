@@ -8,12 +8,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode
 public class RentCollection {
 	/**
@@ -27,33 +29,34 @@ public class RentCollection {
 	 */
 	@JsonProperty("paymentId")
 	private String paymentId;
-	
-	
+
 	/**
 	 * Demand Id of the demand that this fulfils.
 	 */
+	@ToString.Include
 	@JsonProperty("demandId")
 	private String demandId;
-	
-	
+
 	@Builder.Default
 	@JsonProperty("collectionAgainst")
 	private CollectionAgainst collectionAgainst = CollectionAgainst.PAYMENT;
-	
+
 	/**
 	 * Interest collected.
 	 */
 	@Builder.Default
+	@ToString.Include
 	@JsonProperty("interestCollected")
 	private Double interestCollected = 0.0;
-	
+
 	/**
 	 * Principal collected.
 	 */
 	@Builder.Default
+	@ToString.Include
 	@JsonProperty("principalCollected")
 	private Double principalCollected = 0.0;
-	
+
 	public enum CollectionAgainst {
 		PAYMENT("PAYMENT"),
 
@@ -80,10 +83,10 @@ public class RentCollection {
 		}
 	}
 
-	 @JsonProperty("tenantId")
-	 private String tenantId;
-	
+	@JsonProperty("tenantId")
+	private String tenantId;
+
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
-	
+
 }

@@ -62,8 +62,8 @@ CREATE TABLE cs_pt_collection (
    modified_date       	bigint,
 
   CONSTRAINT pk_cs_pt_collection PRIMARY KEY (id), 
-  CONSTRAINT fk_cs_pt_collection_demand FOREIGN KEY (demand_id) REFERENCES cs_pt_demand (id),
-  CONSTRAINT fk_cs_pt_collection_payment FOREIGN KEY (payment_id) REFERENCES cs_pt_payment (id)
+  CONSTRAINT fk_cs_pt_collection_demand FOREIGN KEY (demand_id) REFERENCES cs_pt_demand (id) ON DELETE CASCADE,
+  CONSTRAINT fk_cs_pt_collection_payment FOREIGN KEY (payment_id) REFERENCES cs_pt_payment (id) ON DELETE CASCADE
 );
 
 --> Account Table

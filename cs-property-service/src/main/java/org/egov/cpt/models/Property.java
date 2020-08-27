@@ -90,7 +90,15 @@ public class Property {
 	
 	@Valid
 	@JsonProperty
+	private List<RentDemand> inActiveDemands;
+	
+	@Valid
+	@JsonProperty
 	private List<RentPayment> payments;
+	
+	@Valid
+	@JsonProperty
+	private List<RentPayment> inActivePayments;
 	
 	@Valid
 	@JsonProperty
