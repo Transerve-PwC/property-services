@@ -39,6 +39,14 @@ public class RentDetailQueryBuilder {
 			+ " account.modified_by as account_modified_by,account.modified_date as account_modified_date "
 
             + " FROM cs_pt_account account ";
+	
+	private static final String PAYMENT_SEARCH_QUERY = SELECT +" payment.*,"
+			+ " payment.id as payment_id, payment.property_id as payment_pid,payment.receiptNo as payment_receiptNo,payment.amountPaid as payment_amtPaid,"
+			+ " payment.dateOfPayment as payment_dateOfPayment,payment.mode as payment_mode,payment.created_by as payment_created_by, payment.created_date as payment_created_date,"
+			+ " payment.modified_by as payment_modified_by,payment.modified_date as payment_modified_date "
+			
+			+ " FROM cs_pt_payment payment ";
+	
 
 	private String addPaginationWrapper(String query,  Map<String, Object> preparedStmtList,
 			PropertyCriteria criteria) {
@@ -84,7 +92,18 @@ public class RentDetailQueryBuilder {
 			preparedStmtList.put("propId",criteria.getPropertyId());
 		}
 
-//		String finalQuery=builder.toString().replace("<propId>", criteria.getPropertyId());
+		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
+	}
+	
+	public String getPropertyRentPaymentSearchQuery(PropertyCriteria criteria, Map<String, Object> preparedStmtList) {
+
+		StringBuilder builder = new StringBuilder(PAYMENT_SEARCH_QUERY);
+		
+		if (!ObjectUtils.isEmpty(criteria.getPropertyId())) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("payment.property_id=:propId");
+			preparedStmtList.put("propId",criteria.getPropertyId());
+		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
@@ -98,8 +117,6 @@ public class RentDetailQueryBuilder {
 			builder.append("account.property_id=:propId");
 			preparedStmtList.put("propId",criteria.getPropertyId());
 		}
-
-//		String finalQuery=builder.toString().replace("<propId>", criteria.getPropertyId());
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}

@@ -84,6 +84,9 @@ public class PropertyRepository {
 	private RentDemandRowMapper rentDemandrowMapper;
 	
 	@Autowired
+	private RentPaymentRowMapper rentPaymentrowMapper;
+	
+	@Autowired
 	private RentAccountRowMapper rentAccountrowMapper;
 
 	public List<Property> getProperties(PropertyCriteria criteria) {
@@ -101,6 +104,15 @@ public class PropertyRepository {
 		log.info("query:"+query);
 		log.info("preparedStmtList:"+preparedStmtList);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, rentDemandrowMapper);
+		
+	}
+	
+	public List<RentPayment> getPropertyRentPaymentDetails(PropertyCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = rentQueryBuilder.getPropertyRentPaymentSearchQuery(criteria, preparedStmtList);
+		log.info("query:"+query);
+		log.info("preparedStmtList:"+preparedStmtList);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, rentPaymentrowMapper);
 		
 	}
 	
