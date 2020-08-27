@@ -9,9 +9,12 @@
   },
   "legalHeir": {
     "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ff3",
-    "name": "legalHeir name 1",
+    "name": "legalHeir name 2",
     "age": 50,
-    "address": "legalHeir address 1",
-    "relation": "FATHER"
+    "fatherOrHusbandName": "transferee father name 2",
+    "relation": "FATHER",
+    "address": "transferee address 2",
+    "relationWithDeceased": "FATHER",
+    "percentageOfShareTransferred": 50
   }
 }
