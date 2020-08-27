@@ -57,5 +57,8 @@ public class Owner {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+	
+	@JsonProperty("mortgageDetails")
+	private MortgageDetails mortgageDetails;
 
 }
