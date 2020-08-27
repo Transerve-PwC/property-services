@@ -37,7 +37,7 @@ public class RentEnrichmentService {
 
 	private void enrichPropertyRentdata(Property property, RequestInfo requestInfo) {
 
-		if (CollectionUtils.isEmpty(property.getDemands())) {
+		if (CollectionUtils.isEmpty(property.getDemands())||CollectionUtils.isEmpty(property.getPayments())) {
 			return;
 		}
 
