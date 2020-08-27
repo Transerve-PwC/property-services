@@ -10,6 +10,7 @@ import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RentAccount;
 import org.egov.cpt.models.RentDemand;
+import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.producer.Producer;
@@ -138,20 +139,22 @@ public class PropertyService {
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
 
-		// if (!CollectionUtils.isEmpty(criteria.getRelations())
-		// && criteria.getRelations().contains(PTConstants.RELATION_FINANCE)) {
-		properties.stream().forEach(property -> {
-			List<RentDemand> demands = repository
-					.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
-			RentAccount accounts = repository
-					.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
-			if (!CollectionUtils.isEmpty(demands) && null != accounts) {
-				property.setRentSummary(rentCollectionService.paymentSummary(demands, accounts));
-				property.setDemands(demands);
-				// property.getPayments(payments);
-			}
-		});
-		// }
+		if (properties.size() <= 1 || !CollectionUtils.isEmpty(criteria.getRelations())
+				&& criteria.getRelations().contains(PTConstants.RELATION_FINANCE)) {
+			properties.stream().forEach(property -> {
+				List<RentDemand> demands = repository
+						.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+				List<RentPayment> payments = repository
+						.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+				RentAccount accounts = repository
+						.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+				if (!CollectionUtils.isEmpty(demands) && null != accounts) {
+					property.setRentSummary(rentCollectionService.paymentSummary(demands, accounts));
+					property.setDemands(demands);
+					property.setPayments(payments);
+				}
+			});
+		}
 
 		return properties;
 	}

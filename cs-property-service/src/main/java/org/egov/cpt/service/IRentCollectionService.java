@@ -11,6 +11,8 @@ import org.egov.cpt.models.RentSummary;
 public interface IRentCollectionService {
 
 	/**
+	 * 1. Initial data migration. 2. New Payment. 3. New Demand.
+	 * 
 	 * Get the list of collections for the given demand and payments for the same
 	 * property.
 	 * 

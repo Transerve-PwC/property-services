@@ -87,6 +87,6 @@ public class RentCollection {
 	private String tenantId;
 
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
+	private AuditDetails auditDetails;
 
 }

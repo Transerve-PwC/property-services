@@ -28,7 +28,8 @@ public class RentCollectionService implements IRentCollectionService {
 	@Override
 	public List<RentCollection> settle(final List<RentDemand> demandsToBeSettled, final List<RentPayment> payments,
 			final RentAccount account, double interestRate) {
-
+		Collections.sort(demandsToBeSettled);
+		Collections.sort(payments);
 		/**
 		 * Don't process payments that are already processed.
 		 */
@@ -67,7 +68,7 @@ public class RentCollectionService implements IRentCollectionService {
 
 		for (RentDemand demand : demandsAfterPayments) {
 			RentPayment payment = RentPayment.builder().amountPaid(0D).dateOfPayment(demand.getInterestSince()).build();
-			List<RentCollection> settledCollections = settlePayment(demandsToBeSettled, payment, account, interestRate);
+			List<RentCollection> settledCollections = settlePayment(demandsToBeSettled, payment, account, 0);
 			if (settledCollections.size() == 0) {
 				continue;
 			}
@@ -100,12 +101,16 @@ public class RentCollectionService implements IRentCollectionService {
 				effectiveAmount);
 		effectiveAmount -= interestCollections.stream().mapToDouble(RentCollection::getInterestCollected).sum();
 
+		boolean hasDemandsWithInterest = interestRate > 0 && demands.stream()
+				.filter(demand -> demand.getInterestSince().longValue() < payment.getDateOfPayment().longValue())
+				.count() > 0;
 		/**
 		 * Amount is left after deducting interest for all the demands. Extract
 		 * Principal.
 		 */
 
-		List<RentCollection> principalCollections = effectiveAmount > 0 ? extractPrincipal(demands, effectiveAmount)
+		List<RentCollection> principalCollections = effectiveAmount > 0 && !hasDemandsWithInterest
+				? extractPrincipal(demands, effectiveAmount)
 				: Collections.emptyList();
 		effectiveAmount -= principalCollections.stream().mapToDouble(RentCollection::getPrincipalCollected).sum();
 
