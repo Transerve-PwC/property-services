@@ -127,6 +127,7 @@ public class ReadExcelService {
 								payment.setDateOfPayment(demand.getGenerationDate());
 							} else if (components.length > 1) {
 								try {
+									payment.setReceiptNo(components[0]);
 									int date = this.extractFirstNumericPart(components[1]);
 									Calendar calendar = Calendar.getInstance();
 									calendar.setTimeInMillis(demand.getGenerationDate());
