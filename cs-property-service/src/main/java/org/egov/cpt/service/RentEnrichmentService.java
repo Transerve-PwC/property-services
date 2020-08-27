@@ -52,7 +52,8 @@ public class RentEnrichmentService {
 					});
 				}	
 				property.setInActiveDemands(inActiveDemand);
-				property.getDemands().remove(inActiveDemand);
+				if(!CollectionUtils.isEmpty(inActiveDemand))
+					property.getDemands().remove(inActiveDemand);
 				if (!CollectionUtils.isEmpty(property.getPayments())) {
 					property.getPayments().forEach(payment -> {
 						if (payment.getId() == null) {
@@ -71,7 +72,8 @@ public class RentEnrichmentService {
 					});
 				}
 				property.setInActivePayments(inActivePayment);
-				property.getPayments().remove(inActivePayment);
+				if(!CollectionUtils.isEmpty(inActivePayment))
+					property.getPayments().remove(inActivePayment);
 				
 				if (property.getRentAccount()!=null) {
 					if (property.getRentAccount().getId() == null) {
