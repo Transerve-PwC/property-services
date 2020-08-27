@@ -8,7 +8,7 @@
     "name": "deceased name 2",
     "fatherOrHusbandName": "deceased father name 2",
     "address": "deceased address 2",
-    "percentageOfShare": 100,
+    "percentageOfShareTransferred": 100,
     "dateOfDeath": 1567856
   },
   "transferee": {
