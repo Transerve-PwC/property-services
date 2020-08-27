@@ -1,0 +1,42 @@
+{
+  "dateOfExecution": 15876549,
+  "newspaperAdDate": 159876540,
+  "deceased": {
+    "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffb",
+    "name": "deceased name 2",
+    "fatherOrHusbandName": "deceased father name 2",
+    "address": "deceased address 2",
+    "percentageOfShare": 100,
+    "dateOfDeath": 1567856
+  },
+  "legalHeir": {
+    "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ff3",
+    "name": "legalHeir name 2",
+    "age": 50,
+    "address": "legalHeir address 2",
+    "relation": "FATHER"
+  },
+  "beneficiary": {
+    "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffg",
+    "name": "beneficiary name 2",
+    "age": 50,
+    "address": "beneficiary address 2",
+    "relation": ""
+  },
+  "witness": [
+    {
+      "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffw",
+      "name": "witness name 1",
+      "age": 50,
+      "address": "witness address 1",
+      "mobileNo": 9876543212
+    },
+    {
+      "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ff1",
+      "name": "witness name 2",
+      "age": 50,
+      "address": "witness address 2",
+      "mobileNo": 9876543210
+    }
+  ]
+}

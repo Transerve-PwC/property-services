@@ -1,0 +1,17 @@
+{
+  "deceased": {
+    "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffb",
+    "name": "deceased name 2",
+    "fatherOrHusbandName": "deceased father name 2",
+    "address": "deceased address 2",
+    "percentageOfShare": 100,
+    "dateOfDeath": 1567856
+  },
+  "legalHeir": {
+    "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ff3",
+    "name": "legalHeir name 1",
+    "age": 50,
+    "address": "legalHeir address 1",
+    "relation": "FATHER"
+  }
+}
