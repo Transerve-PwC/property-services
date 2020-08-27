@@ -1,6 +1,5 @@
 package org.egov.cpt.repository;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +15,9 @@ import org.egov.cpt.models.NoticeSearchCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyImages;
+import org.egov.cpt.models.RentAccount;
+import org.egov.cpt.models.RentDemand;
+import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
@@ -79,7 +81,10 @@ public class PropertyRepository {
 	private RentDetailQueryBuilder rentQueryBuilder;
 	
 	@Autowired
-	private RentDetailRowMapper rentDetailrowMapper;
+	private RentDemandRowMapper rentDemandrowMapper;
+	
+	@Autowired
+	private RentAccountRowMapper rentAccountrowMapper;
 
 	public List<Property> getProperties(PropertyCriteria criteria) {
 
@@ -90,14 +95,23 @@ public class PropertyRepository {
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, rowMapper);
 	}
 	
-	public List<Property> getPropertyRentDetails(PropertyCriteria criteria) {
+	public List<RentDemand> getPropertyRentDemandDetails(PropertyCriteria criteria) {
 		Map<String, Object> preparedStmtList = new HashMap<>();
-		String query = rentQueryBuilder.getPropertyRentSearchQuery(criteria, preparedStmtList);
+		String query = rentQueryBuilder.getPropertyRentDemandSearchQuery(criteria, preparedStmtList);
 		log.info("query:"+query);
 		log.info("preparedStmtList:"+preparedStmtList);
-		return namedParameterJdbcTemplate.query(query, preparedStmtList, rentDetailrowMapper);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, rentDemandrowMapper);
 		
 	}
+	
+	public RentAccount getPropertyRentAccountDetails(PropertyCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = rentQueryBuilder.getPropertyRentAccountSearchQuery(criteria, preparedStmtList);
+		log.info("query:"+query);
+		log.info("preparedStmtList:"+preparedStmtList);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, rentAccountrowMapper);
+	}
+
 
 	public List<DuplicateCopy> getDuplicateCopyProperties(DuplicateCopySearchCriteria criteria) {
 		Map<String, Object> preparedStmtList = new HashMap<>();
@@ -149,4 +163,5 @@ public class PropertyRepository {
 		}
 	}
 
+	
 }

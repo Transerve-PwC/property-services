@@ -65,9 +65,6 @@ public class RentDemand {
   @JsonProperty("tenantId")
   private String tenantId;
   
-  @JsonProperty("active")
-  private String active;
-
   public enum ModeEnum {
     UPLOAD("Uploaded"),
 

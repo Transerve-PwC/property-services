@@ -1,7 +1,11 @@
 package org.egov.cpt.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
+import org.apache.poi.hpsf.Array;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.RentDemand;
@@ -23,6 +27,8 @@ public class RentEnrichmentService {
 	
 	public void enrichRentdata(PropertyRequest request){
 		RequestInfo requestInfo = request.getRequestInfo();
+		List<RentDemand> inActiveDemand = new ArrayList();
+		List<RentPayment> inActivePayment = new ArrayList();
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
 				
@@ -38,8 +44,15 @@ public class RentEnrichmentService {
 							demand.setTenantId(property.getTenantId());
 							demand.setAuditDetails(demandAuditDetails);
 						}
+						else{
+							inActiveDemand.add(demand);
+//							property.getDemands().remove(demand);
+						}
+						
 					});
 				}	
+				property.setInActiveDemands(inActiveDemand);
+				property.getDemands().remove(inActiveDemand);
 				if (!CollectionUtils.isEmpty(property.getPayments())) {
 					property.getPayments().forEach(payment -> {
 						if (payment.getId() == null) {
@@ -49,10 +62,17 @@ public class RentEnrichmentService {
 							payment.setMode(RentPayment.ModeEnum.fromValue(PTConstants.MODE_UPLOADED));
 							payment.setTenantId(property.getTenantId());
 							payment.setAuditDetails(paymentAuditDetails);
+						}else{
+							inActivePayment.add(payment);
+//							property.getPayments().remove(payment);
 						}
+						
 
 					});
 				}
+				property.setInActivePayments(inActivePayment);
+				property.getPayments().remove(inActivePayment);
+				
 				if (property.getRentAccount()!=null) {
 					if (property.getRentAccount().getId() == null) {
 						AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);

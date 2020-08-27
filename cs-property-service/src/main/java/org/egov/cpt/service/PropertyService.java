@@ -10,6 +10,9 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
+import org.egov.cpt.models.RentAccount;
+import org.egov.cpt.models.RentDemand;
+import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.producer.Producer;
@@ -152,17 +155,33 @@ public class PropertyService {
 					.build());*/
 		
 		if(criteria.getRelations().contains(PTConstants.RELATION_FINANCE)){
-			propertiesRentDetails = properties.stream()
+			/*propertiesRentDetails = properties.stream()
 				.filter(property -> !repository.getPropertyRentDetails(
 						PropertyCriteria.builder()
 							.propertyId(property.getId())
 							.build()
 					).isEmpty()
-				).collect(Collectors.toList());
+				).collect(Collectors.toList());*/
+			properties.stream().forEach(property->{
+				List<RentDemand>demands= repository.getPropertyRentDemandDetails(
+						PropertyCriteria.builder()
+							.propertyId(property.getId())
+							.build()
+					);
+				RentAccount accounts= repository.getPropertyRentAccountDetails(
+						PropertyCriteria.builder()
+							.propertyId(property.getId())
+							.build()
+					);
+				log.info("demands:"+demands);
+				log.info("accounts:"+accounts);
+				if(!CollectionUtils.isEmpty(demands)&& null!=accounts)
+				property.setRentSummary(rentCollectionService.paymentSummary(demands, accounts));
+			});
 		}	
 
 		// TO get payment Summary
-		propertiesRentDetails.stream().filter(property -> property.getDemands() != null && property.getPayments() != null
+		properties.stream().filter(property -> property.getDemands() != null && property.getPayments() != null
 				&& property.getRentAccount() != null).forEach(property -> {
 					property.setRentSummary(
 							rentCollectionService.paymentSummary(property.getDemands(), property.getRentAccount()));
