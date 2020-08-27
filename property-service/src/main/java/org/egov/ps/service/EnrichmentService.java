@@ -13,6 +13,7 @@ import org.egov.ps.config.Configuration;
 import org.egov.ps.model.Application;
 import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
+import org.egov.ps.model.MortgageDetails;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
 import org.egov.ps.model.Payment;
@@ -65,6 +66,16 @@ public class EnrichmentService {
 			});
 		}
 	}
+	
+	public void enrichMortgageDetailsRequest(PropertyRequest request) {
+		if (!CollectionUtils.isEmpty(request.getProperties())) {
+			request.getProperties().forEach(property -> {
+				property.getPropertyDetails().getOwners().forEach(owner ->{
+					owner.setMortgageDetails(getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
+				});
+			});
+		}
+	}
 
 	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
 
@@ -109,6 +120,17 @@ public class EnrichmentService {
 			});
 		}
 		return owners;
+	}
+	
+	private MortgageDetails getMortgage(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
+		String gen_mortgage_id = UUID.randomUUID().toString();
+		
+		MortgageDetails mortgage = owner.getMortgageDetails();
+		mortgage.setId(gen_mortgage_id);
+		mortgage.setTenantId(property.getTenantId());
+		mortgage.setOwnerId(gen_owner_id);
+		
+		return mortgage;
 	}
 
 	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
