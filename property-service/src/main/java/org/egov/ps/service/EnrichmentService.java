@@ -65,7 +65,7 @@ public class EnrichmentService {
 
 			});
 		}
-	}
+	} 
 	
 	public void enrichMortgageDetailsRequest(PropertyRequest request) {
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
