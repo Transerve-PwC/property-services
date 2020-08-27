@@ -11,30 +11,22 @@
     "percentageOfShare": 100,
     "dateOfDeath": 1567856
   },
-  "legalHeir": {
+  "transferee": {
+    "legalHeirOrbeneficiary": "LEGAL_HEIR",
     "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ff3",
     "name": "legalHeir name 2",
     "age": 50,
     "address": "legalHeir address 2",
     "relation": "FATHER"
   },
-  "beneficiary": {
-    "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffg",
-    "name": "beneficiary name 2",
-    "age": 50,
-    "address": "beneficiary address 2",
-    "relation": ""
-  },
   "witness": [
     {
-      "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffw",
       "name": "witness name 1",
       "age": 50,
       "address": "witness address 1",
       "mobileNo": 9876543212
     },
     {
-      "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ff1",
       "name": "witness name 2",
       "age": 50,
       "address": "witness address 2",
