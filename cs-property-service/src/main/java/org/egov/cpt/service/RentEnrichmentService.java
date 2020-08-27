@@ -56,10 +56,9 @@ public class RentEnrichmentService {
 		if (property.getDemands().stream().filter(demand -> demand.getId() == null || demand.getId().isEmpty())
 				.findAny().isPresent()) {
 			List<RentDemand> demands = propertyRepository.getPropertyRentDemandDetails(criteria);
-			// List<RentPayment> payments =
-			// propertyRepository.getPropertyRentPayments(criteria);
+			 List<RentPayment> payments = propertyRepository.getPropertyRentPaymentDetails(criteria);
 			property.setInActiveDemands(demands);
-			// property.setInActivePayments(payments);
+			property.setInActivePayments(payments);
 			account.setRemainingAmount(0D);
 		}
 
