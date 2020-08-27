@@ -80,7 +80,7 @@ public class PropertyQueryBuilder {
 			+ " cs_pt_documents_v1 doc ON pt.id=doc.reference_id ";
 
 	private static final String OWNER_TABLE = " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id "
-			+ LEFT_JOIN + " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id AND od.permanent = true ";
+			+ INNER_JOIN + " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id AND od.permanent = true ";
 
 	private static final String PI_TABLE = " cs_pt_property_images_application pi ON pi.propertyid = pt.id " + LEFT_JOIN
 			+ " cs_pt_documents_v1 pidoc ON pidoc.reference_id =  pi.id ";
