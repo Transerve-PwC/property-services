@@ -15,6 +15,7 @@
     "name": "legalHeir name 2",
     "age": 50,
     "fatherOrHusbandName": "transferee father name 2",
+    "relation": "FATHER",
     "address": "transferee address 2",
     "relationWithDeceased": "FATHER",
     "percentageOfShareTransferred": 50
