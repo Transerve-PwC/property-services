@@ -797,17 +797,13 @@ public class EnrichmentService {
 			 * 2. owner.ownerDetails.allotmentStartdate (current)
 			 * 3. owner.ownerDetails.permanent (true)
 			 */
-			Optional<Owner> currentOwner = property.getOwners().stream()
-				.filter(owner -> owner.getId().equalsIgnoreCase(latestOwner.getId()))
-				.findAny();
+			
 
-			if (!currentOwner.isPresent()) {
-				throw new CustomException("OWNERSHIP TRANSFER INCOMPLETE", "Could not find owner with id "+ latestOwner.getId() + " for property "+ property.getId());
-			} else {
-				currentOwner.get().setActiveState(true);
-				currentOwner.get().getOwnerDetails().setPermanent(true);
-				currentOwner.get().getOwnerDetails().setAllotmentStartdate(getCurrentTimeEpoch());
-			}
+			latestOwner.setActiveState(true);
+			latestOwner.getOwnerDetails().setPermanent(true);
+			latestOwner.getOwnerDetails().setAllotmentStartdate(getCurrentTimeEpoch());
+			
+			properties.get(0).getOwners().add(latestOwner);
 			
 			/**
 			 * Update the property by sending to the persistor.
