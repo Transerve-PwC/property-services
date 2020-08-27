@@ -66,6 +66,9 @@ public class Configuration {
 
 	@Value("${create.ps.workflow.name}")
 	private String psBusinessServiceValue;
+	
+	@Value("${create.eb.ot.sd.workflow.name}")
+	private String ebOtSdBusinessServiceValue;
 
 	@Value("${workflow.context.path}")
 	private String wfHost;

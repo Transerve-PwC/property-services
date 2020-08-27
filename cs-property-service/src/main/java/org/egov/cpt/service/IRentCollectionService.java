@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.cpt.models.RentAccount;
+import org.egov.cpt.models.RentAccountStatement;
 import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
@@ -49,7 +50,17 @@ public interface IRentCollectionService {
 	 * @param payment
 	 * @return List<RentCollection> Generated collection objects for the new payment.
 	 */
-	public List<RentCollection> processNewPayment(List<RentDemand> demands, RentPayment payment,RentAccount rentAccount);
+	//public List<RentCollection> processNewPayment(List<RentDemand> demands, RentPayment payment,RentAccount rentAccount);
+	
+	/**
+	 * @apiNote This will provide the account statement between the date specified by the user. 
+	 * @param demands
+	 * @param payments
+	 * @param lstCollection
+	 * @return List<RentAccountStatement> 
+	 */
+	public List<RentAccountStatement> accountStatement (List<RentDemand> demands, List<RentPayment> payments,List<RentCollection> lstCollection) ;
+		
 	
 	
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.egov.cpt.models.RentAccount;
+import org.egov.cpt.models.RentAccountStatement;
 import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentCollection.CollectionAgainst;
 import org.egov.cpt.models.RentDemand;
@@ -153,7 +154,6 @@ private  List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, Ren
  * @return List<RentCollection> Collections to be saved in the database.
  */
 @Override
-
 public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled,RentAccount account) 
 //public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled, RentAccount account)
 {
@@ -209,9 +209,9 @@ public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<Ren
  * @param demands
  * @param collections
  * @param payment
- * @return
+ * @return RentSummary
  */
-
+@Override
  public RentSummary paymentSummary(List<RentDemand> demands,RentAccount rentAccount) {
 	 double balancePrincipal =0;
 	 double balanceInterest =0;
@@ -243,23 +243,142 @@ public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<Ren
  }
  
  
- /**
-	 * Process the incoming payment.
-	 * 
-	 * @apiNote This will generate new collections that will be saved and will also modify existing demand objects.
-	 * @apiNote This will be called from PaymentKafkaConsumer
-	 * @param demands
-	 * @param collections
-	 * @param payment
-	 * @return List<RentCollection> Generated collection objects for the new payment.
-	 */
-	public List<RentCollection> processNewPayment(List<RentDemand> demands, RentPayment payment,RentAccount rentAccount){
-		getCollectionsForPayment(demands,payment,rentAccount);
+/**
+ * @apiNote This will provide the account statement between the date specified by the user. 
+ * @param demands
+ * @param payments
+ * @param lstCollection
+ * @return List<RentAccountStatement> 
+ */
+	
+	@Override
+	public List<RentAccountStatement> accountStatement (List<RentDemand> demands, List<RentPayment> payments,List<RentCollection> lstCollection) {
 		
-		demands.clear();
-        demands.addAll(processedDemand);
-		return collections;
+		final double interestRate=24;
+		//ArrayList lstProcessRentDemand;
+		ArrayList<RentAccountStatement> lstAccountStatement=new ArrayList<RentAccountStatement>();
+                double remainingPrincipal=0.0;
+		double remainingInterest=0.0;
+                double outstandingBalance=0.0;
+		for(RentPayment rentPayment:payments) {
+			
+			
+			//lstProcessRentDemand=new ArrayList<RentDemand>();
+			Date paymentDate = new Date(rentPayment.getDateOfPayment());
+			
+			
+			
+			double collectedAmount=0.0;
+                        ArrayList<RentDemand> lstDemandTobeProcess=new ArrayList<RentDemand>();
+		
+			for(RentDemand rentDemand:demands) {
+				
+				Date demandDate = new Date(rentDemand.getGenerationDate());
+				
+                                //filter out the demands which have earlier date than payment 
+				if(demandDate.compareTo(paymentDate)<=0) {
+                                    lstDemandTobeProcess.add(rentDemand);
+					RentAccountStatement rentAccountStatement=new RentAccountStatement();
+					rentAccountStatement.setDate(rentDemand.getGenerationDate());
+					rentAccountStatement.setAmount(rentDemand.getCollectionPrincipal());
+					rentAccountStatement.setType("D");
+					rentAccountStatement.setRemainingPrincipal(remainingPrincipal+rentDemand.getCollectionPrincipal());
+					
+					
+					
+					remainingPrincipal=	remainingPrincipal+rentDemand.getCollectionPrincipal();
+					float daysBetween = ((rentPayment.getDateOfPayment() - rentDemand.getGenerationDate()) / (1000 * 60 * 60 * 24)) + 1;
+					// If days cross the gross period then the interest is applicable
+					if (daysBetween >= rentDemand.getInitialGracePeriod()) {
+						double interest = ((rentDemand.getCollectionPrincipal()* interestRate) / 100) * (daysBetween / 365);
+						remainingInterest=remainingInterest+interest;
+					}
+					rentAccountStatement.setRemainingInterest(remainingInterest);
+					rentAccountStatement.setDueAmount(rentAccountStatement.getRemainingInterest()+rentAccountStatement.getRemainingPrincipal());
+                                        lstAccountStatement.add(rentAccountStatement);
+						
+			}
+			                        
+		}
+			RentAccountStatement rentAccountStatement=new RentAccountStatement();
+			rentAccountStatement.setDate(rentPayment.getDateOfPayment());
+			rentAccountStatement.setAmount(rentPayment.getAmountPaid());
+			rentAccountStatement.setType("C");
+			rentAccountStatement.setRemainingPrincipal(0.0);
+			rentAccountStatement.setRemainingInterest(0.0);
+			rentAccountStatement.setDueAmount(0.0);
+			
+			
+			for(RentCollection rentCollection:lstCollection) {
+                            if(null != rentCollection.getPaymentId()){
+				if(rentCollection.getPaymentId().equals(rentPayment.getId())) {
+					collectedAmount=collectedAmount+rentCollection.getPrincipalCollected();
+					
+				}
+                            }else{
+                               
+                                if(null != lstDemandTobeProcess.stream()
+                                        .filter(tmpRentDemand->tmpRentDemand.getId().equals(rentCollection.getDemandId()))
+                                        .findAny()
+                                        .orElse(null))
+                                           collectedAmount=collectedAmount+rentCollection.getPrincipalCollected();
+                            }
+			}
+                        if((collectedAmount+remainingInterest)<rentPayment.getAmountPaid())
+                            outstandingBalance=rentPayment.getAmountPaid()-collectedAmount;
+			if(remainingInterest<=collectedAmount) {
+				rentAccountStatement.setRemainingInterest(0.0);
+                                remainingInterest=0;
+				collectedAmount=collectedAmount-remainingInterest;
+			}
+			else {
+				rentAccountStatement.setRemainingInterest(remainingInterest-collectedAmount);
+                                remainingInterest=remainingInterest-collectedAmount;
+				collectedAmount=0.0;
+			}
+			if(remainingPrincipal<=collectedAmount) {
+				rentAccountStatement.setRemainingPrincipal(0.0-outstandingBalance);
+                                remainingPrincipal=0;
+				collectedAmount=collectedAmount-remainingPrincipal;
+			}
+			else {
+				rentAccountStatement.setRemainingPrincipal(remainingPrincipal-collectedAmount-outstandingBalance);
+                                remainingPrincipal=remainingPrincipal-collectedAmount;
+				collectedAmount=0.0;
+			}
+                        rentAccountStatement.setDueAmount(rentAccountStatement.getRemainingInterest()+rentAccountStatement.getRemainingPrincipal());
+                                        
+		lstAccountStatement.add(rentAccountStatement);
+                demands.removeAll(lstDemandTobeProcess);
+	
 	}
+                if(demands.size()>0){
+                    for(RentDemand rentDemand:demands){
+                        RentAccountStatement rentAccountStatement=new RentAccountStatement();
+					rentAccountStatement.setDate(rentDemand.getGenerationDate());
+					rentAccountStatement.setAmount(rentDemand.getCollectionPrincipal());
+					rentAccountStatement.setType("D");
+					rentAccountStatement.setRemainingPrincipal(remainingPrincipal+rentDemand.getCollectionPrincipal()-outstandingBalance);
+					
+					
+					
+					remainingPrincipal=	remainingPrincipal+rentDemand.getCollectionPrincipal()-outstandingBalance;
+					float daysBetween = ((new Date().getTime() - rentDemand.getGenerationDate()) / (1000 * 60 * 60 * 24)) + 1;
+					// If days cross the gross period then the interest is applicable
+					if (daysBetween >= rentDemand.getInitialGracePeriod()) {
+						double interest = ((rentDemand.getCollectionPrincipal()* interestRate) / 100) * (daysBetween / 365);
+						remainingInterest=remainingInterest+interest;
+					}
+					rentAccountStatement.setRemainingInterest(remainingInterest);
+					rentAccountStatement.setDueAmount(rentAccountStatement.getRemainingInterest()+rentAccountStatement.getRemainingPrincipal());
+                                        lstAccountStatement.add(rentAccountStatement);
+                    }
+                    
+                }
+                return lstAccountStatement;
+		//System.out.println(lstAccountStatement);
+	}
+	
 	
 
 

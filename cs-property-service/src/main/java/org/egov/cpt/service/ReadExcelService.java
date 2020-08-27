@@ -4,29 +4,25 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.commons.collections4.map.HashedMap;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-//import org.egov.cpt.models.paymentcalculation.Demand;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentDemandResponse;
 import org.egov.cpt.models.RentPayment;
-//import org.egov.cpt.models.paymentcalculation.DemandPaymentResponse;
-//import org.egov.cpt.models.paymentcalculation.Payment;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,74 +33,101 @@ public class ReadExcelService {
 	public RentDemandResponse getDatafromExcelPath(String filePath) {
 		RentDemandResponse response = new RentDemandResponse();
 		try {
-			response =  getDatafromExcel(new FileInputStream(new File(filePath)));
+			response =  getDatafromExcel(new FileInputStream(new File(filePath)),0);
 		} catch (FileNotFoundException e) {
 			log.error("File converting inputstream operation failed due to :" + e.getMessage());
 		}
 		return response;
 	}
 
-	public RentDemandResponse getDatafromExcel(InputStream inputStream) {
+	private static final int CELL_DATE = 0;
+	private static final int CELL_PRINCIPAL = 1;
+	private static final int CELL_REALIZATION = 2;
+	private static final int CELL_RECEIPT_NO = 8;
+
+	private static final String HEADER_CELL = "Month";
+	private static final String FOOTER_CELL = "Total";
+
+
+	public RentDemandResponse getDatafromExcel(InputStream inputStream, int sheetIndex) {
 		List<RentDemand> demands = new ArrayList<>();
 		List<RentPayment> payments = new ArrayList<>();
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		try {
 			Workbook workbook = WorkbookFactory.create(inputStream);
-			Sheet sheet = workbook.getSheetAt(0);
+			Sheet sheet = workbook.getSheetAt(sheetIndex);
 			Iterator<Row> rowIterator = sheet.iterator();
-			int count = 0;
-
-			List<String> headerCells = new ArrayList<>();
+			boolean shouldParseRows = false;
 			while (rowIterator.hasNext()) {				
 				Row currentRow = rowIterator.next();
 				
-				/* Fetching Data will Start after this */
-				if ("Month".equalsIgnoreCase(String.valueOf(currentRow.getCell(0)))) {
-					headerCells = new ArrayList<>();
-					for (int cn = 0; cn < currentRow.getLastCellNum(); cn++) {
-						Cell cell = currentRow.getCell(cn, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-						headerCells.add(cell.getRichStringCellValue().getString());
-					}
-					currentRow = rowIterator.next();
-					count++;
+				/**
+				 * Fetching Data will Start after this header row.
+				 * This will also skip intermediate header rows.
+				 */
+				if (HEADER_CELL.equalsIgnoreCase(String.valueOf(currentRow.getCell(0)))) {
+					shouldParseRows = true;
+					continue;
 				}
 				
 				/* Fetching Data will End after this */
-				if ("Total".equalsIgnoreCase(String.valueOf(currentRow.getCell(0)))) {
+				if (FOOTER_CELL.equalsIgnoreCase(String.valueOf(currentRow.getCell(0)))) {
 					break;
 				}
 				
-				if (count > 0) {
-					Map<String, Object> cellData = new HashedMap<String, Object>();
-					for (int cn = 0; cn < currentRow.getLastCellNum(); cn++) {
-						Cell cell = currentRow.getCell(cn, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-						if(headerCells.size() > cn) {
-							cellData.put(headerCells.get(cn), getValueFromCell(cell));
+				if (shouldParseRows) {
+					RentDemand demand = new RentDemand();
+
+					/**
+					 * First cell as month year.
+					 */
+					Object generationDateCell = getValueFromCell(currentRow.getCell(CELL_DATE, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+					if(generationDateCell instanceof String && !generationDateCell.toString().isEmpty()) {
+						log.debug("Parsing first cell with value {} as date", generationDateCell);
+						try {
+							demand.setGenerationDate(extractDateFromString(generationDateCell.toString()));
+						} catch (DateTimeParseException exception) {
+							log.debug(exception.getLocalizedMessage());
+							continue;
 						}
+					} else if(!generationDateCell.toString().isEmpty()){
+						demand.setGenerationDate((Long) generationDateCell);
 					}
-					cellData.put("Receipt No", "");
-					cellData.put("Receipt Date", "");				
-					if (cellData.get("Receipt No. & Date") != null
-							&& !"".equalsIgnoreCase(String.valueOf(cellData.get("Receipt No. & Date")))) {
-						String[] receiptDetails = cellData.get("Receipt No. & Date").toString().split(" ");
-						cellData.put("Receipt No", receiptDetails[0]);
-						if (receiptDetails.length > 1) {
-							Date date = new Date (Long.parseLong( cellData.get("Month").toString() ) * 1000);
-							date.setDate(Integer
-									.parseInt(receiptDetails[receiptDetails.length - 1].split("[\\/s@&.?$+-]+")[0]));
-							cellData.put("Receipt Date", cellData.get("Month").toString());
-						}
+
+					/**
+					 * generated rent amount for the month.
+					 */
+					demand.setCollectionPrincipal((Double) getValueFromCell(currentRow.getCell(CELL_PRINCIPAL, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+
+					/**
+					 * collected payment amount for the month.
+					 */
+					if (currentRow.getCell(CELL_REALIZATION, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL) != null) {
+						RentPayment payment = RentPayment.builder()
+							.amountPaid(Double.parseDouble(String.valueOf( getValueFromCell(currentRow.getCell(CELL_REALIZATION, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)))) )
+							.build();
 						
+						/**
+						 * parse last cell data for receipt no and receipt date.
+						 */
+						String lastCellData = String.valueOf(getValueFromCell(
+								currentRow.getCell(CELL_RECEIPT_NO, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+						String[] components = lastCellData.split("%s");
+						if (components.length == 1) {
+							payment.setReceiptNo(components[0]);
+						} else if (components.length > 1) {
+							try {
+								int date = this.extractFirstNumericPart(components[1]);
+								Calendar calendar = Calendar.getInstance();
+								calendar.setTimeInMillis(demand.getGenerationDate());
+								calendar.set(Calendar.DATE, date);
+								payment.setDateOfPayment(calendar.getTimeInMillis());
+							} catch (Exception exception) {
+								log.debug(exception.getLocalizedMessage());
+							}
+						}
+						payments.add(payment);
 					}
-					cellData.remove("Receipt No. & Date");
-					if(cellData.get("Realization Amount") != null && 
-							Double.parseDouble(cellData.get("Realization Amount").toString()) > 0) {
-						payments.add(mapper.convertValue(cellData, RentPayment.class));
-					}else if(cellData.get("Realization Amount") != null &&
-							Double.parseDouble(cellData.get("Realization Amount").toString()) == 0) {
-						demands.add(mapper.convertValue(cellData, RentDemand.class));
-					}
+					demands.add(demand);
 				}
 			}
 		} catch (Exception e) {
@@ -114,7 +137,52 @@ public class ReadExcelService {
 		return new RentDemandResponse(demands,payments);
 	}
 
-	
+	private int extractFirstNumericPart(String str) throws NumberFormatException {
+		Pattern pattern = Pattern.compile("'(.*?)'");
+		Matcher matcher = pattern.matcher(str);
+		if (matcher.find())
+		{
+			return Integer.parseInt(matcher.group(1));
+		}
+		throw new NumberFormatException("Could not exract numeric part from "+str);
+	}
+
+	private static final String[] MONTHS = new String[]{"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+
+	/**
+	 * Parse values like 
+	 * Aug.-20 
+	 * Sep. 20
+	 * @param str
+	 * @return
+	 * @throws DateTimeParseException
+	 */
+	private Long extractDateFromString(String str) throws DateTimeParseException {
+        Pattern monthPattern = Pattern.compile("^\\w*");
+		Matcher monthMatcher = monthPattern.matcher(str);
+		if(monthMatcher.find()) {
+			String month = monthMatcher.group().toUpperCase();
+			int monthIndex = Arrays.asList(MONTHS).indexOf(month.substring(0, 3));
+			if (monthIndex < 0 ) {
+				throw new DateTimeParseException("Cannot parse "+ str + " as a date.", null, 0);
+			}
+			Pattern datePattern = Pattern.compile("\\d*$");
+			Matcher dateMatcher = datePattern.matcher(str);
+			if(dateMatcher.find()) {
+                String twoYearDate = dateMatcher.group();
+                int twoYearDateInt = Integer.parseInt(twoYearDate);
+                if (twoYearDateInt >= 100) {
+                    throw new DateTimeParseException("Cannot parse "+ str + " as a date.", null, 0);
+                }
+                int year = twoYearDateInt < 50 ? 2000 + twoYearDateInt : 1900 + twoYearDateInt;
+                Calendar calendar = Calendar.getInstance();
+				calendar.set(year, monthIndex, 1, 12, 0);
+                return calendar.getTimeInMillis();
+			}
+		}
+		throw new DateTimeParseException("Cannot parse "+ str + " as a date.", null, 0);
+	}
+
 	private Object getValueFromCell(Cell cell1) {
 		Object objValue = "";
 		switch (cell1.getCellType()) {
@@ -139,12 +207,5 @@ public class ReadExcelService {
 			objValue = "";
 		}
 		return objValue;
-	}
-
-	public void main(String args[]) {
-		
-		RentDemandResponse temps = getDatafromExcelPath("D:\\Projects\\Transerve\\Docs\\521 to 530.xlsx");
-		System.out.println(temps);
-
 	}
 }
