@@ -10,12 +10,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 @EqualsAndHashCode
 public class RentDemand {
 
@@ -64,7 +66,7 @@ public class RentDemand {
 
   @JsonProperty("tenantId")
   private String tenantId;
-  
+
   public enum ModeEnum {
     UPLOAD("Uploaded"),
 

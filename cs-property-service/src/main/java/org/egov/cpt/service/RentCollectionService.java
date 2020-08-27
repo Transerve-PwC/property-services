@@ -125,13 +125,15 @@ public class RentCollectionService implements IRentCollectionService {
 
 	private List<RentCollection> extractPrincipal(List<RentDemand> demands, double paymentAmount) {
 		ArrayList<RentCollection> collections = new ArrayList<RentCollection>();
-		for (RentDemand demand : demands) {
+		List<RentDemand> filteredDemands = demands.stream().filter(d -> d.getRemainingPrincipal() > 0)
+				.collect(Collectors.toList());
+		for (RentDemand demand : filteredDemands) {
 			if (paymentAmount <= 0) {
 				break;
 			}
 			double collectionAmount = Math.min(demand.getRemainingPrincipal(), paymentAmount);
 
-			paymentAmount -= demand.getRemainingPrincipal();
+			paymentAmount -= collectionAmount;
 			collections.add(RentCollection.builder().tenantId(demand.getTenantId()).demandId(demand.getId())
 					.principalCollected(collectionAmount).build());
 			demand.setRemainingPrincipal(demand.getRemainingPrincipal() - collectionAmount);
@@ -164,6 +166,9 @@ public class RentCollectionService implements IRentCollectionService {
 
 			long noOfDaysForInterestCalculation = ChronoUnit.DAYS.between(demandInterestSinceDate, paymentDate);
 
+			if (noOfDaysForInterestCalculation == 0) {
+				continue;
+			}
 			double interest = demand.getRemainingPrincipal() * noOfDaysForInterestCalculation * interestRate / 365
 					/ 100;
 			if (interest < paymentAmount) {
