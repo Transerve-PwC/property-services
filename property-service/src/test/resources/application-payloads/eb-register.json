@@ -20,6 +20,7 @@
     "relation": "FATHER",
     "address": "transferee address 2",
     "relationWithDeceased": "FATHER",
+    "mobileNo": "9876954322",
     "percentageOfShareTransferred": 50
   },
   "witness": [

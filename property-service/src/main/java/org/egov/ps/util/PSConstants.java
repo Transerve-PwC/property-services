@@ -17,7 +17,11 @@ public class PSConstants {
 	public static final String MDMS_PS_FIELDS = "EstateBranch_OwnershipTransfer_SaleDeed";
 
 	public static final String MDMS_PS_CODE_FILTER = "$.*.code";
-	
+
 	public static final String MDMS_PS_FIELD_FILTER = ".*.fields.*";
+
+	public static final String EB_OT_SD = "EstateBranch_OwnershipTransfer_SaleDeed";
+
+	public static final String EB_OT_RW = "EstateBranch_OwnershipTransfer_RegisteredWill";
 
 }
