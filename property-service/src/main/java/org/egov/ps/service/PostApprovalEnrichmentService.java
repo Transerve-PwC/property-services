@@ -13,6 +13,7 @@ import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyCriteria;
 import org.egov.ps.producer.Producer;
 import org.egov.ps.repository.PropertyRepository;
+import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.ApplicationRequest;
 import org.egov.ps.web.contracts.AuditDetails;
@@ -59,43 +60,102 @@ public class PostApprovalEnrichmentService {
 
 							if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 								property.getPropertyDetails().getOwners().forEach(currentOwner -> {
-									JsonNode purchaser = null;
+
 									OwnerDetails currentOwnerDetails = null;
 									double actualOwnerShare = 0;
 									double salePercentage = 0;
-									if (application.getApplicationDetails().get("owner") != null) {
-										JsonNode ownerWhoIsSelling = application.getApplicationDetails().get("owner");
-										String ownerIdWhoIsSelling = ownerWhoIsSelling.get("id").asText();
 
-										if (ownerIdWhoIsSelling.contentEquals(currentOwner.getId())) {
-											currentOwnerDetails = currentOwner.getOwnerDetails();
-											purchaser = application.getApplicationDetails().get("purchaser");
+									String masterName = application.getBranchType() + "_" + application.getModuleType()
+											+ "_" + application.getApplicationType();
+									switch (masterName) {
+									case PSConstants.EB_OT_SD:
 
-											actualOwnerShare = currentOwner.getShare();
-											salePercentage = purchaser.get("percentageOfShareTransferred").asDouble();
+										JsonNode purchaser = null;
+										if (application.getApplicationDetails().get("owner") != null) {
+											JsonNode ownerWhoIsSelling = application.getApplicationDetails()
+													.get("owner");
+											String ownerIdWhoIsSelling = ownerWhoIsSelling.get("id").asText();
 
-											currentOwner.setShare(actualOwnerShare - salePercentage);
-											if (actualOwnerShare == salePercentage) {
-												currentOwnerDetails.setIsCurrentOwner(false);
+											if (ownerIdWhoIsSelling.contentEquals(currentOwner.getId())) {
+												currentOwnerDetails = currentOwner.getOwnerDetails();
+												purchaser = application.getApplicationDetails().get("purchaser");
+
+												actualOwnerShare = currentOwner.getShare();
+												salePercentage = purchaser.get("percentageOfShareTransferred")
+														.asDouble();
+
+												currentOwner.setShare(actualOwnerShare - salePercentage);
+												if (actualOwnerShare == salePercentage) {
+													currentOwnerDetails.setIsCurrentOwner(false);
+												}
 											}
 										}
+
+										/**
+										 * If purchaser is an existing owner else purchaser will be new owner
+										 */
+										if ((purchaser.get("id") != null
+												|| !purchaser.get("id").asText().contentEquals(""))
+												&& purchaser.get("id").asText().contentEquals(currentOwner.getId())) {
+											currentOwner.setShare(actualOwnerShare + salePercentage);
+
+											currentOwnerDetails.setIsCurrentOwner(true);
+											currentOwnerDetails.setAllotmentNumber(null);
+											currentOwnerDetails.setDateOfAllotment(System.currentTimeMillis());
+										} else {
+											Owner newOwnerItem = getOwnerFromPurcheser(application, property,
+													newOwnerAuditDetails);
+											property.getPropertyDetails().addOwnerItem(newOwnerItem);
+										}
+
+										break;
+
+									case PSConstants.EB_OT_RW:
+
+										JsonNode transferee = null;
+										if (application.getApplicationDetails().get("deceased") != null) {
+											JsonNode deceasedOwner = application.getApplicationDetails()
+													.get("deceased");
+											String deceasedOwnerId = deceasedOwner.get("id").asText();
+
+											if (deceasedOwnerId.contentEquals(currentOwner.getId())) {
+												currentOwnerDetails = currentOwner.getOwnerDetails();
+												transferee = application.getApplicationDetails().get("transferee");
+
+												actualOwnerShare = currentOwner.getShare();
+												salePercentage = transferee.get("percentageOfShareTransferred")
+														.asDouble();
+
+												currentOwner.setShare(actualOwnerShare - salePercentage);
+												if (actualOwnerShare == salePercentage) {
+													currentOwnerDetails.setIsCurrentOwner(false);
+												}
+											}
+										}
+
+										/**
+										 * If purchaser is an existing owner else purchaser will be new owner
+										 */
+										if ((transferee.get("id") != null
+												|| !transferee.get("id").asText().contentEquals(""))
+												&& transferee.get("id").asText().contentEquals(currentOwner.getId())) {
+											currentOwner.setShare(actualOwnerShare + salePercentage);
+
+											currentOwnerDetails.setIsCurrentOwner(true);
+											currentOwnerDetails.setAllotmentNumber(null);
+											currentOwnerDetails.setDateOfAllotment(System.currentTimeMillis());
+										} else {
+											Owner newOwnerItem = getOwnerFromTransferee(application, property,
+													newOwnerAuditDetails);
+											property.getPropertyDetails().addOwnerItem(newOwnerItem);
+										}
+
+										break;
+
+									default:
+										break;
 									}
 
-									/**
-									 * If purchaser is an existing owner else purchaser will be new owner
-									 */
-									if ((purchaser.get("id") != null || !purchaser.get("id").asText().contentEquals(""))
-											&& purchaser.get("id").asText().contentEquals(currentOwner.getId())) {
-										currentOwner.setShare(actualOwnerShare + salePercentage);
-
-										currentOwnerDetails.setIsCurrentOwner(true);
-										currentOwnerDetails.setAllotmentNumber(null);
-										currentOwnerDetails.setDateOfAllotment(System.currentTimeMillis());
-									} else {
-										Owner newOwnerItem = getOwnerFromPurcheser(application, property,
-												newOwnerAuditDetails);
-										property.getPropertyDetails().addOwnerItem(newOwnerItem);
-									}
 								});
 							}
 
@@ -134,6 +194,35 @@ public class PostApprovalEnrichmentService {
 		Owner newOwner = Owner.builder().id(gen_new_owner_id).tenantId(application.getTenantId())
 				.propertyDetailsId(property.getPropertyDetails().getId())
 				.share(purchaser.get("percentageOfShareTransferred").asDouble())
+
+				.cpNumber(null).serialNumber(null) // TODO serial number mandatory field
+
+				.ownerDetails(newOwnerDetails).auditDetails(newOwnerAuditDetails).build();
+
+		return newOwner;
+	}
+
+	private Owner getOwnerFromTransferee(Application application, Property property,
+			AuditDetails newOwnerAuditDetails) {
+
+		JsonNode transferee = application.getApplicationDetails().get("transferee");
+		String gen_new_owner_id = UUID.randomUUID().toString();
+		String gen_new_owner_details_id = UUID.randomUUID().toString();
+
+		OwnerDetails newOwnerDetails = OwnerDetails.builder().id(gen_new_owner_details_id)
+				.tenantId(application.getTenantId()).ownerId(gen_new_owner_id)
+				.ownerName(transferee.get("name").asText()).guardianName(transferee.get("fatherOrHusbandName").asText())
+				.guardianRelation(transferee.get("relation").asText()).mobileNumber(transferee.get("mobileNo").asText())
+
+				.possesionDate(null).allotmentNumber(null) // TODO allotment number mandatory field
+				.dateOfAllotment(System.currentTimeMillis()) // TODO what if purchaser is existing owner
+
+				.isCurrentOwner(true).isMasterEntry(false).dueAmount(BigDecimal.ZERO)
+				.address(transferee.get("address").asText()).auditDetails(newOwnerAuditDetails).build();
+
+		Owner newOwner = Owner.builder().id(gen_new_owner_id).tenantId(application.getTenantId())
+				.propertyDetailsId(property.getPropertyDetails().getId())
+				.share(transferee.get("percentageOfShareTransferred").asDouble())
 
 				.cpNumber(null).serialNumber(null) // TODO serial number mandatory field
 

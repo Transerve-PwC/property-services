@@ -17,6 +17,7 @@
     "fatherOrHusbandName": "transferee father name 2",
     "relation": "FATHER",
     "address": "transferee address 2",
+    "mobileNo": "9876954322",
     "relationWithDeceased": "FATHER",
     "percentageOfShareTransferred": 50
   },
