@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -17,10 +16,8 @@ import org.egov.common.contract.request.User;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
-import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.RequestInfoWrapper;
 import org.egov.cpt.models.UserResponse;
-import org.egov.cpt.models.UserSearchRequest;
 import org.egov.cpt.models.UserSearchRequestCore;
 import org.egov.cpt.models.calculation.Demand;
 import org.egov.cpt.models.calculation.Demand.StatusEnum;

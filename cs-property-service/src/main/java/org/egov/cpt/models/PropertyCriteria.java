@@ -17,7 +17,7 @@ import lombok.ToString;
 @Builder
 
 public class PropertyCriteria {
-	
+
 	@Builder.Default
 	private String tenantId = "ch.chandigarh";
 
@@ -36,17 +36,15 @@ public class PropertyCriteria {
 	private Long limit;
 
 	private String propertyId;
-	
+
 	private List<String> relations;
-	
+
 	@Builder.Default
-	private String createdBy="";
-	
+	private String createdBy = "";
+
 	public boolean isEmpty() {
-		return (this.transitNumber == null && this.colony == null && this.phone == null
-				&& this.name == null && this.state == null && this.offset == null
-				&& this.limit == null && this.propertyId == null);
+		return (this.transitNumber == null && this.colony == null && this.phone == null && this.name == null
+				&& this.state == null && this.offset == null && this.limit == null && this.propertyId == null);
 	}
-	
 
 }

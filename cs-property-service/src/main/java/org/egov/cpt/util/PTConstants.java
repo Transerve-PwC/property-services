@@ -122,6 +122,12 @@ public class PTConstants {
 	public static final String USREVENTS_EVENT_NAME = "Property Tax";
 	public static final String USREVENTS_EVENT_POSTEDBY = "SYSTEM-PT";
 
+	public static final String BUSINESS_SERVICE_MG_RP = "MortgageRP";
+	
+	public static final String BUSINESS_SERVICE_DC_RP = "DuplicateCopyOfAllotmentLetterRP";
+	
+	public static final String BUSINESS_SERVICE_FL_RP = "FRESHLICENSE";
+	
 	// Variable names for diff
 
 	public static final String VARIABLE_ACTION = "action";
@@ -241,5 +247,9 @@ public class PTConstants {
 	public static final String RELATION_FINANCE = "finance";
 
 	public static final String OT_STATUS_APPROVED = "OT_APPROVED";
+	public static final String PM_STATUS_APPROVED = "PM_APPROVED";
+	
+	public static final String false_value = "false";
+	public static final String true_value = "true";
 
 }

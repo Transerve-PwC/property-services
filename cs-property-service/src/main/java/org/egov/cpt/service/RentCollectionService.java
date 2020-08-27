@@ -1,10 +1,8 @@
 package org.egov.cpt.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,9 +11,7 @@ import java.util.Set;
 import org.egov.cpt.models.RentAccount;
 import org.egov.cpt.models.RentAccountStatement;
 import org.egov.cpt.models.RentCollection;
-import org.egov.cpt.models.RentCollection.CollectionAgainst;
 import org.egov.cpt.models.RentDemand;
-import org.egov.cpt.models.RentDemand.ModeEnum;
 import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.models.RentSummary;
 import org.springframework.stereotype.Service;
@@ -154,50 +150,49 @@ private  List<RentDemand> getCollectionsForPayment(List<RentDemand> demands, Ren
  * @return List<RentCollection> Collections to be saved in the database.
  */
 @Override
-public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled,RentAccount account) 
-//public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled, RentAccount account)
-{
-	//	Map<String,Collection> responseMap=new HashMap<String,Collection>();
-		List<RentDemand> lstRentDemandProcess;
-		for(RentPayment rentPayment:paymentsToBeSettled) {
-			if(rentPayment.isProceed())
+
+
+public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<RentPayment> paymentsToBeSettled,RentAccount account, double interestRate) {
+	List<RentDemand> lstRentDemandProcess;
+	for(RentPayment rentPayment:paymentsToBeSettled) {
+		if(rentPayment.isProceed())
+			continue;
+		
+		lstRentDemandProcess=new ArrayList<RentDemand>();
+		Date paymentDate = new Date(rentPayment.getDateOfPayment());
+		
+		for(RentDemand rentDemand:demandsToBeSettled) {
+			if(rentDemand.getRemainingPrincipal()<=0)
 				continue;
-			
-			lstRentDemandProcess=new ArrayList<RentDemand>();
-			Date paymentDate = new Date(rentPayment.getDateOfPayment());
-			
-			for(RentDemand rentDemand:demandsToBeSettled) {
-				if(rentDemand.getRemainingPrincipal()<=0)
-					continue;
-				Date demandDate = new Date(rentDemand.getGenerationDate());
-                                //filter out the demands which have earlier date than payment 
-				if(demandDate.compareTo(paymentDate)<0) {
-					lstRentDemandProcess.add(rentDemand);
-				}
+			Date demandDate = new Date(rentDemand.getGenerationDate());
+							//filter out the demands which have earlier date than payment 
+			if(demandDate.compareTo(paymentDate)<=0) {
+				lstRentDemandProcess.add(rentDemand);
 			}
-                        //call the function to proceed demand against payment 
-			List<RentDemand> paidDemands=getCollectionsForPayment(lstRentDemandProcess,rentPayment,account);
-			
-			demandsToBeSettled.removeAll(paidDemands);
-                        
 		}
-                // cron job
-                if(demandsToBeSettled.size()>0 && account.getRemainingAmount()>0){
-                    RentPayment payment1 = new RentPayment();
-                        //payment1.setId("payment");
-                        payment1.setAmountPaid(account.getRemainingAmount());
-                        payment1.setDateOfPayment(new Date().getTime());
-                       // payment1.setReceiptNo("Receipt" );
-                     //   payment1.setMode(org.egov.cpt.models.RentPayment.Mod);
-                        account.setRemainingAmount(0.0);
-                        List<RentDemand> paidDemands=getCollectionsForPayment(demandsToBeSettled,payment1,account);
-                        demandsToBeSettled.removeAll(paidDemands);
-                        
-                }
-                demandsToBeSettled.clear();
-                demandsToBeSettled.addAll(processedDemand);
-	 return collections;	
+					//call the function to proceed demand against payment 
+		List<RentDemand> paidDemands=getCollectionsForPayment(lstRentDemandProcess,rentPayment,account);
+		
+		demandsToBeSettled.removeAll(paidDemands);
+					
 	}
+	// cron job
+	if(demandsToBeSettled.size()>0 && account.getRemainingAmount()>0){
+		RentPayment payment1 = new RentPayment();
+			//payment1.setId("payment");
+			payment1.setAmountPaid(account.getRemainingAmount());
+			payment1.setDateOfPayment(new Date().getTime());
+			// payment1.setReceiptNo("Receipt" );
+			//   payment1.setMode(org.egov.cpt.models.RentPayment.Mod);
+			account.setRemainingAmount(0.0);
+			List<RentDemand> paidDemands=getCollectionsForPayment(demandsToBeSettled,payment1,account);
+			demandsToBeSettled.removeAll(paidDemands);
+			
+	}
+	demandsToBeSettled.clear();
+	demandsToBeSettled.addAll(processedDemand);
+	return collections;
+}
     
 
 
@@ -215,7 +210,6 @@ public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<Ren
  public RentSummary paymentSummary(List<RentDemand> demands,RentAccount rentAccount) {
 	 double balancePrincipal =0;
 	 double balanceInterest =0;
-	 double balanceAmount =0;
 	 final double interestRate = 24;
 	 RentSummary rentSummary=new RentSummary();
 	 
@@ -232,14 +226,10 @@ public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<Ren
 		 
 		 
 	 }
-	 balanceAmount=rentAccount.getRemainingAmount();
 	 rentSummary.setBalanceAmount(rentAccount.getRemainingAmount());
 	 rentSummary.setBalanceInterest(balanceInterest);
 	 rentSummary.setBalancePrincipal(balancePrincipal);
 	 return rentSummary;
-	 
-	 
-	 
  }
  
  
@@ -378,8 +368,6 @@ public List<RentCollection> settle(List<RentDemand> demandsToBeSettled, List<Ren
                 return lstAccountStatement;
 		//System.out.println(lstAccountStatement);
 	}
-	
-	
 
 
 }

@@ -60,7 +60,11 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.tenantId(tenantId).area(rs.getString("area")).rentPerSqyd(rs.getString("rent_per_sqyd"))
 						.currentOwner(rs.getString("current_owner")).floors(rs.getString("floors"))
 						.additionalDetails(rs.getString("additional_details"))
-						.address(address).auditDetails(auditdetails)
+						.address(address)
+						.rentIncrementPercentage(rs.getDouble("pd_rent_inc_pg"))
+						.rentIncrementPeriod(rs.getInt("pd_rent_inc_period"))
+						.interestRate(rs.getDouble("pd_int_rate"))
+						.auditDetails(auditdetails)
 						.build();
 
 				currentProperty = Property.builder().id(propertyId).transitNumber(rs.getString("transit_number"))
@@ -120,11 +124,12 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.applicationNumber(rs.getString("odapplication_number"))
 						.dateOfDeathAllottee(rs.getLong("date_of_death_allottee"))
 						.relationWithDeceasedAllottee(rs.getString("relation_with_deceased_allottee"))
+						.permanent( rs.getBoolean("od_permanent"))
 						.auditDetails(auditdetails).payment(null).build();
 	
 				Owner owners = Owner.builder().id(rs.getString("oid")).property(property)
 						.tenantId(rs.getString("otenantid")).allotmenNumber(rs.getString("oallotmen_number"))
-						.activeState(rs.getBoolean("oactive_state")).isPrimaryOwner(rs.getString("ois_primary_owner"))
+						.activeState(rs.getBoolean("oactive_state")).isPrimaryOwner(rs.getBoolean("ois_primary_owner"))
 						.ownerDetails(ownerDetails).auditDetails(auditdetails).build();
 	
 				property.addOwnerItem(owners);

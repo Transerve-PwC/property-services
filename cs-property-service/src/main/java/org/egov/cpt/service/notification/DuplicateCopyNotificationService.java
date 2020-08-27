@@ -8,32 +8,23 @@ import java.util.Map;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.EmailRequest;
-import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.SMSRequest;
-import org.egov.cpt.repository.ServiceRequestRepository;
 import org.egov.cpt.util.NotificationUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Service
 public class DuplicateCopyNotificationService {
 
 	private PropertyConfiguration config;
 
-	private ServiceRequestRepository serviceRequestRepository;
-
 	private NotificationUtil util;
 
 	@Autowired
-	public DuplicateCopyNotificationService(PropertyConfiguration config,
-			ServiceRequestRepository serviceRequestRepository, NotificationUtil util) {
+	public DuplicateCopyNotificationService(PropertyConfiguration config, NotificationUtil util) {
 		this.config = config;
-		this.serviceRequestRepository = serviceRequestRepository;
 		this.util = util;
 	}
 

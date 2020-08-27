@@ -24,6 +24,7 @@ import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.repository.OwnershipTransferRepository;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.repository.ServiceRequestRepository;
+import org.egov.cpt.service.MDMSService;
 import org.egov.cpt.util.DuplicateCopyConstants;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
@@ -64,6 +65,9 @@ public class PropertyValidator {
 	@Autowired
 	private WorkflowService workflowService;
 
+	@Autowired
+	private MDMSService mdmsService;
+
 	@Value("${egov.mdms.host}")
 	private String mdmsHost;
 
@@ -82,12 +86,25 @@ public class PropertyValidator {
 
 		validateColony(request, errorMap);
 		validateArea(request, errorMap);
+		validateRentDetails(request, errorMap);
 
-		// TODO Commenting for temporary. Uncomment for payment validations
 //		validatePayment(request, errorMap);
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
+	}
+
+	private void validateRentDetails(PropertyRequest request, Map<String, String> errorMap) {
+		List<Property> property = request.getProperties();
+		property.forEach(properties -> {
+			if (properties.getPropertyDetails().getRentIncrementPercentage()<0 || properties.getPropertyDetails().getRentIncrementPercentage()>=100) {
+				errorMap.put("INVALID INCREMENT PERCENTAGE", "Increment precentage is not valid");
+			}
+
+			if (properties.getPropertyDetails().getInterestRate()<0 || properties.getPropertyDetails().getInterestRate()>=100) {
+				errorMap.put("INVALID INTEREST RATE", "Interest rate is not valid");
+			}
+		});
 	}
 
 	private void validatePayment(PropertyRequest request, Map<String, String> errorMap) {
@@ -118,7 +135,7 @@ public class PropertyValidator {
 					errorMap.put("INVALID OWNER NAME", "Owner Name is not valid");
 				}
 
-				if (!isValid(owner.getOwnerDetails().getMonthlyRent(), 3, 20)) {
+				/*if (!isValid(owner.getOwnerDetails().getMonthlyRent(), 3, 20)) {
 					errorMap.put("INVALID MONTHLY RENT", "Monthly Rent is not valid");
 				}
 
@@ -128,7 +145,7 @@ public class PropertyValidator {
 
 				if (!isValid(owner.getOwnerDetails().getRevisionPercentage(), 1, 5)) {
 					errorMap.put("INVALID REVISION PERCENTAGE", "Revision Percentage is not valid");
-				}
+				}*/
 
 				if (!isNotNullValid(owner.getOwnerDetails().getPosessionStartdate())) {
 					errorMap.put("INVALID POSESSION START DATE",
@@ -231,7 +248,7 @@ public class PropertyValidator {
 			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
 			return JsonPath.read(result, jsonpath);
 		} catch (Exception e) {
-//			log.error("Error while fetching MDMS data", e);
+			log.error("Error while fetching MDMS data", e);
 			throw new CustomException("INVALID TENANT ID ", "No data found for this tenentID");
 		}
 
@@ -299,8 +316,10 @@ public class PropertyValidator {
 
 		validateColony(request, errorMap);
 		validateArea(request, errorMap);
+		validateRentDetails(request, errorMap);
 
-		// TODO Commenting for temporary. Uncomment for payment validations
+		validatePropertyDocuments(request, errorMap);
+
 //		validatePayment(request, errorMap);
 
 		List<Property> prop = request.getProperties();
@@ -375,14 +394,14 @@ public class PropertyValidator {
 	public List<Owner> validateUpdateRequest(OwnershipTransferRequest request) {
 
 		Map<String, String> errorMap = new HashMap<>();
-
+		
 		DuplicateCopySearchCriteria criteria = getOTSearchCriteria(request);
 		List<Owner> ownersFromSearchResponse = OTRepository.searchOwnershipTransfer(criteria);
 		boolean ifOwnerExists = OwnerExists(ownersFromSearchResponse);
 		if (!ifOwnerExists) {
 			throw new CustomException("OWNER NOT FOUND", "The owner to be updated does not exist");
 		}
-
+		validateOwnershipTransferDocuments(request, errorMap);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 
@@ -515,7 +534,7 @@ public class PropertyValidator {
 
 		validateDocument(duplicateCopyRequest);
 		validateIds(duplicateCopyRequest);
-
+		validateDuplicateCopyDocuments(duplicateCopyRequest, errorMap);
 		// validateIds(duplicateCopyRequest, errorMap);
 		String propertyId = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
@@ -881,7 +900,7 @@ public class PropertyValidator {
 
 		validateDocument(mortgageRequest);
 		validateIds(mortgageRequest);
-
+		validateMortgageDocuments(mortgageRequest, errorMap);
 		// validateIds(duplicateCopyRequest, errorMap);
 		String propertyId = mortgageRequest.getMortgageApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
@@ -1021,4 +1040,53 @@ public class PropertyValidator {
 			.forEach(documents -> _validateDuplicateDocuments(documents));
 	}
 
+
+	private void validatePropertyDocuments(PropertyRequest request, Map<String, String> errorMap) {
+		request.getProperties().forEach(property -> {
+			this.validateDocumentsOnType(request.getRequestInfo(), property.getTenantId(), property.getPropertyDetails().getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_PM );
+		});
+	}
+
+	private void validateDocumentsOnType(RequestInfo requestInfo, String tenantId, List<Document> documents, Map<String, String> errorMap, String code) {
+
+		tenantId = tenantId.split("\\.")[0];
+		String filter = "[?(@.code=='" + code + "')].documentList";
+
+		/**
+		 * Get list of application documents from MDMS
+		 */
+		List<Map<String, Object>> data = (List<Map<String, Object>>)mdmsService.getMDMSResponse(requestInfo, tenantId, PTConstants.MDMS_PT_EGF_PROPERTY_SERVICE, 
+			"applications", filter, "$.MdmsRes.PropertyServices.applications");
+		List<Map<String, Object>> mdmsDocuments = (List<Map<String, Object>>)(data.get(0));
+
+		/**
+		 * Filter the mdms document types for the ones that are required.
+		 * For each required document code, verify if it is present in the incoming documents.
+		 */
+		mdmsDocuments.stream()
+			.filter(d -> ((boolean)(d.get("required"))))
+			.map(d -> d.get("code")).forEach(documentCode -> {
+				if (!documents.stream().map(Document::getDocumentType).filter(type -> type.equalsIgnoreCase(String.valueOf(documentCode))).findAny().isPresent()) {
+					errorMap.put("REQUIRED DOCUMENT NOT FOUND", "The document type '" + documentCode + "' is required but it is not present");
+				}
+			});
+	}
+
+	private void validateMortgageDocuments(MortgageRequest request, Map<String, String> errorMap) {
+		request.getMortgageApplications().forEach(mortgage -> {
+			this.validateDocumentsOnType(request.getRequestInfo(), mortgage.getTenantId(), mortgage.getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_MG_RP);
+		});
+	}
+
+	private void validateDuplicateCopyDocuments(DuplicateCopyRequest request, Map<String, String> errorMap) {
+		request.getDuplicateCopyApplications().forEach(duplicateCopy -> {
+			this.validateDocumentsOnType(request.getRequestInfo(), duplicateCopy.getTenantId(), duplicateCopy.getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_DC_RP);
+		});
+	}
+
+	private void validateOwnershipTransferDocuments(OwnershipTransferRequest request, Map<String, String> errorMap) {
+		request.getOwners().forEach(owner -> {
+			this.validateDocumentsOnType(request.getRequestInfo(), owner.getTenantId(), owner.getOwnerDetails().getOwnershipTransferDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_FL_RP);
+		});
+	}
 }

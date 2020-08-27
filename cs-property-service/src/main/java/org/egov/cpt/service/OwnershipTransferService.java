@@ -14,7 +14,6 @@ import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.OwnershipTransferRepository;
 import org.egov.cpt.service.calculation.DemandService;
-import org.egov.cpt.service.notification.MortgageNotificationService;
 import org.egov.cpt.service.notification.PropertyNotificationService;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.validator.PropertyValidator;

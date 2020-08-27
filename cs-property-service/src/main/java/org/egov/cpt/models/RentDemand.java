@@ -18,85 +18,86 @@ import lombok.Setter;
 @Builder
 @EqualsAndHashCode
 public class RentDemand {
-	
-	/**
-	 * Unique id of the demand
-	 */
-	@JsonProperty("id")
-	private String id;
-	
-	/**
-	 * Property that this rent is generated for.
-	 */
-	@JsonProperty("propertyId")
-	private String propertyId;
-	/**
-	 * No of days of grace period before interest starts getting applied.
-	 */
-	@Builder.Default
-	@JsonProperty("initialGracePeriod")
-	private int initialGracePeriod = 10;
-    
-	/**
-	 * Date of generation of this demand.
-	 */
-	@JsonProperty("generationDate")
-	private Long generationDate;
-    
-	/**
-	 * The principal rent amount that is to be collected
-	 */
-	@JsonProperty("collectionPrincipal")
-    private Double collectionPrincipal;
-    
-    /**
-     * The remaining principal that still has to be collected.
-     */
-    @Builder.Default
-    @JsonProperty("remainingPrincipal")
-    private Double remainingPrincipal = 0.0;
-    
-    /**
-     * Last date on which interest was made as 0.
-     */
-    @JsonProperty("interestSince")
-    private Long interestSince;
-  
-    
-    @JsonProperty("tenantId")
-    private String tenantId;
-    
-    public enum ModeEnum {
-        UPLOAD("Uploaded"),
-        
-        GENERATED("Generated");
 
-        private String value;
+  /**
+   * Unique id of the demand
+   */
+  @JsonProperty("id")
+  private String id;
 
-        ModeEnum(String value) {
-          this.value = value;
-        }
+  /**
+   * Property that this rent is generated for.
+   */
+  @JsonProperty("propertyId")
+  private String propertyId;
+  /**
+   * No of days of grace period before interest starts getting applied.
+   */
+  @Builder.Default
+  @JsonProperty("initialGracePeriod")
+  private int initialGracePeriod = 10;
 
-        @Override
-        @JsonValue
-        public String toString() {
-          return String.valueOf(value);
-        }
+  /**
+   * Date of generation of this demand.
+   */
+  @JsonProperty("generationDate")
+  private Long generationDate;
 
-        @JsonCreator
-        public static ModeEnum fromValue(String text) {
-          for (ModeEnum b : ModeEnum.values()) {
-            if (String.valueOf(b.value).equalsIgnoreCase(text)) {
-              return b;
-            }
-          }
-          return null;
+  /**
+   * The principal rent amount that is to be collected
+   */
+  @JsonProperty("collectionPrincipal")
+  private Double collectionPrincipal;
+
+  /**
+   * The remaining principal that still has to be collected.
+   */
+  @Builder.Default
+  @JsonProperty("remainingPrincipal")
+  private Double remainingPrincipal = 0.0;
+
+  /**
+   * Last date on which interest was made as 0.
+   */
+  @JsonProperty("interestSince")
+  private Long interestSince;
+
+  @JsonProperty("tenantId")
+  private String tenantId;
+
+  public enum ModeEnum {
+    UPLOAD("Uploaded"),
+
+    GENERATED("Generated");
+
+    private String value;
+
+    ModeEnum(String value) {
+      this.value = value;
+    }
+
+    @Override
+    @JsonValue
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static ModeEnum fromValue(String text) {
+      for (ModeEnum b : ModeEnum.values()) {
+        if (String.valueOf(b.value).equalsIgnoreCase(text)) {
+          return b;
         }
       }
-    
-    @JsonProperty("mode")
-    private ModeEnum mode = null;
-    
-    @JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
+      return null;
+    }
+  }
+
+  @JsonProperty("mode")
+  @Builder.Default
+  private ModeEnum mode = ModeEnum.UPLOAD;
+
+  @JsonProperty("auditDetails")
+  @Builder.Default
+  private AuditDetails auditDetails = null;
 }
