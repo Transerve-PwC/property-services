@@ -2,10 +2,14 @@
   "modeOfTransfer": "MODE_OF_TRANSFER.SALEDEED",
   "registrationNumber": "reg",
   "dateOfRegistration": 15678994,
-  "owner": {
-    "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffb"
+  "transferor": {
+    "id": "a58ee4f7-e8f2-453c-b1d4-64d9b7f72ffb",
+    "name": "deceased name 2",
+    "fatherOrHusbandName": "deceased father name 2",
+    "address": "deceased address 2",
+    "percentageOfShare": 100
   },
-  "purchaser": {
+  "transferee": {
     "id": "",
     "name": "purchaser name 2",
     "fatherOrHusbandName": "purchaser father name 2",
