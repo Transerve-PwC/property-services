@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.cpt.models.AccountStatementCriteria;
-import org.egov.cpt.models.Payment;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RequestInfoWrapper;
@@ -76,11 +75,13 @@ public class PropertyController {
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/_accountstatement")
-	public ResponseEntity<AccountStatementResponse> searchDateWise(@Valid @RequestBody AccountStatementRequest request) {
-		AccountStatementCriteria accountStatementCriteria = request.getCriteria();		
-		AccountStatementResponse resposne = propertyService.searchPayments(accountStatementCriteria,request.getRequestInfo());
+	public ResponseEntity<AccountStatementResponse> searchDateWise(
+			@Valid @RequestBody AccountStatementRequest request) {
+		AccountStatementCriteria accountStatementCriteria = request.getCriteria();
+		AccountStatementResponse resposne = propertyService.searchPayments(accountStatementCriteria,
+				request.getRequestInfo());
 		return new ResponseEntity<>(resposne, HttpStatus.OK);
 	}
 
