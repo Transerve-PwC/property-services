@@ -126,7 +126,10 @@ public class PropertyService {
 
 		List<RentDemand> demands = repository.getRentDemands(accountStatementCriteria);
 		accountStatementCriteria.setDemandids(demands.stream().map(RentDemand::getId).collect(Collectors.toList()));
-
+		
+		if(CollectionUtils.isEmpty(demands) || CollectionUtils.isEmpty(payments))
+			return AccountStatementResponse.builder().rentAccountStatements(Collections.emptyList()).build();
+		
 		List<RentCollection> collections = repository.getRentCollections(accountStatementCriteria);
 		return AccountStatementResponse.builder()
 				.rentAccountStatements(rentCollectionService.accountStatement(demands, payments, collections)).build();

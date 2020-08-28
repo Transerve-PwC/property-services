@@ -23,12 +23,10 @@ import lombok.ToString;
 public class AccountStatementCriteria {
 
 	@JsonProperty("fromDate")
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date fromDate;
+	private Long fromDate;
 
 	@JsonProperty("toDate")
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date toDate;
+	private Long toDate;
 	
 	@JsonProperty("propertyid")
 	private String propertyid;
