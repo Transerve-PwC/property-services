@@ -322,7 +322,12 @@ public class PropertyValidator {
 		if (!ifOwnerExists) {
 			throw new CustomException("OWNER NOT FOUND", "The owner to be updated does not exist");
 		}
-		validateOwnershipTransferDocuments(request, errorMap);
+		String action=request.getOwners().get(0).getApplicationAction();
+		/**
+		 * MDMS Document validation
+		 */
+		if(!action.equalsIgnoreCase(PTConstants.ACTION_REINITIATE)|| !action.equalsIgnoreCase(PTConstants.ACTION_DRAFT))
+				validateOwnershipTransferDocuments(request, errorMap);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 
@@ -450,6 +455,12 @@ public class PropertyValidator {
 
 		validateDocument(duplicateCopyRequest);
 		validateIds(duplicateCopyRequest);
+		
+		String action=duplicateCopyRequest.getDuplicateCopyApplications().get(0).getAction();
+		/**
+		 * MDMS Document validation
+		 */
+		if(!action.equalsIgnoreCase(PTConstants.ACTION_REINITIATE)|| !action.equalsIgnoreCase(PTConstants.ACTION_DRAFT))
 		validateDuplicateCopyDocuments(duplicateCopyRequest, errorMap);
 		String propertyId = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
@@ -771,7 +782,12 @@ public class PropertyValidator {
 
 		validateDocument(mortgageRequest);
 		validateIds(mortgageRequest);
-		validateMortgageDocuments(mortgageRequest, errorMap);
+		String action=mortgageRequest.getMortgageApplications().get(0).getAction();
+		/**
+		 * MDMS Document validation
+		 */
+		if(!action.equalsIgnoreCase(PTConstants.ACTION_REINITIATE)|| !action.equalsIgnoreCase(PTConstants.ACTION_DRAFT))
+			validateMortgageDocuments(mortgageRequest, errorMap);
 		String propertyId = mortgageRequest.getMortgageApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
 				.appId(mortgageRequest.getMortgageApplications().get(0).getId()).propertyId(propertyId).build();
