@@ -227,14 +227,19 @@ public class PropertyValidator {
 			throw new CustomException(Collections.singletonMap("NO PROPERTIES FOUND", "No properties to update"));
 		}
 		validateIds(request, errorMap);
-
+		/**
+		 * TO validate Owner Details
+		 */
 		validateOwner(request, errorMap);
 
 		validateColony(request, errorMap);
 		validateArea(request, errorMap);
 		validateRentDetails(request, errorMap);
-
-		validatePropertyDocuments(request, errorMap);
+		/**
+		 * TO validate Documents 
+		 */
+		if(!request.getProperties().get(0).getMasterDataAction().equals(""))
+			validatePropertyDocuments(request, errorMap);
 
 //		validatePayment(request, errorMap);
 
