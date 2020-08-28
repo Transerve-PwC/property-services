@@ -154,20 +154,22 @@ public class PropertyService {
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
 
-		// if (!CollectionUtils.isEmpty(criteria.getRelations())
-		// && criteria.getRelations().contains(PTConstants.RELATION_FINANCE)) {
-		properties.stream().forEach(property -> {
-			List<RentDemand> demands = repository
-					.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
-			RentAccount accounts = repository
-					.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
-			if (!CollectionUtils.isEmpty(demands) && null != accounts) {
-				property.setRentSummary(rentCollectionService.paymentSummary(demands, accounts));
-				property.setDemands(demands);
-				// property.getPayments(payments);
-			}
-		});
-		// }
+		if (properties.size() <= 1 || !CollectionUtils.isEmpty(criteria.getRelations())
+				&& criteria.getRelations().contains(PTConstants.RELATION_FINANCE)) {
+			properties.stream().forEach(property -> {
+				List<RentDemand> demands = repository
+						.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+				List<RentPayment> payments = repository
+						.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+				RentAccount accounts = repository
+						.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+				if (!CollectionUtils.isEmpty(demands) && null != accounts) {
+					property.setRentSummary(rentCollectionService.paymentSummary(demands, accounts));
+					property.setDemands(demands);
+					property.setPayments(payments);
+				}
+			});
+		}
 
 		return properties;
 	}

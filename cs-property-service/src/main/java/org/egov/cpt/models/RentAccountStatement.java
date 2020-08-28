@@ -1,5 +1,4 @@
 package org.egov.cpt.models;
-import org.egov.cpt.models.RentCollection.CollectionAgainst;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,42 +14,41 @@ import lombok.Setter;
 @Builder
 @EqualsAndHashCode
 public class RentAccountStatement {
-	/*
-	 * Demand/Payment generation date
-	 */
-	private long date;
-	/*
-	 * Demand/Payment amount
-	 */
-	private double amount;
-	
-	private String type;
-	private double remainingPrincipal;
-	private double remainingInterest;
-	private double dueAmount;
-	
-	public enum Type {
-		C("C"),
-		D("D");
+    /*
+     * Demand/Payment generation date
+     */
+    private long date;
+    /*
+     * Demand/Payment amount
+     */
+    private double amount;
 
-		private String value;
+    private String type;
+    private double remainingPrincipal;
+    private double remainingInterest;
+    private double dueAmount;
 
-		Type(String value) {
-			this.value = value;
-		}
+    public enum Type {
+        C("C"), D("D");
 
-		@Override
-		public String toString() {
-			return String.valueOf(value);
-		}
+        private String value;
 
-		public static String fromValue(String text) {
-			for (Type b : Type.values()) {
-				if (String.valueOf(b.value).equalsIgnoreCase(text)) {
-					return b.value;
-				}
-			}
-			return null;
-		}
-	}
+        Type(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        public static String fromValue(String text) {
+            for (Type b : Type.values()) {
+                if (String.valueOf(b.value).equalsIgnoreCase(text)) {
+                    return b.value;
+                }
+            }
+            return null;
+        }
+    }
 }

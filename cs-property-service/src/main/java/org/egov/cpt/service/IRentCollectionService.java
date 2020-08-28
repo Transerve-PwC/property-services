@@ -43,17 +43,6 @@ public interface IRentCollectionService {
 
 	// Function parameters changed by Pooja
 	public RentSummary paymentSummary(List<RentDemand> demands,RentAccount rentAccount);
-	/**
-	 * Process the incoming payment.
-	 * 
-	 * @apiNote This will generate new collections that will be saved and will also modify existing demand objects.
-	 * @apiNote This will be called from PaymentKafkaConsumer
-	 * @param demands
-	 * @param collections
-	 * @param payment
-	 * @return List<RentCollection> Generated collection objects for the new payment.
-	 */
-	//public List<RentCollection> processNewPayment(List<RentDemand> demands, RentPayment payment,RentAccount rentAccount);
 	
 	/**
 	 * @apiNote This will provide the account statement between the date specified by the user. 
