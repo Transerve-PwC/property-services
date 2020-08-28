@@ -80,8 +80,8 @@ public class PropertyService {
 	private void processRentSummary(PropertyRequest request) {
 		request.getProperties().stream().filter(property -> property.getDemands() != null
 				&& property.getPayments() != null && property.getRentAccount() != null).forEach(property -> {
-					property.setRentSummary(
-							rentCollectionService.paymentSummary(property.getDemands(), property.getRentAccount()));
+					property.setRentSummary(rentCollectionService.calculateRentSummary(property.getDemands(),
+							property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
 				});
 	}
 
@@ -118,16 +118,18 @@ public class PropertyService {
 		}
 		rentEnrichmentService.enrichCollection(request);
 	}
-	
-	public AccountStatementResponse searchPayments(AccountStatementCriteria accountStatementCriteria,RequestInfo requestInfo) {		
+
+	public AccountStatementResponse searchPayments(AccountStatementCriteria accountStatementCriteria,
+			RequestInfo requestInfo) {
 		List<RentPayment> payments = repository.getRentPayments(accountStatementCriteria);
 		accountStatementCriteria.setPaymentids(payments.stream().map(RentPayment::getId).collect(Collectors.toList()));
-		
+
 		List<RentDemand> demands = repository.getRentDemands(accountStatementCriteria);
 		accountStatementCriteria.setDemandids(demands.stream().map(RentDemand::getId).collect(Collectors.toList()));
-		
-		List<RentCollection> collections = repository.getRentCollections(accountStatementCriteria);		
-		return AccountStatementResponse.builder().rentAccountStatements(rentCollectionService.accountStatement(demands, payments, collections)).build();
+
+		List<RentCollection> collections = repository.getRentCollections(accountStatementCriteria);
+		return AccountStatementResponse.builder()
+				.rentAccountStatements(rentCollectionService.accountStatement(demands, payments, collections)).build();
 	}
 
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
@@ -164,7 +166,8 @@ public class PropertyService {
 				RentAccount accounts = repository
 						.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
 				if (!CollectionUtils.isEmpty(demands) && null != accounts) {
-					property.setRentSummary(rentCollectionService.paymentSummary(demands, accounts));
+					property.setRentSummary(rentCollectionService.calculateRentSummary(demands, accounts,
+							property.getPropertyDetails().getInterestRate()));
 					property.setDemands(demands);
 					property.setPayments(payments);
 				}

@@ -161,7 +161,7 @@ public class RentCollectionService implements IRentCollectionService {
 			}
 			LocalDate demandGenerationDate = Instant.ofEpochMilli(demand.getGenerationDate())
 					.atZone(ZoneId.systemDefault()).toLocalDate();
-			LocalDate paymentDate = Instant.ofEpochMilli(paymentTimeStamp).atZone(ZoneId.systemDefault()).toLocalDate();
+			LocalDate paymentDate = getLocalDate(paymentTimeStamp);
 
 			long noOfDaysBetweenGenerationAndPayment = ChronoUnit.DAYS.between(demandGenerationDate, paymentDate);
 			if (noOfDaysBetweenGenerationAndPayment <= demand.getInitialGracePeriod()) {
@@ -199,10 +199,45 @@ public class RentCollectionService implements IRentCollectionService {
 	 * @param payment
 	 * @return
 	 */
-	public RentSummary paymentSummary(List<RentDemand> demands, RentAccount rentAccount) {
+	@Override
+	public RentSummary calculateRentSummaryAt(List<RentDemand> demands, RentAccount rentAccount, double interestRate,
+			long atTimestamp) {
+		final LocalDate atDate = getLocalDate(atTimestamp);
+		return demands.stream().filter(demand -> demand.getRemainingPrincipal() > 0).reduce(
+				RentSummary.builder().balanceAmount(rentAccount.getRemainingAmount()).build(), (summary, demand) -> {
+
+					/**
+					 * Calculate interest till atDate
+					 */
+					LocalDate demandGenerationDate = getLocalDate(demand.getGenerationDate());
+					long noOfDaysBetweenGenerationAndPayment = ChronoUnit.DAYS.between(demandGenerationDate, atDate);
+					if (noOfDaysBetweenGenerationAndPayment <= demand.getInitialGracePeriod()) {
+						return summary;
+					}
+
+					LocalDate demandInterestSinceDate = getLocalDate(demand.getInterestSince());
+
+					long noOfDaysForInterestCalculation = ChronoUnit.DAYS.between(demandInterestSinceDate, atDate);
+					double calculatedInterest = demand.getRemainingPrincipal() * noOfDaysForInterestCalculation
+							* interestRate / 365 / 100;
+					/**
+					 * Summarize the result.
+					 */
+					return RentSummary.builder()
+							.balancePrincipal(summary.getBalancePrincipal() + demand.getRemainingPrincipal())
+							.balanceInterest(summary.getBalanceInterest() + calculatedInterest).build();
+				}, (summary, demand) -> summary);
+	}
+
+	private LocalDate getLocalDate(long atTimestamp) {
+		return Instant.ofEpochMilli(atTimestamp).atZone(ZoneId.systemDefault()).toLocalDate();
+	}
+
+	@SuppressWarnings("unused")
+	private RentSummary _getPaymentSummary(List<RentDemand> demands, RentAccount rentAccount, double interestRate,
+			long atTimestamp) {
 		double balancePrincipal = 0;
 		double balanceInterest = 0;
-		final double interestRate = 24;
 		RentSummary rentSummary = new RentSummary();
 
 		for (RentDemand rentDemand : demands) {
@@ -354,5 +389,10 @@ public class RentCollectionService implements IRentCollectionService {
 
 		}
 		return lstAccountStatement;
+	}
+
+	@Override
+	public RentSummary calculateRentSummary(List<RentDemand> demands, RentAccount rentAccount, double interestRate) {
+		return this.calculateRentSummaryAt(demands, rentAccount, interestRate, System.currentTimeMillis());
 	}
 }

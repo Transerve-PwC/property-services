@@ -38,19 +38,37 @@ public interface IRentCollectionService {
 	 * @return
 	 */
 
-	// public RentSummary getRentSummary(ArrayList<RentDemand> demands,
-	// List<RentCollection> collections, List<RentPayment> payment);
-
-	// Function parameters changed by Pooja
-	public RentSummary paymentSummary(List<RentDemand> demands,RentAccount rentAccount);
-	
 	/**
-	 * @apiNote This will provide the account statement between the date specified by the user. 
+	 * Get the rent summary
+	 * 
+	 * @param demands
+	 * @param rentAccount
+	 * @param interestRate
+	 * @return
+	 */
+	public RentSummary calculateRentSummary(List<RentDemand> demands, RentAccount rentAccount, double interestRate);
+
+	/**
+	 * Get the rent summary
+	 * 
+	 * @param demands
+	 * @param rentAccount
+	 * @param interestRate
+	 * @param atTimestamp
+	 * @return
+	 */
+	public RentSummary calculateRentSummaryAt(List<RentDemand> demands, RentAccount rentAccount, double interestRate,
+			long atTimestamp);
+
+	/**
+	 * @apiNote This will provide the account statement between the date specified
+	 *          by the user.
 	 * @param demands
 	 * @param payments
 	 * @param lstCollection
-	 * @return List<RentAccountStatement> 
+	 * @return List<RentAccountStatement>
 	 */
-	public List<RentAccountStatement> accountStatement (List<RentDemand> demands, List<RentPayment> payments,List<RentCollection> lstCollection) ;
-		
+	public List<RentAccountStatement> accountStatement(List<RentDemand> demands, List<RentPayment> payments,
+			List<RentCollection> lstCollection);
+
 }
