@@ -42,4 +42,3 @@ public class RentPaymentRowMapper implements ResultSetExtractor<List<RentPayment
 		return new ArrayList<>(paymentMap.values());
 	}
 }
-

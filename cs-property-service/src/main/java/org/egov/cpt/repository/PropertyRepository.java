@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
@@ -16,6 +17,7 @@ import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyImages;
 import org.egov.cpt.models.RentAccount;
+import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.producer.Producer;
@@ -174,6 +176,29 @@ public class PropertyRepository {
 					new DuplicateCopyRequest(requestInfo, dcApplicationsForUpdate));
 		}
 	}
-
 	
+	public List<RentPayment> getRentPayments(AccountStatementCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = queryBuilder.getRentPaymentSearchQuery(criteria, preparedStmtList);
+		log.info("query:"+query);
+		log.info("preparedStmtList:"+preparedStmtList);
+		return namedParameterJdbcTemplate.query(query,preparedStmtList, rentPaymentrowMapper);
+	}
+	
+	public List<RentDemand> getRentDemands(AccountStatementCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = queryBuilder.getRentDemandSearchQuery(criteria, preparedStmtList);
+		log.info("query:"+query);
+		log.info("preparedStmtList:"+preparedStmtList);
+		return namedParameterJdbcTemplate.query(query,preparedStmtList, rentDemandrowMapper);
+	}
+	
+	public List<RentCollection> getRentCollections(AccountStatementCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = queryBuilder.getRentCollectionSearchQuery(criteria, preparedStmtList);
+		log.info("query:"+query);
+		log.info("preparedStmtList:"+preparedStmtList);
+		return namedParameterJdbcTemplate.query(query,preparedStmtList, new RentCollectionRowMapper());
+	}
+
 }

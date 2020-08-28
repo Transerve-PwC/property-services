@@ -3,6 +3,7 @@ package org.egov.cpt.service;
 import java.util.List;
 
 import org.egov.cpt.models.RentAccount;
+import org.egov.cpt.models.RentAccountStatement;
 import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
@@ -11,8 +12,6 @@ import org.egov.cpt.models.RentSummary;
 public interface IRentCollectionService {
 
 	/**
-	 * 1. Initial data migration. 2. New Payment. 3. New Demand.
-	 * 
 	 * Get the list of collections for the given demand and payments for the same
 	 * property.
 	 * 
@@ -43,5 +42,15 @@ public interface IRentCollectionService {
 	// List<RentCollection> collections, List<RentPayment> payment);
 
 	// Function parameters changed by Pooja
-	public RentSummary paymentSummary(List<RentDemand> demands, RentAccount rentAccount);
+	public RentSummary paymentSummary(List<RentDemand> demands,RentAccount rentAccount);
+	
+	/**
+	 * @apiNote This will provide the account statement between the date specified by the user. 
+	 * @param demands
+	 * @param payments
+	 * @param lstCollection
+	 * @return List<RentAccountStatement> 
+	 */
+	public List<RentAccountStatement> accountStatement (List<RentDemand> demands, List<RentPayment> payments,List<RentCollection> lstCollection) ;
+		
 }
