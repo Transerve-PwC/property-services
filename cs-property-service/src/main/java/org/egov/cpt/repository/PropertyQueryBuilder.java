@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.util.PTConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,7 @@ public class PropertyQueryBuilder {
 			+ " cs_pt_documents_v1 doc ON pt.id=doc.reference_id ";
 
 	private static final String OWNER_TABLE = " cs_pt_ownership_v1 ownership ON pt.id=ownership.property_id "
-			+ LEFT_JOIN + " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id AND od.permanent = true ";
+			+ INNER_JOIN + " cs_pt_ownershipdetails_v1 od ON ownership.id = od.owner_id AND od.permanent = true ";
 
 	private static final String PI_TABLE = " cs_pt_property_images_application pi ON pi.propertyid = pt.id " + LEFT_JOIN
 			+ " cs_pt_documents_v1 pidoc ON pidoc.reference_id =  pi.id ";
@@ -93,6 +94,19 @@ public class PropertyQueryBuilder {
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pmodified_date desc) offset_ FROM " + "({})"
 			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
+	
+	private static final String PAYMENT_SEARCH_QUERY = SELECT +" payment.*,"
+			+ " payment.id as payment_id, payment.property_id as payment_pid,payment.receiptNo as payment_receiptNo,payment.amountPaid as payment_amtPaid,"
+			+ " payment.dateOfPayment as payment_dateOfPayment,payment.mode as payment_mode,payment.created_by as payment_created_by, payment.created_date as payment_created_date,"
+			+ " payment.modified_by as payment_modified_by,payment.modified_date as payment_modified_date "
+			+ " FROM cs_pt_payment payment ";
+	
+	private static final String DEMAND_SEARCH_QUERY = SELECT + " demand.*,"
+			+ " demand.id as demand_id,demand.property_id as demand_pid,demand.initialGracePeriod as demand_IniGracePeriod, demand.generationDate as demand_genDate,"
+			+ " demand.collectionPrincipal as demand_colPrincipal,demand.remainingPrincipal as demand_remPrincipal, demand.interestSince as demand_intSince,"
+			+ " demand.mode as demand_mode, demand.created_by as demand_created_by, demand.created_date as demand_created_date,"
+			+ " demand.modified_by as demand_modified_by,demand.modified_date as demand_modified_date "
+			+ " FROM  cs_pt_demand demand ";
 
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList, PropertyCriteria criteria) {
 
@@ -115,6 +129,62 @@ public class PropertyQueryBuilder {
 		return finalQuery;
 	}
 
+	/**
+	 * 
+	 * @param criteria
+	 * @param preparedStmtList
+	 * @return
+	 */
+	public String getRentPaymentSearchQuery(AccountStatementCriteria criteria, Map<String, Object> preparedStmtList) {
+		StringBuilder query = new StringBuilder();
+		query.append(PAYMENT_SEARCH_QUERY + " WHERE ");
+		query.append(" payment.created_date >= :fromdate AND ");
+		query.append(" payment.created_date <= :todate AND ");
+		query.append(" payment.property_id = :propertyid");
+		preparedStmtList.put("fromdate", criteria.getFromDate().getTime());
+		preparedStmtList.put("todate", criteria.getToDate().getTime());
+		preparedStmtList.put("propertyid", criteria.getPropertyid());
+		return query.toString();
+	}
+	
+	/**
+	 * 
+	 * @param criteria
+	 * @param preparedStmtList
+	 * @return
+	 */
+	public String getRentDemandSearchQuery(AccountStatementCriteria criteria, Map<String, Object> preparedStmtList) {
+		StringBuilder query = new StringBuilder();
+		query.append(DEMAND_SEARCH_QUERY+" WHERE ");
+		query.append(" demand.created_date >= :fromdate AND ");
+		query.append(" demand.created_date <= :todate AND ");
+		query.append(" demand.property_id = :propertyid");
+		preparedStmtList.put("fromdate", criteria.getFromDate().getTime());
+		preparedStmtList.put("todate", criteria.getToDate().getTime());
+		preparedStmtList.put("propertyid", criteria.getPropertyid());
+		return query.toString();
+	}
+	
+	/**
+	 * 
+	 * @param criteria
+	 * @param preparedStmtList
+	 * @return
+	 */
+	public String getRentCollectionSearchQuery(AccountStatementCriteria criteria, Map<String, Object> preparedStmtList) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT * FROM cs_pt_collection WHERE ");
+		query.append(" created_date >= :fromdate AND ");
+		query.append(" created_date <= :todate AND ");
+		query.append(" payment_id IN (:paymentids) OR ");
+		query.append(" demand_id IN (:demandids) ");
+		preparedStmtList.put("fromdate", criteria.getFromDate().getTime());
+		preparedStmtList.put("todate", criteria.getToDate().getTime());
+		preparedStmtList.put("paymentids", criteria.getPaymentids());
+		preparedStmtList.put("demandids", criteria.getDemandids());
+		return query.toString();
+	}
+	
 	/**
 	 * 
 	 * @param criteria

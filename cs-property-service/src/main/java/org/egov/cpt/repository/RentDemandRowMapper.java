@@ -44,5 +44,4 @@ public class RentDemandRowMapper implements ResultSetExtractor<List<RentDemand>>
 		}
 		return new ArrayList<>(demandMap.values());
 	}
-	
 }

@@ -19,7 +19,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class RentDemand {
+public class RentDemand implements Comparable<RentDemand> {
 
   /**
    * Unique id of the demand
@@ -102,4 +102,9 @@ public class RentDemand {
   @JsonProperty("auditDetails")
   @Builder.Default
   private AuditDetails auditDetails = null;
+
+  @Override
+  public int compareTo(RentDemand other) {
+    return this.getGenerationDate().compareTo(other.getGenerationDate());
+  }
 }

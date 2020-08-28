@@ -79,10 +79,6 @@ public class OwnerDetails {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
-	@Valid
-	@JsonProperty("payment")
-	private List<Payment> payment;
-
 	@JsonProperty("fatherOrHusband")
 	private String fatherOrHusband;
 
@@ -118,9 +114,9 @@ public class OwnerDetails {
 	}
 
 	/**
-	 * This value will tell us if this got added as part of property masters or via ownership transfer application.
-	 * This should be either MasterEntry or CitizenApplication.
-	 * This 
+	 * This value will tell us if this got added as part of property masters or via
+	 * ownership transfer application. This should be either MasterEntry or
+	 * CitizenApplication. This
 	 */
 	@Builder.Default
 	@JsonProperty("applicationType")
@@ -131,7 +127,7 @@ public class OwnerDetails {
 	 */
 	@Builder.Default
 	@JsonProperty("permanent")
-	private Boolean permanent=false;
+	private Boolean permanent = false;
 
 	@JsonProperty("relationWithDeceasedAllottee")
 	private String relationWithDeceasedAllottee;
