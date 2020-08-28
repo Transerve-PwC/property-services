@@ -75,6 +75,10 @@ public class PTConstants {
 	public static final String ACTION_APPROVE = "APPROVE";
 
 	public static final String ACTION_REJECT = "REJECT";
+	
+	public static final String ACTION_REINITIATE = "REINITIATE";
+	
+	public static final String ACTION_DRAFT = "REINITIATE";
 
 	public static final String TRIGGER_NOWORKFLOW = "NOWORKFLOW";
 
