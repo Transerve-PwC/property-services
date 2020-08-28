@@ -59,20 +59,20 @@ public class PostApprovalEnrichmentService {
 
 							if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 								property.getPropertyDetails().getOwners().forEach(currentOwner -> {
-									JsonNode purchaser = null;
+									JsonNode transferee = null;
 									OwnerDetails currentOwnerDetails = null;
 									double actualOwnerShare = 0;
 									double salePercentage = 0;
-									if (application.getApplicationDetails().get("owner") != null) {
-										JsonNode ownerWhoIsSelling = application.getApplicationDetails().get("owner");
+									if (application.getApplicationDetails().get("transferor") != null) {
+										JsonNode ownerWhoIsSelling = application.getApplicationDetails().get("transferor");
 										String ownerIdWhoIsSelling = ownerWhoIsSelling.get("id").asText();
 
 										if (ownerIdWhoIsSelling.contentEquals(currentOwner.getId())) {
 											currentOwnerDetails = currentOwner.getOwnerDetails();
-											purchaser = application.getApplicationDetails().get("purchaser");
+											transferee = application.getApplicationDetails().get("transferee");
 
 											actualOwnerShare = currentOwner.getShare();
-											salePercentage = purchaser.get("percentageOfShareTransferred").asDouble();
+											salePercentage = transferee.get("percentageOfShareTransferred").asDouble();
 
 											currentOwner.setShare(actualOwnerShare - salePercentage);
 											if (actualOwnerShare == salePercentage) {
@@ -84,8 +84,8 @@ public class PostApprovalEnrichmentService {
 									/**
 									 * If purchaser is an existing owner else purchaser will be new owner
 									 */
-									if ((purchaser.get("id") != null || !purchaser.get("id").asText().contentEquals(""))
-											&& purchaser.get("id").asText().contentEquals(currentOwner.getId())) {
+									if ((transferee.get("id") != null || !transferee.get("id").asText().contentEquals(""))
+											&& transferee.get("id").asText().contentEquals(currentOwner.getId())) {
 										currentOwner.setShare(actualOwnerShare + salePercentage);
 
 										currentOwnerDetails.setIsCurrentOwner(true);
@@ -116,24 +116,24 @@ public class PostApprovalEnrichmentService {
 
 	private Owner getOwnerFromPurcheser(Application application, Property property, AuditDetails newOwnerAuditDetails) {
 
-		JsonNode purchaser = application.getApplicationDetails().get("purchaser");
+		JsonNode transferee = application.getApplicationDetails().get("transferee");
 		String gen_new_owner_id = UUID.randomUUID().toString();
 		String gen_new_owner_details_id = UUID.randomUUID().toString();
 
 		OwnerDetails newOwnerDetails = OwnerDetails.builder().id(gen_new_owner_details_id)
-				.tenantId(application.getTenantId()).ownerId(gen_new_owner_id).ownerName(purchaser.get("name").asText())
-				.guardianName(purchaser.get("fatherOrHusbandName").asText())
-				.guardianRelation(purchaser.get("relation").asText()).mobileNumber(purchaser.get("mobileNo").asText())
+				.tenantId(application.getTenantId()).ownerId(gen_new_owner_id).ownerName(transferee.get("name").asText())
+				.guardianName(transferee.get("fatherOrHusbandName").asText())
+				.guardianRelation(transferee.get("relation").asText()).mobileNumber(transferee.get("mobileNo").asText())
 
 				.possesionDate(null).allotmentNumber(null) // TODO allotment number mandatory field
 				.dateOfAllotment(System.currentTimeMillis()) // TODO what if purchaser is existing owner
 
 				.isCurrentOwner(true).isMasterEntry(false).dueAmount(BigDecimal.ZERO)
-				.address(purchaser.get("address").asText()).auditDetails(newOwnerAuditDetails).build();
+				.address(transferee.get("address").asText()).auditDetails(newOwnerAuditDetails).build();
 
 		Owner newOwner = Owner.builder().id(gen_new_owner_id).tenantId(application.getTenantId())
 				.propertyDetailsId(property.getPropertyDetails().getId())
-				.share(purchaser.get("percentageOfShareTransferred").asDouble())
+				.share(transferee.get("percentageOfShareTransferred").asDouble())
 
 				.cpNumber(null).serialNumber(null) // TODO serial number mandatory field
 
