@@ -141,8 +141,8 @@ public class PropertyQueryBuilder {
 		query.append(" payment.created_date >= :fromdate AND ");
 		query.append(" payment.created_date <= :todate AND ");
 		query.append(" payment.property_id = :propertyid");
-		preparedStmtList.put("fromdate", criteria.getFromDate().getTime());
-		preparedStmtList.put("todate", criteria.getToDate().getTime());
+		preparedStmtList.put("fromdate", criteria.getFromDate());
+		preparedStmtList.put("todate", criteria.getToDate());
 		preparedStmtList.put("propertyid", criteria.getPropertyid());
 		return query.toString();
 	}
@@ -159,8 +159,8 @@ public class PropertyQueryBuilder {
 		query.append(" demand.created_date >= :fromdate AND ");
 		query.append(" demand.created_date <= :todate AND ");
 		query.append(" demand.property_id = :propertyid");
-		preparedStmtList.put("fromdate", criteria.getFromDate().getTime());
-		preparedStmtList.put("todate", criteria.getToDate().getTime());
+		preparedStmtList.put("fromdate", criteria.getFromDate());
+		preparedStmtList.put("todate", criteria.getToDate());
 		preparedStmtList.put("propertyid", criteria.getPropertyid());
 		return query.toString();
 	}
@@ -178,8 +178,8 @@ public class PropertyQueryBuilder {
 		query.append(" created_date <= :todate AND ");
 		query.append(" payment_id IN (:paymentids) OR ");
 		query.append(" demand_id IN (:demandids) ");
-		preparedStmtList.put("fromdate", criteria.getFromDate().getTime());
-		preparedStmtList.put("todate", criteria.getToDate().getTime());
+		preparedStmtList.put("fromdate", criteria.getFromDate());
+		preparedStmtList.put("todate", criteria.getToDate());
 		preparedStmtList.put("paymentids", criteria.getPaymentids());
 		preparedStmtList.put("demandids", criteria.getDemandids());
 		return query.toString();
