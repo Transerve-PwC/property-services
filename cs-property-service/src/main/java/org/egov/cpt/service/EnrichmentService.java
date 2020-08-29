@@ -354,7 +354,7 @@ public class EnrichmentService {
 
 	private void updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
 		enrichDocuments(owner.getOwnerDetails().getOwnershipTransferDocuments(), requestInfo,
-				owner.getProperty().getId(), owner.getId(), owner.getProperty().getId());
+				owner.getProperty().getId(), owner.getId(), owner.getProperty().getTenantId());
 	}
 
 	private OwnerDetails updateOwnerShipDetails(Owner owner, Property foundProperty, RequestInfo requestInfo,
