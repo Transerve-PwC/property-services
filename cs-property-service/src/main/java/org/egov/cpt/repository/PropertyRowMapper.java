@@ -259,8 +259,8 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.lastModifiedBy(rs.getString("account_modified_by"))
 						.lastModifiedTime(rs.getLong("account_modified_date")).build();
 				RentAccount rentAccount = RentAccount.builder().id(rs.getString("account_id")).propertyId("account_pid")
-						.remainingAmount(rs.getDouble("account_remainingAmount"))
-						.tenantId(rs.getString("account_tenantid")).auditDetails(accountAuditDetails).build();
+						.remainingAmount(rs.getDouble("account_remainingAmount")).auditDetails(accountAuditDetails)
+						.build();
 				property.setRentAccount(rentAccount);
 			}
 
@@ -272,10 +272,10 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.lastModifiedBy(rs.getString("collection_modified_by"))
 						.lastModifiedTime(rs.getLong("collection_modified_date")).build();
 				RentCollection rentCollection = RentCollection.builder().id(rs.getString("collection_id"))
-						.paymentId(rs.getString("collection_payment_id")).demandId(rs.getString("collection_demand_id"))
+						.demandId(rs.getString("collection_demand_id"))
 						.interestCollected(rs.getDouble("collection_intCollected"))
 						.principalCollected(rs.getDouble("collection_principalCollected"))
-						.tenantId(rs.getString("collection_tenantid")).auditDetails(collectionAuditDetails).build();
+						.auditDetails(collectionAuditDetails).build();
 				property.addCollectionItem(rentCollection);
 			}
 		}

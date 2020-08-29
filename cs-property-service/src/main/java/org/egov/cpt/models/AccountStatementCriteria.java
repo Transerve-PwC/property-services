@@ -1,9 +1,6 @@
 package org.egov.cpt.models;
 
-import java.util.Date;
 import java.util.List;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -27,10 +24,10 @@ public class AccountStatementCriteria {
 
 	@JsonProperty("toDate")
 	private Long toDate;
-	
+
 	@JsonProperty("propertyid")
 	private String propertyid;
-	
+
 	private List<String> paymentids;
 	private List<String> demandids;
 }
