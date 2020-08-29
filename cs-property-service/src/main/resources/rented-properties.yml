@@ -315,7 +315,7 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedTime
 
-        - query: INSERT INTO cs_pt_collection(id, demand_id, interestCollected, principalCollected, collectedAt, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET interestCollected=?, principalCollected=?, modified_by=?, modified_date=?;
+        - query: INSERT INTO cs_pt_collection(id, demand_id, interestCollected, principalCollected, collectedAt, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET interestCollected=?, principalCollected=?, modified_by=?, modified_date=?;
           basePath: $.Properties.*.rentCollections.*
           jsonMaps:
             - jsonPath: $.Properties.*.rentCollections.*.id
@@ -643,7 +643,7 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedTime
 
-        - query: INSERT INTO cs_pt_collection(id, demand_id, interestCollected, principalCollected, collectedAt, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET interestCollected=?, principalCollected=?, modified_by=?, modified_date=?;
+        - query: INSERT INTO cs_pt_collection(id, demand_id, interestCollected, principalCollected, collectedAt, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET interestCollected=?, principalCollected=?, modified_by=?, modified_date=?;
           basePath: $.Properties.*.rentCollections.*
           jsonMaps:
             - jsonPath: $.Properties.*.rentCollections.*.id
