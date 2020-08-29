@@ -326,7 +326,7 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.rentCollections.*.principalCollected
 
-            - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
+            - jsonPath: $.Properties.*.rentCollections.*.collectedAt
 
             - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdBy
 
@@ -654,7 +654,7 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.rentCollections.*.principalCollected
 
-            - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
+            - jsonPath: $.Properties.*.rentCollections.*.collectedAt
 
             - jsonPath: $.Properties.*.rentCollections.*.auditDetails.createdBy
 
