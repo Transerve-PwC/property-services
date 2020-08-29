@@ -204,15 +204,12 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime
 
-
-        - query: DELETE FROM cs_pt_demand WHERE property_id=? and tenantid=?;
+        - query: DELETE FROM cs_pt_demand WHERE property_id=?;
           basePath: $.Properties.*.inActiveDemands.*
           jsonMaps:
             - jsonPath: $.Properties.*.inActiveDemands.*.propertyId
 
-            - jsonPath: $.Properties.*.inActiveDemands.*.tenantId
-
-        - query: INSERT INTO cs_pt_demand(id, property_id, initialGracePeriod, generationDate, collectionPrincipal, remainingPrincipal, interestSince,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET initialGracePeriod = ?, generationDate =?, collectionPrincipal =?,remainingPrincipal =?,interestSince=?,modified_by=?, modified_date =?;
+        - query: INSERT INTO cs_pt_demand(id, property_id, initialGracePeriod, generationDate, collectionPrincipal, remainingPrincipal, interestSince, mode, status, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET initialGracePeriod = ?, remainingPrincipal =?, interestSince=?, status = ?, modified_by=?, modified_date =?;
           basePath: $.Properties.*.demands.*
           jsonMaps:
             - jsonPath: $.Properties.*.demands.*.id
@@ -231,7 +228,7 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.demands.*.mode
 
-            - jsonPath: $.Properties.*.demands.*.tenantId
+            - jsonPath: $.Properties.*.demands.*.status
 
             - jsonPath: $.Properties.*.demands.*.auditDetails.createdBy
 
@@ -243,26 +240,22 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.demands.*.initialGracePeriod
 
-            - jsonPath: $.Properties.*.demands.*.generationDate
-
-            - jsonPath: $.Properties.*.demands.*.collectionPrincipal
-
             - jsonPath: $.Properties.*.demands.*.remainingPrincipal
 
             - jsonPath: $.Properties.*.demands.*.interestSince
+
+            - jsonPath: $.Properties.*.demands.*.status
 
             - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedBy
 
             - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedTime
 
-        - query: DELETE FROM cs_pt_payment WHERE property_id=? and tenantid=?;
+        - query: DELETE FROM cs_pt_payment WHERE property_id=?;
           basePath: $.Properties.*.inActivePayments.*
           jsonMaps:
             - jsonPath: $.Properties.*.inActivePayments.*.propertyId
 
-            - jsonPath: $.Properties.*.inActivePayments.*.tenantId
-
-        - query: INSERT INTO cs_pt_payment(id, property_id, receiptNo, amountPaid, dateOfPayment,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET receiptNo=?, amountPaid=?, dateOfPayment=?,modified_by=?, modified_date=?;
+        - query: INSERT INTO cs_pt_payment(id, property_id, receiptNo, amountPaid, dateOfPayment, mode, processed, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET receiptNo=?, amountPaid=?, processed=?, dateOfPayment=? ,modified_by=?, modified_date=?;
           basePath: $.Properties.*.payments.*
           jsonMaps:
             - jsonPath: $.Properties.*.payments.*.id
@@ -277,7 +270,7 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.payments.*.mode
 
-            - jsonPath: $.Properties.*.payments.*.tenantId
+            - jsonPath: $.Properties.*.payments.*.processed
 
             - jsonPath: $.Properties.*.payments.*.auditDetails.createdBy
 
@@ -291,13 +284,15 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.payments.*.amountPaid
 
+            - jsonPath: $.Properties.*.payments.*.processed
+
             - jsonPath: $.Properties.*.payments.*.dateOfPayment
 
             - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedBy
 
             - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedTime
 
-        - query: INSERT INTO cs_pt_account(id, property_id, remainingAmount,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET remainingAmount=?,modified_by=?, modified_date=?;
+        - query: INSERT INTO cs_pt_account(id, property_id, remainingAmount, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET remainingAmount=?, modified_by=?, modified_date=?;
           basePath: $.Properties.*.rentAccount
           jsonMaps:
             - jsonPath: $.Properties.*.rentAccount.id
@@ -305,8 +300,6 @@ serviceMaps:
             - jsonPath: $.Properties.*.rentAccount.propertyId
 
             - jsonPath: $.Properties.*.rentAccount.remainingAmount
-
-            - jsonPath: $.Properties.*.rentAccount.tenantId
 
             - jsonPath: $.Properties.*.rentAccount.auditDetails.createdBy
 
@@ -322,20 +315,16 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedTime
 
-        - query: INSERT INTO cs_pt_collection(id, demand_id, payment_id, interestCollected, principalCollected,tenantid,collectionAgainst,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET interestCollected=?, principalCollected=?,collectionAgainst=?,modified_by=?, modified_date=?;
+        - query: INSERT INTO cs_pt_collection(id, demand_id, interestCollected, principalCollected, collectedAt, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET interestCollected=?, principalCollected=?, modified_by=?, modified_date=?;
           basePath: $.Properties.*.rentCollections.*
           jsonMaps:
             - jsonPath: $.Properties.*.rentCollections.*.id
 
             - jsonPath: $.Properties.*.rentCollections.*.demandId
 
-            - jsonPath: $.Properties.*.rentCollections.*.paymentId
-
             - jsonPath: $.Properties.*.rentCollections.*.interestCollected
 
             - jsonPath: $.Properties.*.rentCollections.*.principalCollected
-
-            - jsonPath: $.Properties.*.rentCollections.*.tenantId
 
             - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
 
@@ -351,8 +340,6 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.rentCollections.*.principalCollected
 
-            - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
-
             - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedBy
 
             - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedTime
@@ -362,13 +349,11 @@ serviceMaps:
       fromTopic: update-property-csp
       isTransaction: true
       queryMaps:
-      
         - query: INSERT INTO cs_pt_property_audit_v1 SELECT * FROM cs_pt_property_v1 WHERE id = ?;
           basePath: Properties.*
           jsonMaps:
             - jsonPath: $.Properties.*.id
-            
-            
+
         - query: UPDATE cs_pt_property_v1 SET tenantid=?, colony=?, master_data_state=?, master_data_action=?, modified_by=?, modified_date=? where id=? AND transit_number=?;
           basePath: Properties.*
           jsonMaps:
@@ -387,8 +372,7 @@ serviceMaps:
             - jsonPath: $.Properties.*.id
 
             - jsonPath: $.Properties.*.transitNumber
-            
-            
+
         - query: INSERT INTO cs_pt_propertydetails_audit_v1 SELECT * FROM cs_pt_propertydetails_v1 WHERE id = ?;
           basePath: Properties.*
           jsonMaps:
@@ -424,13 +408,11 @@ serviceMaps:
             - jsonPath: $.Properties.*.propertyDetails.propertyId
 
             - jsonPath: $.Properties.*.propertyDetails.transitNumber
-            
-            
+
         - query: INSERT INTO cs_pt_ownership_audit_v1 SELECT * FROM cs_pt_ownership_v1 WHERE id = ?;
           basePath: $.Properties.*.owners.*
           jsonMaps:
             - jsonPath: $.Properties.*.owners.*.id
-            
 
         - query: UPDATE cs_pt_ownership_v1 SET tenantid=?, allotmen_number=?, active_state=?, is_primary_owner=?, modified_by=?, modified_date=? where id=?;
           basePath: $.Properties.*.owners.*
@@ -448,8 +430,7 @@ serviceMaps:
             - jsonPath: $.Properties.*.owners.*.auditDetails.lastModifiedTime
 
             - jsonPath: $.Properties.*.owners.*.id
-            
-         
+
         - query: INSERT INTO cs_pt_ownershipdetails_audit_v1 SELECT * FROM cs_pt_ownershipdetails_v1 WHERE id = ?;
           basePath: $.Properties.*.owners.*
           jsonMaps:
@@ -540,22 +521,18 @@ serviceMaps:
             - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedBy
 
             - jsonPath: $.Properties.*.propertyDetails.applicationDocuments.*.auditDetails.lastModifiedTime
-            
-        
+
         - query: INSERT INTO cs_pt_demand_audit SELECT * FROM cs_pt_demand WHERE id = ?;
           basePath: $.Properties.*.inActiveDemands.*
           jsonMaps:
             - jsonPath: $.Properties.*.inActiveDemands.*.id
-        
 
-        - query: DELETE FROM cs_pt_demand WHERE property_id=? and tenantid=?;
+        - query: DELETE FROM cs_pt_demand WHERE property_id=?;
           basePath: $.Properties.*.inActiveDemands.*
           jsonMaps:
             - jsonPath: $.Properties.*.inActiveDemands.*.propertyId
 
-            - jsonPath: $.Properties.*.inActiveDemands.*.tenantId
-
-        - query: INSERT INTO cs_pt_demand(id, property_id, initialGracePeriod, generationDate, collectionPrincipal, remainingPrincipal, interestSince,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET initialGracePeriod = ?, generationDate =?, collectionPrincipal =?,remainingPrincipal =?,interestSince=?,modified_by=?, modified_date =?;
+        - query: INSERT INTO cs_pt_demand(id, property_id, initialGracePeriod, generationDate, collectionPrincipal, remainingPrincipal, interestSince, mode, status, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET initialGracePeriod = ?, remainingPrincipal =?, interestSince=?, status = ?, modified_by=?, modified_date =?;
           basePath: $.Properties.*.demands.*
           jsonMaps:
             - jsonPath: $.Properties.*.demands.*.id
@@ -574,7 +551,7 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.demands.*.mode
 
-            - jsonPath: $.Properties.*.demands.*.tenantId
+            - jsonPath: $.Properties.*.demands.*.status
 
             - jsonPath: $.Properties.*.demands.*.auditDetails.createdBy
 
@@ -586,26 +563,22 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.demands.*.initialGracePeriod
 
-            - jsonPath: $.Properties.*.demands.*.generationDate
-
-            - jsonPath: $.Properties.*.demands.*.collectionPrincipal
-
             - jsonPath: $.Properties.*.demands.*.remainingPrincipal
 
             - jsonPath: $.Properties.*.demands.*.interestSince
+
+            - jsonPath: $.Properties.*.demands.*.status
 
             - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedBy
 
             - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedTime
 
-        - query: DELETE FROM cs_pt_payment WHERE property_id=? and tenantid=?;
+        - query: DELETE FROM cs_pt_payment WHERE property_id=?;
           basePath: $.Properties.*.inActivePayments.*
           jsonMaps:
             - jsonPath: $.Properties.*.inActivePayments.*.propertyId
 
-            - jsonPath: $.Properties.*.inActivePayments.*.tenantId
-
-        - query: INSERT INTO cs_pt_payment(id, property_id, receiptNo, amountPaid, dateOfPayment,mode,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET receiptNo=?, amountPaid=?, dateOfPayment=?,modified_by=?, modified_date=?;
+        - query: INSERT INTO cs_pt_payment(id, property_id, receiptNo, amountPaid, dateOfPayment, mode, processed, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET receiptNo=?, amountPaid=?, processed=?, dateOfPayment=? ,modified_by=?, modified_date=?;
           basePath: $.Properties.*.payments.*
           jsonMaps:
             - jsonPath: $.Properties.*.payments.*.id
@@ -620,7 +593,7 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.payments.*.mode
 
-            - jsonPath: $.Properties.*.payments.*.tenantId
+            - jsonPath: $.Properties.*.payments.*.processed
 
             - jsonPath: $.Properties.*.payments.*.auditDetails.createdBy
 
@@ -634,19 +607,20 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.payments.*.amountPaid
 
+            - jsonPath: $.Properties.*.payments.*.processed
+
             - jsonPath: $.Properties.*.payments.*.dateOfPayment
 
             - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedBy
 
             - jsonPath: $.Properties.*.payments.*.auditDetails.lastModifiedTime
-            
-            
+
         - query: INSERT INTO cs_pt_account_audit SELECT * FROM cs_pt_account WHERE id = ?;
           basePath: $.Properties.*.rentAccount
           jsonMaps:
             - jsonPath: $.Properties.*.rentAccount.id
 
-        - query: INSERT INTO cs_pt_account(id, property_id, remainingAmount,tenantid,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET remainingAmount=?,modified_by=?, modified_date=?;
+        - query: INSERT INTO cs_pt_account(id, property_id, remainingAmount, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET remainingAmount=?, modified_by=?, modified_date=?;
           basePath: $.Properties.*.rentAccount
           jsonMaps:
             - jsonPath: $.Properties.*.rentAccount.id
@@ -654,8 +628,6 @@ serviceMaps:
             - jsonPath: $.Properties.*.rentAccount.propertyId
 
             - jsonPath: $.Properties.*.rentAccount.remainingAmount
-
-            - jsonPath: $.Properties.*.rentAccount.tenantId
 
             - jsonPath: $.Properties.*.rentAccount.auditDetails.createdBy
 
@@ -671,20 +643,16 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedTime
 
-        - query: INSERT INTO cs_pt_collection(id, demand_id, payment_id, interestCollected, principalCollected,tenantid,collectionAgainst,created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET interestCollected=?, principalCollected=?,collectionAgainst=?,modified_by=?, modified_date=?;
+        - query: INSERT INTO cs_pt_collection(id, demand_id, interestCollected, principalCollected, collectedAt, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)ON CONFLICT (id) DO UPDATE SET interestCollected=?, principalCollected=?, modified_by=?, modified_date=?;
           basePath: $.Properties.*.rentCollections.*
           jsonMaps:
             - jsonPath: $.Properties.*.rentCollections.*.id
 
             - jsonPath: $.Properties.*.rentCollections.*.demandId
 
-            - jsonPath: $.Properties.*.rentCollections.*.paymentId
-
             - jsonPath: $.Properties.*.rentCollections.*.interestCollected
 
             - jsonPath: $.Properties.*.rentCollections.*.principalCollected
-
-            - jsonPath: $.Properties.*.rentCollections.*.tenantId
 
             - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
 
@@ -699,8 +667,6 @@ serviceMaps:
             - jsonPath: $.Properties.*.rentCollections.*.interestCollected
 
             - jsonPath: $.Properties.*.rentCollections.*.principalCollected
-
-            - jsonPath: $.Properties.*.rentCollections.*.collectionAgainst
 
             - jsonPath: $.Properties.*.rentCollections.*.auditDetails.lastModifiedBy
 
@@ -800,8 +766,6 @@ serviceMaps:
             - jsonPath: $.Owners.*.ownerDetails.dueAmount
 
             - jsonPath: $.Owners.*.ownerDetails.aproCharge
-
-        
 
     - version: 1.0
       description: Persists Owners details in cs_pt_ownership_v1 table
