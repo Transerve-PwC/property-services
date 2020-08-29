@@ -23,9 +23,6 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Service
 public class PostApprovalEnrichmentService {
 

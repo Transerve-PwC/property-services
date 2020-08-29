@@ -32,9 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Service
 public class EnrichmentService {
 
@@ -86,11 +83,10 @@ public class EnrichmentService {
 	}
 
 	public void validateMortgageDetails(Property property, Owner owner, RequestInfo requestInfo, String id) {
-		// TODO Auto-generated method stub
 		MortgageDetails mortgage = owner.getMortgageDetails();
 		List<Map<String, Object>> fieldConfigurations = mdmsservice.getMortgageDocumentConfig(mortgage.getMortgageType(), requestInfo, property.getTenantId());
 		
-		//To Do :: write code to validate documents base on master json template.
+		//TODO :: write code to validate documents base on master json template.
 	}
 
 	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {

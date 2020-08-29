@@ -114,10 +114,6 @@ public class DateRangeValidator implements IApplicationValidator {
 				 * 	Both dates are equal dates - if (startDate.compareTo(endDate) == 0  )
 				 */
 
-				if(null == actualDateValidat) {
-					return false;
-				}
-
 				if(startDate.compareTo(endDate) > 0 || startDate.compareTo(endDate) == 0 ) {
 					return false;
 				}
