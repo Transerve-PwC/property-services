@@ -860,7 +860,7 @@ public class EnrichmentService {
 
 	private void enrichDocuments(List<Document> documents, RequestInfo requestInfo, String propertyId,
 			String referenceId, String tenantId) {
-		if (!CollectionUtils.isEmpty(documents)) {
+		if (CollectionUtils.isEmpty(documents)) {
 			return;
 		}
 		AuditDetails documentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
