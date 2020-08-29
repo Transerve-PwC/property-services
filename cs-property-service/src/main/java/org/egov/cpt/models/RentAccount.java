@@ -16,21 +16,18 @@ import lombok.Setter;
 @Builder
 @EqualsAndHashCode
 public class RentAccount {
-	
+
 	@JsonProperty("id")
 	private String id;
-	
+
 	@JsonProperty("propertyId")
 	private String propertyId;
-	
+
 	@JsonProperty("remainingAmount")
-	private Double remainingAmount;
-	
-	@JsonProperty("tenantId")
-	private String tenantId;
+	@Builder.Default
+	private Double remainingAmount = 0D;
 
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
-	
+	private AuditDetails auditDetails;
 
 }

@@ -15,6 +15,7 @@ import org.egov.cpt.models.RentAccount;
 import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
+import org.egov.cpt.models.RentSummary;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +29,11 @@ public class RentCollectionServiceTests {
     private final String FEB_1_2020 = "01 02 2020";
     private final String FEB_15_2020 = "15 02 2020";
     private final String MAY_1_2020 = "01 05 2020";
-    private final double DEFAULT_INTEREST_RATE = 25D;
+    private final String DEC_1_1998 = "01 12 1998";
+    private final String JAN_1_1999 = "01 01 1999";
+    private final String FEB_1_1999 = "01 02 1999";
+    private final String FEB_16_1999 = "16 02 1999";
+    private final double DEFAULT_INTEREST_RATE = 24D;
     private final double ZERO_INTEREST_RATE = 0D;
 
     RentCollectionService rentCollectionService;
@@ -139,12 +144,28 @@ public class RentCollectionServiceTests {
     }
 
     @Test
+    public void testSimpleInterestSettlement() throws ParseException {
+        List<RentDemand> demands = Arrays.asList(getDemand(100, DEC_1_1998), getDemand(100, JAN_1_1999),
+                getDemand(100, FEB_1_1999));
+        List<RentPayment> payments = Arrays.asList(getPayment(200, FEB_16_1999));
+        RentAccount account = getAccount(0);
+        List<RentCollection> collections = this.rentCollectionService.settle(demands, payments, account,
+                DEFAULT_INTEREST_RATE);
+        RentSummary summary = this.rentCollectionService.calculateRentSummaryAt(demands, account, DEFAULT_INTEREST_RATE,
+                getEpochFromDateString(FEB_16_1999));
+        assertEquals(0, summary.getBalanceAmount(), 0.1);
+    }
+
+    @Test
     public void testInterestSettlement() throws ParseException {
         List<RentDemand> demands = getDemands(500, JAN_1_2020, 10);
         List<RentPayment> payments = getPayments(500, MAY_1_2020, 10);
         RentAccount account = getAccount(0);
-        List<RentCollection> collections = this.rentCollectionService.settle(demands, payments, account, 25);
+        List<RentCollection> collections = this.rentCollectionService.settle(demands, payments, account,
+                DEFAULT_INTEREST_RATE);
         assertEquals(29, collections.size());
+        RentSummary summary = this.rentCollectionService.calculateRentSummary(demands, account, DEFAULT_INTEREST_RATE);
+        assertEquals(0, summary.getBalanceAmount(), 0.1);
     }
 
     private long getEpochFromDateString(String date) throws ParseException {

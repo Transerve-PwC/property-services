@@ -14,18 +14,12 @@ import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.MortgageApplicant;
 import org.egov.cpt.models.MortgageApprovedGrantDetails;
 import org.egov.cpt.models.Property;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Component
 public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
-
-	@Autowired
-	private ObjectMapper mapper;
 
 	@Override
 	public List<Mortgage> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -48,8 +42,7 @@ public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
 				currentapplication = Mortgage.builder().id(mortgageId).property(property)
 						.tenantId(rs.getString("tenantid")).state(rs.getString("state")).action(rs.getString("action"))
 						.applicationNumber(rs.getString("app_number"))
-						.allotmentNumber(rs.getString("owner_allot_number"))
-						.auditDetails(auditdetails).build();
+						.allotmentNumber(rs.getString("owner_allot_number")).auditDetails(auditdetails).build();
 				applicationMap.put(mortgageId, currentapplication);
 			}
 			addChildrenToProperty(rs, currentapplication);
@@ -99,11 +92,10 @@ public class MortgageRowMapper implements ResultSetExtractor<List<Mortgage>> {
 		}
 
 		if (rs.getString("docId") != null && rs.getBoolean("doc_active")) {
-			Document applicationDocument = Document.builder()
-					.documentType(rs.getString("doctype")).fileStoreId(rs.getString("doc_filestoreid"))
-					.id(rs.getString("docId")).tenantId(rs.getString("doctenantid")).active(rs.getBoolean("doc_active"))
-					.referenceId(rs.getString("doc_referenceid"))
-					.propertyId(rs.getString("doc_propertyid"))
+			Document applicationDocument = Document.builder().documentType(rs.getString("doctype"))
+					.fileStoreId(rs.getString("doc_filestoreid")).id(rs.getString("docId"))
+					.tenantId(rs.getString("doctenantid")).active(rs.getBoolean("doc_active"))
+					.referenceId(rs.getString("doc_referenceid")).propertyId(rs.getString("doc_propertyid"))
 					.auditDetails(auditDetails).build();
 			currentapplication.addApplicationDocumentsItem(applicationDocument);
 		}

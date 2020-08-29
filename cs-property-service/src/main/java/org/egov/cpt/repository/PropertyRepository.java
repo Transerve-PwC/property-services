@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
@@ -16,13 +17,13 @@ import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyImages;
 import org.egov.cpt.models.RentAccount;
+import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -32,8 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Repository
 public class PropertyRepository {
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private PropertyQueryBuilder queryBuilder;
@@ -43,25 +42,25 @@ public class PropertyRepository {
 
 	@Autowired
 	private DuplicateCopyPropertyRowMapper duplicateCopyPropertyRowMapper;
-	
+
 	@Autowired
 	private DuplicateCopyQueryBuilder duplicatecopyQueryBuilder;
-	
+
 	@Autowired
 	private MortgageRowMapper mortgageRowMapper;
-	
+
 	@Autowired
 	private MortgageQueryBuilder mortgageQueryBuilder;
-	
+
 	@Autowired
 	private PropertyImagesRowMapper propertyImagesRowMapper;
-	
+
 	@Autowired
 	private PropertyImagesQueryBuilder propertyImagesQueryBuilder;
-	
+
 	@Autowired
 	private NoticeRowMapper noticeRowMapper;
-	
+
 	@Autowired
 	private NoticeQueryBuilder noticeQueryBuilder;
 
@@ -73,19 +72,19 @@ public class PropertyRepository {
 
 	@Autowired
 	WorkflowIntegrator workflowIntegrator;
-	
+
 	@Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-	
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
 	@Autowired
 	private RentDetailQueryBuilder rentQueryBuilder;
-	
+
 	@Autowired
 	private RentDemandRowMapper rentDemandrowMapper;
-	
+
 	@Autowired
 	private RentPaymentRowMapper rentPaymentrowMapper;
-	
+
 	@Autowired
 	private RentAccountRowMapper rentAccountrowMapper;
 
@@ -93,64 +92,63 @@ public class PropertyRepository {
 
 		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
-		log.info("query:"+query);
-		log.info("preparedStmtList:"+preparedStmtList);
+		log.info("query:" + query);
+		log.info("preparedStmtList:" + preparedStmtList);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, rowMapper);
 	}
-	
+
 	public List<RentDemand> getPropertyRentDemandDetails(PropertyCriteria criteria) {
 		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = rentQueryBuilder.getPropertyRentDemandSearchQuery(criteria, preparedStmtList);
-		log.info("query:"+query);
-		log.info("preparedStmtList:"+preparedStmtList);
+		log.info("query:" + query);
+		log.info("preparedStmtList:" + preparedStmtList);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, rentDemandrowMapper);
-		
+
 	}
-	
+
 	public List<RentPayment> getPropertyRentPaymentDetails(PropertyCriteria criteria) {
 		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = rentQueryBuilder.getPropertyRentPaymentSearchQuery(criteria, preparedStmtList);
-		log.info("query:"+query);
-		log.info("preparedStmtList:"+preparedStmtList);
+		log.info("query:" + query);
+		log.info("preparedStmtList:" + preparedStmtList);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, rentPaymentrowMapper);
-		
+
 	}
-	
+
 	public RentAccount getPropertyRentAccountDetails(PropertyCriteria criteria) {
 		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = rentQueryBuilder.getPropertyRentAccountSearchQuery(criteria, preparedStmtList);
-		log.info("query:"+query);
-		log.info("preparedStmtList:"+preparedStmtList);
+		log.info("query:" + query);
+		log.info("preparedStmtList:" + preparedStmtList);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, rentAccountrowMapper);
 	}
-
 
 	public List<DuplicateCopy> getDuplicateCopyProperties(DuplicateCopySearchCriteria criteria) {
 		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = duplicatecopyQueryBuilder.getDuplicateCopyPropertySearchQuery(criteria, preparedStmtList);
-//		log.info("SearchQuery:"+query);
+		// log.info("SearchQuery:"+query);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, duplicateCopyPropertyRowMapper);
 	}
-	
-	//PI
+
+	// PI
 	public List<PropertyImages> getPropertyImagesProperties(DuplicateCopySearchCriteria criteria) {
 		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = propertyImagesQueryBuilder.getPropertyImagesSearchQuery(criteria, preparedStmtList);
-//		log.info("SearchQuery:"+query);
+		// log.info("SearchQuery:"+query);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, propertyImagesRowMapper);
 	}
 
 	public List<Mortgage> getMortgageProperties(DuplicateCopySearchCriteria criteria) {
 		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = mortgageQueryBuilder.getMortgageSearchQuery(criteria, preparedStmtList);
-		log.info("MortgageSearchQuery:"+query);
+		log.info("MortgageSearchQuery:" + query);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, mortgageRowMapper);
 	}
-	
+
 	public List<NoticeGeneration> getNotices(NoticeSearchCriteria criteria) {
 		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = noticeQueryBuilder.getNoticeSearchQuery(criteria, preparedStmtList);
-		log.info("noticeSearchQuery:"+query);
+		log.info("noticeSearchQuery:" + query);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, noticeRowMapper);
 	}
 
@@ -175,5 +173,28 @@ public class PropertyRepository {
 		}
 	}
 
-	
+	public List<RentPayment> getRentPayments(AccountStatementCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = queryBuilder.getRentPaymentSearchQuery(criteria, preparedStmtList);
+		log.info("query:" + query);
+		log.info("preparedStmtList:" + preparedStmtList);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, rentPaymentrowMapper);
+	}
+
+	public List<RentDemand> getRentDemands(AccountStatementCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = queryBuilder.getRentDemandSearchQuery(criteria, preparedStmtList);
+		log.info("query:" + query);
+		log.info("preparedStmtList:" + preparedStmtList);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, rentDemandrowMapper);
+	}
+
+	public List<RentCollection> getRentCollections(AccountStatementCriteria criteria) {
+		Map<String, Object> preparedStmtList = new HashMap<>();
+		String query = queryBuilder.getRentCollectionSearchQuery(criteria, preparedStmtList);
+		log.info("query:" + query);
+		log.info("preparedStmtList:" + preparedStmtList);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, new RentCollectionRowMapper());
+	}
+
 }

@@ -3,6 +3,7 @@ package org.egov.cpt.service;
 import java.util.List;
 
 import org.egov.cpt.models.RentAccount;
+import org.egov.cpt.models.RentAccountStatement;
 import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
@@ -37,9 +38,37 @@ public interface IRentCollectionService {
 	 * @return
 	 */
 
-	// public RentSummary getRentSummary(ArrayList<RentDemand> demands,
-	// List<RentCollection> collections, List<RentPayment> payment);
+	/**
+	 * Get the rent summary
+	 * 
+	 * @param demands
+	 * @param rentAccount
+	 * @param interestRate
+	 * @return
+	 */
+	public RentSummary calculateRentSummary(List<RentDemand> demands, RentAccount rentAccount, double interestRate);
 
-	// Function parameters changed by Pooja
-	public RentSummary paymentSummary(List<RentDemand> demands, RentAccount rentAccount);
+	/**
+	 * Get the rent summary
+	 * 
+	 * @param demands
+	 * @param rentAccount
+	 * @param interestRate
+	 * @param atTimestamp
+	 * @return
+	 */
+	public RentSummary calculateRentSummaryAt(List<RentDemand> demands, RentAccount rentAccount, double interestRate,
+			long atTimestamp);
+
+	/**
+	 * @apiNote This will provide the account statement between the date specified
+	 *          by the user.
+	 * @param demands
+	 * @param payments
+	 * @param lstCollection
+	 * @return List<RentAccountStatement>
+	 */
+	public List<RentAccountStatement> accountStatement(List<RentDemand> demands, List<RentPayment> payments,
+			List<RentCollection> collections, Long fromDateTimestamp, Long toDateTimestamp);
+
 }

@@ -13,18 +13,12 @@ import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Property;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Component
 public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<DuplicateCopy>> {
-
-	@Autowired
-	private ObjectMapper mapper;
 
 	@Override
 	public List<DuplicateCopy> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -48,8 +42,7 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 				currentapplication = DuplicateCopy.builder().id(applicationId).property(property)
 						.tenantId(rs.getString("tenantid")).state(rs.getString("state")).action(rs.getString("action"))
 						.applicationNumber(rs.getString("app_number"))
-						.allotmentNumber(rs.getString("owner_allot_number"))
-						.auditDetails(auditdetails).build();
+						.allotmentNumber(rs.getString("owner_allot_number")).auditDetails(auditdetails).build();
 				applicationMap.put(applicationId, currentapplication);
 			}
 			addChildrenToProperty(rs, currentapplication);
@@ -85,14 +78,10 @@ public class DuplicateCopyPropertyRowMapper implements ResultSetExtractor<List<D
 		}
 
 		if (rs.getString("docId") != null && rs.getBoolean("doc_active")) {
-			Document applicationDocument = Document.builder()
-					.documentType(rs.getString("doctype"))
-					.fileStoreId(rs.getString("doc_filestoreid"))
-					.id(rs.getString("docId"))
-					.referenceId(rs.getString("doc_referenceid"))
-					.tenantId(rs.getString("doctenantid"))
-					.active(rs.getBoolean("doc_active"))
-					.auditDetails(auditDetails)
+			Document applicationDocument = Document.builder().documentType(rs.getString("doctype"))
+					.fileStoreId(rs.getString("doc_filestoreid")).id(rs.getString("docId"))
+					.referenceId(rs.getString("doc_referenceid")).tenantId(rs.getString("doctenantid"))
+					.active(rs.getBoolean("doc_active")).auditDetails(auditDetails)
 					.propertyId(rs.getString("doc_propertyid")).build();
 			currentapplication.addApplicationDocumentsItem(applicationDocument);
 		}

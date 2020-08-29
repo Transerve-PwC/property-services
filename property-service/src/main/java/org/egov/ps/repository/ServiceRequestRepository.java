@@ -18,9 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ServiceRequestRepository {
 
 	@Autowired
-	private ObjectMapper mapper;
-
-	@Autowired
 	private RestTemplate restTemplate;
 
 

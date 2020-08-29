@@ -7,33 +7,24 @@ import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.EmailRequest;
-import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.SMSRequest;
-import org.egov.cpt.repository.ServiceRequestRepository;
 import org.egov.cpt.util.NotificationUtil;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Service
 public class PropertyNotificationService {
 
 	private PropertyConfiguration config;
 
-	private ServiceRequestRepository serviceRequestRepository;
-
 	private NotificationUtil util;
 
 	@Autowired
-	public PropertyNotificationService(PropertyConfiguration config, ServiceRequestRepository serviceRequestRepository,
-			NotificationUtil util) {
+	public PropertyNotificationService(PropertyConfiguration config, NotificationUtil util) {
 		this.config = config;
-		this.serviceRequestRepository = serviceRequestRepository;
 		this.util = util;
 	}
 
@@ -55,37 +46,38 @@ public class PropertyNotificationService {
 				}
 			}
 		}
-		if(null != config.getIsEMAILNotificationEnabled()) {
-			if(config.getIsEMAILNotificationEnabled()) {
-				enrichEMAILRequest(request,emailRequest);
-				if(!CollectionUtils.isEmpty(emailRequest))
-					util.sendEMAIL(emailRequest,true);
+		if (null != config.getIsEMAILNotificationEnabled()) {
+			if (config.getIsEMAILNotificationEnabled()) {
+				enrichEMAILRequest(request, emailRequest);
+				if (!CollectionUtils.isEmpty(emailRequest))
+					util.sendEMAIL(emailRequest, true);
 			}
 		}
 
 	}
 
 	private void enrichEMAILRequest(OwnershipTransferRequest request, List<EmailRequest> emailRequest) {
-		 String tenantId = request.getOwners().get(0).getTenantId();
-	        for(Owner owner : request.getOwners()){
-	        	Map<String,String > emailIdToApplicant = new HashMap<>();
-	            
-	                if(owner.getOwnerDetails().getEmail()!= null)
-	                	emailIdToApplicant.put(owner.getOwnerDetails().getEmail(),owner.getOwnerDetails().getName());
-	           
-	                if (emailIdToApplicant.isEmpty()) {
-	            	continue;
-	            }
-				String message = null;
-				String localizationMessages;
-						localizationMessages = util.getLocalizationMessages(tenantId, request.getRequestInfo());
-						message = util.getCustomizedOTMsg(request.getRequestInfo(), owner, localizationMessages);
-	            if(message==null) continue;
+		String tenantId = request.getOwners().get(0).getTenantId();
+		for (Owner owner : request.getOwners()) {
+			Map<String, String> emailIdToApplicant = new HashMap<>();
 
-				message = message.replace("\\n", "\n");
-				emailRequest.addAll(util.createEMAILRequest(message,emailIdToApplicant));
-	        }
-		
+			if (owner.getOwnerDetails().getEmail() != null)
+				emailIdToApplicant.put(owner.getOwnerDetails().getEmail(), owner.getOwnerDetails().getName());
+
+			if (emailIdToApplicant.isEmpty()) {
+				continue;
+			}
+			String message = null;
+			String localizationMessages;
+			localizationMessages = util.getLocalizationMessages(tenantId, request.getRequestInfo());
+			message = util.getCustomizedOTMsg(request.getRequestInfo(), owner, localizationMessages);
+			if (message == null)
+				continue;
+
+			message = message.replace("\\n", "\n");
+			emailRequest.addAll(util.createEMAILRequest(message, emailIdToApplicant));
+		}
+
 	}
 
 	/**

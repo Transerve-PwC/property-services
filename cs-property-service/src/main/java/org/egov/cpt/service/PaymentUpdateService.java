@@ -1,10 +1,11 @@
 package org.egov.cpt.service;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
@@ -27,8 +28,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -42,8 +41,6 @@ public class PaymentUpdateService {
 	private DuplicateCopyService duplicateCopyService;
 
 	private PropertyRepository propertyRepository;
-
-	private EnrichmentService enrichmentService;
 
 	private ObjectMapper mapper;
 
@@ -60,13 +57,12 @@ public class PaymentUpdateService {
 	@Autowired
 	public PaymentUpdateService(OwnershipTransferService ownershipTransferService,
 			OwnershipTransferRepository repositoryOt, DuplicateCopyService duplicateCopyService,
-			PropertyRepository propertyRepository, EnrichmentService enrichmentService, ObjectMapper mapper,
-			WorkflowService workflowService, PropertyUtil util) {
+			PropertyRepository propertyRepository, ObjectMapper mapper, WorkflowService workflowService,
+			PropertyUtil util) {
 		this.ownershipTransferService = ownershipTransferService;
 		this.repositoryOt = repositoryOt;
 		this.duplicateCopyService = duplicateCopyService;
 		this.propertyRepository = propertyRepository;
-		this.enrichmentService = enrichmentService;
 		this.mapper = mapper;
 		this.workflowService = workflowService;
 		this.util = util;
@@ -95,77 +91,79 @@ public class PaymentUpdateService {
 
 					String wfbusinessServiceName = null;
 					switch (paymentDetail.getBusinessService()) {
-					case PTConstants.BUSINESS_SERVICE_OT:
-						wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_OT;
+						case PTConstants.BUSINESS_SERVICE_OT:
+							wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_OT;
 
-						DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
-						searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
+							DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
+							searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
 
-						List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria,
-								requestInfo);
+							List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria,
+									requestInfo);
 
-						BusinessService otBusinessService = workflowService
-								.getBusinessService(owners.get(0).getTenantId(), requestInfo, wfbusinessServiceName);
+							BusinessService otBusinessService = workflowService.getBusinessService(
+									owners.get(0).getTenantId(), requestInfo, wfbusinessServiceName);
 
-						if (CollectionUtils.isEmpty(owners))
-							throw new CustomException("INVALID RECEIPT",
-									"No Owner found for the comsumerCode " + searchCriteria.getApplicationNumber());
+							if (CollectionUtils.isEmpty(owners))
+								throw new CustomException("INVALID RECEIPT",
+										"No Owner found for the comsumerCode " + searchCriteria.getApplicationNumber());
 
-						owners.forEach(owner -> owner.setApplicationAction(PTConstants.ACTION_PAY));
+							owners.forEach(owner -> owner.setApplicationAction(PTConstants.ACTION_PAY));
 
-						Role role = Role.builder().code("SYSTEM_PAYMENT").build();
-						requestInfo.getUserInfo().getRoles().add(role);
-						OwnershipTransferRequest updateRequest = OwnershipTransferRequest.builder()
-								.requestInfo(requestInfo).owners(owners).build();
+							Role role = Role.builder().code("SYSTEM_PAYMENT").build();
+							requestInfo.getUserInfo().getRoles().add(role);
+							OwnershipTransferRequest updateRequest = OwnershipTransferRequest.builder()
+									.requestInfo(requestInfo).owners(owners).build();
 
-						updateRequest.getOwners().forEach(
-								obj -> log.info(" the status of the application is : " + obj.getApplicationState()));
+							updateRequest.getOwners().forEach(obj -> log
+									.info(" the status of the application is : " + obj.getApplicationState()));
 
-						List<String> endStates = Collections.nCopies(updateRequest.getOwners().size(),
-								PTConstants.STATUS_APPROVED);
+							// List<String> endStates =
+							// Collections.nCopies(updateRequest.getOwners().size(),
+							// PTConstants.STATUS_APPROVED);
 
-//						enrichmentService.postStatusEnrichment(updateRequest, endStates);
+							// enrichmentService.postStatusEnrichment(updateRequest, endStates);
 
-						Map<String, Boolean> idToIsStateUpdatableMap = util
-								.getIdToIsStateUpdatableMap(otBusinessService, owners);
+							Map<String, Boolean> idToIsStateUpdatableMap = util
+									.getIdToIsStateUpdatableMap(otBusinessService, owners);
 
-						repositoryOt.update(updateRequest, idToIsStateUpdatableMap);
-						break;
+							repositoryOt.update(updateRequest, idToIsStateUpdatableMap);
+							break;
 
-					case PTConstants.BUSINESS_SERVICE_DC:
-						wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_DC;
+						case PTConstants.BUSINESS_SERVICE_DC:
+							wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_DC;
 
-						DuplicateCopySearchCriteria searchCriteriaDc = new DuplicateCopySearchCriteria();
-						searchCriteriaDc.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
+							DuplicateCopySearchCriteria searchCriteriaDc = new DuplicateCopySearchCriteria();
+							searchCriteriaDc.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
 
-						List<DuplicateCopy> dcApplications = duplicateCopyService.searchApplication(searchCriteriaDc,
-								requestInfo);
+							List<DuplicateCopy> dcApplications = duplicateCopyService
+									.searchApplication(searchCriteriaDc, requestInfo);
 
-						BusinessService dcBusinessService = workflowService.getBusinessService(
-								dcApplications.get(0).getTenantId(), requestInfo, wfbusinessServiceName);
+							BusinessService dcBusinessService = workflowService.getBusinessService(
+									dcApplications.get(0).getTenantId(), requestInfo, wfbusinessServiceName);
 
-						if (CollectionUtils.isEmpty(dcApplications))
-							throw new CustomException("INVALID RECEIPT",
-									"No Owner found for the comsumerCode " + searchCriteriaDc.getApplicationNumber());
+							if (CollectionUtils.isEmpty(dcApplications))
+								throw new CustomException("INVALID RECEIPT", "No Owner found for the comsumerCode "
+										+ searchCriteriaDc.getApplicationNumber());
 
-						dcApplications.forEach(dcApplication -> dcApplication.setAction(PTConstants.ACTION_PAY));
+							dcApplications.forEach(dcApplication -> dcApplication.setAction(PTConstants.ACTION_PAY));
 
-						DuplicateCopyRequest updateDCRequest = DuplicateCopyRequest.builder().requestInfo(requestInfo)
-								.duplicateCopyApplications(dcApplications).build();
+							DuplicateCopyRequest updateDCRequest = DuplicateCopyRequest.builder()
+									.requestInfo(requestInfo).duplicateCopyApplications(dcApplications).build();
 
-						updateDCRequest.getDuplicateCopyApplications()
-								.forEach(obj -> log.info(" the status of the application is : " + obj.getState()));
+							updateDCRequest.getDuplicateCopyApplications()
+									.forEach(obj -> log.info(" the status of the application is : " + obj.getState()));
 
-						List<String> dcEndStates = Collections.nCopies(
-								updateDCRequest.getDuplicateCopyApplications().size(), PTConstants.STATUS_APPROVED);
+							// List<String> dcEndStates =
+							// Collections.nCopies(updateDCRequest.getDuplicateCopyApplications().size(),
+							// PTConstants.STATUS_APPROVED);
 
-//						enrichmentService.postStatusEnrichmentDC(updateDCRequest, dcEndStates);
+							// enrichmentService.postStatusEnrichmentDC(updateDCRequest, dcEndStates);
 
-						Map<String, Boolean> idToIsStateUpdatableMapDc = util
-								.getIdToIsStateUpdatableMapDc(dcBusinessService, dcApplications);
+							Map<String, Boolean> idToIsStateUpdatableMapDc = util
+									.getIdToIsStateUpdatableMapDc(dcBusinessService, dcApplications);
 
-						propertyRepository.updateDcPayment(updateDCRequest, idToIsStateUpdatableMapDc);
-						break;
+							propertyRepository.updateDcPayment(updateDCRequest, idToIsStateUpdatableMapDc);
+							break;
 					}
 				}
 			}

@@ -1,6 +1,5 @@
 package org.egov.cpt.repository;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +13,6 @@ import org.egov.cpt.producer.Producer;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -24,8 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 @Repository
 @Slf4j
 public class OwnershipTransferRepository {
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private OwnershipTransferQueryBuilder queryBuilder;
@@ -41,9 +37,9 @@ public class OwnershipTransferRepository {
 
 	@Autowired
 	WorkflowIntegrator workflowIntegrator;
-	
+
 	@Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 	public List<Owner> searchOwnershipTransfer(DuplicateCopySearchCriteria criteria) {
 

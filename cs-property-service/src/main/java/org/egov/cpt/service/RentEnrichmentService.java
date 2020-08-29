@@ -1,10 +1,12 @@
 package org.egov.cpt.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.models.AuditDetails;
+import org.egov.cpt.models.ModeEnum;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RentAccount;
@@ -37,7 +39,7 @@ public class RentEnrichmentService {
 
 	private void enrichPropertyRentdata(Property property, RequestInfo requestInfo) {
 
-		if (CollectionUtils.isEmpty(property.getDemands())) {
+		if (CollectionUtils.isEmpty(property.getDemands()) && CollectionUtils.isEmpty(property.getPayments())) {
 			return;
 		}
 
@@ -45,7 +47,7 @@ public class RentEnrichmentService {
 		RentAccount account = propertyRepository.getPropertyRentAccountDetails(criteria);
 		if (account == null) {
 			account = RentAccount.builder().remainingAmount(0D).id(UUID.randomUUID().toString())
-					.propertyId(property.getId()).tenantId(property.getTenantId())
+					.propertyId(property.getId())
 					.auditDetails(propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true)).build();
 		}
 		property.setRentAccount(account);
@@ -53,13 +55,19 @@ public class RentEnrichmentService {
 		/**
 		 * Delete existing data as new data is coming in.
 		 */
-		if (property.getDemands().stream().filter(demand -> demand.getId() == null || demand.getId().isEmpty())
-				.findAny().isPresent()) {
-			List<RentDemand> demands = propertyRepository.getPropertyRentDemandDetails(criteria);
-			 List<RentPayment> payments = propertyRepository.getPropertyRentPaymentDetails(criteria);
-			property.setInActiveDemands(demands);
-			property.setInActivePayments(payments);
+		boolean hasAnyNewDemandOrPayment = property.getDemands().stream()
+				.filter(demand -> demand.getId() == null || demand.getId().isEmpty()).findAny().isPresent()
+				|| property.getPayments().stream()
+						.filter(payment -> payment.getId() == null || payment.getId().isEmpty()).findAny().isPresent();
+		if (hasAnyNewDemandOrPayment) {
+			List<RentDemand> existingDemands = propertyRepository.getPropertyRentDemandDetails(criteria);
+			List<RentPayment> existingPayments = propertyRepository.getPropertyRentPaymentDetails(criteria);
+			property.setInActiveDemands(existingDemands);
+			property.setInActivePayments(existingPayments);
 			account.setRemainingAmount(0D);
+		} else {
+			property.setInActiveDemands(Collections.emptyList());
+			property.setInActivePayments(Collections.emptyList());
 		}
 
 		property.getDemands().forEach(demand -> {
@@ -70,9 +78,10 @@ public class RentEnrichmentService {
 				demand.setPropertyId(property.getId());
 				demand.setRemainingPrincipal(demand.getCollectionPrincipal());
 				demand.setInterestSince(demand.getGenerationDate());
-				demand.setMode(RentDemand.ModeEnum.fromValue(PTConstants.MODE_UPLOADED));
-				demand.setTenantId(property.getTenantId());
+				demand.setMode(ModeEnum.fromValue(PTConstants.MODE_UPLOADED));
 				demand.setAuditDetails(demandAuditDetails);
+			} else {
+				demand.getId();
 			}
 		});
 
@@ -82,9 +91,10 @@ public class RentEnrichmentService {
 						true);
 				payment.setId(UUID.randomUUID().toString());
 				payment.setPropertyId(property.getId());
-				payment.setMode(RentPayment.ModeEnum.fromValue(PTConstants.MODE_UPLOADED));
-				payment.setTenantId(property.getTenantId());
+				payment.setMode(ModeEnum.fromValue(PTConstants.MODE_UPLOADED));
 				payment.setAuditDetails(paymentAuditDetails);
+			} else {
+				payment.getId();
 			}
 		});
 	}
@@ -100,7 +110,6 @@ public class RentEnrichmentService {
 							AuditDetails rentAuditDetails = propertyutil
 									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 							collection.setId(UUID.randomUUID().toString());
-							collection.setTenantId(property.getTenantId());
 							collection.setAuditDetails(rentAuditDetails);
 						}
 

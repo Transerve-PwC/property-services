@@ -5,11 +5,10 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.common.contract.response.ResponseInfo;
-import org.egov.cpt.models.Mortgage;
-import org.egov.cpt.models.NoticeGeneration;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.egov.common.contract.response.ResponseInfo;
+import org.egov.cpt.models.NoticeGeneration;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

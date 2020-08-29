@@ -17,22 +17,12 @@ import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.PropertyImages;
-import org.egov.cpt.models.RentAccount;
-import org.egov.cpt.models.RentCollection;
-import org.egov.cpt.models.RentDemand;
-import org.egov.cpt.models.RentPayment;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Component
 public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
-
-	@Autowired
-	private ObjectMapper mapper;
 
 	@Override
 	public List<Property> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -48,30 +38,27 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 				AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("pcreated_by"))
 						.createdTime(rs.getLong("pcreated_date")).lastModifiedBy(rs.getString("pmodified_by"))
 						.lastModifiedTime(rs.getLong("pmodified_date")).build();
-				
+
 				Address address = Address.builder().id(rs.getString("aid")).propertyId(rs.getString("aproperty_id"))
-						.transitNumber(rs.getString("atransit_number")).tenantId(tenantId).colony(rs.getString("colony"))
-						.area(rs.getString("addressArea")).district(rs.getString("district")).state(rs.getString("state"))
+						.transitNumber(rs.getString("atransit_number")).tenantId(tenantId)
+						.colony(rs.getString("colony")).area(rs.getString("addressArea"))
+						.district(rs.getString("district")).state(rs.getString("state"))
 						.country(rs.getString("country")).pincode(rs.getString("pincode"))
 						.landmark(rs.getString("landmark")).build();
-				
+
 				PropertyDetails propertyDetails = PropertyDetails.builder().id(rs.getString("pdid"))
 						.propertyId(rs.getString("pdproperty_id")).transitNumber(rs.getString("transit_number"))
 						.tenantId(tenantId).area(rs.getString("area")).rentPerSqyd(rs.getString("rent_per_sqyd"))
 						.currentOwner(rs.getString("current_owner")).floors(rs.getString("floors"))
-						.additionalDetails(rs.getString("additional_details"))
-						.address(address)
+						.additionalDetails(rs.getString("additional_details")).address(address)
 						.rentIncrementPercentage(rs.getDouble("pd_rent_inc_pg"))
-						.rentIncrementPeriod(rs.getInt("pd_rent_inc_period"))
-						.interestRate(rs.getDouble("pd_int_rate"))
-						.auditDetails(auditdetails)
-						.build();
+						.rentIncrementPeriod(rs.getInt("pd_rent_inc_period")).interestRate(rs.getDouble("pd_int_rate"))
+						.auditDetails(auditdetails).build();
 
 				currentProperty = Property.builder().id(propertyId).transitNumber(rs.getString("transit_number"))
 						.tenantId(tenantId).colony(rs.getString("colony"))
 						.masterDataState(rs.getString("master_data_state"))
-						.masterDataAction(rs.getString("master_data_action"))
-						.propertyDetails(propertyDetails)
+						.masterDataAction(rs.getString("master_data_action")).propertyDetails(propertyDetails)
 						.auditDetails(auditdetails).build();
 				propertyMap.put(propertyId, currentProperty);
 			}
@@ -90,24 +77,21 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					.lastModifiedTime(rs.getLong("dmodified_date")).build();
 
 			Document applicationDocument = Document.builder().id(rs.getString("docid"))
-					.referenceId(rs.getString("docreference_id"))
-					.propertyId(rs.getString("docproperty_id")).tenantId(rs.getString("doctenantid"))
-					.active(rs.getBoolean("docis_active"))
-					.documentType(rs.getString("doc_document_type"))
-					.fileStoreId(rs.getString("doc_fileStore_id"))
+					.referenceId(rs.getString("docreference_id")).propertyId(rs.getString("docproperty_id"))
+					.tenantId(rs.getString("doctenantid")).active(rs.getBoolean("docis_active"))
+					.documentType(rs.getString("doc_document_type")).fileStoreId(rs.getString("doc_fileStore_id"))
 					.auditDetails(docAuditdetails).build();
 			property.getPropertyDetails().addApplicationDocumentsItem(applicationDocument);
 		}
 
-		
 		if (hasColumn(rs, "oid")) {
 			String OwnerPropertyId = rs.getString("oproperty_id");
 			if (rs.getString("oid") != null && OwnerPropertyId.equals(property.getId())) {
-	
+
 				AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("ocreated_by"))
 						.createdTime(rs.getLong("ocreated_date")).lastModifiedBy(rs.getString("omodified_by"))
 						.lastModifiedTime(rs.getLong("omodified_date")).build();
-	
+
 				OwnerDetails ownerDetails = OwnerDetails.builder().id(rs.getString("odid"))
 						.propertyId(rs.getString("oproperty_id")).ownerId(rs.getString("owner_id"))
 						.tenantId(rs.getString("otenantid")).name(rs.getString("name")).email(rs.getString("email"))
@@ -124,209 +108,116 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.applicationNumber(rs.getString("odapplication_number"))
 						.dateOfDeathAllottee(rs.getLong("date_of_death_allottee"))
 						.relationWithDeceasedAllottee(rs.getString("relation_with_deceased_allottee"))
-						.permanent( rs.getBoolean("od_permanent"))
-						.auditDetails(auditdetails).payment(null).build();
-	
+						.permanent(rs.getBoolean("od_permanent")).auditDetails(auditdetails).build();
+
 				Owner owners = Owner.builder().id(rs.getString("oid")).property(property)
 						.tenantId(rs.getString("otenantid")).allotmenNumber(rs.getString("oallotmen_number"))
 						.activeState(rs.getBoolean("oactive_state")).isPrimaryOwner(rs.getBoolean("ois_primary_owner"))
 						.ownerDetails(ownerDetails).auditDetails(auditdetails).build();
-	
+
 				property.addOwnerItem(owners);
 			}
 		}
 		if (hasColumn(rs, "piid")) {
 			String propertyImagesPropertyId = rs.getString("pipropertyid");
 			if (rs.getString("piid") != null && propertyImagesPropertyId.equals(property.getId())) {
-	
+
 				AuditDetails piAuditDetails = AuditDetails.builder().createdBy(rs.getString("piCreatedBy"))
 						.createdTime(rs.getLong("piCreatedTime")).lastModifiedBy(rs.getString("piModifiedBy"))
 						.lastModifiedTime(rs.getLong("piModifiedTime")).build();
-	
+
 				PropertyImages propertyImages = PropertyImages.builder().id(rs.getString("piid")).property(property)
 						.tenantId(rs.getString("pitenantid")).applicationNumber(rs.getString("piapp_number"))
-						.description(rs.getString("pidescription"))
-						.capturedBy(rs.getString("picapturedBy"))
+						.description(rs.getString("pidescription")).capturedBy(rs.getString("picapturedBy"))
 						.auditDetails(piAuditDetails).build();
-	
+
 				property.addPropertyImagesItem(propertyImages);
-	
+
 				if (rs.getString("pidocid") != null && rs.getBoolean("pidoc_active")) {
-					Document applicationDocument = Document.builder()
-							.documentType(rs.getString("pidoctype"))
-							.fileStoreId(rs.getString("pidoc_filestoreid"))
-							.id(rs.getString("pidocId"))
-							.tenantId(rs.getString("pidoctenantid"))
-							.active(rs.getBoolean("pidoc_active"))
-							.referenceId(rs.getString("pidoc_referenceid"))
-							.propertyId(rs.getString("pidoc_propertyid"))
+					Document applicationDocument = Document.builder().documentType(rs.getString("pidoctype"))
+							.fileStoreId(rs.getString("pidoc_filestoreid")).id(rs.getString("pidocId"))
+							.tenantId(rs.getString("pidoctenantid")).active(rs.getBoolean("pidoc_active"))
+							.referenceId(rs.getString("pidoc_referenceid")).propertyId(rs.getString("pidoc_propertyid"))
 							.auditDetails(piAuditDetails).build();
-					
-					for (PropertyImages propertyImage: property.getPropertyImages()){
-						if(propertyImage.getId().equalsIgnoreCase(rs.getString("pidoc_referenceid"))){
+
+					for (PropertyImages propertyImage : property.getPropertyImages()) {
+						if (propertyImage.getId().equalsIgnoreCase(rs.getString("pidoc_referenceid"))) {
 							propertyImage.addApplicationDocumentsItem(applicationDocument);
 						}
 					}
-	
-					/*PropertyImages propertyImages1 = property.getPropertyImages().stream().filter(p -> {
-						try {
-							return p.getId().equalsIgnoreCase(rs.getString("pidocid"));
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
-						return false;
-					}).findFirst().get();
-					propertyImages1.addApplicationDocumentsItem(applicationDocument);*/
-	
+
+					/*
+					 * PropertyImages propertyImages1 =
+					 * property.getPropertyImages().stream().filter(p -> { try { return
+					 * p.getId().equalsIgnoreCase(rs.getString("pidocid")); } catch (SQLException e)
+					 * { e.printStackTrace(); } return false; }).findFirst().get();
+					 * propertyImages1.addApplicationDocumentsItem(applicationDocument);
+					 */
+
 				}
 			}
 		}
-		
-//Notice Generation	
+
+		// Notice Generation
 		if (hasColumn(rs, "ngid")) {
 			if (rs.getString("ngid") != null && rs.getString("ng_propertyid").equals(property.getId())) {
-	
+
 				AuditDetails ngAuditDetails = AuditDetails.builder().createdBy(rs.getString("ngCreatedBy"))
 						.createdTime(rs.getLong("ngCreatedTime")).lastModifiedBy(rs.getString("ngModifiedBy"))
 						.lastModifiedTime(rs.getLong("ngModifiedTime")).build();
-	
+
 				NoticeGeneration noticeGeneration = NoticeGeneration.builder().id(rs.getString("ngid"))
-						.property(property)
-						.tenantId(rs.getString("ngtenantid"))
-						.memoNumber(rs.getString("ng_memoNumber"))
-						.memoDate(rs.getLong("ng_memoDate"))
-						.noticeType(rs.getString("ng_noticeType"))
-						.guardian(rs.getString("ng_guardian"))
-						.relationship(rs.getString("ng_relationship"))
-						.violations(rs.getString("ng_violations"))
-						.description(rs.getString("ng_description"))
-						.demandNoticeFrom(rs.getLong("ng_demandNoticeFrom"))
-						.demandNoticeTo(rs.getLong("ng_demandNoticeTo"))
-						.recoveryType(rs.getString("ng_recoveryType"))
-						.amount(rs.getDouble("ng_amount"))
-						.propertyImageId(rs.getString("ng_p_image_id"))
-						.allotmentNumber(rs.getString("oallotmen_number"))
-						.auditDetails(ngAuditDetails)
-						.build();
-	
+						.property(property).tenantId(rs.getString("ngtenantid"))
+						.memoNumber(rs.getString("ng_memoNumber")).memoDate(rs.getLong("ng_memoDate"))
+						.noticeType(rs.getString("ng_noticeType")).guardian(rs.getString("ng_guardian"))
+						.relationship(rs.getString("ng_relationship")).violations(rs.getString("ng_violations"))
+						.description(rs.getString("ng_description")).demandNoticeFrom(rs.getLong("ng_demandNoticeFrom"))
+						.demandNoticeTo(rs.getLong("ng_demandNoticeTo")).recoveryType(rs.getString("ng_recoveryType"))
+						.amount(rs.getDouble("ng_amount")).propertyImageId(rs.getString("ng_p_image_id"))
+						.allotmentNumber(rs.getString("oallotmen_number")).auditDetails(ngAuditDetails).build();
+
 				property.addNoticeItem(noticeGeneration);
-	
+
 				if (rs.getString("ngdoc_id") != null && rs.getBoolean("ngdoc_active")) {
-					Document applicationDocument = Document.builder()
-							.documentType(rs.getString("ngdoc_type"))
-							.fileStoreId(rs.getString("ngdoc_filestoreid"))
-							.id(rs.getString("ngdoc_id"))
-							.tenantId(rs.getString("ngdoc_tenantid"))
-							.active(rs.getBoolean("ngdoc_active"))
-							.referenceId(rs.getString("ngdoc_referenceid"))
-							.propertyId(rs.getString("ngdoc_propertyid"))
+					Document applicationDocument = Document.builder().documentType(rs.getString("ngdoc_type"))
+							.fileStoreId(rs.getString("ngdoc_filestoreid")).id(rs.getString("ngdoc_id"))
+							.tenantId(rs.getString("ngdoc_tenantid")).active(rs.getBoolean("ngdoc_active"))
+							.referenceId(rs.getString("ngdoc_referenceid")).propertyId(rs.getString("ngdoc_propertyid"))
 							.auditDetails(ngAuditDetails).build();
-					
-					for (NoticeGeneration notice: property.getNotices()){
-						if(notice.getId().equalsIgnoreCase(rs.getString("ngdoc_referenceid"))){
+
+					for (NoticeGeneration notice : property.getNotices()) {
+						if (notice.getId().equalsIgnoreCase(rs.getString("ngdoc_referenceid"))) {
 							notice.addApplicationDocumentsItem(applicationDocument);
 						}
 					}
-	
-					/*NoticeGeneration notice = property.getNotices().stream().filter(p -> {
-						try {
-							return p.getId().equalsIgnoreCase(rs.getString("ngdoc_id"));
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
-						return false;
-					}).findFirst().get();
-					notice.addApplicationDocumentsItem(applicationDocument);*/
-	
+
+					/*
+					 * NoticeGeneration notice = property.getNotices().stream().filter(p -> { try {
+					 * return p.getId().equalsIgnoreCase(rs.getString("ngdoc_id")); } catch
+					 * (SQLException e) { e.printStackTrace(); } return false; }).findFirst().get();
+					 * notice.addApplicationDocumentsItem(applicationDocument);
+					 */
+
 				}
 			}
 		}
-		
-//GrantDetails
-		if (hasColumn(rs, "gd_id")){
+
+		// GrantDetails
+		if (hasColumn(rs, "gd_id")) {
 			if (rs.getString("gd_id") != null) {
 				AuditDetails magdAuditDetails = AuditDetails.builder().createdBy(rs.getString("gd_createdBy"))
 						.createdTime(rs.getLong("gd_createdTime")).lastModifiedBy(rs.getString("gd_modifiedBy"))
 						.lastModifiedTime(rs.getLong("gd_modifiedTime")).build();
 				MortgageApprovedGrantDetails mortgageApprovedGrantDetails = MortgageApprovedGrantDetails.builder()
-						.id(rs.getString("gd_id"))
-						.propertyDetailId(rs.getString("gd_property_id"))
-						.bankName(rs.getString("gd_bank_name"))
-						.mortgageAmount(rs.getBigDecimal("gd_mortgage_amount"))
-						.sanctionLetterNumber(rs.getString("gd_sanLetterNum"))
-						.sanctionDate(rs.getLong("gd_sanDate"))
-						.mortgageEndDate(rs.getLong("gd_mortgageEndDate"))
-						.auditDetails(magdAuditDetails).build();
+						.id(rs.getString("gd_id")).propertyDetailId(rs.getString("gd_property_id"))
+						.bankName(rs.getString("gd_bank_name")).mortgageAmount(rs.getBigDecimal("gd_mortgage_amount"))
+						.sanctionLetterNumber(rs.getString("gd_sanLetterNum")).sanctionDate(rs.getLong("gd_sanDate"))
+						.mortgageEndDate(rs.getLong("gd_mortgageEndDate")).auditDetails(magdAuditDetails).build();
 				property.addGrantDetailItem(mortgageApprovedGrantDetails);
 			}
 		}
-//Demands
-		if (hasColumn(rs, "demand_id")){	
-			if (rs.getString("demand_id") != null) {
-				AuditDetails demandAuditDetails = AuditDetails.builder().createdBy(rs.getString("demand_created_by"))
-						.createdTime(rs.getLong("demand_created_date")).lastModifiedBy(rs.getString("demand_modified_by"))
-						.lastModifiedTime(rs.getLong("demand_modified_date")).build();
-				RentDemand rentDemand = RentDemand.builder().id(rs.getString("demand_id"))
-						.propertyId("demand_pid")
-						.initialGracePeriod(rs.getInt("demand_IniGracePeriod"))
-						.generationDate(rs.getLong("demand_genDate"))
-						.collectionPrincipal(rs.getDouble("demand_colPrincipal"))
-						.remainingPrincipal(rs.getDouble("demand_remPrincipal"))
-						.interestSince(rs.getLong("demand_intSince"))
-						.mode(RentDemand.ModeEnum.fromValue(rs.getString("demand_mode")))
-						.auditDetails(demandAuditDetails)
-						.build();
-				property.addDemandItem(rentDemand);
-			}
-			
-	//Payments
-			if (rs.getString("payment_id") != null) {
-				AuditDetails paymentAuditDetails = AuditDetails.builder().createdBy(rs.getString("payment_created_by"))
-						.createdTime(rs.getLong("payment_created_date")).lastModifiedBy(rs.getString("payment_modified_by"))
-						.lastModifiedTime(rs.getLong("payment_modified_date")).build();
-				RentPayment rentPayment = RentPayment.builder().id(rs.getString("payment_id"))
-						.propertyId("payment_pid")
-						.receiptNo(rs.getString("payment_receiptNo"))
-						.amountPaid(rs.getDouble("payment_amtPaid"))
-						.dateOfPayment(rs.getLong("payment_dateOfPayment"))
-						.mode(RentPayment.ModeEnum.fromValue(rs.getString("payment_mode")))
-						.auditDetails(paymentAuditDetails)
-						.build();
-				property.addPaymentItem(rentPayment);
-			}
-			
-	//Account
-			if (rs.getString("account_id") != null) {
-				AuditDetails accountAuditDetails = AuditDetails.builder().createdBy(rs.getString("account_created_by"))
-						.createdTime(rs.getLong("account_created_date")).lastModifiedBy(rs.getString("account_modified_by"))
-						.lastModifiedTime(rs.getLong("account_modified_date")).build();
-				RentAccount rentAccount = RentAccount.builder().id(rs.getString("account_id"))
-						.propertyId("account_pid")
-						.remainingAmount(rs.getDouble("account_remainingAmount"))
-						.tenantId(rs.getString("account_tenantid"))
-						.auditDetails(accountAuditDetails)
-						.build();
-				property.setRentAccount(rentAccount);
-			}
-			
-	//Collection
-			if (rs.getString("collection_id") != null) {
-				AuditDetails collectionAuditDetails = AuditDetails.builder().createdBy(rs.getString("collection_created_by"))
-						.createdTime(rs.getLong("collection_created_date")).lastModifiedBy(rs.getString("collection_modified_by"))
-						.lastModifiedTime(rs.getLong("collection_modified_date")).build();
-				RentCollection rentCollection = RentCollection.builder().id(rs.getString("collection_id"))
-						.paymentId(rs.getString("collection_payment_id"))
-						.demandId(rs.getString("collection_demand_id"))
-						.interestCollected(rs.getDouble("collection_intCollected"))
-						.principalCollected(rs.getDouble("collection_principalCollected"))
-						.tenantId(rs.getString("collection_tenantid"))
-						.auditDetails(collectionAuditDetails)
-						.build();
-				property.addCollectionItem(rentCollection);
-			}
-		}
 	}
-	
+
 	public static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
 		ResultSetMetaData rsmd = rs.getMetaData();
 		int columns = rsmd.getColumnCount();

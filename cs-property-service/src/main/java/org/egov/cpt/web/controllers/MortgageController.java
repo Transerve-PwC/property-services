@@ -5,14 +5,11 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.RequestInfoWrapper;
 import org.egov.cpt.service.MortgageService;
 import org.egov.cpt.util.ResponseInfoFactory;
-import org.egov.cpt.web.contracts.DuplicateCopyRequest;
-import org.egov.cpt.web.contracts.DuplicateCopyResponse;
 import org.egov.cpt.web.contracts.MortgageRequest;
 import org.egov.cpt.web.contracts.MortgageResponse;
 import org.slf4j.Logger;
