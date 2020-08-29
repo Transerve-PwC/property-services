@@ -157,27 +157,9 @@ public class EnrichmentService {
 
 	public PropertyDetails updatePropertyDetail(Property property, RequestInfo requestInfo) {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
-		List<Document> applicationDocuments = updateApplicationDocs(propertyDetail, property, requestInfo);
-		propertyDetail.setApplicationDocuments(applicationDocuments);
+		enrichDocuments(propertyDetail.getApplicationDocuments(), requestInfo, property.getId(), property.getId(),
+				property.getTenantId());
 		return propertyDetail;
-	}
-
-	private List<Document> updateApplicationDocs(PropertyDetails propertyDetails, Property property,
-			RequestInfo requestInfo) {
-		List<Document> applicationDocuments = propertyDetails.getApplicationDocuments();
-		if (!CollectionUtils.isEmpty(applicationDocuments)) {
-			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-			applicationDocuments.forEach(document -> {
-				if (document.getId() == null) {
-					document.setId(UUID.randomUUID().toString());
-				}
-				document.setPropertyId(property.getId());
-				document.setReferenceId(property.getId());
-				document.setTenantId(property.getTenantId());
-				document.setAuditDetails(docAuditDetails);
-			});
-		}
-		return applicationDocuments;
 	}
 
 	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
@@ -296,7 +278,7 @@ public class EnrichmentService {
 		AuditDetails updateAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 		if (!CollectionUtils.isEmpty(request.getOwners())) {
 			request.getOwners().forEach(owner -> {
-				List<Document> ownershipTransferDocuments = updateOwnershipTransferDocs(owner, requestInfo);
+				updateOwnershipTransferDocs(owner, requestInfo);
 				AuditDetails modifyAuditDetails = owner.getAuditDetails();
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
 				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
@@ -305,7 +287,6 @@ public class EnrichmentService {
 				owner.setActiveState(false);
 				owner.setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
-				owner.getOwnerDetails().setOwnershipTransferDocuments(ownershipTransferDocuments);
 
 				// demand generation
 				enrichUpdateDemand(owner);
@@ -371,22 +352,9 @@ public class EnrichmentService {
 		return String.format("%s_%s", businessService, category.toString());
 	}
 
-	private List<Document> updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
-		List<Document> ownershipTransferDocuments = owner.getOwnerDetails().getOwnershipTransferDocuments();
-		if (!CollectionUtils.isEmpty(ownershipTransferDocuments)) {
-			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-			ownershipTransferDocuments.forEach(document -> {
-				if (document.getId() == null) {
-					String gen_doc_id = UUID.randomUUID().toString();
-					document.setId(gen_doc_id);
-					document.setReferenceId(owner.getId());
-					document.setTenantId(owner.getTenantId());
-					document.setPropertyId(owner.getProperty().getId());
-				}
-				document.setAuditDetails(docAuditDetails);
-			});
-		}
-		return ownershipTransferDocuments;
+	private void updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
+		enrichDocuments(owner.getOwnerDetails().getOwnershipTransferDocuments(), requestInfo,
+				owner.getProperty().getId(), owner.getId(), owner.getProperty().getId());
 	}
 
 	private OwnerDetails updateOwnerShipDetails(Owner owner, Property foundProperty, RequestInfo requestInfo,
@@ -492,26 +460,8 @@ public class EnrichmentService {
 
 				application.setCapturedBy(requestInfo.getUserInfo().getName());
 
-				// Document details
-				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
-					application.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil
-									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setReferenceId(
-									propertyImagesRequest.getPropertyImagesApplications().get(0).getId());
-							document.setPropertyId(
-									propertyImagesRequest.getPropertyImagesApplications().get(0).getProperty().getId());
-							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(
-									propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId());
-						}
-					});
-
-				}
-
+				enrichDocuments(application.getApplicationDocuments(), requestInfo, application.getProperty().getId(),
+						application.getId(), application.getTenantId());
 			});
 		}
 		setPIIdgenIds(propertyImagesRequest);
@@ -608,29 +558,9 @@ public class EnrichmentService {
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
 				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
 				application.setAuditDetails(modifyAuditDetails);
-				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
-					application.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil
-									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							AuditDetails modifyDocAuditDetails = application.getAuditDetails();
-							modifyDocAuditDetails.setLastModifiedBy(documentAuditDetails.getLastModifiedBy());
-							modifyDocAuditDetails.setLastModifiedTime(documentAuditDetails.getLastModifiedTime());
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setPropertyId(
-									duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
-							document.setReferenceId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId());
-							document.setAuditDetails(modifyDocAuditDetails);
-							document.setTenantId(
-									duplicateCopyRequest.getDuplicateCopyApplications().get(0).getTenantId());
-						}
-
-						// demand generation
-						enrichDuplicateCopyUpdateDemand(application);
-					});
-
-				}
+				enrichDocuments(application.getApplicationDocuments(), requestInfo, application.getProperty().getId(),
+						application.getId(), application.getTenantId());
+				enrichDuplicateCopyUpdateDemand(application);
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {
@@ -654,25 +584,8 @@ public class EnrichmentService {
 
 				application.setCapturedBy(requestInfo.getUserInfo().getName());
 
-				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
-					application.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil
-									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setReferenceId(
-									propertyImagesRequest.getPropertyImagesApplications().get(0).getId());
-							document.setPropertyId(
-									propertyImagesRequest.getPropertyImagesApplications().get(0).getProperty().getId());
-							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(
-									propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId());
-						}
-
-					});
-
-				}
+				enrichDocuments(application.getApplicationDocuments(), requestInfo, application.getProperty().getId(),
+						application.getId(), application.getTenantId());
 			});
 		}
 
@@ -854,22 +767,8 @@ public class EnrichmentService {
 		if (!CollectionUtils.isEmpty(mortgageRequest.getMortgageApplications())) {
 			mortgageRequest.getMortgageApplications().forEach(application -> {
 				application.setAuditDetails(propertyAuditDetails);
-				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
-					application.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil
-									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setReferenceId(mortgageRequest.getMortgageApplications().get(0).getId());
-							document.setPropertyId(
-									mortgageRequest.getMortgageApplications().get(0).getProperty().getId());
-							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(mortgageRequest.getMortgageApplications().get(0).getTenantId());
-						}
-					});
-
-				}
+				enrichDocuments(application.getApplicationDocuments(), requestInfo, application.getProperty().getId(),
+						application.getId(), application.getTenantId());
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {
@@ -922,24 +821,8 @@ public class EnrichmentService {
 						.setId(noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
 				notice.setAuditDetails(noticeAuditDetails);
 
-				if (!CollectionUtils.isEmpty(notice.getApplicationDocuments())) {
-					notice.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil
-									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setReferenceId(gen_notice_id);
-							document.setPropertyId(
-									noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
-							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(noticeGenerationRequest.getNoticeApplications().get(0).getTenantId());
-						}
-
-					});
-
-				}
+				enrichDocuments(notice.getApplicationDocuments(), requestInfo, notice.getProperty().getId(),
+						notice.getId(), notice.getTenantId());
 			});
 		}
 		setNoticeIdgenIds(noticeGenerationRequest);
@@ -969,25 +852,28 @@ public class EnrichmentService {
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
 				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
 				application.setAuditDetails(modifyAuditDetails);
-				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
-					application.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil
-									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setReferenceId(noticeGenerationRequest.getNoticeApplications().get(0).getId());
-							document.setPropertyId(
-									noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
-							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(noticeGenerationRequest.getNoticeApplications().get(0).getTenantId());
-						}
-
-					});
-
-				}
+				enrichDocuments(application.getApplicationDocuments(), requestInfo, application.getProperty().getId(),
+						application.getId(), application.getTenantId());
 			});
 		}
+	}
+
+	private void enrichDocuments(List<Document> documents, RequestInfo requestInfo, String propertyId,
+			String referenceId, String tenantId) {
+		if (!CollectionUtils.isEmpty(documents)) {
+			return;
+		}
+		AuditDetails documentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		documents.forEach(document -> {
+			if (document.getId() == null) {
+				document.setId(UUID.randomUUID().toString());
+				document.setActive(true);
+			}
+			document.setReferenceId(referenceId);
+			document.setPropertyId(propertyId);
+			document.setAuditDetails(documentAuditDetails);
+			document.setTenantId(tenantId);
+		});
 	}
 
 }
