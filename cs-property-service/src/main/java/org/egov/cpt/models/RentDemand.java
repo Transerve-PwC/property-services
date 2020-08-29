@@ -64,40 +64,13 @@ public class RentDemand implements Comparable<RentDemand> {
   @JsonProperty("interestSince")
   private Long interestSince;
 
-  @JsonProperty("tenantId")
-  private String tenantId;
-
-  public enum ModeEnum {
-    UPLOAD("Uploaded"),
-
-    GENERATED("Generated");
-
-    private String value;
-
-    ModeEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static ModeEnum fromValue(String text) {
-      for (ModeEnum b : ModeEnum.values()) {
-        if (String.valueOf(b.value).equalsIgnoreCase(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
-
   @JsonProperty("mode")
   @Builder.Default
   private ModeEnum mode = ModeEnum.UPLOAD;
+
+  @JsonProperty("status")
+  @Builder.Default
+  private PaymentStatusEnum status = PaymentStatusEnum.UNPAID;
 
   @JsonProperty("auditDetails")
   @Builder.Default
@@ -106,5 +79,22 @@ public class RentDemand implements Comparable<RentDemand> {
   @Override
   public int compareTo(RentDemand other) {
     return this.getGenerationDate().compareTo(other.getGenerationDate());
+  }
+
+  public boolean isPaid() {
+    return this.status == PaymentStatusEnum.PAID;
+  }
+
+  public boolean isUnPaid() {
+    return !this.isPaid();
+  }
+
+  public void setRemainingPrincipalAndUpdatePaymentStatus(Double d) {
+    this.setRemainingPrincipal(d);
+    if (this.remainingPrincipal == 0) {
+      this.status = PaymentStatusEnum.PAID;
+    } else {
+      this.status = PaymentStatusEnum.UNPAID;
+    }
   }
 }

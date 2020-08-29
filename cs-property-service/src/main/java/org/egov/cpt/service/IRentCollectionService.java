@@ -69,6 +69,6 @@ public interface IRentCollectionService {
 	 * @return List<RentAccountStatement>
 	 */
 	public List<RentAccountStatement> accountStatement(List<RentDemand> demands, List<RentPayment> payments,
-			List<RentCollection> lstCollection);
+			List<RentCollection> collections, Long fromDateTimestamp, Long toDateTimestamp);
 
 }

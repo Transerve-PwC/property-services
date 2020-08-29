@@ -1,8 +1,7 @@
 package org.egov.cpt.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,48 +47,19 @@ public class RentPayment implements Comparable<RentPayment> {
 	@JsonProperty("dateOfPayment")
 	private Long dateOfPayment;
 
-	public enum ModeEnum {
-		UPLOAD("Uploaded"),
-
-		GENERATED("Generated");
-
-		private String value;
-
-		ModeEnum(String value) {
-			this.value = value;
-		}
-
-		@Override
-		@JsonValue
-		public String toString() {
-			return String.valueOf(value);
-		}
-
-		@JsonCreator
-		public static ModeEnum fromValue(String text) {
-			for (ModeEnum b : ModeEnum.values()) {
-				if (String.valueOf(b.value).equalsIgnoreCase(text)) {
-					return b;
-				}
-			}
-			return null;
-		}
-	}
-
 	@JsonProperty("mode")
-	private ModeEnum mode = null;
+	@Builder.Default
+	private ModeEnum mode = ModeEnum.UPLOAD;
 
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
+	private AuditDetails auditDetails;
 
-	@JsonProperty("tenantId")
-	private String tenantId;
-
-	// TODO: Change to`processed`
 	/**
-	 * boolean indicates whether payment is proceed or not
+	 * boolean indicates whether payment is processed or not
 	 */
-	private boolean proceed;
+	@Builder.Default
+	@JsonIgnore
+	private boolean processed = false;
 
 	@Override
 	public int compareTo(RentPayment other) {

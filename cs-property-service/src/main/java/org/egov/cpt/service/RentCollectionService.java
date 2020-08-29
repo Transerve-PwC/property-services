@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,7 +36,7 @@ public class RentCollectionService implements IRentCollectionService {
 		/**
 		 * Don't process payments that are already processed.
 		 */
-		List<RentPayment> paymentsToBeSettled = payments.stream().filter(payment -> !payment.isProceed())
+		List<RentPayment> paymentsToBeSettled = payments.stream().filter(payment -> !payment.isProcessed())
 				.collect(Collectors.toList());
 
 		/**
@@ -52,11 +53,16 @@ public class RentCollectionService implements IRentCollectionService {
 		/**
 		 * We have positive account balance.
 		 */
-		List<RentDemand> leftOverDemands = demandsToBeSettled.stream()
-				.filter(demand -> demand.getRemainingPrincipal() > 0).collect(Collectors.toList());
+		List<RentDemand> leftOverDemands = demandsToBeSettled.stream().filter(RentDemand::isUnPaid)
+				.collect(Collectors.toList());
 		if (leftOverDemands.size() == 0) {
 			return collections;
 		}
+
+		/**
+		 * In the case of 1) demand generation at 1st of every month. 2) More amount
+		 * payed toward the end which should be adjusted to left over demands.
+		 */
 		ArrayList<RentCollection> result = new ArrayList<RentCollection>(collections);
 		List<RentDemand> demandsAfterPayments;
 		if (CollectionUtils.isEmpty(payments)) {
@@ -68,6 +74,10 @@ public class RentCollectionService implements IRentCollectionService {
 					.collect(Collectors.toList());
 		}
 
+		/**
+		 * Settle each demand by creating an empty payment with the demand generation
+		 * date.
+		 */
 		for (RentDemand demand : demandsAfterPayments) {
 			RentPayment payment = RentPayment.builder().amountPaid(0D).dateOfPayment(demand.getInterestSince()).build();
 			List<RentCollection> settledCollections = settlePayment(demandsToBeSettled, payment, account, 0);
@@ -87,8 +97,9 @@ public class RentCollectionService implements IRentCollectionService {
 		/**
 		 * Each payment will only operate on the demands generated before it is paid.
 		 */
-		List<RentDemand> demands = demandsToBeSettled.stream().filter(demand -> demand.getRemainingPrincipal() > 0
-				&& demand.getGenerationDate() <= payment.getDateOfPayment()).collect(Collectors.toList());
+		List<RentDemand> demands = demandsToBeSettled.stream()
+				.filter(demand -> demand.isUnPaid() && demand.getGenerationDate() <= payment.getDateOfPayment())
+				.collect(Collectors.toList());
 
 		/**
 		 * Effective amount to be settled = paidAmount + accountBalance
@@ -125,15 +136,14 @@ public class RentCollectionService implements IRentCollectionService {
 		/**
 		 * Mark payment as processed.
 		 */
-		payment.setProceed(true);
+		payment.setProcessed(true);
 		return Stream.of(interestCollections, principalCollections).flatMap(x -> x.stream())
 				.collect(Collectors.toList());
 	}
 
 	private List<RentCollection> extractPrincipal(List<RentDemand> demands, double paymentAmount) {
 		ArrayList<RentCollection> collections = new ArrayList<RentCollection>();
-		List<RentDemand> filteredDemands = demands.stream().filter(d -> d.getRemainingPrincipal() > 0)
-				.collect(Collectors.toList());
+		List<RentDemand> filteredDemands = demands.stream().filter(RentDemand::isUnPaid).collect(Collectors.toList());
 		for (RentDemand demand : filteredDemands) {
 			if (paymentAmount <= 0) {
 				break;
@@ -141,9 +151,9 @@ public class RentCollectionService implements IRentCollectionService {
 			double collectionAmount = Math.min(demand.getRemainingPrincipal(), paymentAmount);
 
 			paymentAmount -= collectionAmount;
-			collections.add(RentCollection.builder().tenantId(demand.getTenantId()).demandId(demand.getId())
-					.principalCollected(collectionAmount).build());
-			demand.setRemainingPrincipal(demand.getRemainingPrincipal() - collectionAmount);
+			collections.add(
+					RentCollection.builder().demandId(demand.getId()).principalCollected(collectionAmount).build());
+			demand.setRemainingPrincipalAndUpdatePaymentStatus(demand.getRemainingPrincipal() - collectionAmount);
 		}
 		return collections;
 	}
@@ -159,8 +169,7 @@ public class RentCollectionService implements IRentCollectionService {
 			if (paymentAmount <= 0) {
 				break;
 			}
-			LocalDate demandGenerationDate = Instant.ofEpochMilli(demand.getGenerationDate())
-					.atZone(ZoneId.systemDefault()).toLocalDate();
+			LocalDate demandGenerationDate = getLocalDate(demand.getGenerationDate());
 			LocalDate paymentDate = getLocalDate(paymentTimeStamp);
 
 			long noOfDaysBetweenGenerationAndPayment = ChronoUnit.DAYS.between(demandGenerationDate, paymentDate);
@@ -168,8 +177,7 @@ public class RentCollectionService implements IRentCollectionService {
 				continue;
 			}
 
-			LocalDate demandInterestSinceDate = Instant.ofEpochMilli(demand.getInterestSince())
-					.atZone(ZoneId.systemDefault()).toLocalDate();
+			LocalDate demandInterestSinceDate = getLocalDate(demand.getInterestSince());
 
 			long noOfDaysForInterestCalculation = ChronoUnit.DAYS.between(demandInterestSinceDate, paymentDate);
 
@@ -179,8 +187,7 @@ public class RentCollectionService implements IRentCollectionService {
 			double interest = demand.getRemainingPrincipal() * noOfDaysForInterestCalculation * interestRate / 365
 					/ 100;
 			if (interest < paymentAmount) {
-				collections.add(RentCollection.builder().tenantId(demand.getTenantId()).interestCollected(interest)
-						.demandId(demand.getId()).build());
+				collections.add(RentCollection.builder().interestCollected(interest).demandId(demand.getId()).build());
 				demand.setInterestSince(paymentTimeStamp);
 				paymentAmount -= interest;
 			}
@@ -203,14 +210,15 @@ public class RentCollectionService implements IRentCollectionService {
 	public RentSummary calculateRentSummaryAt(List<RentDemand> demands, RentAccount rentAccount, double interestRate,
 			long atTimestamp) {
 		final LocalDate atDate = getLocalDate(atTimestamp);
-		return demands.stream().filter(demand -> demand.getRemainingPrincipal() > 0).reduce(
+		return demands.stream().filter(RentDemand::isUnPaid).reduce(
 				RentSummary.builder().balanceAmount(rentAccount.getRemainingAmount()).build(), (summary, demand) -> {
 
 					/**
 					 * Calculate interest till atDate
 					 */
 					LocalDate demandGenerationDate = getLocalDate(demand.getGenerationDate());
-					long noOfDaysBetweenGenerationAndPayment = ChronoUnit.DAYS.between(demandGenerationDate, atDate);
+					long noOfDaysBetweenGenerationAndPayment = 1
+							+ ChronoUnit.DAYS.between(demandGenerationDate, atDate);
 					if (noOfDaysBetweenGenerationAndPayment <= demand.getInitialGracePeriod()) {
 						return summary;
 					}
@@ -233,30 +241,6 @@ public class RentCollectionService implements IRentCollectionService {
 		return Instant.ofEpochMilli(atTimestamp).atZone(ZoneId.systemDefault()).toLocalDate();
 	}
 
-	@SuppressWarnings("unused")
-	private RentSummary _getPaymentSummary(List<RentDemand> demands, RentAccount rentAccount, double interestRate,
-			long atTimestamp) {
-		double balancePrincipal = 0;
-		double balanceInterest = 0;
-		RentSummary rentSummary = new RentSummary();
-
-		for (RentDemand rentDemand : demands) {
-			double interest = 0;
-			float daysBetween = ((new Date().getTime() - rentDemand.getGenerationDate()) / (1000 * 60 * 60 * 24)) + 1;
-			// If days cross the gross period then the interest is applicable
-
-			if (daysBetween > rentDemand.getInitialGracePeriod()) {
-				interest = ((rentDemand.getRemainingPrincipal() * interestRate) / 100) * (daysBetween / 365);
-			}
-			balanceInterest += interest;
-			balancePrincipal += rentDemand.getRemainingPrincipal();
-		}
-		rentSummary.setBalanceAmount(rentAccount.getRemainingAmount());
-		rentSummary.setBalanceInterest(balanceInterest);
-		rentSummary.setBalancePrincipal(balancePrincipal);
-		return rentSummary;
-	}
-
 	/**
 	 * @apiNote This will provide the account statement between the date specified
 	 *          by the user.
@@ -265,9 +249,48 @@ public class RentCollectionService implements IRentCollectionService {
 	 * @param lstCollection
 	 * @return List<RentAccountStatement>
 	 */
+	// @Override
+	public List<RentAccountStatement> _accountStatement(List<RentDemand> demands, List<RentPayment> payments,
+			List<RentCollection> collections, Long fromDateTimestamp, Long toDateTimestamp) {
+		Collections.sort(demands);
+		Collections.sort(payments);
+		// List<RentDemand> collectedDemands = new
+		// ArrayList<RentDemand>(demands.size());
+		// List<RentPayment> collectedPayments = new
+		// ArrayList<RentPayment>(payments.size());
+		List<RentAccountStatement> accountStatementItems = new ArrayList<RentAccountStatement>();
+		RentAccount rentAccount = RentAccount.builder().build();
+		while (true) {
+			Iterator<RentDemand> demandIterator = demands.iterator();
+			Iterator<RentPayment> paymentIterator = payments.iterator();
+			RentDemand nextDemand = demandIterator.hasNext() ? demandIterator.next() : null;
+			RentPayment nextPayment = paymentIterator.hasNext() ? paymentIterator.next() : null;
+			long nextTimestamp = 0;
+			long previousTimeStamp = nextTimestamp;
+			if (nextDemand == null && nextPayment == null) {
+				break;
+			} else if (nextDemand == null) {
+				// collectedDemands.add(nextDemand);
+				previousTimeStamp = nextTimestamp;
+				nextTimestamp = nextPayment.getDateOfPayment();
+			} else if (nextPayment == null) {
+				nextTimestamp = nextDemand.getGenerationDate();
+				// collectedPayments.add(nextPayment);
+			} else if (nextDemand.getGenerationDate() <= nextPayment.getDateOfPayment()) {
+				nextTimestamp = nextDemand.getGenerationDate();
+				// collectedDemands.add(nextDemand);
+			} else {
+				nextTimestamp = nextPayment.getDateOfPayment();
+				// collectedPayments.add(nextPayment);
+			}
+			// collections.stream().filter(collection -> collection.getC)
+		}
+		return null;
+	}
+
 	@Override
 	public List<RentAccountStatement> accountStatement(List<RentDemand> demands, List<RentPayment> payments,
-			List<RentCollection> lstCollection) {
+			List<RentCollection> lstCollection, Long fromDateTimestamp, Long toDateTimestamp) {
 
 		final double interestRate = 24;
 		// ArrayList lstProcessRentDemand;
@@ -323,18 +346,11 @@ public class RentCollectionService implements IRentCollectionService {
 			rentAccountStatement.setDueAmount(0.0);
 
 			for (RentCollection rentCollection : lstCollection) {
-				if (null != rentCollection.getPaymentId()) {
-					if (rentCollection.getPaymentId().equals(rentPayment.getId())) {
-						collectedAmount = collectedAmount + rentCollection.getPrincipalCollected();
 
-					}
-				} else {
-
-					if (null != lstDemandTobeProcess.stream()
-							.filter(tmpRentDemand -> tmpRentDemand.getId().equals(rentCollection.getDemandId()))
-							.findAny().orElse(null))
-						collectedAmount = collectedAmount + rentCollection.getPrincipalCollected();
-				}
+				if (null != lstDemandTobeProcess.stream()
+						.filter(tmpRentDemand -> tmpRentDemand.getId().equals(rentCollection.getDemandId())).findAny()
+						.orElse(null))
+					collectedAmount = collectedAmount + rentCollection.getPrincipalCollected();
 			}
 			if ((collectedAmount + remainingInterest) < rentPayment.getAmountPaid())
 				outstandingBalance = rentPayment.getAmountPaid() - collectedAmount;

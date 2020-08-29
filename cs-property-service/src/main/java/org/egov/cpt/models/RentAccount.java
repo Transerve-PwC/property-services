@@ -24,10 +24,8 @@ public class RentAccount {
 	private String propertyId;
 
 	@JsonProperty("remainingAmount")
-	private Double remainingAmount;
-
-	@JsonProperty("tenantId")
-	private String tenantId;
+	@Builder.Default
+	private Double remainingAmount = 0D;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;

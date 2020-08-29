@@ -17,10 +17,6 @@ import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.PropertyImages;
-import org.egov.cpt.models.RentAccount;
-import org.egov.cpt.models.RentCollection;
-import org.egov.cpt.models.RentDemand;
-import org.egov.cpt.models.RentPayment;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -218,65 +214,6 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.sanctionLetterNumber(rs.getString("gd_sanLetterNum")).sanctionDate(rs.getLong("gd_sanDate"))
 						.mortgageEndDate(rs.getLong("gd_mortgageEndDate")).auditDetails(magdAuditDetails).build();
 				property.addGrantDetailItem(mortgageApprovedGrantDetails);
-			}
-		}
-		// Demands
-		if (hasColumn(rs, "demand_id")) {
-			if (rs.getString("demand_id") != null) {
-				AuditDetails demandAuditDetails = AuditDetails.builder().createdBy(rs.getString("demand_created_by"))
-						.createdTime(rs.getLong("demand_created_date"))
-						.lastModifiedBy(rs.getString("demand_modified_by"))
-						.lastModifiedTime(rs.getLong("demand_modified_date")).build();
-				RentDemand rentDemand = RentDemand.builder().id(rs.getString("demand_id")).propertyId("demand_pid")
-						.initialGracePeriod(rs.getInt("demand_IniGracePeriod"))
-						.generationDate(rs.getLong("demand_genDate"))
-						.collectionPrincipal(rs.getDouble("demand_colPrincipal"))
-						.remainingPrincipal(rs.getDouble("demand_remPrincipal"))
-						.interestSince(rs.getLong("demand_intSince"))
-						.mode(RentDemand.ModeEnum.fromValue(rs.getString("demand_mode")))
-						.auditDetails(demandAuditDetails).build();
-				property.addDemandItem(rentDemand);
-			}
-
-			// Payments
-			if (rs.getString("payment_id") != null) {
-				AuditDetails paymentAuditDetails = AuditDetails.builder().createdBy(rs.getString("payment_created_by"))
-						.createdTime(rs.getLong("payment_created_date"))
-						.lastModifiedBy(rs.getString("payment_modified_by"))
-						.lastModifiedTime(rs.getLong("payment_modified_date")).build();
-				RentPayment rentPayment = RentPayment.builder().id(rs.getString("payment_id")).propertyId("payment_pid")
-						.receiptNo(rs.getString("payment_receiptNo")).amountPaid(rs.getDouble("payment_amtPaid"))
-						.dateOfPayment(rs.getLong("payment_dateOfPayment"))
-						.mode(RentPayment.ModeEnum.fromValue(rs.getString("payment_mode")))
-						.auditDetails(paymentAuditDetails).build();
-				property.addPaymentItem(rentPayment);
-			}
-
-			// Account
-			if (rs.getString("account_id") != null) {
-				AuditDetails accountAuditDetails = AuditDetails.builder().createdBy(rs.getString("account_created_by"))
-						.createdTime(rs.getLong("account_created_date"))
-						.lastModifiedBy(rs.getString("account_modified_by"))
-						.lastModifiedTime(rs.getLong("account_modified_date")).build();
-				RentAccount rentAccount = RentAccount.builder().id(rs.getString("account_id")).propertyId("account_pid")
-						.remainingAmount(rs.getDouble("account_remainingAmount")).auditDetails(accountAuditDetails)
-						.build();
-				property.setRentAccount(rentAccount);
-			}
-
-			// Collection
-			if (rs.getString("collection_id") != null) {
-				AuditDetails collectionAuditDetails = AuditDetails.builder()
-						.createdBy(rs.getString("collection_created_by"))
-						.createdTime(rs.getLong("collection_created_date"))
-						.lastModifiedBy(rs.getString("collection_modified_by"))
-						.lastModifiedTime(rs.getLong("collection_modified_date")).build();
-				RentCollection rentCollection = RentCollection.builder().id(rs.getString("collection_id"))
-						.demandId(rs.getString("collection_demand_id"))
-						.interestCollected(rs.getDouble("collection_intCollected"))
-						.principalCollected(rs.getDouble("collection_principalCollected"))
-						.auditDetails(collectionAuditDetails).build();
-				property.addCollectionItem(rentCollection);
 			}
 		}
 	}
