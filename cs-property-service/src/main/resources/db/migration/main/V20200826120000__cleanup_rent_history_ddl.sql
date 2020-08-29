@@ -5,7 +5,7 @@ ALTER TABLE cs_pt_account DROP COLUMN IF EXISTS    tenantId;
 ALTER TABLE cs_pt_demand_audit DROP COLUMN IF EXISTS   tenantId;
 ALTER TABLE cs_pt_account_audit DROP COLUMN IF EXISTS  tenantId;
 
-ALTER TABLE cs_pt_collection DROP COLUMN IF EXISTS paymentId;
+ALTER TABLE cs_pt_collection DROP COLUMN IF EXISTS payment_id;
 ALTER TABLE cs_pt_collection DROP COLUMN IF EXISTS collectionAgainst;
 ALTER TABLE cs_pt_collection 
 ADD COLUMN IF NOT EXISTS collectedAt bigint;

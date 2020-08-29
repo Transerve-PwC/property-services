@@ -79,7 +79,8 @@ public class RentCollectionService implements IRentCollectionService {
 		 * date.
 		 */
 		for (RentDemand demand : demandsAfterPayments) {
-			RentPayment payment = RentPayment.builder().amountPaid(0D).dateOfPayment(demand.getInterestSince()).build();
+			RentPayment payment = RentPayment.builder().amountPaid(0D).dateOfPayment(demand.getGenerationDate())
+					.build();
 			List<RentCollection> settledCollections = settlePayment(demandsToBeSettled, payment, account, 0);
 			if (settledCollections.size() == 0) {
 				continue;
@@ -123,7 +124,7 @@ public class RentCollectionService implements IRentCollectionService {
 		 */
 
 		List<RentCollection> principalCollections = effectiveAmount > 0 && !hasDemandsWithInterest
-				? extractPrincipal(demands, effectiveAmount)
+				? extractPrincipal(demands, effectiveAmount, payment.getDateOfPayment())
 				: Collections.emptyList();
 		effectiveAmount -= principalCollections.stream().mapToDouble(RentCollection::getPrincipalCollected).sum();
 
@@ -141,7 +142,8 @@ public class RentCollectionService implements IRentCollectionService {
 				.collect(Collectors.toList());
 	}
 
-	private List<RentCollection> extractPrincipal(List<RentDemand> demands, double paymentAmount) {
+	private List<RentCollection> extractPrincipal(List<RentDemand> demands, double paymentAmount,
+			long paymentTimestamp) {
 		ArrayList<RentCollection> collections = new ArrayList<RentCollection>();
 		List<RentDemand> filteredDemands = demands.stream().filter(RentDemand::isUnPaid).collect(Collectors.toList());
 		for (RentDemand demand : filteredDemands) {
@@ -151,8 +153,8 @@ public class RentCollectionService implements IRentCollectionService {
 			double collectionAmount = Math.min(demand.getRemainingPrincipal(), paymentAmount);
 
 			paymentAmount -= collectionAmount;
-			collections.add(
-					RentCollection.builder().demandId(demand.getId()).principalCollected(collectionAmount).build());
+			collections.add(RentCollection.builder().demandId(demand.getId()).principalCollected(collectionAmount)
+					.collectedAt(paymentTimestamp).build());
 			demand.setRemainingPrincipalAndUpdatePaymentStatus(demand.getRemainingPrincipal() - collectionAmount);
 		}
 		return collections;
@@ -187,7 +189,8 @@ public class RentCollectionService implements IRentCollectionService {
 			double interest = demand.getRemainingPrincipal() * noOfDaysForInterestCalculation * interestRate / 365
 					/ 100;
 			if (interest < paymentAmount) {
-				collections.add(RentCollection.builder().interestCollected(interest).demandId(demand.getId()).build());
+				collections.add(RentCollection.builder().interestCollected(interest).collectedAt(paymentTimeStamp)
+						.demandId(demand.getId()).build());
 				demand.setInterestSince(paymentTimeStamp);
 				paymentAmount -= interest;
 			}
