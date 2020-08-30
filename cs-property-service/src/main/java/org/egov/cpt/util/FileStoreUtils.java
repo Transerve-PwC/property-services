@@ -17,27 +17,28 @@ public class FileStoreUtils {
 
 	@Value("${egov.filestore-service-host}${egov.file.url.path}")
 	private String fileStoreUrl;
-	
+
 	private RestTemplate restTemplate;
-	
+
 	public FileStoreUtils(RestTemplate restTemplate) {
 		super();
 		this.restTemplate = restTemplate;
 	}
 
 	@Cacheable(value = "fileUrl", sync = true)
+	@SuppressWarnings("unchecked")
 	public String fetchFileStoreUrl(ExcelSearchCriteria searchCriteria) {
-		String responseMap ="";
+		String responseMap = "";
 		StringBuilder uri = new StringBuilder(fileStoreUrl);
-		uri.append("?tenantId="+searchCriteria.getTenantId()+"&fileStoreIds="+searchCriteria.getFileStoreId());
+		uri.append("?tenantId=" + searchCriteria.getTenantId() + "&fileStoreIds=" + searchCriteria.getFileStoreId());
 		try {
-			Map<String,Object> response = restTemplate.getForObject(uri.toString(), HashMap.class);
+			Map<String, Object> response = (Map<String, Object>) (restTemplate.getForObject(uri.toString(),
+					HashMap.class));
 			responseMap = String.valueOf(response.get(searchCriteria.getFileStoreId()));
 		} catch (Exception e) {
 			log.error("Exception while fetching file url: ", e);
 		}
 		return responseMap;
 	}
-	
 
 }

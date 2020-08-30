@@ -1,7 +1,5 @@
 package org.egov.cpt.models;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +25,4 @@ public class AccountStatementCriteria {
 
 	@JsonProperty("propertyid")
 	private String propertyid;
-
-	private List<String> paymentids;
-	private List<String> demandids;
 }

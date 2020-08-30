@@ -3,7 +3,6 @@ package org.egov.cpt.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
@@ -11,7 +10,6 @@ import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RentAccount;
-import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.models.calculation.BusinessService;
@@ -121,19 +119,28 @@ public class PropertyService {
 
 	public AccountStatementResponse searchPayments(AccountStatementCriteria accountStatementCriteria,
 			RequestInfo requestInfo) {
-		List<RentPayment> payments = repository.getRentPayments(accountStatementCriteria);
-		accountStatementCriteria.setPaymentids(payments.stream().map(RentPayment::getId).collect(Collectors.toList()));
 
-		List<RentDemand> demands = repository.getRentDemands(accountStatementCriteria);
-		accountStatementCriteria.setDemandids(demands.stream().map(RentDemand::getId).collect(Collectors.toList()));
-
-		if (CollectionUtils.isEmpty(demands) || CollectionUtils.isEmpty(payments)) {
+		List<Property> properties = repository
+				.getProperties(PropertyCriteria.builder().propertyId(accountStatementCriteria.getPropertyid())
+						.relations(Collections.singletonList("finance")).build());
+		if (CollectionUtils.isEmpty(properties)) {
 			return AccountStatementResponse.builder().rentAccountStatements(Collections.emptyList()).build();
 		}
 
-		List<RentCollection> collections = repository.getRentCollections(accountStatementCriteria);
-		return AccountStatementResponse.builder().rentAccountStatements(rentCollectionService.accountStatement(demands,
-				payments, collections, accountStatementCriteria.getFromDate(), accountStatementCriteria.getToDate()))
+		Property property = properties.get(0);
+		List<RentDemand> demands = repository
+				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+		List<RentPayment> payments = repository
+				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+		// if (CollectionUtils.isEmpty(demands) || CollectionUtils.isEmpty(payments)) {
+		// return
+		// AccountStatementResponse.builder().rentAccountStatements(Collections.emptyList()).build();
+		// }
+
+		return AccountStatementResponse.builder()
+				.rentAccountStatements(rentCollectionService.getAccountStatement(demands, payments,
+						property.getPropertyDetails().getInterestRate(), accountStatementCriteria.getFromDate(),
+						accountStatementCriteria.getToDate()))
 				.build();
 	}
 

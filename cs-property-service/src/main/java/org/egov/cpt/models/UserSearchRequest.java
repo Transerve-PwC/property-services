@@ -87,9 +87,8 @@ public class UserSearchRequest {
 	private String revisionPercentage;
 
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
+	private AuditDetails auditDetails;
 
-	// TODO doubt
 	@JsonProperty("pageSize")
 	private int pageSize;
 

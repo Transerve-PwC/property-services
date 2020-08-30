@@ -66,30 +66,30 @@ public class NotificationUtil {
 
 		switch (ACTION_STATUS) {
 
-		case PTConstants.OT_ACTION_STATUS_SUBMIT:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
-			message = getInitiatedOtMsg(owner, messageTemplate);
-			break;
+			case PTConstants.OT_ACTION_STATUS_SUBMIT:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
+				message = getInitiatedOtMsg(owner, messageTemplate);
+				break;
 
-		case PTConstants.OT_ACTION_STATUS_REJECTED:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
-			message = getInitiatedOtMsg(owner, messageTemplate);
-			break;
+			case PTConstants.OT_ACTION_STATUS_REJECTED:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
+				message = getInitiatedOtMsg(owner, messageTemplate);
+				break;
 
-		case PTConstants.OT_ACTION_STATUS_SENDBACK:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
-			message = getInitiatedOtMsg(owner, messageTemplate);
-			break;
+			case PTConstants.OT_ACTION_STATUS_SENDBACK:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
+				message = getInitiatedOtMsg(owner, messageTemplate);
+				break;
 
-		case PTConstants.OT_ACTION_STATUS_APPROVED:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
-			message = getInitiatedOtMsg(owner, messageTemplate);
-			break;
+			case PTConstants.OT_ACTION_STATUS_APPROVED:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
+				message = getInitiatedOtMsg(owner, messageTemplate);
+				break;
 
-		case PTConstants.OT_ACTION_STATUS_PAYMENT:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
-			message = getInitiatedOtMsg(owner, messageTemplate);
-			break;
+			case PTConstants.OT_ACTION_STATUS_PAYMENT:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
+				message = getInitiatedOtMsg(owner, messageTemplate);
+				break;
 		}
 		return message;
 	}
@@ -106,6 +106,7 @@ public class NotificationUtil {
 		return message;
 	}
 
+	@SuppressWarnings("unchecked")
 	private String getMessageTemplate(String notificationCode, String localizationMessage) {
 		String path = "$..messages[?(@.code==\"{}\")].message";
 		path = path.replace("{}", notificationCode);
@@ -114,7 +115,7 @@ public class NotificationUtil {
 			Object messageObj = JsonPath.parse(localizationMessage).read(path);
 			message = ((ArrayList<String>) messageObj).get(0);
 		} catch (Exception e) {
-//			log.warn("Fetching from localization failed", e);
+			// log.warn("Fetching from localization failed", e);
 			return "" + e;
 		}
 		return message;
@@ -135,17 +136,13 @@ public class NotificationUtil {
 		}
 		return smsRequest;
 	}
-	
+
 	public List<EmailRequest> createEMAILRequest(String message, Map<String, String> emailIdToApplicant) {
 		List<EmailRequest> emailRequest = new LinkedList<>();
 		for (Map.Entry<String, String> entryset : emailIdToApplicant.entrySet()) {
 			String customizedMsg = message.replace("<1>", entryset.getValue());
-			emailRequest.add(EmailRequest.builder()
-					.email(entryset.getKey())
-					.subject(PTConstants.EMAIL_SUBJECT)
-					.body(customizedMsg)
-					.isHTML(false)
-					.build());
+			emailRequest.add(EmailRequest.builder().email(entryset.getKey()).subject(PTConstants.EMAIL_SUBJECT)
+					.body(customizedMsg).isHTML(false).build());
 		}
 		return emailRequest;
 	}
@@ -153,30 +150,33 @@ public class NotificationUtil {
 	public void sendSMS(List<SMSRequest> smsRequestsList, boolean isSMSEnabled) {
 		if (isSMSEnabled) {
 			if (CollectionUtils.isEmpty(smsRequestsList)) {
-//				log.info("Messages from localization couldn't be fetched!");
+				// log.info("Messages from localization couldn't be fetched!");
 			}
 			for (SMSRequest smsRequest : smsRequestsList) {
 				producer.push(config.getSmsNotifTopic(), smsRequest);
-//				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
+				// log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " +
+				// smsRequest.getMessage());
 			}
 		}
 
 	}
-	
+
 	public void sendEMAIL(List<EmailRequest> emailRequestList, boolean isEMAILEnabled) {
 		if (isEMAILEnabled) {
 			if (CollectionUtils.isEmpty(emailRequestList))
 				log.info("Messages from localization couldn't be fetched!");
 			for (EmailRequest emailRequest : emailRequestList) {
-				producer.pushEmail(config.getEmailNotifTopic(), emailRequest.getEmail(),  emailRequest.getBody(),PTConstants.EMAIL_SUBJECT, false);
+				producer.pushEmail(config.getEmailNotifTopic(), emailRequest.getEmail(), emailRequest.getBody(),
+						PTConstants.EMAIL_SUBJECT, false);
 				log.info("EmailAddress: " + emailRequest.getEmail() + " Messages: " + emailRequest.getBody());
 			}
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public String getLocalizationMessages(String tenantId, RequestInfo requestInfo) {
-		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo),
-				requestInfo);
+		LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository
+				.fetchResult(getUri(tenantId, requestInfo), requestInfo);
 		String jsonString = new JSONObject(responseMap).toString();
 		return jsonString;
 	}
@@ -207,30 +207,30 @@ public class NotificationUtil {
 
 		switch (ACTION_STATUS) {
 
-		case PTConstants.DC_ACTION_STATUS_SUBMIT:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
-			message = getInitiatedDcMsg(copy, messageTemplate);
-			break;
+			case PTConstants.DC_ACTION_STATUS_SUBMIT:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
+				message = getInitiatedDcMsg(copy, messageTemplate);
+				break;
 
-		case PTConstants.DC_ACTION_STATUS_REJECTED:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
-			message = getInitiatedDcMsg(copy, messageTemplate);
-			break;
+			case PTConstants.DC_ACTION_STATUS_REJECTED:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
+				message = getInitiatedDcMsg(copy, messageTemplate);
+				break;
 
-		case PTConstants.DC_ACTION_STATUS_SENDBACK:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
-			message = getInitiatedDcMsg(copy, messageTemplate);
-			break;
+			case PTConstants.DC_ACTION_STATUS_SENDBACK:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
+				message = getInitiatedDcMsg(copy, messageTemplate);
+				break;
 
-		case PTConstants.DC_ACTION_STATUS_APPROVED:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
-			message = getInitiatedDcMsg(copy, messageTemplate);
-			break;
+			case PTConstants.DC_ACTION_STATUS_APPROVED:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
+				message = getInitiatedDcMsg(copy, messageTemplate);
+				break;
 
-		case PTConstants.DC_ACTION_STATUS_PAYMENT:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
-			message = getInitiatedDcMsg(copy, messageTemplate);
-			break;
+			case PTConstants.DC_ACTION_STATUS_PAYMENT:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
+				message = getInitiatedDcMsg(copy, messageTemplate);
+				break;
 		}
 		return message;
 	}
@@ -249,18 +249,18 @@ public class NotificationUtil {
 
 	public String getOTOwnerPaymentMsg(Owner owner, String localizationMessages) {
 		String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS, localizationMessages);
-		messageTemplate = messageTemplate.replace("<2>",owner.getOwnerDetails().getName());
-		messageTemplate = messageTemplate.replace("<3>",PTConstants.OWNERSHIP_TRANSFER_APPLICATION);
-		messageTemplate = messageTemplate.replace("<4>",owner.getOwnerDetails().getApplicationNumber());
+		messageTemplate = messageTemplate.replace("<2>", owner.getOwnerDetails().getName());
+		messageTemplate = messageTemplate.replace("<3>", PTConstants.OWNERSHIP_TRANSFER_APPLICATION);
+		messageTemplate = messageTemplate.replace("<4>", owner.getOwnerDetails().getApplicationNumber());
 
 		return messageTemplate;
 	}
 
 	public String getDCOwnerPaymentMsg(DuplicateCopy copy, String localizationMessages) {
 		String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS, localizationMessages);
-		messageTemplate = messageTemplate.replace("<2>",copy.getApplicant().get(0).getName());
-		messageTemplate = messageTemplate.replace("<3>",PTConstants.DUPLICATE_COPY_APPLICATION);
-		messageTemplate = messageTemplate.replace("<4>",copy.getApplicationNumber());
+		messageTemplate = messageTemplate.replace("<2>", copy.getApplicant().get(0).getName());
+		messageTemplate = messageTemplate.replace("<3>", PTConstants.DUPLICATE_COPY_APPLICATION);
+		messageTemplate = messageTemplate.replace("<4>", copy.getApplicationNumber());
 
 		return messageTemplate;
 	}
@@ -273,25 +273,25 @@ public class NotificationUtil {
 
 		switch (ACTION_STATUS) {
 
-		case PTConstants.MG_ACTION_STATUS_SUBMIT:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
-			message = getInitiatedMGMsg(mortgage, messageTemplate);
-			break;
+			case PTConstants.MG_ACTION_STATUS_SUBMIT:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SUBMIT, localizationMessage);
+				message = getInitiatedMGMsg(mortgage, messageTemplate);
+				break;
 
-		case PTConstants.MG_ACTION_STATUS_REJECTED:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
-			message = getInitiatedMGMsg(mortgage, messageTemplate);
-			break;
+			case PTConstants.MG_ACTION_STATUS_REJECTED:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
+				message = getInitiatedMGMsg(mortgage, messageTemplate);
+				break;
 
-		case PTConstants.MG_ACTION_STATUS_SENDBACK:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
-			message = getInitiatedMGMsg(mortgage, messageTemplate);
-			break;
+			case PTConstants.MG_ACTION_STATUS_SENDBACK:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_SENDBACK, localizationMessage);
+				message = getInitiatedMGMsg(mortgage, messageTemplate);
+				break;
 
-		case PTConstants.MG_ACTION_STATUS_MORTGAGE_APPROVED:
-			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
-			message = getInitiatedMGMsg(mortgage, messageTemplate);
-			break;
+			case PTConstants.MG_ACTION_STATUS_MORTGAGE_APPROVED:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_APPROVED, localizationMessage);
+				message = getInitiatedMGMsg(mortgage, messageTemplate);
+				break;
 
 		}
 		return message;
@@ -305,27 +305,28 @@ public class NotificationUtil {
 		return message;
 	}
 
-	public String getCustomizedNoticeMsg(RequestInfo requestInfo, NoticeGeneration notice,Owner ownerDtl,String localizationMessages) {
+	public String getCustomizedNoticeMsg(RequestInfo requestInfo, NoticeGeneration notice, Owner ownerDtl,
+			String localizationMessages) {
 		String message = null, messageTemplate;
-		if(notice.getNoticeType().equalsIgnoreCase(PTConstants.NG_TYPE_VIOLATION)){
+		if (notice.getNoticeType().equalsIgnoreCase(PTConstants.NG_TYPE_VIOLATION)) {
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_NG_VIOLATION, localizationMessages);
-			message = getViolationNoticeMsg(notice,ownerDtl, messageTemplate);
-		}
-		else{
+			message = getViolationNoticeMsg(notice, ownerDtl, messageTemplate);
+		} else {
 			messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_NG_RECOVERY, localizationMessages);
-			message = getRecoveryNoticeMsg(notice,ownerDtl, messageTemplate);
+			message = getRecoveryNoticeMsg(notice, ownerDtl, messageTemplate);
 		}
 		return message;
 	}
-	
-	private String getViolationNoticeMsg(NoticeGeneration notice,Owner ownerDtl, String message) {
+
+	private String getViolationNoticeMsg(NoticeGeneration notice, Owner ownerDtl, String message) {
 		message = message.replace("<1>", ownerDtl.getOwnerDetails().getName());
 		message = message.replace("<2>", ownerDtl.getAllotmenNumber());
 		message = message.replace("<3>", notice.getMemoNumber());
 
 		return message;
 	}
-	private String getRecoveryNoticeMsg(NoticeGeneration notice,Owner ownerDtl, String message) {
+
+	private String getRecoveryNoticeMsg(NoticeGeneration notice, Owner ownerDtl, String message) {
 		message = message.replace("<1>", ownerDtl.getOwnerDetails().getName());
 		message = message.replace("<2>", notice.getMemoNumber());
 		message = message.replace("<3>", notice.getAmount().toString());
@@ -333,8 +334,9 @@ public class NotificationUtil {
 		return message;
 	}
 
-	public String getOTPayerPaymentMsg(Owner owner, Map<String,String> valMap,String localizationMessages) {
-		String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS_PAYER, localizationMessages);
+	public String getOTPayerPaymentMsg(Owner owner, Map<String, String> valMap, String localizationMessages) {
+		String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS_PAYER,
+				localizationMessages);
 		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
 		messageTemplate = messageTemplate.replace("<3>", owner.getOwnerDetails().getApplicationNumber());
 		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));
@@ -342,7 +344,8 @@ public class NotificationUtil {
 	}
 
 	public String getDCPayerPaymentMsg(DuplicateCopy copy, Map<String, String> valMap, String localizationMessages) {
-		String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS_PAYER, localizationMessages);
+		String messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT_SUCCESS_PAYER,
+				localizationMessages);
 		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
 		messageTemplate = messageTemplate.replace("<3>", copy.getApplicationNumber());
 		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));

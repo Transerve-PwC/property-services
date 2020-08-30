@@ -1,5 +1,11 @@
 package org.egov.cpt.models;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -23,10 +29,25 @@ public class RentAccountStatement {
      */
     private double amount;
 
-    private String type;
+    private Type type;
     private double remainingPrincipal;
+
     private double remainingInterest;
-    private double dueAmount;
+
+    public double getRemainingInterest() {
+        return Math.max(0, this.remainingInterest - this.remainingBalance);
+    }
+
+    @JsonProperty("remainingBalance")
+    private double remainingBalance;
+
+    public double getRemainingBalance() {
+        return Math.max(0, this.remainingBalance - this.remainingPrincipal - this.remainingInterest);
+    }
+
+    private double getDueAmount() {
+        return Math.max(0, this.remainingPrincipal + this.remainingInterest - this.remainingBalance);
+    }
 
     public enum Type {
         C("C"), D("D");
@@ -50,5 +71,16 @@ public class RentAccountStatement {
             }
             return null;
         }
+    }
+
+    @JsonIgnore
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yy");
+
+    @Override
+    public String toString() {
+        return String.format(
+                "date=%s, amount=%.2f, type=%s, balancePrincipal=%.2f, balanceInterest=%.2f, totalDue=%.2f, balanceAmount=%.2f",
+                dateFormat.format(new Date(this.date)), this.amount, this.type.value, this.getRemainingPrincipal(),
+                this.getRemainingInterest(), this.getDueAmount(), this.getRemainingBalance());
     }
 }
