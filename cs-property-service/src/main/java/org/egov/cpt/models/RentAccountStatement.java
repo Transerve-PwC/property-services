@@ -45,7 +45,7 @@ public class RentAccountStatement {
         return Math.max(0, this.remainingBalance - this.remainingPrincipal - this.remainingInterest);
     }
 
-    private double getDueAmount() {
+    public double getDueAmount() {
         return Math.max(0, this.remainingPrincipal + this.remainingInterest - this.remainingBalance);
     }
 
@@ -78,9 +78,9 @@ public class RentAccountStatement {
 
     @Override
     public String toString() {
-        return String.format(
-                "date=%s, amount=%.2f, type=%s, balancePrincipal=%.2f, balanceInterest=%.2f, totalDue=%.2f, balanceAmount=%.2f",
-                dateFormat.format(new Date(this.date)), this.amount, this.type.value, this.getRemainingPrincipal(),
-                this.getRemainingInterest(), this.getDueAmount(), this.getRemainingBalance());
+        return String.format("%s\tamount=%.2f\t%s\tprincipalDue=%.2f\tinterestDue=%.2f\ttotalDue=%.2f\tbalance=%.2f",
+                dateFormat.format(new Date(this.date)), this.amount, this.type == Type.C ? "Payment" : "Rent",
+                this.getRemainingPrincipal(), this.getRemainingInterest(), this.getDueAmount(),
+                this.getRemainingBalance());
     }
 }

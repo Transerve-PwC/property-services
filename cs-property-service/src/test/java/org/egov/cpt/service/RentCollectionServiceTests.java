@@ -17,6 +17,7 @@ import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.models.RentSummary;
+import org.egov.cpt.util.RentCollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,26 +26,28 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 @SuppressWarnings("unused")
 public class RentCollectionServiceTests {
-    private final String JAN_1_2020 = "01 01 2020";
-    private final String JAN_15_2020 = "15 01 2020";
-    private final String FEB_1_2020 = "01 02 2020";
-    private final String FEB_15_2020 = "15 02 2020";
-    private final String MAY_1_2020 = "01 05 2020";
-    private final String DEC_1_1998 = "01 12 1998";
-    private final String JAN_1_1999 = "01 01 1999";
-    private final String FEB_1_1999 = "01 02 1999";
-    private final String FEB_16_1999 = "16 02 1999";
-    private final String MAR_1_1999 = "01 03 1999";
-    private final String APR_1_1999 = "01 04 1999";
+    private static final String JAN_1_2020 = "01 01 2020";
+    private static final String JAN_15_2020 = "15 01 2020";
+    private static final String FEB_1_2020 = "01 02 2020";
+    private static final String FEB_15_2020 = "15 02 2020";
+    private static final String MAY_1_2020 = "01 05 2020";
+    private static final String DEC_1_1998 = "01 12 1998";
+    private static final String JAN_1_1999 = "01 01 1999";
+    private static final String FEB_1_1999 = "01 02 1999";
+    private static final String FEB_16_1999 = "16 02 1999";
+    private static final String MAR_1_1999 = "01 03 1999";
+    private static final String APR_1_1999 = "01 04 1999";
 
-    private final double DEFAULT_INTEREST_RATE = 24D;
-    private final double ZERO_INTEREST_RATE = 0D;
+    public static final double DEFAULT_INTEREST_RATE = 24D;
+    private static final double ZERO_INTEREST_RATE = 0D;
 
     RentCollectionService rentCollectionService;
+    RentCollectionUtils utils;
 
     @Before
     public void setup() {
         this.rentCollectionService = new RentCollectionService();
+        this.utils = new RentCollectionUtils();
     }
 
     /**
@@ -169,7 +172,8 @@ public class RentCollectionServiceTests {
         List<RentPayment> payments = Arrays.asList(getPayment(200, FEB_16_1999));
         List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
                 payments, DEFAULT_INTEREST_RATE, null, null);
-        System.out.println(accountStatementItems);
+        utils.printStatement(accountStatementItems);
+        utils.reconcileStatement(accountStatementItems, DEFAULT_INTEREST_RATE);
     }
 
     @Test
@@ -179,7 +183,8 @@ public class RentCollectionServiceTests {
         List<RentPayment> payments = Arrays.asList(getPayment(400, FEB_16_1999), getPayment(20, APR_1_1999));
         List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
                 payments, DEFAULT_INTEREST_RATE, null, null);
-        System.out.println(accountStatementItems);
+        utils.printStatement(accountStatementItems);
+        utils.reconcileStatement(accountStatementItems, DEFAULT_INTEREST_RATE);
     }
 
     @Test
@@ -188,7 +193,8 @@ public class RentCollectionServiceTests {
         List<RentPayment> payments = Arrays.asList(getPayment(200, FEB_16_1999), getPayment(200, APR_1_1999));
         List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
                 payments, DEFAULT_INTEREST_RATE, null, null);
-        System.out.println(accountStatementItems);
+        utils.printStatement(accountStatementItems);
+        utils.reconcileStatement(accountStatementItems, DEFAULT_INTEREST_RATE);
     }
 
     @Test

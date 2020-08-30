@@ -114,15 +114,17 @@ public class RentCollectionService implements IRentCollectionService {
 				effectiveAmount);
 		effectiveAmount -= interestCollections.stream().mapToDouble(RentCollection::getInterestCollected).sum();
 
-		boolean hasDemandsWithInterest = interestRate > 0 && demands.stream()
-				.filter(demand -> demand.getInterestSince().longValue() < payment.getDateOfPayment().longValue())
-				.count() > 0;
+		/**
+		 * Principal is to be extracted only when there are no demands with interest not
+		 * extracted.
+		 */
+		boolean shouldExtractPrincipal = (effectiveAmount > 0 || interestRate == 0)
+				&& !didExtractAllDemandsInterest(demands, payment.getDateOfPayment());
 		/**
 		 * Amount is left after deducting interest for all the demands. Extract
 		 * Principal.
 		 */
-
-		List<RentCollection> principalCollections = effectiveAmount > 0 && !hasDemandsWithInterest
+		List<RentCollection> principalCollections = shouldExtractPrincipal
 				? extractPrincipal(demands, effectiveAmount, payment.getDateOfPayment())
 				: Collections.emptyList();
 		effectiveAmount -= principalCollections.stream().mapToDouble(RentCollection::getPrincipalCollected).sum();
@@ -139,6 +141,23 @@ public class RentCollectionService implements IRentCollectionService {
 		payment.setProcessed(true);
 		return Stream.of(interestCollections, principalCollections).flatMap(x -> x.stream())
 				.collect(Collectors.toList());
+	}
+
+	/**
+	 * For each demand check if payment date is after the initialGracePeriod and
+	 * interest since is behind payment date.
+	 * 
+	 * @param demands
+	 * @param dateOfPayment
+	 * @return
+	 */
+	private boolean didExtractAllDemandsInterest(List<RentDemand> demands, long dateOfPayment) {
+		return demands.stream().filter(RentDemand::isUnPaid).filter(demand -> {
+			LocalDate demandGenerationDate = getLocalDate(demand.getGenerationDate());
+			LocalDate paymentDate = getLocalDate(dateOfPayment);
+			return demand.getInitialGracePeriod() < ChronoUnit.DAYS.between(demandGenerationDate, paymentDate)
+					&& dateOfPayment > demand.getInterestSince();
+		}).findAny().isPresent();
 	}
 
 	private List<RentCollection> extractPrincipal(List<RentDemand> demands, double paymentAmount,
@@ -255,6 +274,7 @@ public class RentCollectionService implements IRentCollectionService {
 	@Override
 	public List<RentAccountStatement> getAccountStatement(List<RentDemand> demands, List<RentPayment> payments,
 			double interestRate, Long fromDateTimestamp, Long toDateTimestamp) {
+		payments = payments.stream().filter(payment -> payment.getAmountPaid() > 0).collect(Collectors.toList());
 		Collections.sort(demands);
 		Collections.sort(payments);
 		List<RentAccountStatement> accountStatementItems = new ArrayList<RentAccountStatement>();
