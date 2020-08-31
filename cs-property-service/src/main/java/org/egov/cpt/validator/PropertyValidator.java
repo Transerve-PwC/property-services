@@ -278,7 +278,7 @@ public class PropertyValidator {
 				List<String> oIdList=propertySearch.getOwners().stream().map(Owner::getId).collect(Collectors.toList());
 				property.getOwners().forEach(owner -> {
 					if(!oIdList.contains(owner.getId())){
-						errorMap.put("INVALID ID", "ID is not valid");
+						errorMap.put("INVALID ID",String.format("Existing user with id '%s' is missing during update. All the owners should be present during the update API", owner.getId()));
 					}
 				});
 
