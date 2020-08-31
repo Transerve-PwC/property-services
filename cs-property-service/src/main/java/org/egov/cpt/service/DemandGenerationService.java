@@ -116,7 +116,7 @@ public class DemandGenerationService {
 		rentDemand.setCollectionPrincipal(collectionPrincipal);
 		rentDemand.setRemainingPrincipal(rentDemand.getCollectionPrincipal());
 		rentDemand.setInterestSince(rentDemand.getGenerationDate());
-		rentDemand.setTenantId(property.getTenantId());
+		//rentDemand.setTenantId(property.getTenantId());
 		// rentDemand.setAuditDetails();
 	}
 
