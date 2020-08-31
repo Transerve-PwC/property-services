@@ -7,7 +7,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.egov.cpt.models.calculation.Calculation;
-import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertySerializer;
 import org.springframework.validation.annotation.Validated;
 
@@ -54,11 +53,12 @@ public class DuplicateCopy {
 
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
-	
+
 	@JsonProperty("allotmentNumber")
 	private String allotmentNumber;
-	
+
 	@JsonProperty("assignee")
+	@Builder.Default
 	private List<String> assignee = null;
 
 	@Size(max = 128)
@@ -66,21 +66,18 @@ public class DuplicateCopy {
 	private String comment;
 
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
+	private AuditDetails auditDetails;
 
 	@Valid
 	@JsonProperty("applicationDocuments")
-	private List<Document> applicationDocuments = null;
+	private List<Document> applicationDocuments;
 
 	@Valid
 	@JsonProperty("applicant")
 	private List<Applicant> applicant;
 
-	@JsonProperty("businessService")
-	private String businessService = PTConstants.BUSINESS_SERVICE_DC;
-	
 	@Valid
-    @JsonProperty("wfDocuments")
+	@JsonProperty("wfDocuments")
 	private List<Document> wfdocuments;
 
 	@JsonProperty("calculation")

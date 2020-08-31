@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.Role;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.Property;
@@ -95,10 +94,10 @@ public class PropertyService {
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		processRentHistory(request);
 		userService.createUser(request);
-		String action =request.getProperties().get(0).getMasterDataAction();
-		String state =request.getProperties().get(0).getMasterDataState();
-		if ((config.getIsWorkflowEnabled()&& !action.equalsIgnoreCase(""))
-				&& (!state.equalsIgnoreCase(PTConstants.PM_STATUS_APPROVED)) ) {
+		String action = request.getProperties().get(0).getMasterDataAction();
+		String state = request.getProperties().get(0).getMasterDataState();
+		if ((config.getIsWorkflowEnabled() && !action.equalsIgnoreCase(""))
+				&& (!state.equalsIgnoreCase(PTConstants.PM_STATUS_APPROVED))) {
 			wfIntegrator.callWorkFlow(request);
 		}
 		producer.push(config.getUpdatePropertyTopic(), request);
