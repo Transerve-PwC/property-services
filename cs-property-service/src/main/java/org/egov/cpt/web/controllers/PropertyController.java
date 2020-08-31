@@ -1,5 +1,8 @@
 package org.egov.cpt.web.controllers;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -78,7 +81,11 @@ public class PropertyController {
 
 	@PostMapping("/_accountstatement")
 	public ResponseEntity<AccountStatementResponse> searchDateWise(
-			@Valid @RequestBody AccountStatementRequest request) {
+			@Valid @RequestBody AccountStatementRequest request) throws Exception {
+		/* Set intial date in a fromDate if it is null */
+		request.getCriteria().setFromDate( request.getCriteria().getFromDate() == null ? new Date(0).getTime(): request.getCriteria().getFromDate());
+		/* Set current date in a toDate if it is null */
+		request.getCriteria().setToDate(request.getCriteria().getToDate() == null ? new Date().getTime(): request.getCriteria().getToDate());	
 		AccountStatementCriteria accountStatementCriteria = request.getCriteria();
 		AccountStatementResponse resposne = propertyService.searchPayments(accountStatementCriteria,
 				request.getRequestInfo());

@@ -3,6 +3,7 @@ package org.egov.cpt.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
@@ -127,25 +128,34 @@ public class PropertyService {
 				.getProperties(PropertyCriteria.builder().propertyId(accountStatementCriteria.getPropertyid())
 						.relations(Collections.singletonList("finance")).build());
 		if (CollectionUtils.isEmpty(properties)) {
-			return AccountStatementResponse.builder().rentAccountStatements(Collections.emptyList()).build();
+			return AccountStatementResponse.builder().rentAccountStatements(Collections.emptyList()).build();			
 		}
-
+		
 		Property property = properties.get(0);
 		List<RentDemand> demands = repository
-				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build())
+				.stream()
+				.filter(rentDemand -> accountStatementCriteria.getFromDate() <= rentDemand.getAuditDetails().getCreatedTime())
+				.filter(rentDemand -> accountStatementCriteria.getToDate() >= rentDemand.getAuditDetails().getCreatedTime())
+				.map(rentDemand-> {	return rentDemand; })
+				.collect(Collectors.toList());
+		
 		List<RentPayment> payments = repository
-				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
-		// if (CollectionUtils.isEmpty(demands) || CollectionUtils.isEmpty(payments)) {
-		// return
-		// AccountStatementResponse.builder().rentAccountStatements(Collections.emptyList()).build();
-		// }
-
+				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build())
+				.stream()
+				.filter(rentPayment -> accountStatementCriteria.getFromDate() <= rentPayment.getAuditDetails().getCreatedTime())
+				.filter(rentPayment -> accountStatementCriteria.getToDate() >= rentPayment.getAuditDetails().getCreatedTime())
+				.map(rentPayment-> {	return rentPayment; })
+				.collect(Collectors.toList());
+		
+		
 		return AccountStatementResponse.builder()
 				.rentAccountStatements(rentCollectionService.getAccountStatement(demands, payments,
 						property.getPropertyDetails().getInterestRate(), accountStatementCriteria.getFromDate(),
 						accountStatementCriteria.getToDate()))
 				.build();
 	}
+	
 
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
 		if (criteria.isEmpty()) {
