@@ -1,0 +1,49 @@
+serviceMaps:
+  serviceName: csp
+  mappings:
+    - version: 1.0
+	  description: Persists Properties details in cs_pt_demand table
+      fromTopic: save-rent-demand
+      isTransaction: true
+      queryMaps:
+
+        - query: INSERT INTO cs_pt_demand(id, property_id, initialGracePeriod, generationDate, collectionPrincipal, remainingPrincipal, interestSince, mode, status, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Properties.*.demands.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.demands.*.id
+
+            - jsonPath: $.Properties.*.demands.*.propertyId
+
+            - jsonPath: $.Properties.*.demands.*.initialGracePeriod
+
+            - jsonPath: $.Properties.*.demands.*.generationDate
+
+            - jsonPath: $.Properties.*.demands.*.collectionPrincipal
+
+            - jsonPath: $.Properties.*.demands.*.remainingPrincipal
+
+            - jsonPath: $.Properties.*.demands.*.interestSince
+
+            - jsonPath: $.Properties.*.demands.*.mode
+
+            - jsonPath: $.Properties.*.demands.*.status
+
+            - jsonPath: $.Properties.*.demands.*.auditDetails.createdBy
+
+            - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedBy
+
+            - jsonPath: $.Properties.*.demands.*.auditDetails.createdTime
+
+            - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedTime
+
+            - jsonPath: $.Properties.*.demands.*.initialGracePeriod
+
+            - jsonPath: $.Properties.*.demands.*.remainingPrincipal
+
+            - jsonPath: $.Properties.*.demands.*.interestSince
+
+            - jsonPath: $.Properties.*.demands.*.status
+
+            - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedBy
+
+            - jsonPath: $.Properties.*.demands.*.auditDetails.lastModifiedTime

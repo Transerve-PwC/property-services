@@ -15,9 +15,9 @@ import lombok.ToString;
 @Builder
 public class DemandCriteria {
 
-	private String month;
+	private String date;
 	
 	public boolean isEmpty() {
-		return (this.month == null);
+		return (this.date == null);
 	}
 }
