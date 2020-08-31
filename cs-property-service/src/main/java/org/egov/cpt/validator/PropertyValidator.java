@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.models.Document;
@@ -274,14 +275,11 @@ public class PropertyValidator {
 						errorMap);
 				compareIds(propertySearch.getTransitNumber(),
 						property.getPropertyDetails().getAddress().getTransitNumber(), errorMap);
-				propertySearch.getOwners().forEach(searchOwner -> {
-					property.getOwners().forEach(owner -> {
-						compareIds(searchOwner.getId(), owner.getId(), errorMap);
-						compareIds(propertySearch.getId(), owner.getProperty().getId(), errorMap);
-						compareIds(searchOwner.getOwnerDetails().getId(), owner.getOwnerDetails().getId(), errorMap);
-						compareIds(propertySearch.getId(), owner.getOwnerDetails().getPropertyId(), errorMap);
-						compareIds(searchOwner.getId(), owner.getOwnerDetails().getOwnerId(), errorMap);
-					});
+				List<String> oIdList=propertySearch.getOwners().stream().map(Owner::getId).collect(Collectors.toList());
+				property.getOwners().forEach(owner -> {
+					if(!oIdList.contains(owner.getId())){
+						errorMap.put("INVALID ID",String.format("Existing user with id '%s' is missing during update. All the owners should be present during the update API", owner.getId()));
+					}
 				});
 
 			});

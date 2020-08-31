@@ -486,6 +486,25 @@ serviceMaps:
             - jsonPath: $.Properties.*.owners.*.ownerDetails.auditDetails.lastModifiedTime
 
             - jsonPath: $.Properties.*.owners.*.ownerDetails.id
+            
+            
+        - query: UPDATE cs_pt_address_v1 SET colony=?, area=?, district=?, pincode=?, modified_by=?, modified_date=? WHERE property_id=?;
+          basePath: $.Properties.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.colony
+
+            - jsonPath: $.Properties.*.propertyDetails.address.area
+
+            - jsonPath: $.Properties.*.propertyDetails.address.district
+
+            - jsonPath: $.Properties.*.propertyDetails.address.pincode
+
+            - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.lastModifiedBy
+
+            - jsonPath: $.Properties.*.propertyDetails.address.auditDetails.lastModifiedTime  
+            
+            - jsonPath: $.Properties.*.id 
+            
 
         - query: INSERT INTO cs_pt_documents_v1 (id, reference_id, tenantid, is_active, document_type, fileStore_id, property_id, created_by, modified_by, created_date, modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type =?, fileStore_id =?,modified_by =?, modified_date =?;
           basePath: $.Properties.*.propertyDetails.applicationDocuments.*
