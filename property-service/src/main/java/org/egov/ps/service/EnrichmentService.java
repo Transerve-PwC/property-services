@@ -1,5 +1,7 @@
 package org.egov.ps.service;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.config.Configuration;
 import org.egov.ps.model.Application;
@@ -18,10 +21,13 @@ import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
 import org.egov.ps.model.Payment;
 import org.egov.ps.model.Property;
+import org.egov.ps.model.PropertyCriteria;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.model.PurchaseDetails;
 import org.egov.ps.model.idgen.IdResponse;
+import org.egov.ps.producer.Producer;
 import org.egov.ps.repository.IdGenRepository;
+import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.ApplicationRequest;
@@ -31,6 +37,11 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,6 +57,12 @@ public class EnrichmentService {
 
 	@Autowired
 	private Configuration config;
+
+	@Autowired
+	PropertyRepository propertyRepository;
+	
+	@Autowired
+	private Producer producer;
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
@@ -65,14 +82,37 @@ public class EnrichmentService {
 
 			});
 		}
-	} 
-	
-	public void enrichMortgageDetailsRequest(PropertyRequest request) {
-		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().forEach(property -> {
-				property.getPropertyDetails().getOwners().forEach(owner ->{
-					owner.setMortgageDetails(getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
-				});
+	}
+
+	public void postEnrichMortgageDetails(ApplicationRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+		if (!CollectionUtils.isEmpty(request.getApplications())) {
+			request.getApplications().forEach(application -> {
+				if (null != application && null != application.getProperty()
+						&& application.getState().equalsIgnoreCase(PSConstants.PM_APPROVED)
+						&& application.getProperty().getId() != null) {
+					
+					//set audit details..
+					application.setAuditDetails(auditDetails);
+					
+					//fetch property data
+					PropertyCriteria propertySearchCriteria = PropertyCriteria.builder()
+							.propertyId(application.getProperty().getId()).build();
+					List<Property> properties = propertyRepository.getProperties(propertySearchCriteria);
+
+					if (!CollectionUtils.isEmpty(properties)) {
+						properties.forEach(property -> {
+							if (null != property.getPropertyDetails() 
+									&& !CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
+								property.getPropertyDetails().getOwners().forEach(owner -> {
+									owner.setMortgageDetails(getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
+								});
+							}
+						});
+					}
+				}
 			});
 		}
 	}
@@ -121,7 +161,7 @@ public class EnrichmentService {
 		}
 		return owners;
 	}
-	
+
 	private MortgageDetails getMortgage(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
 		String gen_mortgage_id = UUID.randomUUID().toString();
 		
@@ -130,6 +170,20 @@ public class EnrichmentService {
 		mortgage.setTenantId(property.getTenantId());
 		mortgage.setOwnerId(gen_owner_id);
 		
+		List<Document> documents = mortgage.getMortgageDocuments();
+		if(!CollectionUtils.isEmpty(documents)) {
+			AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+			documents.forEach(document -> {
+				if (document.getId() == null) {
+					String gen_doc_id = UUID.randomUUID().toString();
+					document.setId(gen_doc_id);
+					document.setTenantId(property.getTenantId());
+					document.setReferenceId(property.getId());
+					document.setPropertyId(property.getId());
+				}
+				document.setAuditDetails(docAuditDetails);
+			});
+		}
 		return mortgage;
 	}
 
