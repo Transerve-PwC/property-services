@@ -190,24 +190,25 @@ public class EnrichmentService {
 	public void validateMortgageDetails(Property property, Owner owner, RequestInfo requestInfo, String id){
 		// TODO Auto-generated method stub
 		MortgageDetails mortgage = owner.getMortgageDetails();
-
+		Map<String, String> errorMap = new HashMap<>();
 		if(mortgage!=null ) {
 			List<Map<String, Object>> fieldConfigurations = mdmsservice.getMortgageDocumentConfig("mortgage", requestInfo, "ch");
 
 			//To Do :: write code to validate documents base on master json template.
 			ObjectMapper mapper = new ObjectMapper();
 			List<MortgageDocuments> mortgageTypeList = mapper.convertValue(fieldConfigurations, new TypeReference<List<MortgageDocuments>>() { });
-			Map<String, String> errorMap = new HashMap<>();
 
 			if(mortgage.getMortgageDocuments() != null || !mortgage.getMortgageDocuments().isEmpty()) {
-					mortgage.getMortgageDocuments().stream().forEach(document -> {
-							if(!mortgageTypeList.contains(MortgageDocuments.builder().code(document.getDocumentType()).build())) {
-									errorMap.put("INVALID DOCUMENT",
-													"Document is not valid for user : " + owner.getOwnerDetails().getOwnerName());
-							}
-					});
+				mortgage.getMortgageDocuments().stream().forEach(document -> {
+					if(!mortgageTypeList.contains(MortgageDocuments.builder().code(document.getDocumentType()).build())) {
+						errorMap.put("INVALID DOCUMENT "+document.getDocumentType(),
+								"Document is not valid for user : " + owner.getOwnerDetails().getOwnerName());
+					}
+				});
 			}
 		}
+		
+		System.out.println(errorMap);
 	}
 	
 	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
