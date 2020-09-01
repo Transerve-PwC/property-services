@@ -9,6 +9,7 @@ CREATE TABLE cs_pt_property_images_application (
    tenantid			    	CHARACTER VARYING (256),
    application_number		CHARACTER VARYING (64),
    description				CHARACTER VARYING (1000),
+   capturedBy 				CHARACTER VARYING (256),
   
    created_by           	CHARACTER VARYING (128) NOT NULL,
    created_time         	bigint,
@@ -27,6 +28,7 @@ CREATE TABLE cs_pt_property_images_application_audit (
    tenantid			    	CHARACTER VARYING (256),
    application_number		CHARACTER VARYING (64),
    description				CHARACTER VARYING (1000),
+   capturedBy 				CHARACTER VARYING (256),
   
    created_by           	CHARACTER VARYING (128) NOT NULL,
    created_time         	bigint,

@@ -29,20 +29,23 @@ CREATE TABLE cs_pt_property_v1 (
 );
 
 CREATE TABLE cs_pt_propertydetails_v1 (
-   id           		CHARACTER VARYING (256) NOT NULL,
-   property_id       	CHARACTER VARYING (256),
-   transit_number       CHARACTER VARYING (256) NOT NULL,
-   tenantid			    CHARACTER VARYING (256),
-   area           		CHARACTER VARYING (256),
-   rent_per_sqyd        CHARACTER VARYING (256),
-   current_owner        CHARACTER VARYING (256),
-   floors           	CHARACTER VARYING (256),
-   additional_details   CHARACTER VARYING (256), -- JSONB
+   id           		     CHARACTER VARYING (256) NOT NULL,
+   property_id       	     CHARACTER VARYING (256),
+   transit_number            CHARACTER VARYING (256) NOT NULL,
+   tenantid			         CHARACTER VARYING (256),
+   area           		     CHARACTER VARYING (256),
+   rent_per_sqyd             CHARACTER VARYING (256),
+   current_owner             CHARACTER VARYING (256),
+   floors           	     CHARACTER VARYING (256),
+   additional_details        CHARACTER VARYING (256), -- JSONB
+   interest_rate             numeric(4,2),
+   rent_increment_percentage numeric(4,2),
+   rent_increment_period     int,
   
-   created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         CHARACTER VARYING NOT NULL,
-   modified_by     		CHARACTER VARYING (128),
-   modified_date       	CHARACTER VARYING,
+   created_by                CHARACTER VARYING (128) NOT NULL,
+   created_date              CHARACTER VARYING NOT NULL,
+   modified_by     		     CHARACTER VARYING (128),
+   modified_date       	     CHARACTER VARYING,
 
   CONSTRAINT pk_cs_pt_propertydetails_v1 PRIMARY KEY (id),
   CONSTRAINT uk_cs_pt_propertydetails_v1 UNIQUE (transit_number),
@@ -152,20 +155,23 @@ CREATE TABLE cs_pt_property_audit_v1 (
 );
 
 CREATE TABLE cs_pt_propertydetails_audit_v1 (
-   id           		CHARACTER VARYING (256) NOT NULL,
-   property_id       	CHARACTER VARYING (256),
-   transit_number       CHARACTER VARYING (256) NOT NULL,
-   tenantid			    CHARACTER VARYING (256),
-   area           		CHARACTER VARYING (256),
-   rent_per_sqyd        CHARACTER VARYING (256),
-   current_owner        CHARACTER VARYING (256),
-   floors           	CHARACTER VARYING (256),
-   additional_details   CHARACTER VARYING (256), -- JSONB
+   id           		     CHARACTER VARYING (256) NOT NULL,
+   property_id       	     CHARACTER VARYING (256),
+   transit_number            CHARACTER VARYING (256) NOT NULL,
+   tenantid			         CHARACTER VARYING (256),
+   area           		     CHARACTER VARYING (256),
+   rent_per_sqyd             CHARACTER VARYING (256),
+   current_owner             CHARACTER VARYING (256),
+   floors           	     CHARACTER VARYING (256),
+   additional_details        CHARACTER VARYING (256), -- JSONB
+   interest_rate             numeric(4,2),
+   rent_increment_percentage numeric(4,2),
+   rent_increment_period     int,
   
-   created_by           CHARACTER VARYING (128) NOT NULL,
-   created_date         CHARACTER VARYING NOT NULL,
-   modified_by     		CHARACTER VARYING (128),
-   modified_date       	CHARACTER VARYING
+   created_by                CHARACTER VARYING (128) NOT NULL,
+   created_date              CHARACTER VARYING NOT NULL,
+   modified_by     		     CHARACTER VARYING (128),
+   modified_date       	     CHARACTER VARYING
 );
 
 CREATE TABLE cs_pt_ownership_audit_v1 (
