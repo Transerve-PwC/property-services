@@ -89,10 +89,8 @@ public class PaymentUpdateService {
 			for (PaymentDetail paymentDetail : paymentDetails) {
 				if (allowedservices.contains(paymentDetail.getBusinessService())) {
 
-					String wfbusinessServiceName = null;
 					switch (paymentDetail.getBusinessService()) {
-						case PTConstants.BUSINESS_SERVICE_OT:
-							wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_OT;
+						case PTConstants.BILLING_BUSINESS_SERVICE_OT: {
 
 							DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
 							searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
@@ -101,7 +99,7 @@ public class PaymentUpdateService {
 									requestInfo);
 
 							BusinessService otBusinessService = workflowService.getBusinessService(
-									owners.get(0).getTenantId(), requestInfo, wfbusinessServiceName);
+									owners.get(0).getTenantId(), requestInfo, PTConstants.BUSINESS_SERVICE_OT);
 
 							if (CollectionUtils.isEmpty(owners))
 								throw new CustomException("INVALID RECEIPT",
@@ -117,20 +115,17 @@ public class PaymentUpdateService {
 							updateRequest.getOwners().forEach(obj -> log
 									.info(" the status of the application is : " + obj.getApplicationState()));
 
-							// List<String> endStates =
-							// Collections.nCopies(updateRequest.getOwners().size(),
-							// PTConstants.STATUS_APPROVED);
-
-							// enrichmentService.postStatusEnrichment(updateRequest, endStates);
+							/**
+							 * Payment is not the end state for Ownership Transfer. No need to postEnrich
+							 */
 
 							Map<String, Boolean> idToIsStateUpdatableMap = util
 									.getIdToIsStateUpdatableMap(otBusinessService, owners);
 
 							repositoryOt.update(updateRequest, idToIsStateUpdatableMap);
 							break;
-
-						case PTConstants.BUSINESS_SERVICE_DC:
-							wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_DC;
+						}
+						case PTConstants.BILLING_BUSINESS_SERVICE_DC: {
 
 							DuplicateCopySearchCriteria searchCriteriaDc = new DuplicateCopySearchCriteria();
 							searchCriteriaDc.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
@@ -139,7 +134,7 @@ public class PaymentUpdateService {
 									.searchApplication(searchCriteriaDc, requestInfo);
 
 							BusinessService dcBusinessService = workflowService.getBusinessService(
-									dcApplications.get(0).getTenantId(), requestInfo, wfbusinessServiceName);
+									dcApplications.get(0).getTenantId(), requestInfo, PTConstants.BUSINESS_SERVICE_DC);
 
 							if (CollectionUtils.isEmpty(dcApplications))
 								throw new CustomException("INVALID RECEIPT", "No Owner found for the comsumerCode "
@@ -153,17 +148,16 @@ public class PaymentUpdateService {
 							updateDCRequest.getDuplicateCopyApplications()
 									.forEach(obj -> log.info(" the status of the application is : " + obj.getState()));
 
-							// List<String> dcEndStates =
-							// Collections.nCopies(updateDCRequest.getDuplicateCopyApplications().size(),
-							// PTConstants.STATUS_APPROVED);
-
-							// enrichmentService.postStatusEnrichmentDC(updateDCRequest, dcEndStates);
+							/**
+							 * Nothing to enrich for Duplicate Copy Letter
+							 */
 
 							Map<String, Boolean> idToIsStateUpdatableMapDc = util
 									.getIdToIsStateUpdatableMapDc(dcBusinessService, dcApplications);
 
 							propertyRepository.updateDcPayment(updateDCRequest, idToIsStateUpdatableMapDc);
 							break;
+						}
 					}
 				}
 			}

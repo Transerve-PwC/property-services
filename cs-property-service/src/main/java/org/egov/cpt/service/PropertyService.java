@@ -94,8 +94,10 @@ public class PropertyService {
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		processRentHistory(request);
 		userService.createUser(request);
-		if (config.getIsWorkflowEnabled()
-				&& !request.getProperties().get(0).getMasterDataAction().equalsIgnoreCase("")) {
+		String action = request.getProperties().get(0).getMasterDataAction();
+		String state = request.getProperties().get(0).getMasterDataState();
+		if ((config.getIsWorkflowEnabled() && !action.equalsIgnoreCase(""))
+				&& (!state.equalsIgnoreCase(PTConstants.PM_STATUS_APPROVED))) {
 			wfIntegrator.callWorkFlow(request);
 		}
 		producer.push(config.getUpdatePropertyTopic(), request);
