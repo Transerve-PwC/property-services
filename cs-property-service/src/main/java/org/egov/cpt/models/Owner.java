@@ -6,7 +6,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.egov.cpt.models.calculation.Calculation;
-import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertySerializer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -41,7 +40,7 @@ public class Owner {
 
 	@JsonProperty("ownerDetails")
 	private OwnerDetails ownerDetails;
-	
+
 	@Builder.Default
 	@JsonProperty("assignee")
 	private List<String> assignee = null;
@@ -51,19 +50,18 @@ public class Owner {
 	private String comment;
 
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
+	private AuditDetails auditDetails;
 
 	/**
-	 * This will be the first allotee.
-	 * During property master, this becomes true.
+	 * This will be the first allotee. During property master, this becomes true.
 	 */
 	@Builder.Default
 	@JsonProperty("isPrimaryOwner")
-	private Boolean isPrimaryOwner=false;
+	private Boolean isPrimaryOwner = false;
 
 	/**
-	 * This represents currently active owner.
-	 * During property master, this should be true.
+	 * This represents currently active owner. During property master, this should
+	 * be true.
 	 */
 	@JsonProperty("activeState")
 	private Boolean activeState;
@@ -77,14 +75,10 @@ public class Owner {
 	@JsonProperty("applicationAction")
 	private String applicationAction;
 
-	@Builder.Default
-	@JsonProperty("businessService")
-	private String businessService = PTConstants.BUSINESS_SERVICE_OT;
-
 	@JsonProperty("calculation")
 	Calculation calculation;
 
 	@Valid
-    @JsonProperty("wfDocuments")
+	@JsonProperty("wfDocuments")
 	private List<Document> wfdocuments;
 }

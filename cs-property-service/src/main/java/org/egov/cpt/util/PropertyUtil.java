@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.AuditDetails;
@@ -67,12 +66,12 @@ public class PropertyUtil {
 	 * 
 	 * @return url for tl-calculator service
 	 */
-//	public StringBuilder getCalculationURI(String businessService) {
-//		StringBuilder uri = new StringBuilder();
-//		uri.append(config.getCalculatorHost());
-//		uri.append(config.getCalculateEndpointTL());
-//		return uri;
-//	}
+	// public StringBuilder getCalculationURI(String businessService) {
+	// StringBuilder uri = new StringBuilder();
+	// uri.append(config.getCalculatorHost());
+	// uri.append(config.getCalculateEndpointTL());
+	// return uri;
+	// }
 
 	/**
 	 * Creates demand Search url based on tenanatId,businessService and ConsumerCode
@@ -104,13 +103,12 @@ public class PropertyUtil {
 	public Map<String, Boolean> getIdToIsStateUpdatableMap(BusinessService businessService, List<Owner> searchresult) {
 		Map<String, Boolean> idToIsStateUpdatableMap = new HashMap<>();
 		searchresult.forEach(result -> {
-			String nameofBusinessService = result.getBusinessService();
-			if (StringUtils.equals(nameofBusinessService, PTConstants.BUSINESS_SERVICE_OT)
-					&& (result.getApplicationState().equalsIgnoreCase(PTConstants.STATUS_INITIATED))) {
+			if (result.getApplicationState().equalsIgnoreCase(PTConstants.STATUS_INITIATED)) {
 				idToIsStateUpdatableMap.put(result.getId(), true);
-			} else
+			} else {
 				idToIsStateUpdatableMap.put(result.getId(),
 						workflowService.isStateUpdatable(result.getApplicationState(), businessService));
+			}
 		});
 		return idToIsStateUpdatableMap;
 	}
@@ -119,9 +117,7 @@ public class PropertyUtil {
 			List<DuplicateCopy> searchresult) {
 		Map<String, Boolean> idToIsStateUpdatableMapDc = new HashMap<>();
 		searchresult.forEach(result -> {
-			String nameofBusinessService = result.getBusinessService();
-			if (StringUtils.equals(nameofBusinessService, PTConstants.BUSINESS_SERVICE_DC)
-					&& (result.getState().equalsIgnoreCase(PTConstants.STATUS_INITIATED))) {
+			if (result.getState().equalsIgnoreCase(PTConstants.STATUS_INITIATED)) {
 				idToIsStateUpdatableMapDc.put(result.getId(), true);
 			} else
 				idToIsStateUpdatableMapDc.put(result.getId(),

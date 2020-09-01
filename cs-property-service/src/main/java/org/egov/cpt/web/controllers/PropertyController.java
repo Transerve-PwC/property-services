@@ -81,9 +81,7 @@ public class PropertyController {
 
 	@PostMapping("/_accountstatement")
 	public ResponseEntity<AccountStatementResponse> searchDateWise(
-			@Valid @RequestBody AccountStatementRequest request) throws Exception {
-		/* Set intial date in a fromDate if it is null */
-		request.getCriteria().setFromDate( request.getCriteria().getFromDate() == null ? new Date(0).getTime(): request.getCriteria().getFromDate());
+			@Valid @RequestBody AccountStatementRequest request) throws Exception {		
 		/* Set current date in a toDate if it is null */
 		request.getCriteria().setToDate(request.getCriteria().getToDate() == null ? new Date().getTime(): request.getCriteria().getToDate());	
 		AccountStatementCriteria accountStatementCriteria = request.getCriteria();

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.models.Document;
@@ -188,12 +189,12 @@ public class PropertyValidator {
 	private void validateTransitNumber(PropertyRequest request, Map<String, String> errorMap) {
 
 		/**
-		 * Make sure we have a valid transit number.
+		 * Make sure we have a valid transit number. Valid transit site numbers are
+		 * numeric and between 1 and 10000
 		 */
 		List<Property> properties = request.getProperties();
-		Optional<Property> propertyWithInvalidTransitNumber = properties
-				.stream().filter(property -> property.getTransitNumber() == null
-						|| property.getTransitNumber().length() < 4 || property.getTransitNumber().length() > 25)
+		Optional<Property> propertyWithInvalidTransitNumber = properties.stream().filter(
+				property -> property.getTransitNumber() == null || !property.getTransitNumber().matches("\\d{1,4}"))
 				.findAny();
 		if (propertyWithInvalidTransitNumber.isPresent()) {
 			throw new CustomException(Collections.singletonMap("INVALID TRANSIT NUMBER", String.format(
@@ -244,9 +245,9 @@ public class PropertyValidator {
 
 		// validatePayment(request, errorMap);
 
-		List<Property> prop = request.getProperties();
-		prop.forEach(properties -> {
-			if (properties.getTransitNumber().length() < 4 || properties.getTransitNumber().length() > 25) {
+		List<Property> properties = request.getProperties();
+		properties.forEach(property -> {
+			if (!property.getTransitNumber().matches("\\d{1,4}")) {
 				errorMap.put("INVALID TRANSIT NUMBER", "Transit number is not valid ");
 			}
 		});
@@ -274,14 +275,11 @@ public class PropertyValidator {
 						errorMap);
 				compareIds(propertySearch.getTransitNumber(),
 						property.getPropertyDetails().getAddress().getTransitNumber(), errorMap);
-				propertySearch.getOwners().forEach(searchOwner -> {
-					property.getOwners().forEach(owner -> {
-						compareIds(searchOwner.getId(), owner.getId(), errorMap);
-						compareIds(propertySearch.getId(), owner.getProperty().getId(), errorMap);
-						compareIds(searchOwner.getOwnerDetails().getId(), owner.getOwnerDetails().getId(), errorMap);
-						compareIds(propertySearch.getId(), owner.getOwnerDetails().getPropertyId(), errorMap);
-						compareIds(searchOwner.getId(), owner.getOwnerDetails().getOwnerId(), errorMap);
-					});
+				List<String> oIdList=propertySearch.getOwners().stream().map(Owner::getId).collect(Collectors.toList());
+				property.getOwners().forEach(owner -> {
+					if(!oIdList.contains(owner.getId())){
+						errorMap.put("INVALID ID",String.format("Existing user with id '%s' is missing during update. All the owners should be present during the update API", owner.getId()));
+					}
 				});
 
 			});
@@ -950,11 +948,15 @@ public class PropertyValidator {
 		 */
 		mdmsDocuments.stream().filter(d -> ((boolean) (d.get("required")))).map(d -> d.get("code"))
 				.forEach(documentCode -> {
-					if (!documents.stream().map(Document::getDocumentType)
-							.filter(type -> type.equalsIgnoreCase(String.valueOf(documentCode))).findAny()
-							.isPresent()) {
+					long count = documents.stream().map(Document::getDocumentType)
+							.filter(type -> type.equalsIgnoreCase(String.valueOf(documentCode))).count();
+					if (count == 0) {
 						errorMap.put("REQUIRED DOCUMENT NOT FOUND",
 								"The document type '" + documentCode + "' is required but it is not present");
+					}
+					if (count >= 2) {
+						errorMap.put("DUPLICATE DOCUMENT",
+								"The document type '" + documentCode + "' is found more than once.");
 					}
 				});
 	}

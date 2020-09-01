@@ -114,7 +114,7 @@ public class PaymentNotificationService {
 					valMap.put(emailKey, paymentDetail.getBill().getPayerEmail());
 
 					switch (paymentDetail.getBusinessService()) {
-						case PTConstants.BUSINESS_SERVICE_OT:
+						case PTConstants.BILLING_BUSINESS_SERVICE_OT:
 
 							DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
 							searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
@@ -142,7 +142,7 @@ public class PaymentNotificationService {
 
 							break;
 
-						case PTConstants.BUSINESS_SERVICE_DC:
+						case PTConstants.BILLING_BUSINESS_SERVICE_DC:
 
 							DuplicateCopySearchCriteria searchCriteriaDc = new DuplicateCopySearchCriteria();
 							searchCriteriaDc.setApplicationNumber(paymentDetail.getBill().getConsumerCode());

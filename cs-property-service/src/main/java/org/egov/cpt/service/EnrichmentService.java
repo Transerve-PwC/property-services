@@ -296,18 +296,17 @@ public class EnrichmentService {
 
 	private void enrichGenerateDemand(Owner owner) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		owner.setBusinessService(PTConstants.BUSINESS_SERVICE_OT);
 
 		TaxHeadEstimate estimateDue = new TaxHeadEstimate();
-		estimateDue.setEstimateAmount(new BigDecimal(0.0)); // TODO doubt amount
+		estimateDue.setEstimateAmount(new BigDecimal(0.0));
 		estimateDue.setCategory(Category.DUE);
-		estimateDue.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
+		estimateDue.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_OT, Category.DUE));
 		estimates.add(estimateDue);
 
 		TaxHeadEstimate estimateCharges = new TaxHeadEstimate();
-		estimateCharges.setEstimateAmount(new BigDecimal(0.0)); // TODO doubt amount
+		estimateCharges.setEstimateAmount(new BigDecimal(0.0));
 		estimateCharges.setCategory(Category.CHARGES);
-		estimateCharges.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.CHARGES));
+		estimateCharges.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_OT, Category.CHARGES));
 		estimates.add(estimateCharges);
 
 		Calculation calculation = Calculation.builder()
@@ -318,27 +317,27 @@ public class EnrichmentService {
 
 	private void enrichUpdateDemand(Owner owner) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		owner.setBusinessService(PTConstants.BUSINESS_SERVICE_OT);
+
 		// TaxHeadEstimate estimate = new TaxHeadEstimate();
 		/*
 		 * if (owner.getApplicationState().equalsIgnoreCase(PTConstants.
 		 * OT_STATE_PENDING_SA_VERIFICATION)) {
 		 * estimate.setEstimateAmount(owner.getOwnerDetails().getDueAmount());
 		 * estimate.setCategory(Category.DUE);
-		 * estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(),
-		 * Category.DUE)); }
+		 * estimate.setTaxHeadCode(getTaxHeadCode(PTConstants.
+		 * BILLING_BUSINESS_SERVICE_OT, Category.DUE)); }
 		 */
 		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.OT_STATE_PENDING_APRO)) {
 			TaxHeadEstimate estimate1 = new TaxHeadEstimate();
 			estimate1.setEstimateAmount(owner.getOwnerDetails().getDueAmount());
 			estimate1.setCategory(Category.DUE);
-			estimate1.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
+			estimate1.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_OT, Category.DUE));
 			estimates.add(estimate1);
 
 			TaxHeadEstimate estimate2 = new TaxHeadEstimate();
 			estimate2.setEstimateAmount(owner.getOwnerDetails().getAproCharge());
 			estimate2.setCategory(Category.CHARGES);
-			estimate2.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.CHARGES));
+			estimate2.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_OT, Category.CHARGES));
 			estimates.add(estimate2);
 		}
 		// estimates.add(estimate);
@@ -348,8 +347,8 @@ public class EnrichmentService {
 		owner.setCalculation(calculation);
 	}
 
-	private String getTaxHeadCode(String businessService, Category category) {
-		return String.format("%s_%s", businessService, category.toString());
+	private String getTaxHeadCode(String billingBusService, Category category) {
+		return String.format("%s_%s", billingBusService, category.toString());
 	}
 
 	private void updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
@@ -469,18 +468,17 @@ public class EnrichmentService {
 
 	private void enrichDuplicateCopyGenerateDemand(DuplicateCopy application) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		application.setBusinessService(PTConstants.BUSINESS_SERVICE_DC);
 
 		TaxHeadEstimate estimateFee = new TaxHeadEstimate();
 		estimateFee.setEstimateAmount(new BigDecimal(0.0));
 		estimateFee.setCategory(Category.FEE);
-		estimateFee.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.FEE));
+		estimateFee.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_DC, Category.FEE));
 		estimates.add(estimateFee);
 
 		TaxHeadEstimate estimateCharges = new TaxHeadEstimate();
 		estimateCharges.setEstimateAmount(new BigDecimal(0.0));
 		estimateCharges.setCategory(Category.CHARGES);
-		estimateCharges.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.CHARGES));
+		estimateCharges.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_DC, Category.CHARGES));
 		estimates.add(estimateCharges);
 
 		Calculation calculation = Calculation.builder().applicationNumber(application.getApplicationNumber())
@@ -491,27 +489,26 @@ public class EnrichmentService {
 
 	private void enrichDuplicateCopyUpdateDemand(DuplicateCopy application) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		application.setBusinessService(PTConstants.BUSINESS_SERVICE_DC);
 
 		/*
 		 * if (application.getState().equalsIgnoreCase(PTConstants.
 		 * DC_STATE_PENDING_SA_VERIFICATION)) {
 		 * estimate.setEstimateAmount(application.getApplicant().get(0).getFeeAmount());
 		 * estimate.setCategory(Category.FEE);
-		 * estimate.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(),
-		 * Category.FEE)); }
+		 * estimate.setTaxHeadCode(getTaxHeadCode(PTConstants.
+		 * BILLING_BUSINESS_SERVICE_DC, Category.FEE)); }
 		 */
 		if (application.getState().equalsIgnoreCase(PTConstants.DC_STATE_PENDING_APRO)) {
 			TaxHeadEstimate estimate1 = new TaxHeadEstimate();
 			estimate1.setEstimateAmount(application.getApplicant().get(0).getFeeAmount());
 			estimate1.setCategory(Category.FEE);
-			estimate1.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.FEE));
+			estimate1.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_DC, Category.FEE));
 			estimates.add(estimate1);
 
 			TaxHeadEstimate estimate2 = new TaxHeadEstimate();
 			estimate2.setEstimateAmount(application.getApplicant().get(0).getAproCharge());
 			estimate2.setCategory(Category.CHARGES);
-			estimate2.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.CHARGES));
+			estimate2.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_DC, Category.CHARGES));
 			estimates.add(estimate2);
 		}
 		Calculation calculation = Calculation.builder().applicationNumber(application.getApplicationNumber())
@@ -798,7 +795,7 @@ public class EnrichmentService {
 
 	public void postStatusEnrichmentDC(DuplicateCopyRequest duplicateCopyRequest, List<String> endstates) {
 		duplicateCopyRequest.getDuplicateCopyApplications().forEach(dcApplication -> {
-			// TODO: add enrichment
+			// No enrichment for duplicate copy applications after final approval.
 		});
 	}
 

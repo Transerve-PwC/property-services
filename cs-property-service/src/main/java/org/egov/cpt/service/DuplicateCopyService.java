@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Service
 public class DuplicateCopyService {
@@ -50,7 +51,7 @@ public class DuplicateCopyService {
 
 	@Autowired
 	private DuplicateCopyNotificationService notificationService;
-	
+
 	@Autowired
 	private WorkflowService workflowService;
 
@@ -67,25 +68,26 @@ public class DuplicateCopyService {
 	}
 
 	public List<DuplicateCopy> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
-		propertyValidator.validateDuplicateCopySearch(requestInfo,criteria);
-	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
-	    if(requestInfo.getUserInfo().getType().equalsIgnoreCase(PTConstants.ROLE_EMPLOYEE)&& CollectionUtils.isEmpty(criteria.getStatus())){
-			String wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_DC;
-			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, wfbusinessServiceName);
-			List<State> stateList= otBusinessService.getStates();
+		propertyValidator.validateDuplicateCopySearch(requestInfo, criteria);
+		enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo, criteria);
+		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(PTConstants.ROLE_EMPLOYEE)
+				&& CollectionUtils.isEmpty(criteria.getStatus())) {
+			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo,
+					PTConstants.BUSINESS_SERVICE_DC);
+			List<State> stateList = otBusinessService.getStates();
 			List<String> states = new ArrayList<String>();
-			
-			for(State state: stateList){
-					states.add(state.getState());
+
+			for (State state : stateList) {
+				states.add(state.getState());
 			}
 			states.remove("");
 			states.remove(PTConstants.DC_DRAFTED);
-			
-			log.info("states:"+states);
-		
+
+			log.info("states:" + states);
+
 			criteria.setStatus(states);
 		}
-	    
+
 		List<DuplicateCopy> properties = getApplication(criteria, requestInfo);
 		return properties;
 	}
@@ -103,10 +105,12 @@ public class DuplicateCopyService {
 				.validateDuplicateCopyUpdateRequest(duplicateCopyRequest);
 		enrichmentService.enrichDuplicateCopyUpdateRequest(duplicateCopyRequest, searchedProperty);
 		String applicationState = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getState();
-		/*if (applicationState.equalsIgnoreCase(PTConstants.DC_STATE_PENDING_SA_VERIFICATION)) {
-			demandService.updateDuplicateCopyDemand(duplicateCopyRequest.getRequestInfo(),
-					duplicateCopyRequest.getDuplicateCopyApplications());
-		}*/
+		/*
+		 * if (applicationState.equalsIgnoreCase(PTConstants.
+		 * DC_STATE_PENDING_SA_VERIFICATION)) {
+		 * demandService.updateDuplicateCopyDemand(duplicateCopyRequest.getRequestInfo()
+		 * , duplicateCopyRequest.getDuplicateCopyApplications()); }
+		 */
 		if (applicationState.equalsIgnoreCase(PTConstants.DC_STATE_PENDING_APRO)) {
 			demandService.generateDuplicateCopyDemand(duplicateCopyRequest.getRequestInfo(),
 					duplicateCopyRequest.getDuplicateCopyApplications());
