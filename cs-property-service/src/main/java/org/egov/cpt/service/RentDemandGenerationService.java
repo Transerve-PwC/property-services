@@ -13,18 +13,22 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RentAccount;
-import org.egov.cpt.models.RentCollection;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentDemandCriteria;
 import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
+import org.egov.cpt.util.PropertyUtil;
+import org.egov.cpt.web.contracts.PropertyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,13 +44,18 @@ public class RentDemandGenerationService {
 	
 	private RentCollectionService rentCollectionService;
 
+	PropertyUtil propertyutil;
+
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("d/MM/yyyy");
 
 	@Autowired
-	public RentDemandGenerationService(PropertyRepository propertyRepository, Producer producer, PropertyConfiguration config) {
+	public RentDemandGenerationService(PropertyRepository propertyRepository, Producer producer, PropertyConfiguration config,
+			RentCollectionService rentCollectionService, PropertyUtil propertyutil) {
 		this.propertyRepository = propertyRepository;
 		this.producer = producer;
 		this.config = config;
+		this.rentCollectionService = rentCollectionService;
+		this.propertyutil = propertyutil;
 	}
 
 	public void createDemand(RentDemandCriteria demandCriteria) {
@@ -133,15 +142,29 @@ public class RentDemandGenerationService {
 		property.setRentAccount(rentAccount);
 		property.setPayments(rentPaymentList);
 		
-		List<RentCollection> rentCollectionList = null;
 		if (rentPaymentList != null && rentAccount != null) {
 
-			rentCollectionList = rentCollectionService.settle(property.getDemands(), property.getPayments(),
-					property.getRentAccount(), property.getPropertyDetails().getInterestRate());
+			property.setRentCollections(rentCollectionService.settle(property.getDemands(), property.getPayments(),
+					property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
 		}
-		property.setRentCollections(rentCollectionList);
+		PropertyRequest propertyRequest = new PropertyRequest();
+		propertyRequest.setProperties(Collections.singletonList(property));
+		//RequestInfo requestInfo = propertyRequest.getRequestInfo();
 		
-		producer.push(config.getUpdatePropertyTopic(), property);
+		if (!CollectionUtils.isEmpty(property.getRentCollections())) {
+			property.getRentCollections().forEach(collection -> {
+				if (collection.getId() == null) {
+					//AuditDetails rentAuditDetails = propertyutil
+						//	.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+					collection.setId(UUID.randomUUID().toString());
+					//collection.setAuditDetails(rentAuditDetails);
+				}
+
+			});
+		}
+		
+		
+		producer.push(config.getUpdatePropertyTopic(), propertyRequest);
 	}
 
 }
