@@ -141,8 +141,8 @@ public class PropertyService {
 		List<RentPayment> payments = repository
 				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build())
 				.stream()
-				.filter(rentDemand -> accountStatementCriteria.getToDate() >= rentDemand.getAuditDetails().getCreatedTime())
-				.map(rentDemand-> {	return rentDemand; })
+				.filter(rentPayment  -> accountStatementCriteria.getToDate() >= rentPayment .getAuditDetails().getCreatedTime())
+				.map(rentPayment -> {	return rentPayment ; })
 				.collect(Collectors.toList());
 
 		return AccountStatementResponse.builder()
