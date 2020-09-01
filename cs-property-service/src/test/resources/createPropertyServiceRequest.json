@@ -1,93 +1,92 @@
 {
-    "RequestInfo": {
-        "apiId": "Rainmaker",
-        "ver": ".01",
-        "ts": "",
-        "action": "_create",
-        "did": "1",
-        "key": "",
-        "msgId": "20170310130900|en_IN",
-        "authToken": "7c743e64-dac6-4221-a003-5c61ae9afcc0",
-         "userInfo": {
-            "id": 7,
-            "userName": "9900289033",
-            "name": "Sunitha",
-            "type": "CITIZEN",
-            "mobileNumber": null,
-            "emailId": "",
-            "roles": [
-                {
-                    "id": null,
-                    "name": "TL Approver",
-                    "code": "TL_APPROVER",
-                    "tenantId": "ch.chandigarh"
-                },
-                {
-                    "id": null,
-                    "name": "CLERK",
-                    "code": "CTL_CLERK",
-                    "tenantId": "ch.chandigarh"
-                },
-                {
-                    "id": null,
-                    "name": "Employee",
-                    "code": "EMPLOYEE",
-                    "tenantId": "ch.chandigarh"
-                }
-            ],
-            "tenantId": "ch.chandigarh",
-            "uuid": "2743bf22-6499-4029-bd26-79e5d0ce6427"
-        }
-        
-    },
-    "Properties": [
+  "RequestInfo": {
+    "apiId": "Rainmaker",
+    "ver": ".01",
+    "ts": "",
+    "action": "_create",
+    "did": "1",
+    "key": "",
+    "msgId": "20170310130900|en_IN",
+    "authToken": "7c743e64-dac6-4221-a003-5c61ae9afcc0",
+    "userInfo": {
+      "id": 7,
+      "userName": "9900289033",
+      "name": "Sunitha",
+      "type": "CITIZEN",
+      "mobileNumber": null,
+      "emailId": "",
+      "roles": [
         {
-    "propertyDetails": {
-      "rentPerSqyd": 4,
-      "area": "AREA.125",
-      "address": {
-        "area": "Some Area",
-        "district": "Some district",
-        "state": "Some State",
-        "country": "India",
-        "pincode": "500012",
-        "landmark": "Behind Postoffice"
+          "id": null,
+          "name": "TL Approver",
+          "code": "TL_APPROVER",
+          "tenantId": "ch.chandigarh"
+        },
+        {
+          "id": null,
+          "name": "CLERK",
+          "code": "CTL_CLERK",
+          "tenantId": "ch.chandigarh"
+        },
+        {
+          "id": null,
+          "name": "Employee",
+          "code": "EMPLOYEE",
+          "tenantId": "ch.chandigarh"
+        }
+      ],
+      "tenantId": "ch.chandigarh",
+      "uuid": "2743bf22-6499-4029-bd26-79e5d0ce6427"
+    }
+  },
+  "Properties": [
+    {
+      "propertyDetails": {
+        "rentPerSqyd": 4,
+        "area": "AREA.125",
+        "address": {
+          "area": "Some Area",
+          "district": "Some district",
+          "state": "Some State",
+          "country": "India",
+          "pincode": "500012",
+          "landmark": "Behind Postoffice"
+        },
+        "floors": "",
+        "additionalDetails": ""
       },
-      "floors": "",
-      "additionalDetails": ""
-    },
-    "colony": "COLONY.KUMHAR",
-    "transitNumber": "TestTransit001",
-    "owners": [
-      {
-        "allotmentStartdate": 1444501799000,
-        "allotmenNumber": "TestAllotment001",
-        "posessionStartdate": 1444588199000,
-        "name": "TestOwner",
-        "phone": "9550259567",
-        "dateOfBirth": 631218599000,
-        "gender": "MALE",
-        "email": "test@egov.org.in",
-        "aadhaarNumber": "2345678901",
-        "monthlyRent": "2000",
-        "revisionPeriod": "3",
-        "revisionPercentage": "5",
-        "payment": [
-          {
-            "amountPaid": "10000",
-            "paymentDate": 1577903399000,
-            "paymentMode": "Online"
-          }
-        ],
-        "allotmentEnddate": 1602354599000,
-        "posessionEnddate": 1602440999000,
-        "applicationStatus": "",
-        "activeState": true,
-        "isPrimaryOwner": true
-      }
-    ],
-    "tenantId": "ch.chandigarh",
-    "masterDataAction": "INITIATE"
-  }
-    ]
+      "colony": "COLONY.KUMHAR",
+      "transitNumber": "123",
+      "owners": [
+        {
+          "allotmentStartdate": 1444501799000,
+          "allotmenNumber": "TestAllotment001",
+          "posessionStartdate": 1444588199000,
+          "name": "TestOwner",
+          "phone": "9550259567",
+          "dateOfBirth": 631218599000,
+          "gender": "MALE",
+          "email": "test@egov.org.in",
+          "aadhaarNumber": "2345678901",
+          "monthlyRent": "2000",
+          "revisionPeriod": "3",
+          "revisionPercentage": "5",
+          "payment": [
+            {
+              "amountPaid": "10000",
+              "paymentDate": 1577903399000,
+              "paymentMode": "Online"
+            }
+          ],
+          "allotmentEnddate": 1602354599000,
+          "posessionEnddate": 1602440999000,
+          "applicationStatus": "",
+          "activeState": true,
+          "isPrimaryOwner": true
+        }
+      ],
+      "tenantId": "ch.chandigarh",
+      "masterDataAction": "INITIATE"
+    }
+  ]
 }

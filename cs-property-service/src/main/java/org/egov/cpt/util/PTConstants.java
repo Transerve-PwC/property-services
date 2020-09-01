@@ -65,7 +65,10 @@ public class PTConstants {
 	public static final String BUSINESS_SERVICE_OT = "OwnershipTransferRP";
 
 	public static final String BILLING_BUSINESS_SERVICE_OT = "RentedProperties.OwnershipTransfer";
+
 	public static final String BILLING_BUSINESS_SERVICE_DC = "RentedProperties.DuplicateAllotmentLetter";
+
+	public static final String BILLING_BUSINESS_SERVICE_RENT = "RentedProperties.Rent";
 
 	public static final String BUSINESS_SERVICE_DC = "DuplicateCopyOfAllotmentLetterRP";
 

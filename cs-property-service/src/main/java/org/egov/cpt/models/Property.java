@@ -52,6 +52,7 @@ public class Property {
 	private String masterDataAction;
 
 	@JsonProperty("assignee")
+	@Builder.Default
 	private List<String> assignee = null;
 
 	@Size(max = 128)
@@ -59,7 +60,7 @@ public class Property {
 	private String comment;
 
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
+	private AuditDetails auditDetails;
 
 	@JsonProperty("propertyDetails")
 	private PropertyDetails propertyDetails;
@@ -71,47 +72,46 @@ public class Property {
 	@Valid
 	@JsonProperty
 	private List<DuplicateCopy> duplicateCopys;
-	
+
 	@Valid
 	@JsonProperty
 	private List<PropertyImages> propertyImages;
-	
+
 	@Valid
 	@JsonProperty
 	private List<NoticeGeneration> notices;
-	
+
 	@Valid
 	@JsonProperty
 	private List<MortgageApprovedGrantDetails> grantDetails;
-	
+
 	@Valid
 	@JsonProperty
 	private List<RentDemand> demands;
-	
+
 	@Valid
 	@JsonProperty
 	private List<RentDemand> inActiveDemands;
-	
+
 	@Valid
 	@JsonProperty
 	private List<RentPayment> payments;
-	
+
 	@Valid
 	@JsonProperty
 	private List<RentPayment> inActivePayments;
-	
+
 	@Valid
 	@JsonProperty
 	private List<RentCollection> rentCollections;
-	
+
 	@Valid
 	@JsonProperty
 	private RentAccount rentAccount;
-	
+
 	@Valid
 	@JsonProperty
 	private RentSummary rentSummary;
-	
 
 	public Property addDocumentItem(DuplicateCopy newDuplicateCopyItem) {
 		if (this.duplicateCopys == null) {
@@ -151,7 +151,7 @@ public class Property {
 		this.propertyImages.add(newPropertyImagesItem);
 		return this;
 	}
-	
+
 	public Property addNoticeItem(NoticeGeneration newNoticeItem) {
 		if (this.notices == null) {
 			this.notices = new ArrayList<>();
@@ -164,7 +164,7 @@ public class Property {
 		this.notices.add(newNoticeItem);
 		return this;
 	}
-	
+
 	public Property addGrantDetailItem(MortgageApprovedGrantDetails newGrantDetailItem) {
 		if (this.grantDetails == null) {
 			this.grantDetails = new ArrayList<>();
@@ -177,7 +177,7 @@ public class Property {
 		this.grantDetails.add(newGrantDetailItem);
 		return this;
 	}
-	
+
 	public Property addDemandItem(RentDemand newDemandItem) {
 		if (this.demands == null) {
 			this.demands = new ArrayList<>();
@@ -190,7 +190,7 @@ public class Property {
 		this.demands.add(newDemandItem);
 		return this;
 	}
-	
+
 	public Property addPaymentItem(RentPayment newPaymentItem) {
 		if (this.payments == null) {
 			this.payments = new ArrayList<>();
@@ -203,7 +203,7 @@ public class Property {
 		this.payments.add(newPaymentItem);
 		return this;
 	}
-	
+
 	public Property addCollectionItem(RentCollection newCollectionItem) {
 		if (this.rentCollections == null) {
 			this.rentCollections = new ArrayList<>();
@@ -216,8 +216,7 @@ public class Property {
 		this.rentCollections.add(newCollectionItem);
 		return this;
 	}
-	
-	
+
 	@JsonProperty("pincode")
 	private String pincode;
 
