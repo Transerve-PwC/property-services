@@ -58,8 +58,8 @@ CREATE TABLE cs_pt_ownership_v1 (
    allotmen_number   	CHARACTER VARYING (256),
    application_state    CHARACTER VARYING (256),
    application_action 	CHARACTER VARYING (256),
-   active_state         CHARACTER VARYING (256),
-   is_primary_owner   	CHARACTER VARYING (256),
+   active_state         BOOLEAN,
+   is_primary_owner   	BOOLEAN,
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    created_date         CHARACTER VARYING NOT NULL,
@@ -96,7 +96,7 @@ CREATE TABLE cs_pt_ownershipdetails_v1 (
    date_of_death_allottee 		CHARACTER VARYING (256),
    application_number 			CHARACTER VARYING (256),
    application_type				CHARACTER VARYING (256),
-   permanent 					CHARACTER VARYING (256),
+   permanent 					BOOLEAN,
    due_amount 					INTEGER,
    apro_charge 					INTEGER,
   
@@ -175,8 +175,8 @@ CREATE TABLE cs_pt_ownership_audit_v1 (
    allotmen_number   	CHARACTER VARYING (256),
    application_state    CHARACTER VARYING (256),
    application_action 	CHARACTER VARYING (256),
-   active_state         CHARACTER VARYING (256),
-   is_primary_owner   	CHARACTER VARYING (256),
+   active_state         BOOLEAN,
+   is_primary_owner   	BOOLEAN,
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    created_date         CHARACTER VARYING NOT NULL,
@@ -208,7 +208,7 @@ CREATE TABLE cs_pt_ownershipdetails_audit_v1 (
    date_of_death_allottee 		CHARACTER VARYING (256),
    application_number 			CHARACTER VARYING (256),
    application_type				CHARACTER VARYING (256),
-   permanent 					CHARACTER VARYING (256),
+   permanent 					BOOLEAN,
    due_amount 					INTEGER,
    apro_charge 					INTEGER,
   

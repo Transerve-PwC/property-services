@@ -270,25 +270,15 @@ public class DemandService {
 
 			log.info("ownerUser:" + ownerUser);
 
-			// User requestUser = requestInfo.getUserInfo(); // user from request
-			// information
 			User requestUser = ownerUser.get(0).toCommonUser();
 			log.info("requestUser:" + requestUser);
 
-			User user = null;
-			if (requestUser.getMobileNumber() != null) {
-				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
-						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
-						.mobileNumber(requestUser.getMobileNumber()).emailId(requestUser.getEmailId())
-						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
-						.build();
-			} else {
-				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
-						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
-						.mobileNumber(requestUser.getUserName()).emailId(requestUser.getEmailId())
-						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
-						.build();
-			}
+			String mobileNumber = requestUser.getMobileNumber() != null ? requestUser.getMobileNumber()
+					: requestUser.getUserName();
+			User user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
+					.name(requestUser.getName()).type(requestInfo.getUserInfo().getType()).mobileNumber(mobileNumber)
+					.emailId(requestUser.getEmailId()).roles(requestUser.getRoles()).tenantId(requestUser.getTenantId())
+					.uuid(requestUser.getUuid()).build();
 
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			if (!CollectionUtils.isEmpty(application.getCalculation().getTaxHeadEstimates())) {
