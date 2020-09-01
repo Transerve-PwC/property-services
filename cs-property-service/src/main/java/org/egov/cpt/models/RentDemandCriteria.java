@@ -13,7 +13,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DemandCriteria {
+public class RentDemandCriteria {
 
 	private String date;
 	
