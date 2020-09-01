@@ -158,6 +158,12 @@ public class PaymentUpdateService {
 							propertyRepository.updateDcPayment(updateDCRequest, idToIsStateUpdatableMapDc);
 							break;
 						}
+						case PTConstants.BILLING_BUSINESS_SERVICE_RENT: {
+							String consumerCode = paymentDetail.getBill().getConsumerCode();
+
+							// Consumer code is made up of
+							break;
+						}
 					}
 				}
 			}
