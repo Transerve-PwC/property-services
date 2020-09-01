@@ -130,6 +130,7 @@ public class PropertyService {
 			return AccountStatementResponse.builder().rentAccountStatements(Collections.emptyList()).build();
 		}
 		
+		/* Fetch Rent Demand records and Payment records using property id object */
 		Property property = properties.get(0);
 		List<RentDemand> demands = repository
 				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build())
