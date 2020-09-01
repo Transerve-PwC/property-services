@@ -1,5 +1,6 @@
 package org.egov.cpt.web.controllers;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -79,6 +80,8 @@ public class PropertyController {
 	@PostMapping("/_accountstatement")
 	public ResponseEntity<AccountStatementResponse> searchDateWise(
 			@Valid @RequestBody AccountStatementRequest request) {
+		/* Set current date in a toDate if it is null */
+		request.getCriteria().setToDate(request.getCriteria().getToDate() == null ? new Date().getTime(): request.getCriteria().getToDate());	
 		AccountStatementCriteria accountStatementCriteria = request.getCriteria();
 		AccountStatementResponse resposne = propertyService.searchPayments(accountStatementCriteria,
 				request.getRequestInfo());
