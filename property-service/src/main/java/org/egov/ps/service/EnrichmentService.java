@@ -1,7 +1,5 @@
 package org.egov.ps.service;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,13 +8,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.config.Configuration;
 import org.egov.ps.model.Application;
 import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.MortgageDetails;
+import org.egov.ps.model.MortgageDocuments;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
 import org.egov.ps.model.Payment;
@@ -38,10 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.jayway.jsonpath.JsonPath;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,6 +59,9 @@ public class EnrichmentService {
 	
 	@Autowired
 	private Producer producer;
+	
+	@Autowired
+	private MDMSService mdmsservice;
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
@@ -107,6 +106,7 @@ public class EnrichmentService {
 							if (null != property.getPropertyDetails() 
 									&& !CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 								property.getPropertyDetails().getOwners().forEach(owner -> {
+									validateMortgageDetails(property, owner, request.getRequestInfo(), owner.getId());
 									owner.setMortgageDetails(getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
 								});
 							}
@@ -187,6 +187,29 @@ public class EnrichmentService {
 		return mortgage;
 	}
 
+	public void validateMortgageDetails(Property property, Owner owner, RequestInfo requestInfo, String id){
+		// TODO Auto-generated method stub
+		MortgageDetails mortgage = owner.getMortgageDetails();
+
+		if(mortgage!=null ) {
+			List<Map<String, Object>> fieldConfigurations = mdmsservice.getMortgageDocumentConfig("mortgage", requestInfo, "ch");
+
+			//To Do :: write code to validate documents base on master json template.
+			ObjectMapper mapper = new ObjectMapper();
+			List<MortgageDocuments> mortgageTypeList = mapper.convertValue(fieldConfigurations, new TypeReference<List<MortgageDocuments>>() { });
+			Map<String, String> errorMap = new HashMap<>();
+
+			if(mortgage.getMortgageDocuments() != null || !mortgage.getMortgageDocuments().isEmpty()) {
+					mortgage.getMortgageDocuments().stream().forEach(document -> {
+							if(!mortgageTypeList.contains(MortgageDocuments.builder().code(document.getDocumentType()).build())) {
+									errorMap.put("INVALID DOCUMENT",
+													"Document is not valid for user : " + owner.getOwnerDetails().getOwnerName());
+							}
+					});
+			}
+		}
+	}
+	
 	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
 
 		OwnerDetails ownerDetails = owner.getOwnerDetails();

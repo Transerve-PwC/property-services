@@ -20,4 +20,6 @@ public class PSConstants {
 	
 	public static final String MDMS_PS_FIELD_FILTER = ".*.fields.*";
 
+	public static final String MDMS_PS_MORTGAGE_FILTER = ".*.documentList.*";
+
 }
