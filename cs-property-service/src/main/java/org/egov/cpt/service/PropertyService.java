@@ -3,6 +3,7 @@ package org.egov.cpt.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
@@ -131,13 +132,18 @@ public class PropertyService {
 
 		Property property = properties.get(0);
 		List<RentDemand> demands = repository
-				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build())
+				.stream()
+				.filter(rentDemand -> accountStatementCriteria.getToDate() >= rentDemand.getAuditDetails().getCreatedTime())
+				.map(rentDemand-> {	return rentDemand; })
+				.collect(Collectors.toList());
+		
 		List<RentPayment> payments = repository
-				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
-		// if (CollectionUtils.isEmpty(demands) || CollectionUtils.isEmpty(payments)) {
-		// return
-		// AccountStatementResponse.builder().rentAccountStatements(Collections.emptyList()).build();
-		// }
+				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build())
+				.stream()
+				.filter(rentDemand -> accountStatementCriteria.getToDate() >= rentDemand.getAuditDetails().getCreatedTime())
+				.map(rentDemand-> {	return rentDemand; })
+				.collect(Collectors.toList());
 
 		return AccountStatementResponse.builder()
 				.rentAccountStatements(rentCollectionService.getAccountStatement(demands, payments,
