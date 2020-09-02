@@ -12,6 +12,8 @@ import org.egov.common.contract.request.Role;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.Property;
+import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.PaymentDetail;
 import org.egov.cpt.models.calculation.PaymentRequest;
@@ -35,6 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentUpdateService {
 
 	private OwnershipTransferService ownershipTransferService;
+	
+	private PropertyService propertyService;
 
 	private OwnershipTransferRepository repositoryOt;
 
@@ -161,7 +165,18 @@ public class PaymentUpdateService {
 						case PTConstants.BILLING_BUSINESS_SERVICE_RENT: {
 							String consumerCode = paymentDetail.getBill().getConsumerCode();
 
-							// Consumer code is made up of
+							PropertyCriteria searchCriteria = new PropertyCriteria();
+							searchCriteria.setTransitNumber(util.getTransitNumberFromConsumerCode(consumerCode));
+
+							List<Property> properties = propertyService.searchProperty(searchCriteria,requestInfo);
+
+							BusinessService pmBusinessService = workflowService.getBusinessService(
+									properties.get(0).getTenantId(), requestInfo, PTConstants.BILLING_BUSINESS_SERVICE_RENT);
+
+							if (CollectionUtils.isEmpty(properties))
+								throw new CustomException("INVALID RECEIPT",
+										"No Property found for the comsumerCode " + consumerCode);
+
 							break;
 						}
 					}
