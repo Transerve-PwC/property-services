@@ -5,9 +5,6 @@ import javax.validation.Valid;
 import org.egov.cpt.models.RentDemandCriteria;
 import org.egov.cpt.models.RequestInfoWrapper;
 import org.egov.cpt.service.RentDemandGenerationService;
-import org.egov.cpt.util.ResponseInfoFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +29,10 @@ public class RentDemandGenerationController {
 	}
 
 	@PostMapping("/_create")
-	public ResponseEntity<?> create(@Valid @ModelAttribute RentDemandCriteria demandCriteria, @Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
+	public ResponseEntity<?> create(@Valid @ModelAttribute RentDemandCriteria demandCriteria,
+			@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
 		demandGenerationService.createDemand(demandCriteria, requestInfoWrapper.getRequestInfo());
-		log.info("Rend Demand generation request for year: "+ demandCriteria.getDate());
+		log.info("Rend Demand generation request for year: " + demandCriteria.getDate());
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

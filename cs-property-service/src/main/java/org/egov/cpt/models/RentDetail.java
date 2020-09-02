@@ -1,15 +1,9 @@
 package org.egov.cpt.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.egov.cpt.models.calculation.Calculation;
 import org.springframework.validation.annotation.Validated;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -36,7 +30,7 @@ public class RentDetail {
 
 	@JsonProperty("transitNumber")
 	private String transitNumber;
-	
+
 	@JsonProperty("propertyId")
 	private String propertyId;
 
@@ -45,10 +39,10 @@ public class RentDetail {
 
 	@JsonProperty("amount")
 	private Double amount;
-	
+
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
-	
+
 	@JsonProperty("calculation")
 	Calculation calculation;
 

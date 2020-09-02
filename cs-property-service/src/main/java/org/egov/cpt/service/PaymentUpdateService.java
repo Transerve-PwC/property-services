@@ -23,7 +23,6 @@ import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
-import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.cpt.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentUpdateService {
 
 	private OwnershipTransferService ownershipTransferService;
-	
+
 	private PropertyService propertyService;
 
 	private OwnershipTransferRepository repositoryOt;
@@ -52,7 +51,7 @@ public class PaymentUpdateService {
 	private WorkflowService workflowService;
 
 	private PropertyUtil util;
-	
+
 	private RentEnrichmentService rentEnrichmentService;
 
 	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
@@ -65,7 +64,7 @@ public class PaymentUpdateService {
 	public PaymentUpdateService(OwnershipTransferService ownershipTransferService,
 			OwnershipTransferRepository repositoryOt, DuplicateCopyService duplicateCopyService,
 			PropertyRepository propertyRepository, ObjectMapper mapper, WorkflowService workflowService,
-			PropertyUtil util,RentEnrichmentService rentEnrichmentService) {
+			PropertyUtil util, RentEnrichmentService rentEnrichmentService) {
 		this.ownershipTransferService = ownershipTransferService;
 		this.repositoryOt = repositoryOt;
 		this.duplicateCopyService = duplicateCopyService;
@@ -172,14 +171,14 @@ public class PaymentUpdateService {
 							PropertyCriteria searchCriteria = new PropertyCriteria();
 							searchCriteria.setTransitNumber(util.getTransitNumberFromConsumerCode(consumerCode));
 
-							List<Property> properties = propertyService.searchProperty(searchCriteria,requestInfo);
+							List<Property> properties = propertyService.searchProperty(searchCriteria, requestInfo);
 
 							if (CollectionUtils.isEmpty(properties))
 								throw new CustomException("INVALID RECEIPT",
 										"No Property found for the comsumerCode " + consumerCode);
-							
-							rentEnrichmentService.PostEnrichmentForRentPayment(requestInfo,properties,paymentDetails);
-							
+
+							rentEnrichmentService.postEnrichmentForRentPayment(requestInfo, properties, paymentDetails);
+
 							break;
 						}
 					}

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
@@ -34,17 +33,15 @@ public class RentEnrichmentService {
 
 	@Autowired
 	PropertyRepository propertyRepository;
-	
+
 	@Autowired
 	private IRentCollectionService rentCollectionService;
-	
+
 	@Autowired
 	private PropertyConfiguration config;
 
 	@Autowired
 	private Producer producer;
-	
-	
 
 	public void enrichRentdata(PropertyRequest request) {
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
@@ -137,43 +134,41 @@ public class RentEnrichmentService {
 
 	}
 
-	public void PostEnrichmentForRentPayment(RequestInfo requestInfo,List<Property> properties,List<PaymentDetail> paymentDetails) {
+	public void postEnrichmentForRentPayment(RequestInfo requestInfo, List<Property> properties,
+			List<PaymentDetail> paymentDetails) {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		AuditDetails paymentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(),true);
-		
-		List<RentPayment> RentPayments =new ArrayList<RentPayment>();
+		AuditDetails paymentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+		List<RentPayment> RentPayments = new ArrayList<RentPayment>();
 		RentPayments.add(RentPayment.builder().id(UUID.randomUUID().toString())
 				.amountPaid(paymentDetails.get(0).getTotalAmountPaid().doubleValue())
-				.propertyId(properties.get(0).getId())
-				.dateOfPayment(timestamp.getTime())
+				.propertyId(properties.get(0).getId()).dateOfPayment(timestamp.getTime())
 				.mode(ModeEnum.fromValue(PTConstants.MODE_GENERATED))
-				.receiptNo(paymentDetails.get(0).getReceiptNumber())
-				.auditDetails(paymentAuditDetails)
-				.build());
-		
+				.receiptNo(paymentDetails.get(0).getReceiptNumber()).auditDetails(paymentAuditDetails).build());
+
 		List<RentDemand> demands = propertyRepository
 				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
-		RentAccount accounts = propertyRepository
-				.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
+		RentAccount accounts = propertyRepository.getPropertyRentAccountDetails(
+				PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
 		if (!CollectionUtils.isEmpty(demands) && null != accounts) {
-			properties.get(0).setRentCollections(
-				rentCollectionService.settle(demands, RentPayments,
-						properties.get(0).getRentAccount(), properties.get(0).getPropertyDetails().getInterestRate()));
+			properties.get(0).setRentCollections(rentCollectionService.settle(demands, RentPayments,
+					properties.get(0).getRentAccount(), properties.get(0).getPropertyDetails().getInterestRate()));
 		}
-		PropertyRequest propertyRequest = PropertyRequest.builder().requestInfo(requestInfo)
-				.properties(properties).build();
+		PropertyRequest propertyRequest = PropertyRequest.builder().requestInfo(requestInfo).properties(properties)
+				.build();
 		enrichCollection(propertyRequest);
 		producer.push(config.getUpdatePropertyTopic(), propertyRequest);
-		/*getRentSummary(properties);
-		return properties;*/
+		/*
+		 * getRentSummary(properties); return properties;
+		 */
 	}
 
 	private void getRentSummary(List<Property> properties) {
-		properties.stream().filter(property -> property.getDemands() != null
-				&& property.getPayments() != null && property.getRentAccount() != null).forEach(property -> {
+		properties.stream().filter(property -> property.getDemands() != null && property.getPayments() != null
+				&& property.getRentAccount() != null).forEach(property -> {
 					property.setRentSummary(rentCollectionService.calculateRentSummary(property.getDemands(),
 							property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
 				});
-		
+
 	}
 }
