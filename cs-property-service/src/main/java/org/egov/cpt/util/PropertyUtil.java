@@ -138,11 +138,24 @@ public class PropertyUtil {
 
 	SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD-HH-MM-SS");
 
+	/**
+	 * Generates a new consumer code from a transit number to be sent while creating
+	 * a bill.
+	 * 
+	 * @param transitNumber
+	 * @return
+	 */
 	public String getPropertyRentConsumerCode(String transitNumber) {
 		return String.format("SITE-%s-%s", transitNumber.toUpperCase(), dateFormat.format(new Date()));
 	}
 
 	@SuppressWarnings("finally")
+	/**
+	 * Extracts transit site number from consumer code.
+	 * 
+	 * @param consumerCode
+	 * @return
+	 */
 	public String getTransitNumberFromConsumerCode(String consumerCode) {
 		try {
 			Pattern pattern = Pattern.compile("^SITE-\\d{1,4}?-");
