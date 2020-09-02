@@ -75,8 +75,6 @@ public class RentDemandGenerationService {
 					Comparator<RentDemand> compare = Comparator.comparing(RentDemand::getGenerationDate);
 					Optional<RentDemand> collectionDemand = rentDemandList.stream().min(compare);
 
-					// int currentYear = LocalDate.now().getYear();
-
 					List<String> dateList = rentDemandList.stream().map(r -> r.getGenerationDate()).map(
 							date -> new Date(date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString())
 							.collect(Collectors.toList());
