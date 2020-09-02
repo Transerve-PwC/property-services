@@ -12,6 +12,8 @@ import org.egov.common.contract.request.Role;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.Property;
+import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.PaymentDetail;
 import org.egov.cpt.models.calculation.PaymentRequest;
@@ -21,6 +23,7 @@ import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
+import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.cpt.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentUpdateService {
 
 	private OwnershipTransferService ownershipTransferService;
+	
+	private PropertyService propertyService;
 
 	private OwnershipTransferRepository repositoryOt;
 
@@ -47,6 +52,8 @@ public class PaymentUpdateService {
 	private WorkflowService workflowService;
 
 	private PropertyUtil util;
+	
+	private RentEnrichmentService rentEnrichmentService;
 
 	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
 	private Boolean pickWFServiceNameFromPropertyTypeOnly;
@@ -58,7 +65,7 @@ public class PaymentUpdateService {
 	public PaymentUpdateService(OwnershipTransferService ownershipTransferService,
 			OwnershipTransferRepository repositoryOt, DuplicateCopyService duplicateCopyService,
 			PropertyRepository propertyRepository, ObjectMapper mapper, WorkflowService workflowService,
-			PropertyUtil util) {
+			PropertyUtil util,RentEnrichmentService rentEnrichmentService) {
 		this.ownershipTransferService = ownershipTransferService;
 		this.repositoryOt = repositoryOt;
 		this.duplicateCopyService = duplicateCopyService;
@@ -66,6 +73,7 @@ public class PaymentUpdateService {
 		this.mapper = mapper;
 		this.workflowService = workflowService;
 		this.util = util;
+		this.rentEnrichmentService = rentEnrichmentService;
 	}
 
 	final String tenantId = "tenantId";
@@ -161,7 +169,17 @@ public class PaymentUpdateService {
 						case PTConstants.BILLING_BUSINESS_SERVICE_RENT: {
 							String consumerCode = paymentDetail.getBill().getConsumerCode();
 
-							// Consumer code is made up of
+							PropertyCriteria searchCriteria = new PropertyCriteria();
+							searchCriteria.setTransitNumber(util.getTransitNumberFromConsumerCode(consumerCode));
+
+							List<Property> properties = propertyService.searchProperty(searchCriteria,requestInfo);
+
+							if (CollectionUtils.isEmpty(properties))
+								throw new CustomException("INVALID RECEIPT",
+										"No Property found for the comsumerCode " + consumerCode);
+							
+							rentEnrichmentService.PostEnrichmentForRentPayment(requestInfo,properties,paymentDetails);
+							
 							break;
 						}
 					}
