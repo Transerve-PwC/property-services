@@ -58,7 +58,6 @@ public class RentPayment implements Comparable<RentPayment> {
 	 * boolean indicates whether payment is processed or not
 	 */
 	@Builder.Default
-	@JsonIgnore
 	private boolean processed = false;
 
 	@Override
