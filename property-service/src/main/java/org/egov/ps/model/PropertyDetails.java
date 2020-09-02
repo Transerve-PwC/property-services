@@ -1,5 +1,6 @@
 package org.egov.ps.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,10 +57,10 @@ public class PropertyDetails {
 	private Long dateOfAuction;
 
 	@JsonProperty("areaSqft")
-	private String areaSqft;
+	private int areaSqft;
 
 	@JsonProperty("ratePerSqft")
-	private String ratePerSqft;
+	private BigDecimal ratePerSqft;
 
 	@JsonProperty("lastNocDate")
 	private Long lastNocDate;
@@ -67,14 +68,29 @@ public class PropertyDetails {
 	@JsonProperty("serviceCategory")
 	private String serviceCategory;
 
+	@JsonProperty("isPropertyActive")
+	private Boolean isPropertyActive;
+
+	@JsonProperty("tradeType")
+	private String tradeType;
+
+	@JsonProperty("companyName")
+	private String companyName;
+
+	@JsonProperty("companyAddress")
+	private String companyAddress;
+
+	@JsonProperty("companyRegistrationNumber")
+	private String companyRegistrationNumber;
+
+	@JsonProperty("companyType")
+	private String companyType;
+
 	@JsonProperty("owners")
 	private List<Owner> owners;
 
 	@JsonProperty("courtCases")
 	private List<CourtCase> courtCases;
-
-	@JsonProperty("purchaseDetails")
-	private List<PurchaseDetails> purchaseDetails;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
@@ -90,7 +106,7 @@ public class PropertyDetails {
 		}
 		this.owners.add(newOwnerItem);
 		return this;
-		
+
 	}
 
 	public PropertyDetails addCourtCaseItem(CourtCase courtCaseItem) {
@@ -104,21 +120,7 @@ public class PropertyDetails {
 		}
 		this.courtCases.add(courtCaseItem);
 		return this;
-		
-	}
-	
-	public PropertyDetails addPurchaseDetailsItem(PurchaseDetails purchaseDetailsItem) {
-		if (this.purchaseDetails == null) {
-			this.purchaseDetails = new ArrayList<>();
-		}
-		for (PurchaseDetails purchaseDetail : purchaseDetails) {
-			if (purchaseDetail.getId().equalsIgnoreCase(purchaseDetailsItem.getId())) {
-				return this;
-			}
-		}
-		this.purchaseDetails.add(purchaseDetailsItem);
-		return this;
-		
+
 	}
 
 }

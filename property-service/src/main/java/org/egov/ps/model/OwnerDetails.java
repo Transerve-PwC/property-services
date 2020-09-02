@@ -62,6 +62,9 @@ public class OwnerDetails {
 	@JsonProperty("possesionDate")
 	private Long possesionDate;
 
+	@JsonProperty("isApproved")
+	private Boolean isApproved;
+
 	@JsonProperty("isCurrentOwner")
 	private Boolean isCurrentOwner;
 

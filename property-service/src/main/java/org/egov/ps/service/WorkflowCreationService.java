@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.ps.model.BusinessServiceRequest;
-import org.egov.ps.model.WorkFlowResponseDetails;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.BusinessService;
+import org.egov.ps.web.contracts.BusinessServiceRequest;
 import org.egov.ps.web.contracts.BusinessServiceResponse;
+import org.egov.ps.web.contracts.WorkFlowResponseDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;

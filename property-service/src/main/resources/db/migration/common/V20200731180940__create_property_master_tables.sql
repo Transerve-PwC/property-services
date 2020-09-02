@@ -1,19 +1,18 @@
-DROP TABLE IF EXISTS cs_pm_property_v1;
-DROP TABLE IF EXISTS cs_pm_property_details_v1;
-DROP TABLE IF EXISTS cs_pm_owner_v1;
-DROP TABLE IF EXISTS cs_pm_owner_details_v1;
-DROP TABLE IF EXISTS cs_pm_owner_documents_v1;
-DROP TABLE IF EXISTS cs_pm_court_case_v1;
-DROP TABLE IF EXISTS cs_pm_purchase_details_v1;
+DROP TABLE IF EXISTS cs_ep_property_v1;
+DROP TABLE IF EXISTS cs_ep_property_details_v1;
+DROP TABLE IF EXISTS cs_ep_owner_v1;
+DROP TABLE IF EXISTS cs_ep_owner_details_v1;
+DROP TABLE IF EXISTS cs_ep_documents_v1;
+DROP TABLE IF EXISTS cs_ep_court_case_v1;
 
-DROP TABLE IF EXISTS cs_pm_property_audit_v1;
-DROP TABLE IF EXISTS cs_pm_property_details_audit_v1;
-DROP TABLE IF EXISTS cs_pm_owner_audit_v1;
-DROP TABLE IF EXISTS cs_pm_owner_details_audit_v1;
+DROP TABLE IF EXISTS cs_ep_property_audit_v1;
+DROP TABLE IF EXISTS cs_ep_property_details_audit_v1;
+DROP TABLE IF EXISTS cs_ep_owner_audit_v1;
+DROP TABLE IF EXISTS cs_ep_owner_details_audit_v1;
 
 --> Property tables
 
-CREATE TABLE cs_pm_property_v1 (
+CREATE TABLE cs_ep_property_v1 (
    id           		CHARACTER VARYING (256) NOT NULL,
    tenantid       		CHARACTER VARYING (256),
    file_number			CHARACTER VARYING (256) NOT NULL,
@@ -29,10 +28,10 @@ CREATE TABLE cs_pm_property_v1 (
    created_time         bigint NOT NULL,
    last_modified_time   bigint,
 
-  CONSTRAINT pk_cs_pm_property_v1 PRIMARY KEY (id)
+  CONSTRAINT pk_cs_ep_property_v1 PRIMARY KEY (id)
 );
 
-CREATE TABLE cs_pm_property_details_v1 (
+CREATE TABLE cs_ep_property_details_v1 (
    id           		CHARACTER VARYING (256) NOT NULL,
    tenantid       		CHARACTER VARYING (256),
    property_id       	CHARACTER VARYING (256) NOT NULL,
@@ -41,28 +40,34 @@ CREATE TABLE cs_pm_property_details_v1 (
    mode_of_auction      CHARACTER VARYING (256),
    scheme_name        	CHARACTER VARYING (256),
    date_of_auction      bigint,
-   area_sqft   			CHARACTER VARYING (256),
-   rate_per_sqft        CHARACTER VARYING (256),
+   area_sqft   			numeric(15,2),
+   rate_per_sqft        numeric(15,2),
    last_noc_date        bigint,
    service_category   	CHARACTER VARYING (256),
-   
+   is_property_active	BOOLEAN,
+   trade_type			CHARACTER VARYING (256),
+   company_name			CHARACTER VARYING (256),
+   company_address		CHARACTER VARYING (256),
+   company_registration_number	CHARACTER VARYING (256),
+   company_type			CHARACTER VARYING (256),
+
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
    created_time         bigint NOT NULL,
    last_modified_time   bigint,
 
-  CONSTRAINT pk_cs_pm_property_details_v1 PRIMARY KEY (id),
-  CONSTRAINT fk_cs_pm_property_details_v1 FOREIGN KEY (property_id) REFERENCES cs_pm_property_v1 (id)
+  CONSTRAINT pk_cs_ep_property_details_v1 PRIMARY KEY (id),
+  CONSTRAINT fk_cs_ep_property_details_v1 FOREIGN KEY (property_id) REFERENCES cs_ep_property_v1 (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
 );
 
-CREATE TABLE cs_pm_owner_v1 (
+CREATE TABLE cs_ep_owner_v1 (
    id           		CHARACTER VARYING (256) NOT NULL,
    tenantid       		CHARACTER VARYING (256),
    property_details_id	CHARACTER VARYING (256) NOT NULL,
    serial_number   		CHARACTER VARYING (256),
-   share   				CHARACTER VARYING (256),
+   share   				numeric(3,2),
    cp_number         	CHARACTER VARYING (256),
    state   				CHARACTER VARYING (256),
    action   			CHARACTER VARYING (256),
@@ -72,13 +77,13 @@ CREATE TABLE cs_pm_owner_v1 (
    created_time         bigint NOT NULL,
    last_modified_time   bigint,
 
-  CONSTRAINT pk_cs_pm_owner_v1 PRIMARY KEY (id),
-  CONSTRAINT fk_cs_pm_owner_v1 FOREIGN KEY (property_details_id) REFERENCES cs_pm_property_details_v1 (id)
+  CONSTRAINT pk_cs_ep_owner_v1 PRIMARY KEY (id),
+  CONSTRAINT fk_cs_ep_owner_v1 FOREIGN KEY (property_details_id) REFERENCES cs_ep_property_details_v1 (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
 );
 
-CREATE TABLE cs_pm_owner_details_v1 (
+CREATE TABLE cs_ep_owner_details_v1 (
    id           		CHARACTER VARYING (256) NOT NULL,
    tenantid       		CHARACTER VARYING (256),
    owner_id       		CHARACTER VARYING (256) NOT NULL,
@@ -89,6 +94,7 @@ CREATE TABLE cs_pm_owner_details_v1 (
    allotment_number     CHARACTER VARYING (256),
    date_of_allotment    bigint,
    possesion_date       bigint,
+   is_approved			BOOLEAN,
    is_current_owner  	BOOLEAN,
    is_master_entry    	BOOLEAN,
    due_amount  			numeric(12,2),
@@ -99,32 +105,32 @@ CREATE TABLE cs_pm_owner_details_v1 (
    created_time         bigint NOT NULL,
    last_modified_time   bigint,
 
-  CONSTRAINT pk_cs_pm_owner_details_v1 PRIMARY KEY (id),
-  CONSTRAINT fk_cs_pm_owner_details_v1 FOREIGN KEY (owner_id) REFERENCES cs_pm_owner_v1 (id)
+  CONSTRAINT pk_cs_ep_owner_details_v1 PRIMARY KEY (id),
+  CONSTRAINT fk_cs_ep_owner_details_v1 FOREIGN KEY (owner_id) REFERENCES cs_ep_owner_v1 (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
 );
 
-CREATE TABLE cs_pm_owner_documents_v1 (
+CREATE TABLE cs_ep_documents_v1 (
    id           		CHARACTER VARYING (256) NOT NULL,
-   tenantid       		CHARACTER VARYING (256),
-   owner_details_id     CHARACTER VARYING (256) NOT NULL,
-   document_type		CHARACTER VARYING (256),
+   tenantid			    CHARACTER VARYING (256),
+   reference_id       	CHARACTER VARYING (256) NOT NULL,
+   document_type   		CHARACTER VARYING (256),
    file_store_id        CHARACTER VARYING (256),
-   is_active            BOOLEAN,
+   is_active   			BOOLEAN,
+   property_id    		CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
    created_time         bigint NOT NULL,
    last_modified_time   bigint,
 
-  CONSTRAINT pk_cs_pm_owner_documents_v1 PRIMARY KEY (id),
-  CONSTRAINT fk_cs_pm_owner_documents_v1 FOREIGN KEY (owner_details_id) REFERENCES cs_pm_owner_details_v1 (id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
+  CONSTRAINT pk_cs_ep_documents_v1 PRIMARY KEY (id),
+  CONSTRAINT fk_cs_ep_documents_v1 FOREIGN KEY (property_id) REFERENCES cs_ep_property_v1 (id)
 );
 
-CREATE TABLE cs_pm_court_case_v1 (
+
+CREATE TABLE cs_ep_court_case_v1 (
    id           				CHARACTER VARYING (256) NOT NULL,
    tenantid       				CHARACTER VARYING (256),
    property_details_id			CHARACTER VARYING (256) NOT NULL,
@@ -141,42 +147,17 @@ CREATE TABLE cs_pm_court_case_v1 (
    created_time         		bigint NOT NULL,
    last_modified_time   		bigint,
 
-  CONSTRAINT pk_cs_pm_court_case_v1 PRIMARY KEY (id),
-  CONSTRAINT fk_cs_pm_court_case_v1 FOREIGN KEY (property_details_id) REFERENCES cs_pm_property_details_v1 (id)
+  CONSTRAINT pk_cs_ep_court_case_v1 PRIMARY KEY (id),
+  CONSTRAINT fk_cs_ep_court_case_v1 FOREIGN KEY (property_details_id) REFERENCES cs_ep_property_details_v1 (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
 );
 
-CREATE TABLE cs_pm_purchase_details_v1 (
-   id           				CHARACTER VARYING (256) NOT NULL,
-   tenantid       				CHARACTER VARYING (256),
-   property_details_id			CHARACTER VARYING (256) NOT NULL,
-   new_owner_name 				CHARACTER VARYING (256),
-   new_owner_father_name  		CHARACTER VARYING (256),
-   new_owner_address   			CHARACTER VARYING (256),
-   new_owner_mobile_number   	CHARACTER VARYING (256),
-   seller_name   				CHARACTER VARYING (256),
-   seller_father_name         	CHARACTER VARYING (256),
-   percentage_of_share   		CHARACTER VARYING (256),
-   mode_of_transfer   			CHARACTER VARYING (256),
-   registration_number         	CHARACTER VARYING (256),
-   date_of_registration   		bigint,
-  
-   created_by           		CHARACTER VARYING (128) NOT NULL,
-   last_modified_by     		CHARACTER VARYING (128),
-   created_time         		bigint NOT NULL,
-   last_modified_time   		bigint,
-
-  CONSTRAINT pk_cs_pm_purchase_details_v1 PRIMARY KEY (id),
-  CONSTRAINT fk_cs_pm_purchase_details_v1 FOREIGN KEY (property_details_id) REFERENCES cs_pm_property_details_v1 (id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
-);
 
 --> Property audit tables
 
 
-CREATE TABLE cs_pm_property_audit_v1 (
+CREATE TABLE cs_ep_property_audit_v1 (
    id           		CHARACTER VARYING (256) NOT NULL,
    tenantid       		CHARACTER VARYING (256),
    file_number			CHARACTER VARYING (256) NOT NULL,
@@ -189,11 +170,11 @@ CREATE TABLE cs_pm_property_audit_v1 (
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
-   created_time         CHARACTER VARYING NOT NULL,
-   last_modified_time   CHARACTER VARYING
+   created_time         bigint NOT NULL,
+   last_modified_time   bigint
 );
 
-CREATE TABLE cs_pm_property_details_audit_v1 (
+CREATE TABLE cs_ep_property_details_audit_v1 (
    id           		CHARACTER VARYING (256) NOT NULL,
    tenantid       		CHARACTER VARYING (256),
    property_id       	CHARACTER VARYING (256) NOT NULL,
@@ -201,35 +182,41 @@ CREATE TABLE cs_pm_property_details_audit_v1 (
    type_of_allocation   CHARACTER VARYING (256),
    mode_of_auction      CHARACTER VARYING (256),
    scheme_name        	CHARACTER VARYING (256),
-   date_of_auction      CHARACTER VARYING (256),
-   area_sqft   			CHARACTER VARYING (256),
-   rate_per_sqft        CHARACTER VARYING (256),
-   last_noc_date        CHARACTER VARYING (256),
+   date_of_auction      bigint,
+   area_sqft   			numeric(15,2),
+   rate_per_sqft        numeric(15,2),
+   last_noc_date        bigint,
    service_category   	CHARACTER VARYING (256),
-   
+   is_property_active	BOOLEAN,
+   trade_type			CHARACTER VARYING (256),
+   company_name			CHARACTER VARYING (256),
+   company_address		CHARACTER VARYING (256),
+   company_registration_number	CHARACTER VARYING (256),
+   company_type			CHARACTER VARYING (256),
+
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
-   created_time         CHARACTER VARYING NOT NULL,
-   last_modified_time   CHARACTER VARYING
+   created_time         bigint NOT NULL,
+   last_modified_time   bigint
 );
 
-CREATE TABLE cs_pm_owner_audit_v1 (
+CREATE TABLE cs_ep_owner_audit_v1 (
    id           		CHARACTER VARYING (256) NOT NULL,
    tenantid       		CHARACTER VARYING (256),
    property_details_id	CHARACTER VARYING (256) NOT NULL,
    serial_number   		CHARACTER VARYING (256),
-   share   				CHARACTER VARYING (256),
+   share   				numeric(3,2),
    cp_number         	CHARACTER VARYING (256),
    state   				CHARACTER VARYING (256),
    action   			CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
-   created_time         CHARACTER VARYING NOT NULL,
-   last_modified_time   CHARACTER VARYING
+   created_time         bigint NOT NULL,
+   last_modified_time   bigint
 );
 
-CREATE TABLE cs_pm_owner_details_audit_v1 (
+CREATE TABLE cs_ep_owner_details_audit_v1 (
    id           		CHARACTER VARYING (256) NOT NULL,
    tenantid       		CHARACTER VARYING (256),
    owner_id       		CHARACTER VARYING (256) NOT NULL,
@@ -238,16 +225,17 @@ CREATE TABLE cs_pm_owner_details_audit_v1 (
    guardian_relation    CHARACTER VARYING (256),
    mobile_number       	CHARACTER VARYING (256),
    allotment_number     CHARACTER VARYING (256),
-   date_of_allotment    CHARACTER VARYING (256),
-   possesion_date       CHARACTER VARYING (256),
-   is_current_owner  	CHARACTER VARYING (256),
-   is_master_entry    	CHARACTER VARYING (256),
-   due_amount  			CHARACTER VARYING (256),
+   date_of_allotment    bigint,
+   possesion_date       bigint,
+   is_approved			BOOLEAN,
+   is_current_owner  	BOOLEAN,
+   is_master_entry    	BOOLEAN,
+   due_amount  			numeric(12,2),
    address    			CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
-   created_time         CHARACTER VARYING NOT NULL,
-   last_modified_time   CHARACTER VARYING
+   created_time         bigint NOT NULL,
+   last_modified_time   bigint
 );
 
