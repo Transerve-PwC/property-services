@@ -13,7 +13,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RentAccount;
@@ -56,7 +58,7 @@ public class RentDemandGenerationService {
 		this.propertyutil = propertyutil;
 	}
 
-	public void createDemand(RentDemandCriteria demandCriteria) {
+	public void createDemand(RentDemandCriteria demandCriteria, RequestInfo requestInfo) {
 
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		propertyCriteria.setRelations(new ArrayList<>());
@@ -70,8 +72,7 @@ public class RentDemandGenerationService {
 				List<RentPayment> rentPaymentList = propertyRepository.getPropertyRentPaymentDetails(propertyCriteria);
 				RentAccount rentAccount = propertyRepository.getPropertyRentAccountDetails(propertyCriteria);
 
-				if (!rentDemandList.isEmpty()) {
-
+				if(!CollectionUtils.isEmpty(rentDemandList)) {
 					Comparator<RentDemand> compare = Comparator.comparing(RentDemand::getGenerationDate);
 					Optional<RentDemand> collectionDemand = rentDemandList.stream().min(compare);
 
@@ -79,21 +80,19 @@ public class RentDemandGenerationService {
 							date -> new Date(date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString())
 							.collect(Collectors.toList());
 
-					if (demandCriteria.getDate().isEmpty()) {
+					if (demandCriteria.isEmpty()) {
 						LocalDate currentDate = LocalDate.now();
-
 						if (!dateList.contains(currentDate.toString())) {
 							// generate demand
 							generateRentDemand(property, collectionDemand.get(), currentDate, rentDemandList,
-									rentPaymentList, rentAccount);
+									rentPaymentList, rentAccount, requestInfo);
 						}
 					} else {
 						LocalDate date = LocalDate.parse(demandCriteria.getDate(), FORMATTER);
 						if (!dateList.contains(date.toString())) {
 							// generate demand
 							generateRentDemand(property, collectionDemand.get(), date, rentDemandList, rentPaymentList,
-									rentAccount);
-
+									rentAccount, requestInfo);
 						}
 					}
 				} else {
@@ -108,7 +107,7 @@ public class RentDemandGenerationService {
 	}
 
 	private void generateRentDemand(Property property, RentDemand collectionDemand, LocalDate date,
-			List<RentDemand> rentDemandList, List<RentPayment> rentPaymentList, RentAccount rentAccount) {
+			List<RentDemand> rentDemandList, List<RentPayment> rentPaymentList, RentAccount rentAccount, RequestInfo requestInfo) {
 
 		int oldYear = new Date(collectionDemand.getGenerationDate()).toInstant().atZone(ZoneId.systemDefault())
 				.toLocalDate().getYear();
@@ -139,7 +138,8 @@ public class RentDemandGenerationService {
 		rentDemand.setCollectionPrincipal(collectionPrincipal);
 		rentDemand.setRemainingPrincipal(rentDemand.getCollectionPrincipal());
 		rentDemand.setInterestSince(rentDemand.getGenerationDate());
-		// rentDemand.setAuditDetails(property.getAuditDetails());
+		//rentDemand.setAuditDetails(property.getAuditDetails());
+		
 		rentDemandList.add(rentDemand);
 
 		log.info("rend demand id: " + rendDemandId);
@@ -148,7 +148,7 @@ public class RentDemandGenerationService {
 		property.setRentAccount(rentAccount);
 		property.setPayments(rentPaymentList);
 
-		if (rentPaymentList != null && rentAccount != null) {
+		if (property.getPayments() != null && property.getRentAccount() != null) {
 
 			property.setRentCollections(rentCollectionService.settle(property.getDemands(), property.getPayments(),
 					property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
@@ -160,10 +160,10 @@ public class RentDemandGenerationService {
 		if (!CollectionUtils.isEmpty(property.getRentCollections())) {
 			property.getRentCollections().forEach(collection -> {
 				if (collection.getId() == null) {
-					// AuditDetails rentAuditDetails = propertyutil
-					// .getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+					//AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+						//	true);
 					collection.setId(UUID.randomUUID().toString());
-					// collection.setAuditDetails(rentAuditDetails);
+					//collection.setAuditDetails(rentAuditDetails);
 				}
 
 			});
