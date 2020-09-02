@@ -26,12 +26,9 @@ public class RentDemandGenerationController {
 
 	private RentDemandGenerationService demandGenerationService;
 
-	private ResponseInfoFactory responseInfoFactory;
-
 	@Autowired
-	public RentDemandGenerationController(RentDemandGenerationService demandGenerationService, ResponseInfoFactory responseInfoFactory) {
+	public RentDemandGenerationController(RentDemandGenerationService demandGenerationService) {
 		this.demandGenerationService = demandGenerationService;
-		this.responseInfoFactory = responseInfoFactory;
 	}
 
 	@PostMapping("/_create")
