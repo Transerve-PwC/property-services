@@ -29,12 +29,12 @@ import lombok.Setter;
 public class Calculation {
 
 	@JsonProperty("applicationNumber")
-	private String applicationNumber = null;
+	private String applicationNumber;
 
 	@NotNull
 	@JsonProperty("tenantId")
 	@Size(min = 2, max = 256)
-	private String tenantId = null;
+	private String tenantId;
 
 	@JsonProperty("taxHeadEstimates")
 	List<TaxHeadEstimate> taxHeadEstimates;

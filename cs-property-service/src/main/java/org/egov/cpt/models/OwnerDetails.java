@@ -77,7 +77,7 @@ public class OwnerDetails {
 	private String revisionPercentage;
 
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
+	private AuditDetails auditDetails;
 
 	@JsonProperty("fatherOrHusband")
 	private String fatherOrHusband;

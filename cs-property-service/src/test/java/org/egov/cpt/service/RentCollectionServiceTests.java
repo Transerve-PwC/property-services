@@ -26,6 +26,8 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 @SuppressWarnings("unused")
 public class RentCollectionServiceTests {
+    private static final String JAN_1_2000 = "01 01 2000";
+    private static final String MAY_1_2000 = "01 05 2000";
     private static final String JAN_1_2020 = "01 01 2020";
     private static final String JAN_15_2020 = "15 01 2020";
     private static final String FEB_1_2020 = "01 02 2020";
@@ -170,6 +172,20 @@ public class RentCollectionServiceTests {
         List<RentDemand> demands = Arrays.asList(getDemand(100, DEC_1_1998), getDemand(100, JAN_1_1999),
                 getDemand(100, FEB_1_1999));
         List<RentPayment> payments = Arrays.asList(getPayment(200, FEB_16_1999));
+        List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
+                payments, DEFAULT_INTEREST_RATE, null, null);
+        utils.printStatement(accountStatementItems);
+        utils.reconcileStatement(accountStatementItems, DEFAULT_INTEREST_RATE);
+    }
+
+    @Test
+    public void testUsecase2Settlement() throws ParseException {
+        List<RentDemand> demands = Arrays.asList(getDemand(500, JAN_1_2000));
+        List<RentPayment> payments = Arrays.asList(getPayment(400, MAY_1_2000));
+        RentAccount rentAccount = getAccount(0);
+        this.rentCollectionService.settle(demands, payments, rentAccount, DEFAULT_INTEREST_RATE);
+        RentSummary summary = this.rentCollectionService.calculateRentSummary(demands, rentAccount,
+                DEFAULT_INTEREST_RATE);
         List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
                 payments, DEFAULT_INTEREST_RATE, null, null);
         utils.printStatement(accountStatementItems);

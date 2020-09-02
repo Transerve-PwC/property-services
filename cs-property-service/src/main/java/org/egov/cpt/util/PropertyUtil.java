@@ -1,9 +1,15 @@
 package org.egov.cpt.util;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
@@ -16,10 +22,14 @@ import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class PropertyUtil {
 
 	@Autowired
@@ -124,5 +134,30 @@ public class PropertyUtil {
 						workflowService.isStateUpdatable(result.getState(), businessService));
 		});
 		return idToIsStateUpdatableMapDc;
+	}
+
+	SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD-HH-MM-SS");
+
+	public String getPropertyRentConsumerCode(String transitNumber) {
+		return String.format("SITE-%s-%s", transitNumber.toUpperCase(), dateFormat.format(new Date()));
+	}
+
+	@SuppressWarnings("finally")
+	public String getTransitNumberFromConsumerCode(String consumerCode) {
+		try {
+			Pattern pattern = Pattern.compile("^SITE-\\d{1,4}?-");
+			Matcher matcher = pattern.matcher(consumerCode);
+			if (matcher.find()) {
+				String formatted = matcher.group();
+				String[] tokens = formatted.split("-");
+				return tokens[1];
+			}
+			log.error("Could not match rent consumer code pattern {}", consumerCode);
+		} catch (Exception e) {
+			log.error("Failed during parsing transit number from consumer code", e);
+		} finally {
+			throw new CustomException(Collections.singletonMap("INVALID_RENT_CONSUMER_CODE",
+					"Transit number could not be extracted from consumer code " + consumerCode));
+		}
 	}
 }
