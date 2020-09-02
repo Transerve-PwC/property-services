@@ -23,6 +23,7 @@ import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.web.contracts.DuplicateCopyRequest;
 import org.egov.cpt.web.contracts.OwnershipTransferRequest;
+import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.cpt.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,8 @@ public class PaymentUpdateService {
 	private WorkflowService workflowService;
 
 	private PropertyUtil util;
+	
+	private RentEnrichmentService rentEnrichmentService;
 
 	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
 	private Boolean pickWFServiceNameFromPropertyTypeOnly;
@@ -62,7 +65,7 @@ public class PaymentUpdateService {
 	public PaymentUpdateService(OwnershipTransferService ownershipTransferService,
 			OwnershipTransferRepository repositoryOt, DuplicateCopyService duplicateCopyService,
 			PropertyRepository propertyRepository, ObjectMapper mapper, WorkflowService workflowService,
-			PropertyUtil util) {
+			PropertyUtil util,RentEnrichmentService rentEnrichmentService) {
 		this.ownershipTransferService = ownershipTransferService;
 		this.repositoryOt = repositoryOt;
 		this.duplicateCopyService = duplicateCopyService;
@@ -70,6 +73,7 @@ public class PaymentUpdateService {
 		this.mapper = mapper;
 		this.workflowService = workflowService;
 		this.util = util;
+		this.rentEnrichmentService = rentEnrichmentService;
 	}
 
 	final String tenantId = "tenantId";
@@ -170,13 +174,12 @@ public class PaymentUpdateService {
 
 							List<Property> properties = propertyService.searchProperty(searchCriteria,requestInfo);
 
-							BusinessService pmBusinessService = workflowService.getBusinessService(
-									properties.get(0).getTenantId(), requestInfo, PTConstants.BILLING_BUSINESS_SERVICE_RENT);
-
 							if (CollectionUtils.isEmpty(properties))
 								throw new CustomException("INVALID RECEIPT",
 										"No Property found for the comsumerCode " + consumerCode);
-
+							
+							rentEnrichmentService.PostEnrichmentForRentPayment(requestInfo,properties,paymentDetails);
+							
 							break;
 						}
 					}
