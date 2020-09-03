@@ -18,8 +18,10 @@ import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
+import org.egov.cpt.service.calculation.DemandRepository;
 import org.egov.cpt.service.calculation.DemandService;
 import org.egov.cpt.util.PTConstants;
+import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.validator.PropertyValidator;
 import org.egov.cpt.web.contracts.AccountStatementResponse;
 import org.egov.cpt.web.contracts.PropertyRentRequest;
@@ -68,13 +70,19 @@ public class PropertyService {
 
 	@Autowired
 	private DemandService demandService;
+	
+	@Autowired
+	private PropertyUtil utils;
+	
+	@Autowired
+	private DemandRepository demandRepository;
 
 	public List<Property> createProperty(PropertyRequest request) {
 
 		propertyValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
 		processRentHistory(request);
-		userService.createUser(request);
+//		userService.createUser(request);
 
 		producer.push(config.getSavePropertyTopic(), request);
 
@@ -100,7 +108,7 @@ public class PropertyService {
 		List<Property> propertyFromSearch = propertyValidator.validateUpdateRequest(request);
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		processRentHistory(request);
-		userService.createUser(request);
+//		userService.createUser(request);
 		String action = request.getProperties().get(0).getMasterDataAction();
 		String state = request.getProperties().get(0).getMasterDataState();
 		if ((config.getIsWorkflowEnabled() && !action.equalsIgnoreCase(""))
@@ -206,6 +214,7 @@ public class PropertyService {
 	}
 
 	public List<Property> generateFinanceDemand(PropertyRentRequest rentRequest) {
+		userService.createUser(rentRequest);
 		List<Property> properties = repository.getProperties(PropertyCriteria.builder()
 				.transitNumber(rentRequest.getRentDetails().get(0).getTransitNumber()).build());
 		List<RentDemand> demands = repository
@@ -218,7 +227,10 @@ public class PropertyService {
 						account, properties.get(0).getPropertyDetails().getInterestRate()), properties.get(0));
 			});
 		}
+		
 		demandService.generateRentDemand(rentRequest.getRequestInfo(), rentRequest.getRentDetails());
+		String consumerCode = utils.getPropertyRentConsumerCode(rentRequest.getRentDetails(). get(0).getTransitNumber());
+		demandRepository.fetchBill(rentRequest);
 		return properties;
 	}
 }

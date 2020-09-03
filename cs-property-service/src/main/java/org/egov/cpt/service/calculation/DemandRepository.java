@@ -4,10 +4,15 @@ import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.BillResponseV2;
+import org.egov.cpt.models.BillV2;
 import org.egov.cpt.models.calculation.Demand;
 import org.egov.cpt.models.calculation.DemandRequest;
 import org.egov.cpt.models.calculation.DemandResponse;
 import org.egov.cpt.repository.ServiceRequestRepository;
+import org.egov.cpt.util.PTConstants;
+import org.egov.cpt.util.PropertyUtil;
+import org.egov.cpt.web.contracts.PropertyRentRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,6 +30,9 @@ public class DemandRepository {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	private PropertyUtil utils;
 
 	/**
 	 * Creates demand
@@ -67,6 +75,27 @@ public class DemandRepository {
 		}
 		return response.getDemands();
 
+	}
+
+	public List<BillV2> fetchBill(PropertyRentRequest rentRequest) {
+		String consumerCode = utils.getPropertyRentConsumerCode(rentRequest.getRentDetails(). get(0).getTransitNumber());
+		StringBuilder url = new StringBuilder(config.getBillingHost());
+		String uri= config.getBillGenearateEndpoint().replace("$tenantId", rentRequest.getRentDetails().get(0).getTenantId())
+		.replace("$consumerCode", rentRequest.getRentDetails().get(0).getTenantId())
+		.replace("$businessService", PTConstants.BILLING_BUSINESS_SERVICE_RENT);
+		url.append(uri);
+		Object result = serviceRequestRepository.fetchResult(url,rentRequest.getRequestInfo());
+		BillResponseV2 response = null;
+		try {
+			response = mapper.convertValue(result, BillResponseV2.class);
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("PARSING ERROR", "Failed to parse response of update demand");
+		}
+		return response.getBill();
+	}
+
+	public Object saveCollection(PropertyRentRequest rentRequest, List<BillV2> billes) {
+		return null;
 	}
 
 }

@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -449,40 +450,35 @@ public class DemandService {
 			String tenantId = rentDetail.getTenantId();
 			String consumerCode = utils.getPropertyRentConsumerCode(rentDetail.getTransitNumber());
 
-			/*
-			 * String url = config.getUserHost().concat(config.getUserSearchEndpoint());
-			 * 
-			 * List<org.egov.cpt.models.User> ownerUser = requestInfo.get Set<String> uuid =
-			 * new HashSet<>(); uuid.add(rentDetail.getAuditDetails().getCreatedBy());
-			 * 
-			 * UserSearchRequestCore userSearchRequest =
-			 * UserSearchRequestCore.builder().requestInfo(requestInfo) .uuid(uuid).build();
-			 * 
-			 * ownerUser = mapper .convertValue(serviceRequestRepository.fetchResult(url,
-			 * userSearchRequest), UserResponse.class) .getUser();
-			 */
+			String url = config.getUserHost().concat(config.getUserSearchEndpoint());
 
-			// User ownerUser=requestInfo.getUserInfo();
-			// log.info("ownerUser:" + ownerUser);
+			List<org.egov.cpt.models.User> ownerUser = null;
+//			Set<String> uuid = new HashSet<>();
+//			uuid.add(application.getAuditDetails().getCreatedBy());
+			
 
-			// User requestUser = requestInfo.getUserInfo(); // user from request
-			// information
-			User requestUser = requestInfo.getUserInfo();
+			UserSearchRequestCore userSearchRequest = UserSearchRequestCore.builder().requestInfo(requestInfo)
+					.userName(rentDetail.getOwnerMobileNumber())
+					.tenantId("ch")
+					.build();
+
+			ownerUser = mapper
+					.convertValue(serviceRequestRepository.fetchResult(url, userSearchRequest), UserResponse.class)
+					.getUser();
+			List<org.egov.cpt.models.User> requiredOwner=ownerUser.stream().filter(owner->owner.getUserName().equalsIgnoreCase(rentDetail.getOwnerMobileNumber()))
+			.collect(Collectors.toList());
+				
+			log.info("ownerUser:" + requiredOwner);
+
+			User requestUser = requiredOwner.get(0).toCommonUser();
 			log.info("requestUser:" + requestUser);
-			User user = null;
-			if (requestUser.getMobileNumber() != null) {
-				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
-						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
-						.mobileNumber(requestUser.getMobileNumber()).emailId(requestUser.getEmailId())
-						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
-						.build();
-			} else {
-				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
-						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
-						.mobileNumber(requestUser.getUserName()).emailId(requestUser.getEmailId())
-						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
-						.build();
-			}
+
+			String mobileNumber = requestUser.getMobileNumber() != null ? requestUser.getMobileNumber()
+					: requestUser.getUserName();
+			User user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
+					.name(requestUser.getName()).type(requestInfo.getUserInfo().getType()).mobileNumber(mobileNumber)
+					.emailId(requestUser.getEmailId()).roles(requestUser.getRoles()).tenantId(requestUser.getTenantId())
+					.uuid(requestUser.getUuid()).build();
 
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			if (!CollectionUtils.isEmpty(rentDetail.getCalculation().getTaxHeadEstimates())) {

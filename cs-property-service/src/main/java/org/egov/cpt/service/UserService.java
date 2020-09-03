@@ -2,28 +2,43 @@ package org.egov.cpt.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
+import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.CreateUserRequest;
+import org.egov.cpt.models.OwnerInfo;
+import org.egov.cpt.models.Property;
+import org.egov.cpt.models.RentDetail;
 import org.egov.cpt.models.UserDetailResponse;
 import org.egov.cpt.models.UserSearchRequest;
 import org.egov.cpt.repository.ServiceRequestRepository;
+import org.egov.cpt.web.contracts.PropertyRentRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class UserService {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	private PropertyConfiguration config;
 
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
@@ -43,53 +58,57 @@ public class UserService {
 	@Value("${egov.user.update.path}")
 	private String userUpdateEndpoint;
 
-	public void createUser(PropertyRequest request) {
+	public void createUser(PropertyRentRequest request) {
+//		UserDetailResponse userResponse=null;
 
-//		Property property = request.getProperty();
-//		RequestInfo requestInfo = request.getRequestInfo();
-//		Role role = getCitizenRole();
-//		Set<String> listOfMobileNumbers = getMobileNumbers(property, requestInfo, property.getTenantId());
-//
-//		property.getOwners().forEach(owner -> {
-//
-//			addUserDefaultFields(property.getTenantId(), role, owner);
-//			UserDetailResponse userDetailResponse = userExists(owner, requestInfo);
-//
-//			if (CollectionUtils.isEmpty(userDetailResponse.getUser())) {
-//
-//				/*
-//				 * Sets userName equal to mobileNumber
-//				 * 
-//				 * If mobileNumber already assigned as user-name for another user
-//				 * 
-//				 * then random uuid is assigned as user-name
-//				 */
-//				StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userCreateEndpoint);
-//				setUserName(owner, listOfMobileNumbers);
-//
-//				CreateUserRequest userRequest = CreateUserRequest.builder().requestInfo(requestInfo).user(owner)
-//						.build();
-//
-//				userDetailResponse = userCall(userRequest, uri);
-//
-//				if (ObjectUtils.isEmpty(userDetailResponse)) {
-//					throw new CustomException("INVALID USER RESPONSE",
-//							"The user create has failed for the mobileNumber : " + owner.getUserName());
-//				}
-//			} else {
-//				owner.setId(userDetailResponse.getUser().get(0).getId());
-//				owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
-//				addUserDefaultFields(property.getTenantId(), role, owner);
-//
-//				StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userUpdateEndpoint);
-//				userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
-//				if (userDetailResponse.getUser().get(0).getUuid() == null) {
-//					throw new CustomException("INVALID USER RESPONSE", "The user updated has uuid as null");
-//				}
-//			}
-//			// Assigns value of fields from user got from userDetailResponse to owner object
-//			setOwnerFields(owner, userDetailResponse, requestInfo);
-//		});
+		List<RentDetail> rentDetails = request.getRentDetails();
+		RequestInfo requestInfo = request.getRequestInfo();
+		Role role = getCitizenRole(rentDetails.get(0).getTenantId());
+
+		rentDetails.forEach(rentDetail -> {
+			UserDetailResponse userDetailResponse = searchByUserName(rentDetail.getOwnerMobileNumber(), getStateLevelTenant(rentDetail.getTenantId()));
+			org.egov.cpt.models.OwnerInfo owner=new org.egov.cpt.models.OwnerInfo();
+			if (CollectionUtils.isEmpty(userDetailResponse.getUser())) {
+
+				addUserDefaultFields(rentDetail.getTenantId(), role, owner);
+				StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userCreateEndpoint);
+				owner.setUserName(rentDetail.getOwnerMobileNumber());
+				owner.setName(rentDetail.getOwnerMobileNumber());
+				owner.setMobileNumber(rentDetail.getOwnerMobileNumber());
+
+				UserDetailResponse userResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
+                if (userResponse.getUser().get(0).getUuid() == null) {
+                    throw new CustomException("INVALID USER RESPONSE", "The user created has uuid as null");
+                }
+                log.info("owner created --> " + userResponse.getUser().get(0).getUuid());
+                setOwnerFields(owner, userResponse, requestInfo);
+
+				if (ObjectUtils.isEmpty(userResponse)) {
+					throw new CustomException("INVALID USER RESPONSE",
+							"The user create has failed for the mobileNumber : " + owner.getUserName());
+				}
+			} else {
+				owner.setId(userDetailResponse.getUser().get(0).getId());
+				owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
+				addUserDefaultFields(rentDetail.getTenantId(), role, owner);
+
+				StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userUpdateEndpoint);
+				userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
+				if (userDetailResponse.getUser().get(0).getUuid() == null) {
+					throw new CustomException("INVALID USER RESPONSE", "The user updated has uuid as null");
+				}
+			}
+		});
+//		return userResponse;
+	}
+
+	private void addUserDefaultFields(String tenantId, Role role, org.egov.cpt.models.OwnerInfo owner) {
+		        owner.setActive(true);
+		        owner.setTenantId(tenantId.split("\\.")[0]);
+		        owner.setRoles(Collections.singletonList(role));
+		        owner.setType("CITIZEN");
+		        owner.setCorrespondenceAddress("Address");
+		        owner.setPermanentAddress("Address");
 	}
 
 	/**
@@ -109,7 +128,8 @@ public class UserService {
 	 * 
 	 * @param criteria
 	 * @param requestInfo
-	 * @return serDetailResponse containing the user if present and the responseInfo
+	 * @return serDetailResponse containing the user if present and the
+	 *         responseInfo
 	 */
 	public UserDetailResponse getUser(UserSearchRequest userSearchRequest) {
 		StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
@@ -118,10 +138,13 @@ public class UserService {
 	}
 
 	/**
-	 * Returns UserDetailResponse by calling user service with given uri and object
+	 * Returns UserDetailResponse by calling user service with given uri and
+	 * object
 	 * 
-	 * @param userRequest Request object for user service
-	 * @param uri         The address of the endpoint
+	 * @param userRequest
+	 *            Request object for user service
+	 * @param uri
+	 *            The address of the endpoint
 	 * @return Response from user service as parsed as userDetailResponse
 	 */
 	@SuppressWarnings("unchecked")
@@ -132,30 +155,26 @@ public class UserService {
 			dobFormat = "yyyy-MM-dd";
 		else if (uri.toString().contains(userCreateEndpoint))
 			dobFormat = "dd/MM/yyyy";
-		try {
-			Optional<Object> response = (Optional<Object>) serviceRequestRepository.fetchResult(uri, userRequest);
-
-			if (response.isPresent()) {
-				LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.get();
-				parseResponse(responseMap, dobFormat);
-				UserDetailResponse userDetailResponse = mapper.convertValue(responseMap, UserDetailResponse.class);
-				return userDetailResponse;
-			} else {
-				return new UserDetailResponse();
-			}
-		}
-		// Which Exception to throw?
-		catch (IllegalArgumentException e) {
-			throw new CustomException("IllegalArgumentException", "ObjectMapper not able to convertValue in userCall");
-		}
+		try{
+            LinkedHashMap responseMap = (LinkedHashMap)serviceRequestRepository.fetchResult(uri, userRequest);
+            parseResponse(responseMap,dobFormat);
+            UserDetailResponse userDetailResponse = mapper.convertValue(responseMap,UserDetailResponse.class);
+            return userDetailResponse;
+        }
+        catch(IllegalArgumentException  e)
+        {
+            throw new CustomException("IllegalArgumentException","ObjectMapper not able to convertValue in userCall");
+        }
 	}
 
 	/**
 	 * Parses date formats to long for all users in responseMap
 	 * 
-	 * @param responeMap LinkedHashMap got from user api response
-	 * @param dobFormat  dob format (required because dob is returned in different
-	 *                   format's in search and create response in user service)
+	 * @param responeMap
+	 *            LinkedHashMap got from user api response
+	 * @param dobFormat
+	 *            dob format (required because dob is returned in different
+	 *            format's in search and create response in user service)
 	 */
 	@SuppressWarnings("unchecked")
 	private void parseResponse(LinkedHashMap<String, Object> responeMap, String dobFormat) {
@@ -181,8 +200,10 @@ public class UserService {
 	/**
 	 * Converts date to long
 	 * 
-	 * @param date   date to be parsed
-	 * @param format Format of the date
+	 * @param date
+	 *            date to be parsed
+	 * @param format
+	 *            Format of the date
 	 * @return Long value of date
 	 */
 	private Long dateTolong(String date, String format) {
@@ -196,8 +217,37 @@ public class UserService {
 		return d.getTime();
 	}
 
-//	private Role getCitizenRole() {
-//		return Role.builder().code("CITIZEN").name("Citizen").build();
-//	}
+	private Role getCitizenRole(String tenantId){
+	        Role role = new Role();
+	        role.setCode("CITIZEN");
+	        role.setName("Citizen");
+//	        role.setTenantId(getStateLevelTenant(tenantId));
+	        return role;
+	    }
+
+	private String getStateLevelTenant(String tenantId) {
+		return tenantId.split("\\.")[0];
+	}
+	
+	private UserDetailResponse searchByUserName(String userName,String tenantId){
+        UserSearchRequest userSearchRequest = new UserSearchRequest();
+        userSearchRequest.setUserType("CITIZEN");
+        userSearchRequest.setUserName(userName);
+        userSearchRequest.setTenantId(tenantId);
+        StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
+        return userCall(userSearchRequest,uri);
+
+    }
+	
+	private void setOwnerFields(OwnerInfo owner, UserDetailResponse userDetailResponse,RequestInfo requestInfo){
+        owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
+        owner.setId(userDetailResponse.getUser().get(0).getId());
+        owner.setUserName((userDetailResponse.getUser().get(0).getUserName()));
+        owner.setCreatedBy(requestInfo.getUserInfo().getUuid());
+        owner.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
+//        owner.setCreatedDate(System.currentTimeMillis());
+//        owner.setLastModifiedDate(System.currentTimeMillis());
+        owner.setActive(userDetailResponse.getUser().get(0).getActive());
+    }
 
 }

@@ -232,7 +232,7 @@ public class EnrichmentService {
 	 * @param properties         List of property whose owner's are to be populated
 	 *                           from userDetailResponse
 	 */
-	public void enrichOwner(UserDetailResponse userDetailResponse, List<Property> properties) {
+	/*public void enrichOwner(UserDetailResponse userDetailResponse, List<Property> properties) {
 
 		List<Owner> users = userDetailResponse.getUser();
 		Map<String, Owner> userIdToOwnerMap = new HashMap<>();
@@ -247,7 +247,7 @@ public class EnrichmentService {
 							"The owner of the propertyDetail " + property.getId() + " is not coming in user search");
 			});
 		});
-	}
+	}*/
 
 	/*
 	 * Ownership Transfer

@@ -305,5 +305,9 @@ public class PropertyConfiguration {
 
 	@Value("${egov.demand.update.endpoint}")
 	private String demandUpdateEndpoint;
+	
+	@Value("${egov.bill.gen.endpoint}")
+	private String billGenearateEndpoint;
+	
 
 }
