@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.BillV2;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.RentDetail;
@@ -31,6 +32,7 @@ import org.egov.cpt.models.calculation.TaxHeadEstimate;
 import org.egov.cpt.repository.ServiceRequestRepository;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
+import org.egov.cpt.web.contracts.PropertyRentRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -501,6 +503,11 @@ public class DemandService {
 			demands.add(singleDemand);
 		}
 		return demandRepository.saveDemand(requestInfo, demands);
+	}
+
+	public Object callCollection(PropertyRentRequest rentRequest, List<BillV2> billes) {
+		return demandRepository.saveCollection(rentRequest, billes);
+		
 	}
 
 }

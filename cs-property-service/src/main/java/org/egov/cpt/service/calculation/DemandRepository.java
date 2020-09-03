@@ -95,6 +95,8 @@ public class DemandRepository {
 	}
 
 	public Object saveCollection(PropertyRentRequest rentRequest, List<BillV2> billes) {
+		StringBuilder url = new StringBuilder(config.getCollectionPaymentEndPoint());
+		url.append(config.getDemandUpdateEndpoint());
 		return null;
 	}
 

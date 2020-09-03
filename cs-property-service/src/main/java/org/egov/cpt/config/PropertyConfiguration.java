@@ -309,5 +309,14 @@ public class PropertyConfiguration {
 	@Value("${egov.bill.gen.endpoint}")
 	private String billGenearateEndpoint;
 	
+	@Value("${egov.collectionservice.host}")
+	private String collectionPaymentHost;
+	
+	
+	@Value("${egov.collectionservice.payment.create.path}")
+	private String collectionPaymentEndPoint;
+	
+	
+	
 
 }

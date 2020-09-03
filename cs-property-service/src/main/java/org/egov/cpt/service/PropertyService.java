@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.AccountStatementCriteria;
+import org.egov.cpt.models.BillV2;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RentAccount;
@@ -229,8 +230,8 @@ public class PropertyService {
 		}
 		
 		demandService.generateRentDemand(rentRequest.getRequestInfo(), rentRequest.getRentDetails());
-		String consumerCode = utils.getPropertyRentConsumerCode(rentRequest.getRentDetails(). get(0).getTransitNumber());
-		demandRepository.fetchBill(rentRequest);
+		List<BillV2> billes= demandRepository.fetchBill(rentRequest);
+		demandService.callCollection(rentRequest,billes);
 		return properties;
 	}
 }
