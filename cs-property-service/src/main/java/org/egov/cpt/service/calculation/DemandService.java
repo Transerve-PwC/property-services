@@ -395,9 +395,8 @@ public class DemandService {
 				demands.add(demand);
 				demands = demandRepository.updateDemand(requestInfo, demands);
 			}
-
 		}
-		log.info("Demand genearted");
+		log.info("Demand generated");
 		return demands;
 	}
 

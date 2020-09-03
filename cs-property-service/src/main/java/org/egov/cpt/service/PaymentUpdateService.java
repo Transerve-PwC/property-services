@@ -177,11 +177,16 @@ public class PaymentUpdateService {
 								throw new CustomException("INVALID RECEIPT",
 										"No Property found for the comsumerCode " + consumerCode);
 
-							rentEnrichmentService.postEnrichmentForRentPayment(requestInfo, properties, paymentDetails);
+							rentEnrichmentService.postEnrichmentForRentPayment(requestInfo, properties.get(0),
+									paymentDetail);
 
 							break;
 						}
 					}
+				} else {
+					log.warn(
+							"PaymentUpdateService does not recognize billing service {}. Allowed business services are {}",
+							paymentDetail.getBusinessService(), allowedBusinessServices);
 				}
 			}
 		} catch (Exception e) {

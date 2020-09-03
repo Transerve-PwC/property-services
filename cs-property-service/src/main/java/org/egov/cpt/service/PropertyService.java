@@ -65,7 +65,7 @@ public class PropertyService {
 
 	@Autowired
 	private IRentCollectionService rentCollectionService;
-	
+
 	@Autowired
 	private DemandService demandService;
 
@@ -138,18 +138,20 @@ public class PropertyService {
 
 		Property property = properties.get(0);
 		List<RentDemand> demands = repository
-				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build())
-				.stream()
-				.filter(rentDemand -> accountStatementCriteria.getToDate() >= rentDemand.getAuditDetails().getCreatedTime())
-				.map(rentDemand-> {	return rentDemand; })
-				.collect(Collectors.toList());
-		
+				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build()).stream()
+				.filter(rentDemand -> accountStatementCriteria.getToDate() >= rentDemand.getAuditDetails()
+						.getCreatedTime())
+				.map(rentDemand -> {
+					return rentDemand;
+				}).collect(Collectors.toList());
+
 		List<RentPayment> payments = repository
-				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build())
-				.stream()
-				.filter(rentPayment  -> accountStatementCriteria.getToDate() >= rentPayment .getAuditDetails().getCreatedTime())
-				.map(rentPayment -> {	return rentPayment ; })
-				.collect(Collectors.toList());
+				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build()).stream()
+				.filter(rentPayment -> accountStatementCriteria.getToDate() >= rentPayment.getAuditDetails()
+						.getCreatedTime())
+				.map(rentPayment -> {
+					return rentPayment;
+				}).collect(Collectors.toList());
 
 		return AccountStatementResponse.builder()
 				.rentAccountStatements(rentCollectionService.getAccountStatement(demands, payments,
@@ -203,21 +205,18 @@ public class PropertyService {
 		return properties;
 	}
 
-	public List<Property> genearateRentDemand(PropertyRentRequest rentRequest) {
+	public List<Property> generateFinanceDemand(PropertyRentRequest rentRequest) {
 		List<Property> properties = repository.getProperties(PropertyCriteria.builder()
 				.transitNumber(rentRequest.getRentDetails().get(0).getTransitNumber()).build());
-		RentSummary rentSummary =null;
 		List<RentDemand> demands = repository
-					.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
-		List<RentPayment> payments = repository
-					.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
-		RentAccount accounts = repository
-					.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
-		if (!CollectionUtils.isEmpty(demands) && null != accounts) {
-		rentRequest.getRentDetails().forEach(rentDetail -> {
-			enrichmentService.enrichRentDemand(rentDetail,rentCollectionService.calculateRentSummary(demands, accounts,
-					properties.get(0).getPropertyDetails().getInterestRate()),properties.get(0));
-		});
+				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
+		RentAccount account = repository.getPropertyRentAccountDetails(
+				PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
+		if (!CollectionUtils.isEmpty(demands) && null != account) {
+			rentRequest.getRentDetails().forEach(rentDetail -> {
+				enrichmentService.enrichRentDemand(rentDetail, rentCollectionService.calculateRentSummary(demands,
+						account, properties.get(0).getPropertyDetails().getInterestRate()), properties.get(0));
+			});
 		}
 		demandService.generateRentDemand(rentRequest.getRequestInfo(), rentRequest.getRentDetails());
 		return properties;
