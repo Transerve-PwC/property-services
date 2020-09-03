@@ -77,11 +77,11 @@ public class OwnerDetails {
 	@JsonProperty("address")
 	private String address;
 
-	@JsonProperty("ownerDocuments")
-	private List<Document> ownerDocuments;
-
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+
+	@JsonProperty("ownerDocuments")
+	private List<Document> ownerDocuments;
 
 	public OwnerDetails addOwnerDocumentsItem(Document ownerDocumentItem) {
 		if (this.ownerDocuments == null) {
@@ -110,5 +110,22 @@ public class OwnerDetails {
 		}
 		this.paymentDetails.add(paymentItem);
 		return this;
+	}
+
+	@JsonProperty("courtCases")
+	private List<CourtCase> courtCases;
+
+	public OwnerDetails addCourtCaseItem(CourtCase courtCaseItem) {
+		if (this.courtCases == null) {
+			this.courtCases = new ArrayList<>();
+		}
+		for (CourtCase courtCase : courtCases) {
+			if (courtCase.getId().equalsIgnoreCase(courtCaseItem.getId())) {
+				return this;
+			}
+		}
+		this.courtCases.add(courtCaseItem);
+		return this;
+
 	}
 }

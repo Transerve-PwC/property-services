@@ -45,7 +45,7 @@ public class PropertyDetails {
 	private String propertyType;
 
 	@JsonProperty("typeOfAllocation")
-	private String typeOfAllocation;			
+	private String typeOfAllocation;
 
 	@JsonProperty("emdAmount")
 	private String emdAmount;
@@ -89,14 +89,11 @@ public class PropertyDetails {
 	@JsonProperty("companyType")
 	private String companyType;
 
-	@JsonProperty("owners")
-	private List<Owner> owners;
-
-	@JsonProperty("courtCases")
-	private List<CourtCase> courtCases;
-
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+
+	@JsonProperty("owners")
+	private List<Owner> owners;
 
 	public PropertyDetails addOwnerItem(Owner newOwnerItem) {
 		if (this.owners == null) {
@@ -108,20 +105,6 @@ public class PropertyDetails {
 			}
 		}
 		this.owners.add(newOwnerItem);
-		return this;
-
-	}
-
-	public PropertyDetails addCourtCaseItem(CourtCase courtCaseItem) {
-		if (this.courtCases == null) {
-			this.courtCases = new ArrayList<>();
-		}
-		for (CourtCase courtCase : courtCases) {
-			if (courtCase.getId().equalsIgnoreCase(courtCaseItem.getId())) {
-				return this;
-			}
-		}
-		this.courtCases.add(courtCaseItem);
 		return this;
 
 	}
