@@ -39,6 +39,14 @@ public class RentCollectionServiceTests {
     private static final String FEB_16_1999 = "16 02 1999";
     private static final String MAR_1_1999 = "01 03 1999";
     private static final String APR_1_1999 = "01 04 1999";
+    private static final String MAY_1_1999 = "01 05 1999";
+    private static final String JUN_1_1999 = "01 06 1999";
+    private static final String JUL_1_1999 = "01 07 1999";
+    private static final String AUG_1_1999 = "01 08 1999";
+    private static final String SEP_1_1999 = "01 09 1999";
+    private static final String OCT_1_1999 = "01 10 1999";
+    private static final String NOV_1_1999 = "01 11 1999";
+    private static final String DEC_1_1999 = "01 12 1999";
 
     public static final double DEFAULT_INTEREST_RATE = 24D;
     private static final double ZERO_INTEREST_RATE = 0D;
@@ -250,6 +258,19 @@ public class RentCollectionServiceTests {
         assertEquals(29, collections.size());
         RentSummary summary = this.rentCollectionService.calculateRentSummary(demands, account, DEFAULT_INTEREST_RATE);
         assertEquals(0, summary.getBalanceAmount(), 0.1);
+    }
+
+    @Test
+    public void testContinuousDemands() throws ParseException {
+        List<RentDemand> demands = Arrays.asList(getDemand(100, DEC_1_1998), getDemand(100, JAN_1_1999),
+                getDemand(100, FEB_1_1999), getDemand(100, MAR_1_1999), getDemand(100, APR_1_1999),
+                getDemand(100, MAY_1_1999), getDemand(100, JUN_1_1999), getDemand(100, JUL_1_1999),
+                getDemand(100, AUG_1_1999), getDemand(100, SEP_1_1999), getDemand(100, OCT_1_1999),
+                getDemand(100, NOV_1_1999), getDemand(100, DEC_1_1999));
+        List<RentPayment> payments = Collections.emptyList();
+        List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
+                payments, DEFAULT_INTEREST_RATE, null, null);
+        utils.printStatement(accountStatementItems);
     }
 
     private long getEpochFromDateString(String date) throws ParseException {

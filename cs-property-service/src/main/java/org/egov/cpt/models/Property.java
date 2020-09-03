@@ -6,6 +6,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
+import org.egov.cpt.models.calculation.Calculation;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -112,6 +113,10 @@ public class Property {
 	@Valid
 	@JsonProperty
 	private RentSummary rentSummary;
+	
+	@Valid
+	@JsonProperty
+	private Calculation calculation;
 
 	public Property addDocumentItem(DuplicateCopy newDuplicateCopyItem) {
 		if (this.duplicateCopys == null) {

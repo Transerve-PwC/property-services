@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.ModeEnum;
 import org.egov.cpt.models.Property;
@@ -12,6 +13,8 @@ import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RentAccount;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
+import org.egov.cpt.models.calculation.PaymentDetail;
+import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
@@ -28,6 +31,15 @@ public class RentEnrichmentService {
 
 	@Autowired
 	PropertyRepository propertyRepository;
+
+	@Autowired
+	private IRentCollectionService rentCollectionService;
+
+	@Autowired
+	private PropertyConfiguration config;
+
+	@Autowired
+	private Producer producer;
 
 	public void enrichRentdata(PropertyRequest request) {
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
@@ -118,5 +130,41 @@ public class RentEnrichmentService {
 			});
 		}
 
+	}
+
+	/**
+	 * Accept payment and process it to settle pending demands.
+	 * 
+	 * @param requestInfo
+	 * @param property
+	 * @param paymentDetail
+	 */
+	public void postEnrichmentForRentPayment(RequestInfo requestInfo, Property property, PaymentDetail paymentDetail) {
+		AuditDetails paymentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+		// Construct a new rent payment object.
+		List<RentPayment> RentPayments = Collections.singletonList(RentPayment.builder()
+				.id(UUID.randomUUID().toString()).amountPaid(paymentDetail.getTotalAmountPaid().doubleValue())
+				.propertyId(property.getId()).dateOfPayment(System.currentTimeMillis())
+				.mode(ModeEnum.fromValue(PTConstants.MODE_GENERATED)).processed(false)
+				.receiptNo(paymentDetail.getReceiptNumber()).auditDetails(paymentAuditDetails).build());
+
+		// Get existing demands and rent account.
+		List<RentDemand> demands = propertyRepository
+				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+		RentAccount accounts = propertyRepository
+				.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+
+		// Settle the payment
+		if (!CollectionUtils.isEmpty(demands) && null != accounts) {
+			property.setRentCollections(rentCollectionService.settle(demands, RentPayments, property.getRentAccount(),
+					property.getPropertyDetails().getInterestRate()));
+		}
+
+		// Save everything back to database
+		PropertyRequest propertyRequest = PropertyRequest.builder().requestInfo(requestInfo)
+				.properties(Collections.singletonList(property)).build();
+		enrichCollection(propertyRequest);
+		producer.push(config.getUpdatePropertyTopic(), propertyRequest);
 	}
 }

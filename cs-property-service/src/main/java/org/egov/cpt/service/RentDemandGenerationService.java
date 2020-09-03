@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
-import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RentAccount;
@@ -72,7 +71,7 @@ public class RentDemandGenerationService {
 				List<RentPayment> rentPaymentList = propertyRepository.getPropertyRentPaymentDetails(propertyCriteria);
 				RentAccount rentAccount = propertyRepository.getPropertyRentAccountDetails(propertyCriteria);
 
-				if(!CollectionUtils.isEmpty(rentDemandList)) {
+				if (!CollectionUtils.isEmpty(rentDemandList)) {
 					Comparator<RentDemand> compare = Comparator.comparing(RentDemand::getGenerationDate);
 					Optional<RentDemand> collectionDemand = rentDemandList.stream().min(compare);
 
@@ -107,7 +106,8 @@ public class RentDemandGenerationService {
 	}
 
 	private void generateRentDemand(Property property, RentDemand collectionDemand, LocalDate date,
-			List<RentDemand> rentDemandList, List<RentPayment> rentPaymentList, RentAccount rentAccount, RequestInfo requestInfo) {
+			List<RentDemand> rentDemandList, List<RentPayment> rentPaymentList, RentAccount rentAccount,
+			RequestInfo requestInfo) {
 
 		int oldYear = new Date(collectionDemand.getGenerationDate()).toInstant().atZone(ZoneId.systemDefault())
 				.toLocalDate().getYear();
@@ -138,8 +138,8 @@ public class RentDemandGenerationService {
 		rentDemand.setCollectionPrincipal(collectionPrincipal);
 		rentDemand.setRemainingPrincipal(rentDemand.getCollectionPrincipal());
 		rentDemand.setInterestSince(rentDemand.getGenerationDate());
-		//rentDemand.setAuditDetails(property.getAuditDetails());
-		
+		// rentDemand.setAuditDetails(property.getAuditDetails());
+
 		rentDemandList.add(rentDemand);
 
 		log.info("rend demand id: " + rendDemandId);
@@ -160,10 +160,11 @@ public class RentDemandGenerationService {
 		if (!CollectionUtils.isEmpty(property.getRentCollections())) {
 			property.getRentCollections().forEach(collection -> {
 				if (collection.getId() == null) {
-					//AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(),
-						//	true);
+					// AuditDetails rentAuditDetails =
+					// propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+					// true);
 					collection.setId(UUID.randomUUID().toString());
-					//collection.setAuditDetails(rentAuditDetails);
+					// collection.setAuditDetails(rentAuditDetails);
 				}
 
 			});

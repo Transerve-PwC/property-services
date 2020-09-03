@@ -12,6 +12,8 @@ import org.egov.common.contract.request.Role;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.Property;
+import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.PaymentDetail;
 import org.egov.cpt.models.calculation.PaymentRequest;
@@ -36,6 +38,8 @@ public class PaymentUpdateService {
 
 	private OwnershipTransferService ownershipTransferService;
 
+	private PropertyService propertyService;
+
 	private OwnershipTransferRepository repositoryOt;
 
 	private DuplicateCopyService duplicateCopyService;
@@ -48,6 +52,8 @@ public class PaymentUpdateService {
 
 	private PropertyUtil util;
 
+	private RentEnrichmentService rentEnrichmentService;
+
 	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
 	private Boolean pickWFServiceNameFromPropertyTypeOnly;
 
@@ -58,7 +64,7 @@ public class PaymentUpdateService {
 	public PaymentUpdateService(OwnershipTransferService ownershipTransferService,
 			OwnershipTransferRepository repositoryOt, DuplicateCopyService duplicateCopyService,
 			PropertyRepository propertyRepository, ObjectMapper mapper, WorkflowService workflowService,
-			PropertyUtil util) {
+			PropertyUtil util, RentEnrichmentService rentEnrichmentService) {
 		this.ownershipTransferService = ownershipTransferService;
 		this.repositoryOt = repositoryOt;
 		this.duplicateCopyService = duplicateCopyService;
@@ -66,6 +72,7 @@ public class PaymentUpdateService {
 		this.mapper = mapper;
 		this.workflowService = workflowService;
 		this.util = util;
+		this.rentEnrichmentService = rentEnrichmentService;
 	}
 
 	final String tenantId = "tenantId";
@@ -161,10 +168,25 @@ public class PaymentUpdateService {
 						case PTConstants.BILLING_BUSINESS_SERVICE_RENT: {
 							String consumerCode = paymentDetail.getBill().getConsumerCode();
 
-							// Consumer code is made up of
+							PropertyCriteria searchCriteria = new PropertyCriteria();
+							searchCriteria.setTransitNumber(util.getTransitNumberFromConsumerCode(consumerCode));
+
+							List<Property> properties = propertyService.searchProperty(searchCriteria, requestInfo);
+
+							if (CollectionUtils.isEmpty(properties))
+								throw new CustomException("INVALID RECEIPT",
+										"No Property found for the comsumerCode " + consumerCode);
+
+							rentEnrichmentService.postEnrichmentForRentPayment(requestInfo, properties.get(0),
+									paymentDetail);
+
 							break;
 						}
 					}
+				} else {
+					log.warn(
+							"PaymentUpdateService does not recognize billing service {}. Allowed business services are {}",
+							paymentDetail.getBusinessService(), allowedBusinessServices);
 				}
 			}
 		} catch (Exception e) {
