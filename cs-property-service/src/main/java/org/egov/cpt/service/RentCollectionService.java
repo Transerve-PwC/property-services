@@ -265,7 +265,8 @@ public class RentCollectionService implements IRentCollectionService {
 
 	/**
 	 * @apiNote This will provide the account statement between the date specified
-	 *          by the user.
+	 *          by the user. Jan 2000 ... December 2020 Jan 2020
+	 * 
 	 * @param demands
 	 * @param payments
 	 * @param lstCollection
@@ -274,62 +275,77 @@ public class RentCollectionService implements IRentCollectionService {
 	@Override
 	public List<RentAccountStatement> getAccountStatement(List<RentDemand> demands, List<RentPayment> payments,
 			double interestRate, Long fromDateTimestamp, Long toDateTimestamp) {
-		payments = payments.stream().filter(payment -> payment.getAmountPaid() > 0).collect(Collectors.toList());
+		long endTimestamp = toDateTimestamp == null ? System.currentTimeMillis() : toDateTimestamp.longValue();
+		payments = payments.stream().filter(payment -> payment.getAmountPaid() > 0)
+				.filter(p -> p.getDateOfPayment() <= endTimestamp).collect(Collectors.toList());
 		Collections.sort(demands);
 		Collections.sort(payments);
 		List<RentAccountStatement> accountStatementItems = new ArrayList<RentAccountStatement>();
-		RentAccount rentAccount = RentAccount.builder().build();
+		RentAccount rentAccount = RentAccount.builder().remainingAmount(0D).build();
 		List<RentDemand> demandsToBeSettled = new ArrayList<RentDemand>(demands.size());
 		Iterator<RentDemand> demandIterator = demands.iterator();
 		Iterator<RentPayment> paymentIterator = payments.iterator();
 		RentDemand currentDemand = demandIterator.hasNext() ? demandIterator.next() : null;
 		RentPayment currentPayment = paymentIterator.hasNext() ? paymentIterator.next() : null;
 		while (true) {
+			boolean reachedLast = false;
 			RentSummary rentSummary;
 			RentAccountStatement statement = RentAccountStatement.builder().build();
 			if (currentDemand == null && currentPayment == null) {
-				break;
+				rentSummary = getSummaryForDemand(interestRate, rentAccount, demandsToBeSettled,
+						RentDemand.builder().generationDate(endTimestamp).collectionPrincipal(0D).build(), statement);
+				reachedLast = true;
 			} else if (currentDemand == null) {
-				this.settle(demandsToBeSettled, Collections.singletonList(currentPayment), rentAccount, interestRate);
-				rentSummary = calculateRentSummaryAt(demandsToBeSettled, rentAccount, interestRate,
-						currentPayment.getDateOfPayment());
-				statement.setDate(currentPayment.getDateOfPayment());
-				statement.setAmount(currentPayment.getAmountPaid());
-				statement.setType(Type.C);
+				rentSummary = calculateSummaryForPayment(interestRate, rentAccount, demandsToBeSettled, currentPayment,
+						statement);
 				currentPayment = paymentIterator.hasNext() ? paymentIterator.next() : null;
 			} else if (currentPayment == null) {
 				demandsToBeSettled.add(currentDemand);
-				this.settle(demandsToBeSettled, Collections.emptyList(), rentAccount, interestRate);
-				rentSummary = calculateRentSummaryAt(demandsToBeSettled, rentAccount, interestRate,
-						currentDemand.getGenerationDate());
-				statement.setDate(currentDemand.getGenerationDate());
-				statement.setAmount(currentDemand.getCollectionPrincipal());
-				statement.setType(Type.D);
+				rentSummary = getSummaryForDemand(interestRate, rentAccount, demandsToBeSettled, currentDemand,
+						statement);
 				currentDemand = demandIterator.hasNext() ? demandIterator.next() : null;
 			} else if (currentDemand.getGenerationDate() <= currentPayment.getDateOfPayment()) {
 				demandsToBeSettled.add(currentDemand);
-				this.settle(demandsToBeSettled, Collections.emptyList(), rentAccount, interestRate);
-				rentSummary = calculateRentSummaryAt(demandsToBeSettled, rentAccount, interestRate,
-						currentDemand.getGenerationDate());
-				statement.setDate(currentDemand.getGenerationDate());
-				statement.setAmount(currentDemand.getCollectionPrincipal());
-				statement.setType(Type.D);
+				rentSummary = getSummaryForDemand(interestRate, rentAccount, demandsToBeSettled, currentDemand,
+						statement);
 				currentDemand = demandIterator.hasNext() ? demandIterator.next() : null;
 			} else {
-				this.settle(demandsToBeSettled, Collections.singletonList(currentPayment), rentAccount, interestRate);
-				rentSummary = calculateRentSummaryAt(demandsToBeSettled, rentAccount, interestRate,
-						currentPayment.getDateOfPayment());
-				statement.setDate(currentPayment.getDateOfPayment());
-				statement.setAmount(currentPayment.getAmountPaid());
-				statement.setType(Type.C);
+				rentSummary = calculateSummaryForPayment(interestRate, rentAccount, demandsToBeSettled, currentPayment,
+						statement);
 				currentPayment = paymentIterator.hasNext() ? paymentIterator.next() : null;
 			}
 			statement.setRemainingPrincipal(rentSummary.getBalancePrincipal());
 			statement.setRemainingInterest(rentSummary.getBalanceInterest());
 			statement.setRemainingBalance(rentSummary.getBalanceAmount());
 			accountStatementItems.add(statement);
+			if (reachedLast) {
+				break;
+			}
 		}
 		return accountStatementItems;
+	}
+
+	private RentSummary getSummaryForDemand(double interestRate, RentAccount rentAccount,
+			List<RentDemand> demandsToBeSettled, RentDemand currentDemand, RentAccountStatement statement) {
+		RentSummary rentSummary;
+		this.settle(demandsToBeSettled, Collections.emptyList(), rentAccount, interestRate);
+		rentSummary = calculateRentSummaryAt(demandsToBeSettled, rentAccount, interestRate,
+				currentDemand.getGenerationDate());
+		statement.setDate(currentDemand.getGenerationDate());
+		statement.setAmount(currentDemand.getCollectionPrincipal());
+		statement.setType(Type.D);
+		return rentSummary;
+	}
+
+	private RentSummary calculateSummaryForPayment(double interestRate, RentAccount rentAccount,
+			List<RentDemand> demandsToBeSettled, RentPayment currentPayment, RentAccountStatement statement) {
+		this.settle(demandsToBeSettled, Collections.singletonList(currentPayment), rentAccount, interestRate);
+		RentSummary rentSummary = calculateRentSummaryAt(demandsToBeSettled, rentAccount, interestRate,
+				currentPayment.getDateOfPayment());
+		statement.setDate(currentPayment.getDateOfPayment());
+		statement.setAmount(currentPayment.getAmountPaid());
+		statement.setType(Type.C);
+		return rentSummary;
 	}
 
 	@Override
