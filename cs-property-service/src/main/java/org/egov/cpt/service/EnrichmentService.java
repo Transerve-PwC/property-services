@@ -31,6 +31,8 @@ import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.PropertyImages;
+import org.egov.cpt.models.RentDetail;
+import org.egov.cpt.models.RentSummary;
 import org.egov.cpt.models.UserDetailResponse;
 import org.egov.cpt.models.Idgen.IdResponse;
 import org.egov.cpt.models.calculation.Calculation;
@@ -88,8 +90,8 @@ public class EnrichmentService {
 				property.setAuditDetails(propertyAuditDetails);
 				property.setPropertyDetails(propertyDetail);
 				property.setMasterDataState(PTConstants.PM_DRAFTED);
-				
-//				log.info("property id: " + gen_property_id);
+
+				// log.info("property id: " + gen_property_id);
 
 				if (!CollectionUtils.isEmpty(property.getOwners())) {
 					property.getOwners().forEach(owner -> {
@@ -106,8 +108,8 @@ public class EnrichmentService {
 						property.getPropertyDetails().setCurrentOwner(owner.getId());
 						owner.setIsPrimaryOwner(true);
 						owner.getOwnerDetails().setPermanent(true);
-						
-//						log.info("owner id: " + gen_owner_id);
+
+						// log.info("owner id: " + gen_owner_id);
 					});
 				}
 			});
@@ -126,7 +128,7 @@ public class EnrichmentService {
 		ownerDetails.setPermanent(false);
 		ownerDetails.setAuditDetails(ownerAuditDetails);
 		ownerDetails.setApplicationType(ApplicationTypeEnum.MASTERRP);
-//		log.info("owner detail id: " + gen_owner_details_id);
+		// log.info("owner detail id: " + gen_owner_details_id);
 		return ownerDetails;
 	}
 
@@ -157,28 +159,9 @@ public class EnrichmentService {
 
 	public PropertyDetails updatePropertyDetail(Property property, RequestInfo requestInfo) {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
-		List<Document> applicationDocuments = updateApplicationDocs(propertyDetail, property, requestInfo);
-		propertyDetail.setApplicationDocuments(applicationDocuments);
+		enrichDocuments(propertyDetail.getApplicationDocuments(), requestInfo, property.getId(), property.getId(),
+				property.getTenantId());
 		return propertyDetail;
-	}
-
-	private List<Document> updateApplicationDocs(PropertyDetails propertyDetails, Property property,
-			RequestInfo requestInfo) {
-		List<Document> applicationDocuments = propertyDetails.getApplicationDocuments();
-		if (!CollectionUtils.isEmpty(applicationDocuments)) {
-			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-			applicationDocuments.forEach(document -> {
-				if (document.getId() == null) {
-					String gen_doc_id = UUID.randomUUID().toString();
-					document.setId(gen_doc_id);
-					document.setPropertyId(property.getId());
-					document.setReferenceId(property.getId());
-					document.setTenantId(property.getTenantId());
-				}
-				document.setAuditDetails(docAuditDetails);
-			});
-		}
-		return applicationDocuments;
 	}
 
 	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
@@ -197,13 +180,11 @@ public class EnrichmentService {
 				gen_property_id);
 		propertyDetail.setApplicationDocuments(applicationDocuments);
 
-		/*if (!CollectionUtils.isEmpty(property.getOwners())) {
-			property.getOwners().forEach(owner -> {
-				if (owner.getActiveState()) {
-					propertyDetail.setCurrentOwner(owner.getOwnerDetails().getName());
-				}
-			});
-		}*/
+		/*
+		 * if (!CollectionUtils.isEmpty(property.getOwners())) {
+		 * property.getOwners().forEach(owner -> { if (owner.getActiveState()) {
+		 * propertyDetail.setCurrentOwner(owner.getOwnerDetails().getName()); } }); }
+		 */
 
 		propertyDetail.setAuditDetails(propertyAuditDetails);
 		return propertyDetail;
@@ -287,7 +268,7 @@ public class EnrichmentService {
 				OwnerDetails ownerDetails = updateOwnerShipDetails(owner, foundProperty, requestInfo, gen_owner_id);
 				owner.setOwnerDetails(ownerDetails);
 
-//				demand generation
+				// demand generation
 				enrichGenerateDemand(owner);
 			});
 			setIdgenIds(request);
@@ -299,19 +280,17 @@ public class EnrichmentService {
 		AuditDetails updateAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 		if (!CollectionUtils.isEmpty(request.getOwners())) {
 			request.getOwners().forEach(owner -> {
-				List<Document> ownershipTransferDocuments = updateOwnershipTransferDocs(owner,
-						requestInfo);
+				updateOwnershipTransferDocs(owner, requestInfo);
 				AuditDetails modifyAuditDetails = owner.getAuditDetails();
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
 				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
-				
+
 				owner.setIsPrimaryOwner(false);
 				owner.setActiveState(false);
 				owner.setAuditDetails(modifyAuditDetails);
 				owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
-				owner.getOwnerDetails().setOwnershipTransferDocuments(ownershipTransferDocuments);
 
-//				demand generation
+				// demand generation
 				enrichUpdateDemand(owner);
 			});
 		}
@@ -319,18 +298,17 @@ public class EnrichmentService {
 
 	private void enrichGenerateDemand(Owner owner) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		owner.setBusinessService(PTConstants.BUSINESS_SERVICE_OT);
 
 		TaxHeadEstimate estimateDue = new TaxHeadEstimate();
-		estimateDue.setEstimateAmount(new BigDecimal(0.0)); // TODO doubt amount
+		estimateDue.setEstimateAmount(new BigDecimal(0.0));
 		estimateDue.setCategory(Category.DUE);
-		estimateDue.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
+		estimateDue.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_OT, Category.DUE));
 		estimates.add(estimateDue);
 
 		TaxHeadEstimate estimateCharges = new TaxHeadEstimate();
-		estimateCharges.setEstimateAmount(new BigDecimal(0.0)); // TODO doubt amount
+		estimateCharges.setEstimateAmount(new BigDecimal(0.0));
 		estimateCharges.setCategory(Category.CHARGES);
-		estimateCharges.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.CHARGES));
+		estimateCharges.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_OT, Category.CHARGES));
 		estimates.add(estimateCharges);
 
 		Calculation calculation = Calculation.builder()
@@ -341,54 +319,43 @@ public class EnrichmentService {
 
 	private void enrichUpdateDemand(Owner owner) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		owner.setBusinessService(PTConstants.BUSINESS_SERVICE_OT);
-//		TaxHeadEstimate estimate = new TaxHeadEstimate();
-		/*if (owner.getApplicationState().equalsIgnoreCase(PTConstants.OT_STATE_PENDING_SA_VERIFICATION)) {
-			estimate.setEstimateAmount(owner.getOwnerDetails().getDueAmount());
-			estimate.setCategory(Category.DUE);
-			estimate.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
-		}*/
+
+		// TaxHeadEstimate estimate = new TaxHeadEstimate();
+		/*
+		 * if (owner.getApplicationState().equalsIgnoreCase(PTConstants.
+		 * OT_STATE_PENDING_SA_VERIFICATION)) {
+		 * estimate.setEstimateAmount(owner.getOwnerDetails().getDueAmount());
+		 * estimate.setCategory(Category.DUE);
+		 * estimate.setTaxHeadCode(getTaxHeadCode(PTConstants.
+		 * BILLING_BUSINESS_SERVICE_OT, Category.DUE)); }
+		 */
 		if (owner.getApplicationState().equalsIgnoreCase(PTConstants.OT_STATE_PENDING_APRO)) {
 			TaxHeadEstimate estimate1 = new TaxHeadEstimate();
 			estimate1.setEstimateAmount(owner.getOwnerDetails().getDueAmount());
 			estimate1.setCategory(Category.DUE);
-			estimate1.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.DUE));
+			estimate1.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_OT, Category.DUE));
 			estimates.add(estimate1);
-			
-			TaxHeadEstimate estimate2= new TaxHeadEstimate();
+
+			TaxHeadEstimate estimate2 = new TaxHeadEstimate();
 			estimate2.setEstimateAmount(owner.getOwnerDetails().getAproCharge());
 			estimate2.setCategory(Category.CHARGES);
-			estimate2.setTaxHeadCode(getTaxHeadCode(owner.getBusinessService(), Category.CHARGES));
+			estimate2.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_OT, Category.CHARGES));
 			estimates.add(estimate2);
 		}
-//		estimates.add(estimate);
+		// estimates.add(estimate);
 		Calculation calculation = Calculation.builder()
 				.applicationNumber(owner.getOwnerDetails().getApplicationNumber()).taxHeadEstimates(estimates)
 				.tenantId(owner.getTenantId()).build();
 		owner.setCalculation(calculation);
 	}
 
-	private String getTaxHeadCode(String businessService, Category category) {
-		return String.format("%s_%s", businessService, category.toString());
+	private String getTaxHeadCode(String billingBusService, Category category) {
+		return String.format("%s_%s", billingBusService, category.toString());
 	}
 
-	private List<Document> updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
-		List<Document> ownershipTransferDocuments = owner.getOwnerDetails()
-				.getOwnershipTransferDocuments();
-		if (!CollectionUtils.isEmpty(ownershipTransferDocuments)) {
-			AuditDetails docAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-			ownershipTransferDocuments.forEach(document -> {
-				if (document.getId() == null) {
-					String gen_doc_id = UUID.randomUUID().toString();
-					document.setId(gen_doc_id);
-					document.setReferenceId(owner.getId());
-					document.setTenantId(owner.getTenantId());
-					document.setPropertyId(owner.getProperty().getId());
-				}
-				document.setAuditDetails(docAuditDetails);
-			});
-		}
-		return ownershipTransferDocuments;
+	private void updateOwnershipTransferDocs(Owner owner, RequestInfo requestInfo) {
+		enrichDocuments(owner.getOwnerDetails().getOwnershipTransferDocuments(), requestInfo,
+				owner.getProperty().getId(), owner.getId(), owner.getProperty().getTenantId());
 	}
 
 	private OwnerDetails updateOwnerShipDetails(Owner owner, Property foundProperty, RequestInfo requestInfo,
@@ -435,7 +402,7 @@ public class EnrichmentService {
 		String tenantId = request.getOwners().get(0).getTenantId();
 		List<Owner> owners = request.getOwners();
 		int peopertiesSize = request.getOwners().size();
-		
+
 		List<String> applicationNumbers = setIdgenIds(requestInfo, tenantId, peopertiesSize,
 				config.getApplicationNumberIdgenNameRP(), config.getApplicationNumberIdgenFormatRP());
 		ListIterator<String> itr = applicationNumbers.listIterator();
@@ -461,7 +428,6 @@ public class EnrichmentService {
 				application.getProperty()
 						.setId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
 				application.setAuditDetails(propertyAuditDetails);
-				System.out.println(propertyAuditDetails.toString() + " audit details here");
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {
@@ -472,7 +438,7 @@ public class EnrichmentService {
 					});
 				}
 
-//				demand generation
+				// demand generation
 				enrichDuplicateCopyGenerateDemand(application);
 			});
 		}
@@ -491,26 +457,11 @@ public class EnrichmentService {
 				application.getProperty()
 						.setId(propertyImagesRequest.getPropertyImagesApplications().get(0).getProperty().getId());
 				application.setAuditDetails(propertyAuditDetails);
-				
+
 				application.setCapturedBy(requestInfo.getUserInfo().getName());
 
-				// Document details
-				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
-					application.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil
-									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setReferenceId(propertyImagesRequest.getPropertyImagesApplications().get(0).getId());
-							document.setPropertyId(propertyImagesRequest.getPropertyImagesApplications().get(0).getProperty().getId());
-							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId());
-						}
-					});
-
-				}
-
+				enrichDocuments(application.getApplicationDocuments(), requestInfo, application.getProperty().getId(),
+						application.getId(), application.getTenantId());
 			});
 		}
 		setPIIdgenIds(propertyImagesRequest);
@@ -518,18 +469,17 @@ public class EnrichmentService {
 
 	private void enrichDuplicateCopyGenerateDemand(DuplicateCopy application) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		application.setBusinessService(PTConstants.BUSINESS_SERVICE_DC);
 
 		TaxHeadEstimate estimateFee = new TaxHeadEstimate();
 		estimateFee.setEstimateAmount(new BigDecimal(0.0));
 		estimateFee.setCategory(Category.FEE);
-		estimateFee.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.FEE));
+		estimateFee.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_DC, Category.FEE));
 		estimates.add(estimateFee);
 
 		TaxHeadEstimate estimateCharges = new TaxHeadEstimate();
 		estimateCharges.setEstimateAmount(new BigDecimal(0.0));
 		estimateCharges.setCategory(Category.CHARGES);
-		estimateCharges.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.CHARGES));
+		estimateCharges.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_DC, Category.CHARGES));
 		estimates.add(estimateCharges);
 
 		Calculation calculation = Calculation.builder().applicationNumber(application.getApplicationNumber())
@@ -540,24 +490,26 @@ public class EnrichmentService {
 
 	private void enrichDuplicateCopyUpdateDemand(DuplicateCopy application) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		application.setBusinessService(PTConstants.BUSINESS_SERVICE_DC);
 
-		/*if (application.getState().equalsIgnoreCase(PTConstants.DC_STATE_PENDING_SA_VERIFICATION)) {
-			estimate.setEstimateAmount(application.getApplicant().get(0).getFeeAmount());
-			estimate.setCategory(Category.FEE);
-			estimate.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.FEE));
-		}*/
+		/*
+		 * if (application.getState().equalsIgnoreCase(PTConstants.
+		 * DC_STATE_PENDING_SA_VERIFICATION)) {
+		 * estimate.setEstimateAmount(application.getApplicant().get(0).getFeeAmount());
+		 * estimate.setCategory(Category.FEE);
+		 * estimate.setTaxHeadCode(getTaxHeadCode(PTConstants.
+		 * BILLING_BUSINESS_SERVICE_DC, Category.FEE)); }
+		 */
 		if (application.getState().equalsIgnoreCase(PTConstants.DC_STATE_PENDING_APRO)) {
 			TaxHeadEstimate estimate1 = new TaxHeadEstimate();
 			estimate1.setEstimateAmount(application.getApplicant().get(0).getFeeAmount());
 			estimate1.setCategory(Category.FEE);
-			estimate1.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.FEE));
+			estimate1.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_DC, Category.FEE));
 			estimates.add(estimate1);
-			
+
 			TaxHeadEstimate estimate2 = new TaxHeadEstimate();
 			estimate2.setEstimateAmount(application.getApplicant().get(0).getAproCharge());
 			estimate2.setCategory(Category.CHARGES);
-			estimate2.setTaxHeadCode(getTaxHeadCode(application.getBusinessService(), Category.CHARGES));
+			estimate2.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_DC, Category.CHARGES));
 			estimates.add(estimate2);
 		}
 		Calculation calculation = Calculation.builder().applicationNumber(application.getApplicationNumber())
@@ -583,7 +535,7 @@ public class EnrichmentService {
 		RequestInfo requestInfo = propertyImagesRequest.getRequestInfo();
 		String tenantId = propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId();
 		List<PropertyImages> applications = propertyImagesRequest.getPropertyImagesApplications();
-		
+
 		List<String> applicationNumbers = setIdgenIds(requestInfo, tenantId, applications.size(),
 				config.getApplicationNumberIdgenNamePI(), config.getApplicationNumberIdgenFormatPI());
 		ListIterator<String> itr = applicationNumbers.listIterator();
@@ -604,27 +556,9 @@ public class EnrichmentService {
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
 				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
 				application.setAuditDetails(modifyAuditDetails);
-				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
-					application.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil
-									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							AuditDetails modifyDocAuditDetails = application.getAuditDetails();
-							modifyDocAuditDetails.setLastModifiedBy(documentAuditDetails.getLastModifiedBy());
-							modifyDocAuditDetails.setLastModifiedTime(documentAuditDetails.getLastModifiedTime());
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setPropertyId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
-							document.setReferenceId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId());
-							document.setAuditDetails(modifyDocAuditDetails);
-							document.setTenantId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getTenantId());
-						}
-
-//						demand generation
-						enrichDuplicateCopyUpdateDemand(application);
-					});
-
-				}
+				enrichDocuments(application.getApplicationDocuments(), requestInfo, application.getProperty().getId(),
+						application.getId(), application.getTenantId());
+				enrichDuplicateCopyUpdateDemand(application);
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {
@@ -645,26 +579,11 @@ public class EnrichmentService {
 		if (!CollectionUtils.isEmpty(propertyImagesRequest.getPropertyImagesApplications())) {
 			propertyImagesRequest.getPropertyImagesApplications().forEach(application -> {
 				application.setAuditDetails(propertyAuditDetails);
-				
+
 				application.setCapturedBy(requestInfo.getUserInfo().getName());
-				
-				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
-					application.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil
-									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setReferenceId(propertyImagesRequest.getPropertyImagesApplications().get(0).getId());
-							document.setPropertyId(propertyImagesRequest.getPropertyImagesApplications().get(0).getProperty().getId());
-							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(
-									propertyImagesRequest.getPropertyImagesApplications().get(0).getTenantId());
-						}
 
-					});
-
-				}
+				enrichDocuments(application.getApplicationDocuments(), requestInfo, application.getProperty().getId(),
+						application.getId(), application.getTenantId());
 			});
 		}
 
@@ -745,19 +664,17 @@ public class EnrichmentService {
 	 * 
 	 * @param ownershipTransferRequest The update request
 	 */
-	
+
 	/**
-	 * 1. property.propertyDetails.currentOwner 
+	 * 1. property.propertyDetails.currentOwner
 	 * 
 	 * For current owner
 	 * 
-	 * 1. owner.activeState (true) 
-	 * 2. owner.ownerDetails.allotmentStartdate (current)
-	 * 3. owner.ownerDetails.permanent (true)
+	 * 1. owner.activeState (true) 2. owner.ownerDetails.allotmentStartdate
+	 * (current) 3. owner.ownerDetails.permanent (true)
 	 * 
-	 * For previous owner.
-	 * 1. Make sure allotmentEndDate is set to current date.
-	 * 2. active is false.
+	 * For previous owner. 1. Make sure allotmentEndDate is set to current date. 2.
+	 * active is false.
 	 * 
 	 * meu or applications separate allotment date
 	 */
@@ -771,44 +688,37 @@ public class EnrichmentService {
 			criteria.setLimit(1L);
 			List<Property> properties = propertyRepository.getProperties(criteria);
 			if (CollectionUtils.isEmpty(properties)) {
-				throw new CustomException("OWNERSHIP TRANSFER INCOMPLETE", "Could not find property for this ownership transfer enrichment");
+				throw new CustomException("OWNERSHIP TRANSFER INCOMPLETE",
+						"Could not find property for this ownership transfer enrichment");
 			}
 			Property property = properties.get(0);
 			property.getPropertyDetails().setCurrentOwner(latestOwner.getId());
 
 			/*
-			 * Modify the previous owner.
-			 * 1. Make sure allotmentEndDate is set to current date.
-	 		 * 2. active is false.
+			 * Modify the previous owner. 1. Make sure allotmentEndDate is set to current
+			 * date. 2. active is false.
 			 */
-			Optional<Owner> previousOwner = property.getOwners().stream()
-				.filter(Owner::getActiveState)
-				.findAny();
+			Optional<Owner> previousOwner = property.getOwners().stream().filter(Owner::getActiveState).findAny();
 			if (!previousOwner.isPresent()) {
-				log.error("NO EXISTING OWNER FOUND", "No existing owner with isActive = true found in property "+property.getId());
+				log.error("NO EXISTING OWNER FOUND",
+						"No existing owner with isActive = true found in property " + property.getId());
 			} else {
 				previousOwner.get().setActiveState(false);
 				previousOwner.get().getOwnerDetails().setAllotmentEnddate(getCurrentTimeEpoch());
 			}
 
 			/**
-			 * Get the current owner. 
-			 * 1. owner.activeState (true) 
-			 * 2. owner.ownerDetails.allotmentStartdate (current)
-			 * 3. owner.ownerDetails.permanent (true)
+			 * Get the current owner. 1. owner.activeState (true) 2.
+			 * owner.ownerDetails.allotmentStartdate (current) 3.
+			 * owner.ownerDetails.permanent (true)
 			 */
-			Optional<Owner> currentOwner = property.getOwners().stream()
-				.filter(owner -> owner.getId().equalsIgnoreCase(latestOwner.getId()))
-				.findAny();
 
-			if (!currentOwner.isPresent()) {
-				throw new CustomException("OWNERSHIP TRANSFER INCOMPLETE", "Could not find owner with id "+ latestOwner.getId() + " for property "+ property.getId());
-			} else {
-				currentOwner.get().setActiveState(true);
-				currentOwner.get().getOwnerDetails().setPermanent(true);
-				currentOwner.get().getOwnerDetails().setAllotmentStartdate(getCurrentTimeEpoch());
-			}
-			
+			latestOwner.setActiveState(true);
+			latestOwner.getOwnerDetails().setPermanent(true);
+			latestOwner.getOwnerDetails().setAllotmentStartdate(getCurrentTimeEpoch());
+
+			properties.get(0).getOwners().add(latestOwner);
+
 			/**
 			 * Update the property by sending to the persistor.
 			 */
@@ -818,7 +728,7 @@ public class EnrichmentService {
 			producer.push(config.getUpdatePropertyTopic(), propertyRequest);
 		});
 	}
-	
+
 	public Long getCurrentTimeEpoch() {
 		long epochTime = 0;
 		Date today = Calendar.getInstance().getTime();
@@ -840,9 +750,9 @@ public class EnrichmentService {
 			request.getOwners().forEach(owner -> {
 				if (owner.getProperty().getId() != null)
 					propertyCriteria.setPropertyId(owner.getProperty().getId());
-					ArrayList<String> relations = new ArrayList<String>();
-					relations.add(PTConstants.RELATION_OWNER);
-					propertyCriteria.setRelations(relations);
+				ArrayList<String> relations = new ArrayList<String>();
+				relations.add(PTConstants.RELATION_OWNER);
+				propertyCriteria.setRelations(relations);
 			});
 		}
 		return propertyCriteria;
@@ -855,21 +765,8 @@ public class EnrichmentService {
 		if (!CollectionUtils.isEmpty(mortgageRequest.getMortgageApplications())) {
 			mortgageRequest.getMortgageApplications().forEach(application -> {
 				application.setAuditDetails(propertyAuditDetails);
-				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
-					application.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil
-									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setReferenceId(mortgageRequest.getMortgageApplications().get(0).getId());
-							document.setPropertyId(mortgageRequest.getMortgageApplications().get(0).getProperty().getId());
-							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(mortgageRequest.getMortgageApplications().get(0).getTenantId());
-						}
-					});
-
-				}
+				enrichDocuments(application.getApplicationDocuments(), requestInfo, application.getProperty().getId(),
+						application.getId(), application.getTenantId());
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {
@@ -899,7 +796,7 @@ public class EnrichmentService {
 
 	public void postStatusEnrichmentDC(DuplicateCopyRequest duplicateCopyRequest, List<String> endstates) {
 		duplicateCopyRequest.getDuplicateCopyApplications().forEach(dcApplication -> {
-//			TODO: add enrichment
+			// No enrichment for duplicate copy applications after final approval.
 		});
 	}
 
@@ -918,25 +815,12 @@ public class EnrichmentService {
 			noticeGenerationRequest.getNoticeApplications().forEach(notice -> {
 				String gen_notice_id = UUID.randomUUID().toString();
 				notice.setId(gen_notice_id);
-				notice.getProperty().setId(noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
+				notice.getProperty()
+						.setId(noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
 				notice.setAuditDetails(noticeAuditDetails);
-				
-				if (!CollectionUtils.isEmpty(notice.getApplicationDocuments())) {
-					notice.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setReferenceId(gen_notice_id);
-							document.setPropertyId(noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
-							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(noticeGenerationRequest.getNoticeApplications().get(0).getTenantId());
-						}
 
-					});
-
-				}
+				enrichDocuments(notice.getApplicationDocuments(), requestInfo, notice.getProperty().getId(),
+						notice.getId(), notice.getTenantId());
 			});
 		}
 		setNoticeIdgenIds(noticeGenerationRequest);
@@ -946,13 +830,13 @@ public class EnrichmentService {
 		RequestInfo requestInfo = request.getRequestInfo();
 		String tenantId = request.getNoticeApplications().get(0).getTenantId();
 		List<NoticeGeneration> notice = request.getNoticeApplications();
-		List<String> memoNumbers = setIdgenIds(requestInfo, tenantId, notice.size(),
-				config.getMemoNumberIdgenNameNG(), config.getMemoNumbeIdgenFormatNG());
+		List<String> memoNumbers = setIdgenIds(requestInfo, tenantId, notice.size(), config.getMemoNumberIdgenNameNG(),
+				config.getMemoNumbeIdgenFormatNG());
 		ListIterator<String> itr = memoNumbers.listIterator();
 		notice.forEach(application -> {
 			application.setMemoNumber(itr.next());
 		});
-		
+
 	}
 
 	public void enrichNoticeUpdateRequest(NoticeGenerationRequest noticeGenerationRequest,
@@ -966,25 +850,86 @@ public class EnrichmentService {
 				modifyAuditDetails.setLastModifiedBy(updateAuditDetails.getLastModifiedBy());
 				modifyAuditDetails.setLastModifiedTime(updateAuditDetails.getLastModifiedTime());
 				application.setAuditDetails(modifyAuditDetails);
-				if (!CollectionUtils.isEmpty(application.getApplicationDocuments())) {
-					application.getApplicationDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							AuditDetails documentAuditDetails = propertyutil
-									.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-							document.setId(UUID.randomUUID().toString());
-							document.setActive(true);
-							document.setReferenceId(noticeGenerationRequest.getNoticeApplications().get(0).getId());
-							document.setPropertyId(noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId());
-							document.setAuditDetails(documentAuditDetails);
-							document.setTenantId(noticeGenerationRequest.getNoticeApplications().get(0).getTenantId());
-						}
-
-					});
-
-				}
+				enrichDocuments(application.getApplicationDocuments(), requestInfo, application.getProperty().getId(),
+						application.getId(), application.getTenantId());
 			});
 		}
 	}
 
-	
+	private void enrichDocuments(List<Document> documents, RequestInfo requestInfo, String propertyId,
+			String referenceId, String tenantId) {
+		if (CollectionUtils.isEmpty(documents)) {
+			return;
+		}
+		AuditDetails documentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		documents.forEach(document -> {
+			if (document.getId() == null) {
+				document.setId(UUID.randomUUID().toString());
+				document.setActive(true);
+			}
+			document.setReferenceId(referenceId);
+			document.setPropertyId(propertyId);
+			document.setAuditDetails(documentAuditDetails);
+			document.setTenantId(tenantId);
+		});
+	}
+
+	public void enrichRentDemand(RentDetail rentDetail, RentSummary rentSummary, Property property) {
+		if (rentSummary == null)
+			return;
+		List<TaxHeadEstimate> estimates = new LinkedList<>();
+		double amount = rentDetail.getAmount();
+		double balPrincipal = rentSummary.getBalancePrincipal();
+		double balInterest = rentSummary.getBalanceInterest();
+		double balAmmount = rentSummary.getBalanceAmount();
+		double remainingAmmount;
+
+		if (amount >= balInterest) {
+			TaxHeadEstimate estimate1 = new TaxHeadEstimate();
+			estimate1.setEstimateAmount(new BigDecimal(balInterest));
+			estimate1.setCategory(Category.INTEREST);
+			estimate1.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_RENT, Category.INTEREST));
+			estimates.add(estimate1);
+			remainingAmmount = amount - balInterest;
+			if (remainingAmmount >= balPrincipal) {
+				TaxHeadEstimate estimate2 = new TaxHeadEstimate();
+				estimate2.setEstimateAmount(new BigDecimal(balPrincipal));
+				estimate2.setCategory(Category.PRINCIPAL);
+				estimate2.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_RENT, Category.PRINCIPAL));
+				estimates.add(estimate2);
+			} else {
+				TaxHeadEstimate estimate2 = new TaxHeadEstimate();
+				estimate2.setEstimateAmount(new BigDecimal(remainingAmmount));
+				estimate2.setCategory(Category.PRINCIPAL);
+				estimate2.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_RENT, Category.PRINCIPAL));
+				estimates.add(estimate2);
+			}
+			remainingAmmount = amount - balInterest - balPrincipal;
+			if (remainingAmmount > 0) {
+				TaxHeadEstimate estimate3 = new TaxHeadEstimate();
+				estimate3.setEstimateAmount(new BigDecimal(remainingAmmount));
+				estimate3.setCategory(Category.ADVANCE_COLLECTION);
+				estimate3.setTaxHeadCode(
+						getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_RENT, Category.ADVANCE_COLLECTION));
+				estimates.add(estimate3);
+			}
+		} else {
+			TaxHeadEstimate estimate2 = new TaxHeadEstimate();
+			estimate2.setEstimateAmount(new BigDecimal(amount));
+			estimate2.setCategory(Category.ADVANCE_COLLECTION);
+			estimate2.setTaxHeadCode(
+					getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_RENT, Category.ADVANCE_COLLECTION));
+			estimates.add(estimate2);
+		}
+
+		// estimates.add(estimate);
+		Calculation calculation = Calculation.builder()
+				.applicationNumber(propertyutil.getPropertyRentConsumerCode(rentDetail.getTransitNumber()))
+				.taxHeadEstimates(estimates).tenantId(rentDetail.getTenantId()).build();
+		log.info("calculation:" + calculation);
+		rentDetail.setCalculation(calculation);
+		property.setCalculation(calculation);
+
+	}
+
 }

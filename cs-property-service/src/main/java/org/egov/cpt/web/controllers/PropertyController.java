@@ -1,15 +1,20 @@
 package org.egov.cpt.web.controllers;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RequestInfoWrapper;
 import org.egov.cpt.service.PropertyService;
 import org.egov.cpt.util.ResponseInfoFactory;
+import org.egov.cpt.web.contracts.AccountStatementRequest;
+import org.egov.cpt.web.contracts.AccountStatementResponse;
+import org.egov.cpt.web.contracts.PropertyRentRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.cpt.web.contracts.PropertyResponse;
 import org.slf4j.Logger;
@@ -70,6 +75,42 @@ public class PropertyController {
 		PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
 				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PostMapping("/_accountstatement")
+	public ResponseEntity<AccountStatementResponse> searchDateWise(
+			@Valid @RequestBody AccountStatementRequest request) {
+		/* Set current date in a toDate if it is null */
+		request.getCriteria().setToDate(
+				request.getCriteria().getToDate() == null ? new Date().getTime() : request.getCriteria().getToDate());
+		AccountStatementCriteria accountStatementCriteria = request.getCriteria();
+		AccountStatementResponse resposne = propertyService.searchPayments(accountStatementCriteria,
+				request.getRequestInfo());
+		return new ResponseEntity<>(resposne, HttpStatus.OK);
+	}
+
+	/**
+	 * Offline payment : Employees Request { amount : 500 } Response { property }
+	 * 
+	 * UI : Confirmation page. What do we need ?
+	 * 
+	 * Online payment : Citizen Request { amount : 500 }
+	 * 
+	 * Response { consumerCode : }
+	 * 
+	 * @apiNote For offline payment, we need to get the existing demand, update it
+	 *          with new amount if one does not exist and send that consumer code.
+	 * @param propertyRentRequest
+	 * @return
+	 */
+	@PostMapping("/_rentpayment")
+	public ResponseEntity<PropertyResponse> payRent(@Valid @RequestBody PropertyRentRequest propertyRentRequest) {
+
+		List<Property> properties = propertyService.generateFinanceDemand(propertyRentRequest);
+		ResponseInfo resInfo = responseInfoFactory
+				.createResponseInfoFromRequestInfo(propertyRentRequest.getRequestInfo(), true);
+		PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(resInfo).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 

@@ -1,6 +1,5 @@
 package org.egov.cpt.repository;
 
-import java.util.List;
 import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
@@ -18,18 +17,17 @@ public class MortgageQueryBuilder {
 	private static final String SELECT = "SELECT ";
 	private static final String INNER_JOIN = "INNER JOIN";
 	private static final String LEFT_JOIN = "LEFT OUTER JOIN";
-	private static final String AND_QUERY = " AND ";
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY mgModifiedTime desc) offset_ FROM " + "({})" + " result) result_offset "
-			+ "WHERE offset_ > :start AND offset_ <= :end";
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY mgModifiedTime desc) offset_ FROM " + "({})"
+			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
 
 	private static final String MORTGAGE_SEARCH_QUERY = SELECT + "mg.*,ap.*,doc.*,pt.*,address.*,ownership.*,gd.*,"
 			+ " mg.id as mgid, mg.propertyid, mg.tenantid as mgtenantid, mg.state, mg.action,mg.application_number as app_number,"
 			+ "mg.modified_time as mgModifiedTime,"
 
 			+ " pt.id as pid, pt.transit_number, pt.colony,"
-			
+
 			+ " ownership.allotmen_number as owner_allot_number,"
 
 			+ " address.pincode, address.area,"
@@ -48,15 +46,17 @@ public class MortgageQueryBuilder {
 			+ " FROM cs_pt_mortgage_application mg " + INNER_JOIN + " cs_pt_property_v1 pt on mg.propertyid=pt.id "
 			+ INNER_JOIN + " cs_pt_mortgage_applicant ap ON mg.id =ap.mortgage_id " + LEFT_JOIN
 			+ " cs_pt_address_v1 address ON pt.id=address.property_id " + LEFT_JOIN
-			+ " cs_pt_ownership_v1 ownership ON mg.propertyid = ownership.property_id "+LEFT_JOIN
+			+ " cs_pt_ownership_v1 ownership ON mg.propertyid = ownership.property_id " + LEFT_JOIN
 			+ " cs_pt_mortgage_approved_grantdetails gd ON pt.id=gd.property_id " + LEFT_JOIN
 			+ " cs_pt_documents_v1 doc ON doc.reference_id =  mg.id";
 
-	private String addPaginationWrapper(String query,  Map<String, Object> preparedStmtList,
+	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList,
 			DuplicateCopySearchCriteria criteria) {
 
-		/*if (criteria.getLimit() == null && criteria.getOffset() == null)
-			return query;*/
+		/*
+		 * if (criteria.getLimit() == null && criteria.getOffset() == null) return
+		 * query;
+		 */
 
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();
@@ -71,8 +71,8 @@ public class MortgageQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.put("start",offset);
-		preparedStmtList.put("end",limit + offset);
+		preparedStmtList.put("start", offset);
+		preparedStmtList.put("end", limit + offset);
 
 		return finalQuery;
 	}
@@ -92,37 +92,37 @@ public class MortgageQueryBuilder {
 		if (!ObjectUtils.isEmpty(criteria.getPropertyId())) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("mg.propertyid=:propId");
-			preparedStmtList.put("propId",criteria.getPropertyId());
+			preparedStmtList.put("propId", criteria.getPropertyId());
 		}
 		if (null != criteria.getAppId()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("mg.id=:id");
-			preparedStmtList.put("id",criteria.getAppId());
+			preparedStmtList.put("id", criteria.getAppId());
 		}
 		if (null != criteria.getTransitNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("pt.transit_number=:trnsNumber");
-			preparedStmtList.put("trnsNumber",criteria.getTransitNumber());
+			preparedStmtList.put("trnsNumber", criteria.getTransitNumber());
 		}
 		if (null != criteria.getApplicationNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("mg.application_number=:appNumber");
-			preparedStmtList.put("appNumber",criteria.getApplicationNumber());
+			preparedStmtList.put("appNumber", criteria.getApplicationNumber());
 		}
 		if (null != criteria.getColony()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("pt.colony=:colony");
-			preparedStmtList.put("colony",criteria.getColony());
+			preparedStmtList.put("colony", criteria.getColony());
 		}
 		if (null != criteria.getApplicantMobNo()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("ap.mobileno=:mobNumber");
-			preparedStmtList.put("mobNumber",criteria.getApplicantMobNo());
+			preparedStmtList.put("mobNumber", criteria.getApplicantMobNo());
 		}
 		if (null != criteria.getStatus()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("mg.state IN(:states)");
-			preparedStmtList.put("states",criteria.getStatus());
+			preparedStmtList.put("states", criteria.getStatus());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);

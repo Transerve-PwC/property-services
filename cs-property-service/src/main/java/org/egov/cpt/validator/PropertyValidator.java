@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.models.Document;
@@ -83,11 +84,13 @@ public class PropertyValidator {
 	private void validateRentDetails(PropertyRequest request, Map<String, String> errorMap) {
 		List<Property> property = request.getProperties();
 		property.forEach(properties -> {
-			if (properties.getPropertyDetails().getRentIncrementPercentage()<0 || properties.getPropertyDetails().getRentIncrementPercentage()>=100) {
+			if (properties.getPropertyDetails().getRentIncrementPercentage() < 0
+					|| properties.getPropertyDetails().getRentIncrementPercentage() >= 100) {
 				errorMap.put("INVALID INCREMENT PERCENTAGE", "Increment precentage is not valid");
 			}
 
-			if (properties.getPropertyDetails().getInterestRate()<0 || properties.getPropertyDetails().getInterestRate()>=100) {
+			if (properties.getPropertyDetails().getInterestRate() < 0
+					|| properties.getPropertyDetails().getInterestRate() >= 100) {
 				errorMap.put("INVALID INTEREST RATE", "Interest rate is not valid");
 			}
 		});
@@ -162,6 +165,7 @@ public class PropertyValidator {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private void validateColony(PropertyRequest request, Map<String, String> errorMap) {
 
 		String tenantId = request.getProperties().get(0).getTenantId();
@@ -171,8 +175,8 @@ public class PropertyValidator {
 
 			String filter = "$.*.code";
 			Map<String, List<String>> colonies = (Map<String, List<String>>) mdmsService.getMDMSResponse(requestInfo,
-					tenantId.split("\\.")[0], PTConstants.MDMS_PT_EGF_PROPERTY_SERVICE, "colonies", filter,
-					PTConstants.JSONPATH_COLONY);
+					tenantId.split("\\.")[0], PTConstants.MDMS_PT_MOD_NAME, "colonies", filter,
+					PTConstants.JSONPATH_CODES);
 
 			if (!colonies.get(PTConstants.MDMS_PT_COLONY).contains(property.getColony())
 					|| (property.getColony().length() < 5 || property.getColony().length() > 45)) {
@@ -185,31 +189,29 @@ public class PropertyValidator {
 	private void validateTransitNumber(PropertyRequest request, Map<String, String> errorMap) {
 
 		/**
-		 * Make sure we have a valid transit number.
+		 * Make sure we have a valid transit number. Valid transit site numbers are
+		 * numeric and between 1 and 10000
 		 */
 		List<Property> properties = request.getProperties();
-		Optional<Property> propertyWithInvalidTransitNumber = properties.stream().filter(property -> property.getTransitNumber() == null 
-				|| property.getTransitNumber().length() < 4 
-				|| property.getTransitNumber().length() > 25)
-			.findAny();
+		Optional<Property> propertyWithInvalidTransitNumber = properties.stream().filter(
+				property -> property.getTransitNumber() == null || !property.getTransitNumber().matches("\\d{1,4}"))
+				.findAny();
 		if (propertyWithInvalidTransitNumber.isPresent()) {
-			throw new CustomException(Collections.singletonMap("INVALID TRANSIT NUMBER", String.format("Invalid transit number '%s' found", propertyWithInvalidTransitNumber.get().getTransitNumber())));
+			throw new CustomException(Collections.singletonMap("INVALID TRANSIT NUMBER", String.format(
+					"Invalid transit number '%s' found", propertyWithInvalidTransitNumber.get().getTransitNumber())));
 		}
-		
+
 		/**
 		 * Search for existing properties with the same transit number.
 		 */
-		Optional<String> existingTransitNumberOptional = properties.stream()
-			.map(Property::getTransitNumber)
-			.filter(transitNumber -> !repository.getProperties(
-					PropertyCriteria.builder()
-						.transitNumber(transitNumber)
-						.build()
-				).isEmpty()
-			).findAny();
+		Optional<String> existingTransitNumberOptional = properties.stream().map(Property::getTransitNumber)
+				.filter(transitNumber -> !repository
+						.getProperties(PropertyCriteria.builder().transitNumber(transitNumber).build()).isEmpty())
+				.findAny();
 
 		if (existingTransitNumberOptional.isPresent()) {
-			throw new CustomException(Collections.singletonMap("INVALID TRANSIT NUMBER", String.format("Transit number '%s' already exists", existingTransitNumberOptional.get())));
+			throw new CustomException(Collections.singletonMap("INVALID TRANSIT NUMBER",
+					String.format("Transit number '%s' already exists", existingTransitNumberOptional.get())));
 		}
 	}
 
@@ -227,20 +229,25 @@ public class PropertyValidator {
 			throw new CustomException(Collections.singletonMap("NO PROPERTIES FOUND", "No properties to update"));
 		}
 		validateIds(request, errorMap);
-
+		/**
+		 * TO validate Owner Details
+		 */
 		validateOwner(request, errorMap);
 
 		validateColony(request, errorMap);
 		validateArea(request, errorMap);
 		validateRentDetails(request, errorMap);
+		/**
+		 * TO validate Documents
+		 */
+		if (!request.getProperties().get(0).getMasterDataAction().equals(""))
+			validatePropertyDocuments(request, errorMap);
 
-		validatePropertyDocuments(request, errorMap);
+		// validatePayment(request, errorMap);
 
-//		validatePayment(request, errorMap);
-
-		List<Property> prop = request.getProperties();
-		prop.forEach(properties -> {
-			if (properties.getTransitNumber().length() < 4 || properties.getTransitNumber().length() > 25) {
+		List<Property> properties = request.getProperties();
+		properties.forEach(property -> {
+			if (!property.getTransitNumber().matches("\\d{1,4}")) {
 				errorMap.put("INVALID TRANSIT NUMBER", "Transit number is not valid ");
 			}
 		});
@@ -268,14 +275,14 @@ public class PropertyValidator {
 						errorMap);
 				compareIds(propertySearch.getTransitNumber(),
 						property.getPropertyDetails().getAddress().getTransitNumber(), errorMap);
-				propertySearch.getOwners().forEach(searchOwner -> {
-					property.getOwners().forEach(owner -> {
-						compareIds(searchOwner.getId(), owner.getId(), errorMap);
-						compareIds(propertySearch.getId(), owner.getProperty().getId(), errorMap);
-						compareIds(searchOwner.getOwnerDetails().getId(), owner.getOwnerDetails().getId(), errorMap);
-						compareIds(propertySearch.getId(), owner.getOwnerDetails().getPropertyId(), errorMap);
-						compareIds(searchOwner.getId(), owner.getOwnerDetails().getOwnerId(), errorMap);
-					});
+				List<String> oIdList = propertySearch.getOwners().stream().map(Owner::getId)
+						.collect(Collectors.toList());
+				property.getOwners().forEach(owner -> {
+					if (!oIdList.contains(owner.getId())) {
+						errorMap.put("INVALID ID", String.format(
+								"Existing user with id '%s' is missing during update. All the owners should be present during the update API",
+								owner.getId()));
+					}
 				});
 
 			});
@@ -310,14 +317,20 @@ public class PropertyValidator {
 	public List<Owner> validateUpdateRequest(OwnershipTransferRequest request) {
 
 		Map<String, String> errorMap = new HashMap<>();
-		
+
 		DuplicateCopySearchCriteria criteria = getOTSearchCriteria(request);
 		List<Owner> ownersFromSearchResponse = OTRepository.searchOwnershipTransfer(criteria);
 		boolean ifOwnerExists = OwnerExists(ownersFromSearchResponse);
 		if (!ifOwnerExists) {
 			throw new CustomException("OWNER NOT FOUND", "The owner to be updated does not exist");
 		}
-		validateOwnershipTransferDocuments(request, errorMap);
+		String action = request.getOwners().get(0).getApplicationAction();
+		/**
+		 * MDMS Document validation
+		 */
+		if (!action.equalsIgnoreCase(PTConstants.ACTION_REINITIATE)
+				|| !action.equalsIgnoreCase(PTConstants.ACTION_DRAFT))
+			validateOwnershipTransferDocuments(request, errorMap);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 
@@ -348,7 +361,8 @@ public class PropertyValidator {
 
 	private void validateIds(PropertyRequest request, Map<String, String> errorMap) {
 		if (request.getProperties().stream().filter(property -> property.getId() == null).findAny().isPresent()) {
-			throw new CustomException(Collections.singletonMap("INVALID PROPERTY", "Property cannot be updated without propertyId"));
+			throw new CustomException(
+					Collections.singletonMap("INVALID PROPERTY", "Property cannot be updated without propertyId"));
 		}
 	}
 
@@ -445,7 +459,14 @@ public class PropertyValidator {
 
 		validateDocument(duplicateCopyRequest);
 		validateIds(duplicateCopyRequest);
-		validateDuplicateCopyDocuments(duplicateCopyRequest, errorMap);
+
+		String action = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getAction();
+		/**
+		 * MDMS Document validation
+		 */
+		if (!action.equalsIgnoreCase(PTConstants.ACTION_REINITIATE)
+				|| !action.equalsIgnoreCase(PTConstants.ACTION_DRAFT))
+			validateDuplicateCopyDocuments(duplicateCopyRequest, errorMap);
 		String propertyId = duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
 				.appId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getId()).propertyId(propertyId)
@@ -463,8 +484,8 @@ public class PropertyValidator {
 
 		return searchedProperties;
 	}
-	
-	//PI validate
+
+	// PI validate
 	public List<PropertyImages> validatePropertyImagesUpdateRequest(PropertyImagesRequest propertyImagesRequest) {
 		Map<String, String> errorMap = new HashMap<>();
 
@@ -505,8 +526,8 @@ public class PropertyValidator {
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
-	
-	//PI Ids validate
+
+	// PI Ids validate
 	private void validatePIIds(PropertyImagesRequest propertyImagesRequest) {
 		Map<String, String> errorMap = new HashMap<>();
 		propertyImagesRequest.getPropertyImagesApplications().forEach(application -> {
@@ -541,8 +562,8 @@ public class PropertyValidator {
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
-	
-	//PI documents validate
+
+	// PI documents validate
 	private void validatePIDocument(PropertyImagesRequest propertyImagesRequest) {
 		Map<String, String> errorMap = new HashMap<>();
 
@@ -583,10 +604,8 @@ public class PropertyValidator {
 	}
 
 	private void validateDuplicateDocuments(DuplicateCopyRequest request) {
-		request.getDuplicateCopyApplications()
-			.stream()
-			.map(DuplicateCopy::getApplicationDocuments)
-			.forEach(documents -> _validateDuplicateDocuments(documents));
+		request.getDuplicateCopyApplications().stream().map(DuplicateCopy::getApplicationDocuments)
+				.forEach(documents -> _validateDuplicateDocuments(documents));
 	}
 
 	private void _validateDuplicateDocuments(List<Document> documents) {
@@ -594,8 +613,7 @@ public class PropertyValidator {
 			return;
 		}
 		if (!(documents.stream().map(Document::getFileStoreId).distinct().count() == documents.size())) {
-			throw new CustomException("DUPLICATE_DOCUMENT ERROR",
-								"Same document cannot be used multiple times");
+			throw new CustomException("DUPLICATE_DOCUMENT ERROR", "Same document cannot be used multiple times");
 		}
 	}
 
@@ -615,7 +633,7 @@ public class PropertyValidator {
 
 		return propertiesFromSearchResponse;
 	}
-	
+
 	public List<Property> isPropertyExist(NoticeGenerationRequest noticeGenerationRequest) {
 
 		PropertyCriteria criteria = getPropertyCriteriaForSearch(noticeGenerationRequest);
@@ -627,7 +645,7 @@ public class PropertyValidator {
 
 		return propertiesFromSearchResponse;
 	}
-	
+
 	private PropertyCriteria getPropertyCriteriaForSearch(NoticeGenerationRequest noticeGenerationRequest) {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		if (!CollectionUtils.isEmpty(noticeGenerationRequest.getNoticeApplications())) {
@@ -659,8 +677,8 @@ public class PropertyValidator {
 		return propertyCriteria;
 
 	}
-	
-	//PI Validation
+
+	// PI Validation
 	public List<Property> isPropertyPIExist(PropertyImagesRequest propertyImagesRequest) {
 
 		PropertyCriteria criteria = getPropertyCriteriaForSearchPI(propertyImagesRequest);
@@ -672,7 +690,7 @@ public class PropertyValidator {
 
 		return propertiesFromSearchResponse;
 	}
-	
+
 	private PropertyCriteria getPropertyCriteriaForSearchPI(PropertyImagesRequest propertyImagesRequest) {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		if (!CollectionUtils.isEmpty(propertyImagesRequest.getPropertyImagesApplications())) {
@@ -736,19 +754,20 @@ public class PropertyValidator {
 	private void validateDuplicateMortgage(MortgageRequest request) {
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
 				.propertyId(request.getMortgageApplications().get(0).getProperty().getId()).build();
-		
-		//Except Reject state
-		BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), request.getRequestInfo(), PTConstants.BUSINESS_SERVICE_MG);
-		List<State> stateList= otBusinessService.getStates();
+
+		// Except Reject state
+		BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(),
+				request.getRequestInfo(), PTConstants.BUSINESS_SERVICE_MG);
+		List<State> stateList = otBusinessService.getStates();
 		List<String> states = new ArrayList<String>();
-		
-		for(State state: stateList){
-				states.add(state.getState());
+
+		for (State state : stateList) {
+			states.add(state.getState());
 		}
 		states.remove(PTConstants.MG_REJECTED);
-		log.info("states:"+states);
+		log.info("states:" + states);
 		criteria.setStatus(states);
-		
+
 		List<Mortgage> mortgageProperty = repository.getMortgageProperties(criteria);
 		if (!CollectionUtils.isEmpty(mortgageProperty)) {
 			throw new CustomException("MORTGAGE EXIST", "Already applied for mortgage");
@@ -766,7 +785,13 @@ public class PropertyValidator {
 
 		validateDocument(mortgageRequest);
 		validateIds(mortgageRequest);
-		validateMortgageDocuments(mortgageRequest, errorMap);
+		String action = mortgageRequest.getMortgageApplications().get(0).getAction();
+		/**
+		 * MDMS Document validation
+		 */
+		if (!action.equalsIgnoreCase(PTConstants.ACTION_REINITIATE)
+				|| !action.equalsIgnoreCase(PTConstants.ACTION_DRAFT))
+			validateMortgageDocuments(mortgageRequest, errorMap);
 		String propertyId = mortgageRequest.getMortgageApplications().get(0).getProperty().getId();
 		DuplicateCopySearchCriteria criteria = DuplicateCopySearchCriteria.builder()
 				.appId(mortgageRequest.getMortgageApplications().get(0).getId()).propertyId(propertyId).build();
@@ -846,10 +871,8 @@ public class PropertyValidator {
 	}
 
 	private void validateDuplicateDocuments(MortgageRequest request) {
-		request.getMortgageApplications()
-			.stream()
-			.map(Mortgage::getApplicationDocuments)
-			.forEach(documents -> _validateDuplicateDocuments(documents));
+		request.getMortgageApplications().stream().map(Mortgage::getApplicationDocuments)
+				.forEach(documents -> _validateDuplicateDocuments(documents));
 	}
 
 	public List<NoticeGeneration> validateNoticeUpdateRequest(NoticeGenerationRequest noticeGenerationRequest) {
@@ -857,8 +880,8 @@ public class PropertyValidator {
 
 		String propertyId = noticeGenerationRequest.getNoticeApplications().get(0).getProperty().getId();
 		NoticeSearchCriteria criteria = NoticeSearchCriteria.builder()
-				.noticeId(noticeGenerationRequest.getNoticeApplications().get(0).getId())
-				.propertyId(propertyId).build();
+				.noticeId(noticeGenerationRequest.getNoticeApplications().get(0).getId()).propertyId(propertyId)
+				.build();
 		List<NoticeGeneration> searchedApplications = repository.getNotices(criteria);
 		if (searchedApplications.size() < 1) {
 			errorMap.put("NOTICE NOT FOUND", "The notice to be updated does not exist");
@@ -876,7 +899,7 @@ public class PropertyValidator {
 	public void validateNoticeUpdate(NoticeGenerationRequest noticeGenerationRequest) {
 		validateDuplicateDocuments(noticeGenerationRequest);
 		validateNoticeSpecificNotNullFields(noticeGenerationRequest);
-		
+
 	}
 
 	private void validateNoticeSpecificNotNullFields(NoticeGenerationRequest request) {
@@ -892,24 +915,24 @@ public class PropertyValidator {
 			if (!errorMap.isEmpty())
 				throw new CustomException(errorMap);
 		});
-		
+
 	}
 
 	private void validateDuplicateDocuments(NoticeGenerationRequest request) {
-		request.getNoticeApplications()
-			.stream()
-			.map(NoticeGeneration::getApplicationDocuments)
-			.forEach(documents -> _validateDuplicateDocuments(documents));
+		request.getNoticeApplications().stream().map(NoticeGeneration::getApplicationDocuments)
+				.forEach(documents -> _validateDuplicateDocuments(documents));
 	}
-
 
 	private void validatePropertyDocuments(PropertyRequest request, Map<String, String> errorMap) {
 		request.getProperties().forEach(property -> {
-			this.validateDocumentsOnType(request.getRequestInfo(), property.getTenantId(), property.getPropertyDetails().getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_PM );
+			this.validateDocumentsOnType(request.getRequestInfo(), property.getTenantId(),
+					property.getPropertyDetails().getApplicationDocuments(), errorMap, PTConstants.BUSINESS_SERVICE_PM);
 		});
 	}
 
-	private void validateDocumentsOnType(RequestInfo requestInfo, String tenantId, List<Document> documents, Map<String, String> errorMap, String code) {
+	@SuppressWarnings("unchecked")
+	private void validateDocumentsOnType(RequestInfo requestInfo, String tenantId, List<Document> documents,
+			Map<String, String> errorMap, String code) {
 
 		tenantId = tenantId.split("\\.")[0];
 		String filter = "[?(@.code=='" + code + "')].documentList";
@@ -917,21 +940,27 @@ public class PropertyValidator {
 		/**
 		 * Get list of application documents from MDMS
 		 */
-		List<Map<String, Object>> data = (List<Map<String, Object>>)mdmsService.getMDMSResponse(requestInfo, tenantId, PTConstants.MDMS_PT_EGF_PROPERTY_SERVICE, 
-			"applications", filter, "$.MdmsRes.PropertyServices.applications");
-		List<Map<String, Object>> mdmsDocuments = (List<Map<String, Object>>)(data.get(0));
+		List<Map<String, Object>> data = (List<Map<String, Object>>) mdmsService.getMDMSResponse(requestInfo, tenantId,
+				PTConstants.MDMS_PT_MOD_NAME, "applications", filter, PTConstants.JSONPATH_CODES + ".applications");
+		List<Map<String, Object>> mdmsDocuments = (List<Map<String, Object>>) (data.get(0));
 
 		/**
-		 * Filter the mdms document types for the ones that are required.
-		 * For each required document code, verify if it is present in the incoming documents.
+		 * Filter the mdms document types for the ones that are required. For each
+		 * required document code, verify if it is present in the incoming documents.
 		 */
-		mdmsDocuments.stream()
-			.filter(d -> ((boolean)(d.get("required"))))
-			.map(d -> d.get("code")).forEach(documentCode -> {
-				if (!documents.stream().map(Document::getDocumentType).filter(type -> type.equalsIgnoreCase(String.valueOf(documentCode))).findAny().isPresent()) {
-					errorMap.put("REQUIRED DOCUMENT NOT FOUND", "The document type '" + documentCode + "' is required but it is not present");
-				}
-			});
+		mdmsDocuments.stream().filter(d -> ((boolean) (d.get("required")))).map(d -> d.get("code"))
+				.forEach(documentCode -> {
+					long count = documents.stream().map(Document::getDocumentType)
+							.filter(type -> type.equalsIgnoreCase(String.valueOf(documentCode))).count();
+					if (count == 0) {
+						errorMap.put("REQUIRED DOCUMENT NOT FOUND",
+								"The document type '" + documentCode + "' is required but it is not present");
+					}
+					if (count >= 2) {
+						errorMap.put("DUPLICATE DOCUMENT",
+								"The document type '" + documentCode + "' is found more than once.");
+					}
+				});
 	}
 
 	private void validateMortgageDocuments(MortgageRequest request, Map<String, String> errorMap) {

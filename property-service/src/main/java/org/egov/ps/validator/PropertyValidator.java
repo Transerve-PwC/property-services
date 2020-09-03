@@ -11,11 +11,14 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
+import org.egov.ps.model.Document;
+import org.egov.ps.model.EstateDocumentList;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyCriteria;
 import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.repository.ServiceRequestRepository;
+import org.egov.ps.service.MDMSService;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.ApplicationRequest;
@@ -26,6 +29,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +53,9 @@ public class PropertyValidator {
 
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndpoint;
+	
+	@Autowired
+	private MDMSService mdmsservice;
 
 	public void validateCreateRequest(PropertyRequest request) {
 
@@ -68,40 +76,13 @@ public class PropertyValidator {
 					if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
 						throw new CustomException(Collections.singletonMap("INVALID MOBILE NUMBER", String.format("MobileNumber is not valid for user :"+o.getOwnerDetails().getOwnerName(), o.getOwnerDetails().getOwnerName() )));
 					}
+					//Document Validation
+					if(null != o.getOwnerDetails() && null != o.getOwnerDetails().getOwnerDocuments()) {
+						validateDocumentsOnType(request.getRequestInfo(), property_Optional.get().getTenantId(), o, errorMap, "");
+					}
+					
 				});
 		}
-
-
-		/*
-		List<Property> propertyList = request.getProperties().stream()
-				.filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners()))
-				.collect(Collectors.toList());
-
-		propertyList.stream()
-		.forEach(p -> p.getPropertyDetails().getOwners().stream()
-				.forEach( o -> {
-					if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
-						errorMap.put("INVALID MOBILE NUMBER",
-								"MobileNumber is not valid for user : " + o.getOwnerDetails().getOwnerName());
-					}
-				}));
-				
-		*/
-
-		/*
-		 property.stream()
-			.filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners()))
-			.forEach(p -> p.getPropertyDetails().getOwners().stream()
-					.filter( o -> {
-						if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
-							errorMap.put("INVALID MOBILE NUMBER",
-									"MobileNumber is not valid for user : " + o.getOwnerDetails().getOwnerName());
-							return false;
-						}else {
-							return true;
-						}
-					}));
-		 */
 
 		/* Old code ::
 		property.forEach(properties -> {
@@ -114,6 +95,22 @@ public class PropertyValidator {
 				});
 			}
 		});*/
+	}
+	
+	public void validateDocumentsOnType(RequestInfo requestInfo, String tenantId, Owner owner, Map<String, String> errorMap, String code) {
+		
+		List<Map<String, Object>> fieldConfigurations = mdmsservice.getDocumentConfig("documents", requestInfo, tenantId);
+		ObjectMapper mapper = new ObjectMapper();
+		List<EstateDocumentList> documentTypeList = mapper.convertValue(fieldConfigurations, new TypeReference<List<EstateDocumentList>>() { });
+		System.out.println(documentTypeList.size());
+		
+		
+		owner.getOwnerDetails().getOwnerDocuments().stream().forEach(document -> {
+			if(!documentTypeList.contains(EstateDocumentList.builder().code(document.getDocumentType()).build())) {
+				errorMap.put("INVALID DOCUMENT",
+						"Document is not valid for user : " + owner.getOwnerDetails().getOwnerName());
+			}
+		});
 	}
 
 	private boolean isMobileNumberValid(String mobileNumber) {

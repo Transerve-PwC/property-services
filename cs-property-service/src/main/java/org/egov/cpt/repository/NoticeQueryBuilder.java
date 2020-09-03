@@ -1,10 +1,8 @@
 package org.egov.cpt.repository;
 
-import java.util.List;
 import java.util.Map;
 
 import org.egov.cpt.config.PropertyConfiguration;
-import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.NoticeSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,11 +17,10 @@ public class NoticeQueryBuilder {
 	private static final String SELECT = "SELECT ";
 	private static final String INNER_JOIN = "INNER JOIN";
 	private static final String LEFT_JOIN = "LEFT OUTER JOIN";
-	private static final String AND_QUERY = " AND ";
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY ngModifiedTime desc) offset_ FROM " + "({})" + " result) result_offset "
-			+ "WHERE offset_ > :start AND offset_ <= :end";
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY ngModifiedTime desc) offset_ FROM " + "({})"
+			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
 
 	private static final String NOTICE_SEARCH_QUERY = SELECT + "ng.*,doc.*,pt.*,"
 			+ " ng.id as ngid, ng.propertyid, ng.tenantid as ngtenantid,ng.memo_number as memoNumber,"
@@ -37,15 +34,17 @@ public class NoticeQueryBuilder {
 			+ " doc.id as docId,doc.reference_id as doc_referenceId, doc.tenantId as doctenantid,doc.document_type as doctype , doc.filestore_id as doc_filestoreid,"
 			+ " doc.property_id as doc_propertyid , doc.is_active as doc_active"
 
-			+ " FROM cs_pt_notice_generation_application ng " + INNER_JOIN + " cs_pt_property_v1 pt on ng.propertyid=pt.id "
-			+ LEFT_JOIN
+			+ " FROM cs_pt_notice_generation_application ng " + INNER_JOIN
+			+ " cs_pt_property_v1 pt on ng.propertyid=pt.id " + LEFT_JOIN
 			+ " cs_pt_documents_v1 doc ON doc.reference_id =  ng.id";
 
-	private String addPaginationWrapper(String query,  Map<String, Object> preparedStmtList,
+	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList,
 			NoticeSearchCriteria criteria) {
 
-		/*if (criteria.getLimit() == null && criteria.getOffset() == null)
-			return query;*/
+		/*
+		 * if (criteria.getLimit() == null && criteria.getOffset() == null) return
+		 * query;
+		 */
 
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();
@@ -60,8 +59,8 @@ public class NoticeQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.put("start",offset);
-		preparedStmtList.put("end",limit + offset);
+		preparedStmtList.put("start", offset);
+		preparedStmtList.put("end", limit + offset);
 
 		return finalQuery;
 	}
@@ -81,32 +80,32 @@ public class NoticeQueryBuilder {
 		if (!ObjectUtils.isEmpty(criteria.getPropertyId())) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("ng.propertyid=:propId");
-			preparedStmtList.put("propId",criteria.getPropertyId());
+			preparedStmtList.put("propId", criteria.getPropertyId());
 		}
 		if (null != criteria.getNoticeId()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("ng.id=:id");
-			preparedStmtList.put("id",criteria.getNoticeId());
+			preparedStmtList.put("id", criteria.getNoticeId());
 		}
 		if (null != criteria.getTransitNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("pt.transit_number=:trnsNumber");
-			preparedStmtList.put("trnsNumber",criteria.getTransitNumber());
+			preparedStmtList.put("trnsNumber", criteria.getTransitNumber());
 		}
 		if (null != criteria.getMemoNumber()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("ng.memo_number=:memoNumber");
-			preparedStmtList.put("memoNumber",criteria.getMemoNumber());
+			preparedStmtList.put("memoNumber", criteria.getMemoNumber());
 		}
 		if (null != criteria.getColony()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("pt.colony=:colony");
-			preparedStmtList.put("colony",criteria.getColony());
+			preparedStmtList.put("colony", criteria.getColony());
 		}
 		if (null != criteria.getApplicantMobNo()) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("ap.mobileno=:mobNumber");
-			preparedStmtList.put("mobNumber",criteria.getApplicantMobNo());
+			preparedStmtList.put("mobNumber", criteria.getApplicantMobNo());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);

@@ -4,13 +4,10 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.cpt.models.DuplicateCopy;
-import org.egov.cpt.models.Mortgage;
-import org.egov.cpt.models.NoticeGeneration;
-import org.egov.cpt.models.Property;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.cpt.models.NoticeGeneration;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

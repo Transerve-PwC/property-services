@@ -1,17 +1,15 @@
 package org.egov.cpt.repository;
 
 import java.util.Map;
-import java.util.Optional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,11 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ServiceRequestRepository {
 
 	@Autowired
-	private ObjectMapper mapper;
-
-	@Autowired
 	private RestTemplate restTemplate;
-
 
 	/**
 	 * Fetches results from a REST service using the uri and object
@@ -50,7 +44,7 @@ public class ServiceRequestRepository {
 		return response;
 
 	}
-	
+
 	public Object fetchResult(String uri, Object request) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);

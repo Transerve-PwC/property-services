@@ -10,14 +10,14 @@ public class PTConstants {
 	}
 
 	public static final String ROLE_EMPLOYEE = "EMPLOYEE";
-	
+
 	public static final String ROLE_CITIZEN = "CITIZEN";
-	
+
 	public static final String businessService_csp = "CSP";
 
-	public static final String JSONPATH_CODES = "$.MdmsRes.PropertyServices";
+	public static final String MDMS_PT_MOD_NAME = "RentedProperties";
 
-	public static final String MDMS_PT_MOD_NAME = "PropertyServices";
+	public static final String JSONPATH_CODES = "$.MdmsRes." + MDMS_PT_MOD_NAME;
 
 	public static final String MDMS_PT_PROPERTYTYPE = "PropertyType";
 
@@ -47,25 +47,27 @@ public class PTConstants {
 
 	public static final String MDMS_PT_EGF_MASTER = "egf-master";
 
-	public static final String MDMS_PT_EGF_PROPERTY_SERVICE = "PropertyServices";
-
 	public static final String MDMS_PT_FINANCIALYEAR = "FinancialYear";
 
 	public static final String MDMS_PT_COLONY = "colonies";
 
 	public static final String JSONPATH_FINANCIALYEAR = "$.MdmsRes.egf-master";
 
-	public static final String JSONPATH_COLONY = "$.MdmsRes.PropertyServices";
-
 	public static final String BOUNDARY_HEIRARCHY_CODE = "REVENUE";
 
-//	payment
+	// payment
 	public static final String BUSINESS_SERVICE_PM = "MasterRP";
-	
+
 	public static final String BUSINESS_SERVICE_OT = "OwnershipTransferRP";
 
+	public static final String BILLING_BUSINESS_SERVICE_OT = "RentedProperties.OwnershipTransfer";
+
+	public static final String BILLING_BUSINESS_SERVICE_DC = "RentedProperties.DuplicateAllotmentLetter";
+
+	public static final String BILLING_BUSINESS_SERVICE_RENT = "RentedProperties.Rent";
+
 	public static final String BUSINESS_SERVICE_DC = "DuplicateCopyOfAllotmentLetterRP";
-	
+
 	public static final String BUSINESS_SERVICE_MG = "PermissionToMortgage";
 
 	public static final String ACTION_INITIATE = "INITIATE";
@@ -75,6 +77,10 @@ public class PTConstants {
 	public static final String ACTION_APPROVE = "APPROVE";
 
 	public static final String ACTION_REJECT = "REJECT";
+
+	public static final String ACTION_REINITIATE = "REINITIATE";
+
+	public static final String ACTION_DRAFT = "REINITIATE";
 
 	public static final String TRIGGER_NOWORKFLOW = "NOWORKFLOW";
 
@@ -123,11 +129,11 @@ public class PTConstants {
 	public static final String USREVENTS_EVENT_POSTEDBY = "SYSTEM-PT";
 
 	public static final String BUSINESS_SERVICE_MG_RP = "MortgageRP";
-	
+
 	public static final String BUSINESS_SERVICE_DC_RP = "DuplicateCopyOfAllotmentLetterRP";
-	
+
 	public static final String BUSINESS_SERVICE_FL_RP = "FRESHLICENSE";
-	
+
 	// Variable names for diff
 
 	public static final String VARIABLE_ACTION = "action";
@@ -183,8 +189,8 @@ public class PTConstants {
 	public static final String MORTGAGE_APPLICATION = "Mortgage request";
 	public static final String NOTIFICATION_NG_VIOLATION = "rp.en.counter.violationnoticegenerated";
 	public static final String NOTIFICATION_NG_RECOVERY = "rp.en.counter.recoverynoticegenerated";
-	
-	//Ownership Transfer ACTION_STATUS combinations for notification
+
+	// Ownership Transfer ACTION_STATUS combinations for notification
 
 	public static final String OT_ACTION_STATUS_INITIATED = "INITIATE_OT_DRAFTED";
 	public static final String OT_ACTION_STATUS_SUBMIT = "SUBMIT_OT_PENDINGCLVERIFICATION";
@@ -193,8 +199,8 @@ public class PTConstants {
 	public static final String OT_ACTION_STATUS_PAYMENT = "SENDFORPAYMENT_OT_PENDINGPAYMENT";
 	public static final String OT_ACTION_STATUS_PAYMENT_SUCCESS = "PAY_OT_APPROVED";
 	public static final String OT_ACTION_STATUS_APPROVED = "APPROVE_OT_APPROVED";
-	
-	//Duplicate Copy ACTION_STATUS combinations for notification
+
+	// Duplicate Copy ACTION_STATUS combinations for notification
 
 	public static final String DC_ACTION_STATUS_INITIATED = "INITIATE_DC_DRAFTED";
 	public static final String DC_ACTION_STATUS_SUBMIT = "SUBMIT_DC_PENDINGCLVERIFICATION";
@@ -203,8 +209,8 @@ public class PTConstants {
 	public static final String DC_ACTION_STATUS_PAYMENT = "SENDFORPAYMENT_DC_PENDINGPAYMENT";
 	public static final String DC_ACTION_STATUS_PAYMENT_SUCCESS = "PAY_DC_APPROVED";
 	public static final String DC_ACTION_STATUS_APPROVED = "APPROVE_DC_APPROVED";
-	
-	//Mortgage ACTION_STATUS combinations for notification
+
+	// Mortgage ACTION_STATUS combinations for notification
 
 	public static final String MG_ACTION_STATUS_INITIATED = "INITIATE_MG_DRAFTED";
 	public static final String MG_ACTION_STATUS_SUBMIT = "SUBMIT_MG_PENDINGCLVERIFICATION";
@@ -212,34 +218,34 @@ public class PTConstants {
 	public static final String MG_ACTION_STATUS_SENDBACK = "SENDBACK_MG_PENDINGCLARIFICATION";
 	public static final String MG_ACTION_STATUS_MORTGAGE_APPROVED = "APPROVE_MG_APPROVED";
 
-//  demand generation
+	// demand generation
 	public static final String OT_STATE_PENDING_SA_VERIFICATION = "OT_PENDINGSAVERIFICATION";
 	public static final String OT_STATE_PENDING_APRO = "OT_PENDINGAPRO";
 	public static final String DC_STATE_PENDING_SA_VERIFICATION = "DC_PENDINGSAVERIFICATION";
 	public static final String DC_STATE_PENDING_APRO = "DC_PENDINGAPRO";
 
 	public static final String MG_STATE_PENDING_GRANTDETAIL = "MG_PENDINGGRANTDETAIL";
-	
-//Draft sates
-	public static final String OT_DRAFTED ="OT_DRAFTED";
-	public static final String MG_DRAFTED ="MG_DRAFTED";
-	public static final String DC_DRAFTED ="DC_DRAFTED";
-	public static final String PM_DRAFTED ="PM_DRAFTED";
-	
-//Reject State
-	public static final String MG_REJECTED ="MG_REJECTED";
-	public static final String PM_REJECTED ="PM_REJECTED";
+
+	// Draft sates
+	public static final String OT_DRAFTED = "OT_DRAFTED";
+	public static final String MG_DRAFTED = "MG_DRAFTED";
+	public static final String DC_DRAFTED = "DC_DRAFTED";
+	public static final String PM_DRAFTED = "PM_DRAFTED";
+
+	// Reject State
+	public static final String MG_REJECTED = "MG_REJECTED";
+	public static final String PM_REJECTED = "PM_REJECTED";
 
 	public static final String EMAIL_SUBJECT = "Chandigarh mSeva Application Status";
 
 	public static final String NG_TYPE_VIOLATION = "Violation";
 	public static final String NG_TYPE_RECOVERY = "Recovery";
-	
-//Mode of payment
+
+	// Mode of payment
 	public static final String MODE_UPLOADED = "Uploaded";
 	public static final String MODE_GENERATED = "Generated";
 
-//Relations in PM
+	// Relations in PM
 	public static final String RELATION_OWNER = "owner";
 	public static final String RELATION_PI = "propertyImage";
 	public static final String RELATION_GD = "GrantDetail";
@@ -248,7 +254,7 @@ public class PTConstants {
 
 	public static final String OT_STATUS_APPROVED = "OT_APPROVED";
 	public static final String PM_STATUS_APPROVED = "PM_APPROVED";
-	
+
 	public static final String false_value = "false";
 	public static final String true_value = "true";
 

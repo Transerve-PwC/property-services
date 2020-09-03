@@ -3,17 +3,26 @@ package org.egov.cpt.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
+import org.egov.cpt.models.RentAccount;
+import org.egov.cpt.models.RentDemand;
+import org.egov.cpt.models.RentPayment;
+import org.egov.cpt.models.RentSummary;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
+import org.egov.cpt.service.calculation.DemandService;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.validator.PropertyValidator;
+import org.egov.cpt.web.contracts.AccountStatementResponse;
+import org.egov.cpt.web.contracts.PropertyRentRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
 import org.egov.cpt.workflow.WorkflowService;
@@ -57,30 +66,28 @@ public class PropertyService {
 	@Autowired
 	private IRentCollectionService rentCollectionService;
 
+	@Autowired
+	private DemandService demandService;
+
 	public List<Property> createProperty(PropertyRequest request) {
 
 		propertyValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
-		rentEnrichmentService.enrichRentdata(request);
-		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().stream().filter(property -> property.getDemands() != null
-					&& property.getPayments() != null && property.getRentAccount() != null).forEach(property -> {
-						property.setRentCollections(
-								rentCollectionService.settle(property.getDemands(), property.getPayments(),
-										property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
-					});
-		}
-		rentEnrichmentService.enrichCollection(request);
+		processRentHistory(request);
 		userService.createUser(request);
 
 		producer.push(config.getSavePropertyTopic(), request);
 
+		processRentSummary(request);
+		return request.getProperties();
+	}
+
+	private void processRentSummary(PropertyRequest request) {
 		request.getProperties().stream().filter(property -> property.getDemands() != null
 				&& property.getPayments() != null && property.getRentAccount() != null).forEach(property -> {
-					property.setRentSummary(
-							rentCollectionService.paymentSummary(property.getDemands(), property.getRentAccount()));
+					property.setRentSummary(rentCollectionService.calculateRentSummary(property.getDemands(),
+							property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
 				});
-		return request.getProperties();
 	}
 
 	/**
@@ -92,6 +99,21 @@ public class PropertyService {
 	public List<Property> updateProperty(PropertyRequest request) {
 		List<Property> propertyFromSearch = propertyValidator.validateUpdateRequest(request);
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
+		processRentHistory(request);
+		userService.createUser(request);
+		String action = request.getProperties().get(0).getMasterDataAction();
+		String state = request.getProperties().get(0).getMasterDataState();
+		if ((config.getIsWorkflowEnabled() && !action.equalsIgnoreCase(""))
+				&& (!state.equalsIgnoreCase(PTConstants.PM_STATUS_APPROVED))) {
+			wfIntegrator.callWorkFlow(request);
+		}
+		producer.push(config.getUpdatePropertyTopic(), request);
+
+		processRentSummary(request);
+		return request.getProperties();
+	}
+
+	private void processRentHistory(PropertyRequest request) {
 		rentEnrichmentService.enrichRentdata(request);
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().stream().filter(property -> property.getDemands() != null
@@ -102,20 +124,40 @@ public class PropertyService {
 					});
 		}
 		rentEnrichmentService.enrichCollection(request);
-		userService.createUser(request);
-		if (config.getIsWorkflowEnabled()
-				&& !request.getProperties().get(0).getMasterDataAction().equalsIgnoreCase("")) {
-			wfIntegrator.callWorkFlow(request);
-		}
-		producer.push(config.getUpdatePropertyTopic(), request);
+	}
 
-		// TO get payment Summary
-		request.getProperties().stream().filter(property -> property.getDemands() != null
-				&& property.getPayments() != null && property.getRentAccount() != null).forEach(property -> {
-					property.setRentSummary(
-							rentCollectionService.paymentSummary(property.getDemands(), property.getRentAccount()));
-				});
-		return request.getProperties();
+	public AccountStatementResponse searchPayments(AccountStatementCriteria accountStatementCriteria,
+			RequestInfo requestInfo) {
+
+		List<Property> properties = repository
+				.getProperties(PropertyCriteria.builder().propertyId(accountStatementCriteria.getPropertyid())
+						.relations(Collections.singletonList("finance")).build());
+		if (CollectionUtils.isEmpty(properties)) {
+			return AccountStatementResponse.builder().rentAccountStatements(Collections.emptyList()).build();
+		}
+
+		Property property = properties.get(0);
+		List<RentDemand> demands = repository
+				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build()).stream()
+				.filter(rentDemand -> accountStatementCriteria.getToDate() >= rentDemand.getAuditDetails()
+						.getCreatedTime())
+				.map(rentDemand -> {
+					return rentDemand;
+				}).collect(Collectors.toList());
+
+		List<RentPayment> payments = repository
+				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build()).stream()
+				.filter(rentPayment -> accountStatementCriteria.getToDate() >= rentPayment.getAuditDetails()
+						.getCreatedTime())
+				.map(rentPayment -> {
+					return rentPayment;
+				}).collect(Collectors.toList());
+
+		return AccountStatementResponse.builder()
+				.rentAccountStatements(rentCollectionService.getAccountStatement(demands, payments,
+						property.getPropertyDetails().getInterestRate(), accountStatementCriteria.getFromDate(),
+						accountStatementCriteria.getToDate()))
+				.build();
 	}
 
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
@@ -142,12 +184,41 @@ public class PropertyService {
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
 
-		// TO get payment Summary
-		properties.stream().filter(property -> property.getDemands() != null && property.getPayments() != null
-				&& property.getRentAccount() != null).forEach(property -> {
-					property.setRentSummary(
-							rentCollectionService.paymentSummary(property.getDemands(), property.getRentAccount()));
-				});
+		if (properties.size() <= 1 || !CollectionUtils.isEmpty(criteria.getRelations())
+				&& criteria.getRelations().contains(PTConstants.RELATION_FINANCE)) {
+			properties.stream().forEach(property -> {
+				List<RentDemand> demands = repository
+						.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+				List<RentPayment> payments = repository
+						.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+				RentAccount accounts = repository
+						.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
+				if (!CollectionUtils.isEmpty(demands) && null != accounts) {
+					property.setRentSummary(rentCollectionService.calculateRentSummary(demands, accounts,
+							property.getPropertyDetails().getInterestRate()));
+					property.setDemands(demands);
+					property.setPayments(payments);
+				}
+			});
+		}
+
+		return properties;
+	}
+
+	public List<Property> generateFinanceDemand(PropertyRentRequest rentRequest) {
+		List<Property> properties = repository.getProperties(PropertyCriteria.builder()
+				.transitNumber(rentRequest.getRentDetails().get(0).getTransitNumber()).build());
+		List<RentDemand> demands = repository
+				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
+		RentAccount account = repository.getPropertyRentAccountDetails(
+				PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
+		if (!CollectionUtils.isEmpty(demands) && null != account) {
+			rentRequest.getRentDetails().forEach(rentDetail -> {
+				enrichmentService.enrichRentDemand(rentDetail, rentCollectionService.calculateRentSummary(demands,
+						account, properties.get(0).getPropertyDetails().getInterestRate()), properties.get(0));
+			});
+		}
+		demandService.generateRentDemand(rentRequest.getRequestInfo(), rentRequest.getRentDetails());
 		return properties;
 	}
 }

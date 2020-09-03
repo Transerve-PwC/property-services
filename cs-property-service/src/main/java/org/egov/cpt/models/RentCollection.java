@@ -8,12 +8,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode
 public class RentCollection {
 	/**
@@ -23,67 +25,35 @@ public class RentCollection {
 	private String id;
 
 	/**
-	 * The paymentId of the payment that this is a part of.
+	 * The timestamp at which this collection was made. This is not same as
+	 * createdAt.
 	 */
-	@JsonProperty("paymentId")
-	private String paymentId;
-	
-	
+	private long collectedAt;
+
 	/**
 	 * Demand Id of the demand that this fulfils.
 	 */
+	@ToString.Include
 	@JsonProperty("demandId")
 	private String demandId;
-	
-	
-	@Builder.Default
-	@JsonProperty("collectionAgainst")
-	private CollectionAgainst collectionAgainst = CollectionAgainst.PAYMENT;
-	
+
 	/**
 	 * Interest collected.
 	 */
 	@Builder.Default
+	@ToString.Include
 	@JsonProperty("interestCollected")
-	private Double interestCollected = 0.0;
-	
+	private Double interestCollected = 0D;
+
 	/**
 	 * Principal collected.
 	 */
 	@Builder.Default
+	@ToString.Include
 	@JsonProperty("principalCollected")
-	private Double principalCollected = 0.0;
-	
-	public enum CollectionAgainst {
-		PAYMENT("PAYMENT"),
+	private Double principalCollected = 0D;
 
-		ACCOUNTBALANCE("ACCOUNTBALANCE");
-
-		private String value;
-
-		CollectionAgainst(String value) {
-			this.value = value;
-		}
-
-		@Override
-		public String toString() {
-			return String.valueOf(value);
-		}
-
-		public static CollectionAgainst fromValue(String text) {
-			for (CollectionAgainst b : CollectionAgainst.values()) {
-				if (String.valueOf(b.value).equalsIgnoreCase(text)) {
-					return b;
-				}
-			}
-			return null;
-		}
-	}
-
-	 @JsonProperty("tenantId")
-	 private String tenantId;
-	
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
-	
+	private AuditDetails auditDetails;
+
 }

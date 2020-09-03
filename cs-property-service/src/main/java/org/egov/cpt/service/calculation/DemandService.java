@@ -10,12 +10,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.RentDetail;
 import org.egov.cpt.models.RequestInfoWrapper;
 import org.egov.cpt.models.UserResponse;
 import org.egov.cpt.models.UserSearchRequestCore;
@@ -25,13 +28,12 @@ import org.egov.cpt.models.calculation.DemandDetail;
 import org.egov.cpt.models.calculation.DemandResponse;
 import org.egov.cpt.models.calculation.TaxHeadEstimate;
 import org.egov.cpt.repository.ServiceRequestRepository;
+import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,25 +72,26 @@ public class DemandService {
 
 			String tenantId = owner.getTenantId();
 			String consumerCode = owner.getOwnerDetails().getApplicationNumber();
-			
+
 			String url = config.getUserHost().concat(config.getUserSearchEndpoint());
 
 			List<org.egov.cpt.models.User> ownerUser = null;
 			Set<String> uuid = new HashSet<>();
 			uuid.add(owner.getAuditDetails().getCreatedBy());
 
-			UserSearchRequestCore userSearchRequest = UserSearchRequestCore.builder().requestInfo(requestInfo).
-					uuid(uuid).
-					build();
+			UserSearchRequestCore userSearchRequest = UserSearchRequestCore.builder().requestInfo(requestInfo)
+					.uuid(uuid).build();
 
-			ownerUser = mapper.convertValue(serviceRequestRepository.fetchResult(url, userSearchRequest), UserResponse.class)
+			ownerUser = mapper
+					.convertValue(serviceRequestRepository.fetchResult(url, userSearchRequest), UserResponse.class)
 					.getUser();
-			
-			log.info("ownerUser:"+ownerUser);
 
-//			User requestUser = requestInfo.getUserInfo(); // user from request information
+			log.info("ownerUser:" + ownerUser);
+
+			// User requestUser = requestInfo.getUserInfo(); // user from request
+			// information
 			User requestUser = ownerUser.get(0).toCommonUser();
-			log.info("requestUser:"+requestUser);
+			log.info("requestUser:" + requestUser);
 			User user = null;
 			if (requestUser.getMobileNumber() != null) {
 				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
@@ -103,7 +106,7 @@ public class DemandService {
 						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
 						.build();
 			}
-			
+
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			if (!CollectionUtils.isEmpty(owner.getCalculation().getTaxHeadEstimates())) {
 				owner.getCalculation().getTaxHeadEstimates().forEach(taxHeadEstimate -> {
@@ -115,12 +118,12 @@ public class DemandService {
 
 			Long taxPeriodFrom = System.currentTimeMillis();
 			Long taxPeriodTo = System.currentTimeMillis();
-			String businessService = owner.getBusinessService();
 
 			Demand singleDemand = Demand.builder().status(StatusEnum.ACTIVE).consumerCode(consumerCode)
 					.demandDetails(demandDetails).payer(user).minimumAmountPayable(config.getMinimumPayableAmount())
 					.tenantId(tenantId).taxPeriodFrom(taxPeriodFrom).taxPeriodTo(taxPeriodTo)
-					.consumerType("rentedproperties").businessService(businessService).additionalDetails(null).build();
+					.consumerType("rentedproperties").businessService(PTConstants.BILLING_BUSINESS_SERVICE_OT)
+					.additionalDetails(null).build();
 
 			demands.add(singleDemand);
 		}
@@ -139,23 +142,25 @@ public class DemandService {
 		for (Owner owner : owners) {
 
 			List<Demand> searchResult = searchDemand(owner.getTenantId(),
-					Collections.singleton(owner.getOwnerDetails().getApplicationNumber()), requestInfo,owner.getBusinessService());
+					Collections.singleton(owner.getOwnerDetails().getApplicationNumber()), requestInfo,
+					PTConstants.BILLING_BUSINESS_SERVICE_OT);
 
-			if (CollectionUtils.isEmpty(searchResult))
-			{
-				demands = createDemand(requestInfo,owners);
-				/*throw new CustomException("INVALID UPDATE",
-						"No demand exists for applicationNumber: " + owner.getOwnerDetails().getApplicationNumber());*/
-			}
-			else{
+			if (CollectionUtils.isEmpty(searchResult)) {
+				demands = createDemand(requestInfo, owners);
+				/*
+				 * throw new CustomException("INVALID UPDATE",
+				 * "No demand exists for applicationNumber: " +
+				 * owner.getOwnerDetails().getApplicationNumber());
+				 */
+			} else {
 				Demand demand = searchResult.get(0);
 				List<DemandDetail> demandDetails = demand.getDemandDetails();
 				List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(owner, demandDetails);
 				demand.setDemandDetails(updatedDemandDetails);
 				demands.add(demand);
-				demands= demandRepository.updateDemand(requestInfo, demands);
+				demands = demandRepository.updateDemand(requestInfo, demands);
 			}
-		
+
 		}
 		return demands;
 	}
@@ -250,40 +255,31 @@ public class DemandService {
 
 			String tenantId = application.getTenantId();
 			String consumerCode = application.getApplicationNumber();
-			
+
 			String url = config.getUserHost().concat(config.getUserSearchEndpoint());
 
 			List<org.egov.cpt.models.User> ownerUser = null;
 			Set<String> uuid = new HashSet<>();
 			uuid.add(application.getAuditDetails().getCreatedBy());
 
-			UserSearchRequestCore userSearchRequest = UserSearchRequestCore.builder().requestInfo(requestInfo).
-					uuid(uuid).
-					build();
+			UserSearchRequestCore userSearchRequest = UserSearchRequestCore.builder().requestInfo(requestInfo)
+					.uuid(uuid).build();
 
-			ownerUser = mapper.convertValue(serviceRequestRepository.fetchResult(url, userSearchRequest), UserResponse.class)
+			ownerUser = mapper
+					.convertValue(serviceRequestRepository.fetchResult(url, userSearchRequest), UserResponse.class)
 					.getUser();
-			
-			log.info("ownerUser:"+ownerUser);
 
-//			User requestUser = requestInfo.getUserInfo(); // user from request information
+			log.info("ownerUser:" + ownerUser);
+
 			User requestUser = ownerUser.get(0).toCommonUser();
-			log.info("requestUser:"+requestUser);
+			log.info("requestUser:" + requestUser);
 
-			User user = null;
-			if (requestUser.getMobileNumber() != null) {
-				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
-						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
-						.mobileNumber(requestUser.getMobileNumber()).emailId(requestUser.getEmailId())
-						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
-						.build();
-			} else {
-				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
-						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
-						.mobileNumber(requestUser.getUserName()).emailId(requestUser.getEmailId())
-						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
-						.build();
-			}
+			String mobileNumber = requestUser.getMobileNumber() != null ? requestUser.getMobileNumber()
+					: requestUser.getUserName();
+			User user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
+					.name(requestUser.getName()).type(requestInfo.getUserInfo().getType()).mobileNumber(mobileNumber)
+					.emailId(requestUser.getEmailId()).roles(requestUser.getRoles()).tenantId(requestUser.getTenantId())
+					.uuid(requestUser.getUuid()).build();
 
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			if (!CollectionUtils.isEmpty(application.getCalculation().getTaxHeadEstimates())) {
@@ -296,12 +292,12 @@ public class DemandService {
 
 			Long taxPeriodFrom = System.currentTimeMillis();
 			Long taxPeriodTo = System.currentTimeMillis();
-			String businessService = application.getBusinessService();
 
 			Demand singleDemand = Demand.builder().status(StatusEnum.ACTIVE).consumerCode(consumerCode)
 					.demandDetails(demandDetails).payer(user).minimumAmountPayable(config.getMinimumPayableAmount())
 					.tenantId(tenantId).taxPeriodFrom(taxPeriodFrom).taxPeriodTo(taxPeriodTo)
-					.consumerType("rentedproperties").businessService(businessService).additionalDetails(null).build();
+					.consumerType("rentedproperties").businessService(PTConstants.BILLING_BUSINESS_SERVICE_DC)
+					.additionalDetails(null).build();
 
 			demands.add(singleDemand);
 		}
@@ -317,20 +313,23 @@ public class DemandService {
 
 			List<Demand> searchResult = searchDemand(application.getTenantId(),
 					Collections.singleton(application.getApplicationNumber()), requestInfo,
-					application.getBusinessService());
+					PTConstants.BILLING_BUSINESS_SERVICE_DC);
 			if (CollectionUtils.isEmpty(searchResult)) {
-				demands = createDuplicateCopyDemand(requestInfo,duplicateCopyApplications);
-				/*throw new CustomException("INVALID UPDATE",
-						"No demand exists for applicationNumber: " + application.getApplicationNumber());*/
+				demands = createDuplicateCopyDemand(requestInfo, duplicateCopyApplications);
+				/*
+				 * throw new CustomException("INVALID UPDATE",
+				 * "No demand exists for applicationNumber: " +
+				 * application.getApplicationNumber());
+				 */
 
-			}
-			else{
+			} else {
 				Demand demand = searchResult.get(0);
 				List<DemandDetail> demandDetails = demand.getDemandDetails();
-				List<DemandDetail> updatedDemandDetails = getUpdatedDuplicateCopyDemandDetails(application, demandDetails);
+				List<DemandDetail> updatedDemandDetails = getUpdatedDuplicateCopyDemandDetails(application,
+						demandDetails);
 				demand.setDemandDetails(updatedDemandDetails);
 				demands.add(demand);
-				demands=demandRepository.updateDemand(requestInfo, demands);
+				demands = demandRepository.updateDemand(requestInfo, demands);
 			}
 		}
 		return demands;
@@ -376,6 +375,136 @@ public class DemandService {
 		List<DemandDetail> combinedBillDetials = new LinkedList<>(demandDetails);
 		combinedBillDetials.addAll(newDemandDetails);
 		return combinedBillDetials;
+	}
+
+	public List<Demand> generateRentDemand(RequestInfo requestInfo, List<RentDetail> rentDetails) {
+		List<Demand> demands = new LinkedList<>();
+		for (RentDetail rentDetail : rentDetails) {
+			String consumerCode = utils.getPropertyRentConsumerCode(rentDetail.getTransitNumber());
+
+			List<Demand> searchResult = searchDemand(rentDetail.getTenantId(), Collections.singleton(consumerCode),
+					requestInfo, PTConstants.BILLING_BUSINESS_SERVICE_RENT);
+
+			if (CollectionUtils.isEmpty(searchResult)) {
+				demands = createRentDemand(requestInfo, rentDetails);
+			} else {
+				Demand demand = searchResult.get(0);
+				List<DemandDetail> demandDetails = demand.getDemandDetails();
+				List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(rentDetail, demandDetails);
+				demand.setDemandDetails(updatedDemandDetails);
+				demands.add(demand);
+				demands = demandRepository.updateDemand(requestInfo, demands);
+			}
+		}
+		log.info("Demand generated");
+		return demands;
+	}
+
+	private List<DemandDetail> getUpdatedDemandDetails(RentDetail rentDetail, List<DemandDetail> demandDetails) {
+		List<DemandDetail> newDemandDetails = new ArrayList<>();
+		Map<String, List<DemandDetail>> taxHeadToDemandDetail = new HashMap<>();
+
+		demandDetails.forEach(demandDetail -> {
+			if (!taxHeadToDemandDetail.containsKey(demandDetail.getTaxHeadMasterCode())) {
+				List<DemandDetail> demandDetailList = new LinkedList<>();
+				demandDetailList.add(demandDetail);
+				taxHeadToDemandDetail.put(demandDetail.getTaxHeadMasterCode(), demandDetailList);
+			} else
+				taxHeadToDemandDetail.get(demandDetail.getTaxHeadMasterCode()).add(demandDetail);
+		});
+
+		BigDecimal diffInTaxAmount;
+		List<DemandDetail> demandDetailList;
+		BigDecimal total;
+
+		for (TaxHeadEstimate taxHeadEstimate : rentDetail.getCalculation().getTaxHeadEstimates()) {
+			if (!taxHeadToDemandDetail.containsKey(taxHeadEstimate.getTaxHeadCode()))
+				newDemandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
+						.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).tenantId(rentDetail.getTenantId())
+						.collectionAmount(BigDecimal.ZERO).build());
+			else {
+				demandDetailList = taxHeadToDemandDetail.get(taxHeadEstimate.getTaxHeadCode());
+				total = demandDetailList.stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO,
+						BigDecimal::add);
+				diffInTaxAmount = taxHeadEstimate.getEstimateAmount().subtract(total);
+				if (diffInTaxAmount.compareTo(BigDecimal.ZERO) != 0) {
+					newDemandDetails.add(DemandDetail.builder().taxAmount(diffInTaxAmount)
+							.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).tenantId(rentDetail.getTenantId())
+							.collectionAmount(BigDecimal.ZERO).build());
+				}
+			}
+		}
+		List<DemandDetail> combinedBillDetials = new LinkedList<>(demandDetails);
+		combinedBillDetials.addAll(newDemandDetails);
+		return combinedBillDetials;
+	}
+
+	private List<Demand> createRentDemand(RequestInfo requestInfo, List<RentDetail> rentDetails) {
+		List<Demand> demands = new LinkedList<>();
+		for (RentDetail rentDetail : rentDetails) {
+			if (rentDetail == null)
+				throw new CustomException("INVALID APPLICATIONNUMBER",
+						"Demand cannot be generated for this application");
+
+			String tenantId = rentDetail.getTenantId();
+			String consumerCode = utils.getPropertyRentConsumerCode(rentDetail.getTransitNumber());
+
+			/*
+			 * String url = config.getUserHost().concat(config.getUserSearchEndpoint());
+			 * 
+			 * List<org.egov.cpt.models.User> ownerUser = requestInfo.get Set<String> uuid =
+			 * new HashSet<>(); uuid.add(rentDetail.getAuditDetails().getCreatedBy());
+			 * 
+			 * UserSearchRequestCore userSearchRequest =
+			 * UserSearchRequestCore.builder().requestInfo(requestInfo) .uuid(uuid).build();
+			 * 
+			 * ownerUser = mapper .convertValue(serviceRequestRepository.fetchResult(url,
+			 * userSearchRequest), UserResponse.class) .getUser();
+			 */
+
+			// User ownerUser=requestInfo.getUserInfo();
+			// log.info("ownerUser:" + ownerUser);
+
+			// User requestUser = requestInfo.getUserInfo(); // user from request
+			// information
+			User requestUser = requestInfo.getUserInfo();
+			log.info("requestUser:" + requestUser);
+			User user = null;
+			if (requestUser.getMobileNumber() != null) {
+				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
+						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
+						.mobileNumber(requestUser.getMobileNumber()).emailId(requestUser.getEmailId())
+						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
+						.build();
+			} else {
+				user = User.builder().id(requestUser.getId()).userName(requestUser.getUserName())
+						.name(requestUser.getName()).type(requestInfo.getUserInfo().getType())
+						.mobileNumber(requestUser.getUserName()).emailId(requestUser.getEmailId())
+						.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid())
+						.build();
+			}
+
+			List<DemandDetail> demandDetails = new LinkedList<>();
+			if (!CollectionUtils.isEmpty(rentDetail.getCalculation().getTaxHeadEstimates())) {
+				rentDetail.getCalculation().getTaxHeadEstimates().forEach(taxHeadEstimate -> {
+					demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
+							.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).collectionAmount(BigDecimal.ZERO)
+							.tenantId(tenantId).build());
+				});
+			}
+
+			Long taxPeriodFrom = System.currentTimeMillis();
+			Long taxPeriodTo = System.currentTimeMillis();
+
+			Demand singleDemand = Demand.builder().status(StatusEnum.ACTIVE).consumerCode(consumerCode)
+					.demandDetails(demandDetails).payer(user).minimumAmountPayable(config.getMinimumPayableAmount())
+					.tenantId(tenantId).taxPeriodFrom(taxPeriodFrom).taxPeriodTo(taxPeriodTo)
+					.consumerType("rentedproperties").businessService(PTConstants.BILLING_BUSINESS_SERVICE_RENT)
+					.additionalDetails(null).build();
+
+			demands.add(singleDemand);
+		}
+		return demandRepository.saveDemand(requestInfo, demands);
 	}
 
 }

@@ -3,15 +3,13 @@ package org.egov.cpt.repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.egov.cpt.models.AuditDetails;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
-import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Property;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -53,7 +51,7 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 						.dateOfDeathAllottee(rs.getLong("date_of_death_allottee"))
 						.relationWithDeceasedAllottee(rs.getString("relation_with_deceased_allottee"))
 						.permanent(rs.getBoolean("permanent")).dueAmount(rs.getBigDecimal("due_amount"))
-						.aproCharge(rs.getBigDecimal("apro_charge")).auditDetails(auditdetails).payment(null).build();
+						.aproCharge(rs.getBigDecimal("apro_charge")).auditDetails(auditdetails).build();
 
 				Property property = Property.builder().id(rs.getString("pid"))
 						.transitNumber(rs.getString("transit_number")).colony(rs.getString("colony"))
@@ -80,14 +78,11 @@ public class OwnershipTransferRowMapper implements ResultSetExtractor<List<Owner
 					.createdTime(rs.getLong("ocreated_date")).lastModifiedBy(rs.getString("omodified_by"))
 					.lastModifiedTime(rs.getLong("omodified_date")).build();
 
-			Document ownershipTransferDocument = Document.builder()
-					.id(rs.getString("docid"))
-					.referenceId(rs.getString("doc_referenceId"))
-					.tenantId(rs.getString("doctenantid")).active(rs.getBoolean("docis_active"))
-					.documentType(rs.getString("document_type")).fileStoreId(rs.getString("fileStore_id"))
-					.auditDetails(auditdetails)
-					.propertyId(rs.getString("doc_propertyId"))
-					.build();
+			Document ownershipTransferDocument = Document.builder().id(rs.getString("docid"))
+					.referenceId(rs.getString("doc_referenceId")).tenantId(rs.getString("doctenantid"))
+					.active(rs.getBoolean("docis_active")).documentType(rs.getString("document_type"))
+					.fileStoreId(rs.getString("fileStore_id")).auditDetails(auditdetails)
+					.propertyId(rs.getString("doc_propertyId")).build();
 			owner.getOwnerDetails().addownershipTransferDocumentsItem(ownershipTransferDocument);
 		}
 	}
