@@ -14,18 +14,14 @@ import org.egov.ps.model.Application;
 import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.MortgageDetails;
-import org.egov.ps.model.MortgageDocuments;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
 import org.egov.ps.model.Payment;
 import org.egov.ps.model.Property;
-import org.egov.ps.model.PropertyCriteria;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.model.PurchaseDetails;
 import org.egov.ps.model.idgen.IdResponse;
-import org.egov.ps.producer.Producer;
 import org.egov.ps.repository.IdGenRepository;
-import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.ApplicationRequest;
@@ -36,12 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Service
 public class EnrichmentService {
 
@@ -55,14 +45,8 @@ public class EnrichmentService {
 	private Configuration config;
 
 	@Autowired
-	PropertyRepository propertyRepository;
-	
-	@Autowired
-	private Producer producer;
-	
-	@Autowired
 	private MDMSService mdmsservice;
-
+	
 	public void enrichCreateRequest(PropertyRequest request) {
 
 		RequestInfo requestInfo = request.getRequestInfo();
@@ -81,40 +65,28 @@ public class EnrichmentService {
 
 			});
 		}
-	}
-
-	public void postEnrichMortgageDetails(ApplicationRequest request) {
-		RequestInfo requestInfo = request.getRequestInfo();
-		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-
-		if (!CollectionUtils.isEmpty(request.getApplications())) {
-			request.getApplications().forEach(application -> {
-				if (null != application && null != application.getProperty()
-						&& application.getState().equalsIgnoreCase(PSConstants.PM_APPROVED)
-						&& application.getProperty().getId() != null) {
-					
-					//set audit details..
-					application.setAuditDetails(auditDetails);
-					
-					//fetch property data
-					PropertyCriteria propertySearchCriteria = PropertyCriteria.builder()
-							.propertyId(application.getProperty().getId()).build();
-					List<Property> properties = propertyRepository.getProperties(propertySearchCriteria);
-
-					if (!CollectionUtils.isEmpty(properties)) {
-						properties.forEach(property -> {
-							if (null != property.getPropertyDetails() 
-									&& !CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
-								property.getPropertyDetails().getOwners().forEach(owner -> {
-									validateMortgageDetails(property, owner, request.getRequestInfo(), owner.getId());
-									owner.setMortgageDetails(getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
-								});
-							}
-						});
+	} 
+	
+	public void enrichMortgageDetailsRequest(PropertyRequest request) {
+		if (!CollectionUtils.isEmpty(request.getProperties())) {
+			request.getProperties().forEach(property -> {
+				property.getPropertyDetails().getOwners().forEach(owner ->{
+					//checking -  owner is existing and mortgage details bound with user..
+					if(null != owner.getId() && !owner.getId().isEmpty() && null != owner.getMortgageDetails()) {
+						//validate mortgage details - documents 
+						validateMortgageDetails(property, owner, request.getRequestInfo(), owner.getId());
+						owner.setMortgageDetails(getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
 					}
-				}
+				});
 			});
 		}
+	}
+
+	public void validateMortgageDetails(Property property, Owner owner, RequestInfo requestInfo, String id) {
+		MortgageDetails mortgage = owner.getMortgageDetails();
+		List<Map<String, Object>> fieldConfigurations = mdmsservice.getMortgageDocumentConfig(mortgage.getMortgageType(), requestInfo, property.getTenantId());
+		
+		//TODO :: write code to validate documents base on master json template.
 	}
 
 	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
@@ -161,7 +133,7 @@ public class EnrichmentService {
 		}
 		return owners;
 	}
-
+	
 	private MortgageDetails getMortgage(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
 		String gen_mortgage_id = UUID.randomUUID().toString();
 		
@@ -170,46 +142,9 @@ public class EnrichmentService {
 		mortgage.setTenantId(property.getTenantId());
 		mortgage.setOwnerId(gen_owner_id);
 		
-		List<Document> documents = mortgage.getMortgageDocuments();
-		if(!CollectionUtils.isEmpty(documents)) {
-			AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-			documents.forEach(document -> {
-				if (document.getId() == null) {
-					String gen_doc_id = UUID.randomUUID().toString();
-					document.setId(gen_doc_id);
-					document.setTenantId(property.getTenantId());
-					document.setReferenceId(property.getId());
-					document.setPropertyId(property.getId());
-				}
-				document.setAuditDetails(docAuditDetails);
-			});
-		}
 		return mortgage;
 	}
 
-	public void validateMortgageDetails(Property property, Owner owner, RequestInfo requestInfo, String id){
-		// TODO Auto-generated method stub
-		MortgageDetails mortgage = owner.getMortgageDetails();
-
-		if(mortgage!=null ) {
-			List<Map<String, Object>> fieldConfigurations = mdmsservice.getMortgageDocumentConfig("mortgage", requestInfo, "ch");
-
-			//To Do :: write code to validate documents base on master json template.
-			ObjectMapper mapper = new ObjectMapper();
-			List<MortgageDocuments> mortgageTypeList = mapper.convertValue(fieldConfigurations, new TypeReference<List<MortgageDocuments>>() { });
-			Map<String, String> errorMap = new HashMap<>();
-
-			if(mortgage.getMortgageDocuments() != null || !mortgage.getMortgageDocuments().isEmpty()) {
-					mortgage.getMortgageDocuments().stream().forEach(document -> {
-							if(!mortgageTypeList.contains(MortgageDocuments.builder().code(document.getDocumentType()).build())) {
-									errorMap.put("INVALID DOCUMENT",
-													"Document is not valid for user : " + owner.getOwnerDetails().getOwnerName());
-							}
-					});
-			}
-		}
-	}
-	
 	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
 
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
