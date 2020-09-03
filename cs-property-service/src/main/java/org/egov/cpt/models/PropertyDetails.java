@@ -33,35 +33,34 @@ import lombok.ToString;
 public class PropertyDetails {
 
 	/**
-	 * Current interest rate per year.
-	 * This will not change and is constant.
+	 * Current interest rate per year. This will not change and is constant.
 	 * 
-	 * Vikas Nagar Mauli Jagran (Sites 1-2765) - 0
-	 * Sector 52-53 - 0
-	 * Milk Colony Maloya - 24%
-	 * Kumhar Colony Maloya - 24%
+	 * Vikas Nagar Mauli Jagran (Sites 1-2765) - 0 Sector 52-53 - 0 Milk Colony
+	 * Maloya - 24% Kumhar Colony Maloya - 24%
 	 */
-	private Double interestRate;
+	@Builder.Default
+	@JsonProperty("interestRate")
+	private Double interestRate = 0.0;
 
 	/**
 	 * How much the monthly rent increases once the period ends.
 	 * 
-	 * Vikas Nagar Mauli Jagran (Sites 1-2765) - 5%
-	 * Sector 52-53 - 5%
-	 * Milk Colony Maloya - 25%
-	 * Kumhar Colony Maloya - 25%
+	 * Vikas Nagar Mauli Jagran (Sites 1-2765) - 5% Sector 52-53 - 5% Milk Colony
+	 * Maloya - 25% Kumhar Colony Maloya - 25%
 	 */
-	private Double rentIncrementPercentage;
+	@JsonProperty("rentIncrementPercentage")
+	@Builder.Default
+	private Double rentIncrementPercentage = 5D;
 
 	/**
 	 * How often does the monthly rent amount increase.
 	 * 
-	 * Vikas Nagar Mauli Jagran (Sites 1-2765) - 1
-	 * Sector 52-53 - 1
-	 * Milk Colony Maloya - 5
-	 * Kumhar Colony Maloya - 5
+	 * Vikas Nagar Mauli Jagran (Sites 1-2765) - 1 Sector 52-53 - 1 Milk Colony
+	 * Maloya - 5 Kumhar Colony Maloya - 5
 	 */
-	private Double rentIncrementPeriod;
+	@JsonProperty("rentIncrementPeriod")
+	@Builder.Default
+	private int rentIncrementPeriod = 1;
 
 	@JsonProperty("id")
 	private String id;
@@ -82,8 +81,7 @@ public class PropertyDetails {
 	private String rentPerSqyd;
 
 	/**
-	 * The id of the currently owning user.
-	 * During property master this will be set.
+	 * The id of the currently owning user. During property master this will be set.
 	 * During ownership transfer, new value should be also set here.
 	 */
 	@JsonProperty("currentOwner")
@@ -103,6 +101,7 @@ public class PropertyDetails {
 	private List<Document> applicationDocuments;
 
 	@JsonProperty("auditDetails")
+	@Builder.Default
 	private AuditDetails auditDetails = null;
 
 	public PropertyDetails addApplicationDocumentsItem(Document applicationDocumentsItem) {
@@ -116,7 +115,7 @@ public class PropertyDetails {
 		}
 		this.applicationDocuments.add(applicationDocumentsItem);
 		return this;
-		
+
 	}
 
 }

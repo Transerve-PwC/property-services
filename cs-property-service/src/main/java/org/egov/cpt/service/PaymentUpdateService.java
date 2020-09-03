@@ -1,16 +1,19 @@
 package org.egov.cpt.service;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.Property;
+import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.PaymentDetail;
 import org.egov.cpt.models.calculation.PaymentRequest;
@@ -27,8 +30,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -37,19 +38,21 @@ public class PaymentUpdateService {
 
 	private OwnershipTransferService ownershipTransferService;
 
+	private PropertyService propertyService;
+
 	private OwnershipTransferRepository repositoryOt;
 
 	private DuplicateCopyService duplicateCopyService;
 
 	private PropertyRepository propertyRepository;
 
-	private EnrichmentService enrichmentService;
-
 	private ObjectMapper mapper;
 
 	private WorkflowService workflowService;
 
 	private PropertyUtil util;
+
+	private RentEnrichmentService rentEnrichmentService;
 
 	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
 	private Boolean pickWFServiceNameFromPropertyTypeOnly;
@@ -60,16 +63,16 @@ public class PaymentUpdateService {
 	@Autowired
 	public PaymentUpdateService(OwnershipTransferService ownershipTransferService,
 			OwnershipTransferRepository repositoryOt, DuplicateCopyService duplicateCopyService,
-			PropertyRepository propertyRepository, EnrichmentService enrichmentService, ObjectMapper mapper,
-			WorkflowService workflowService, PropertyUtil util) {
+			PropertyRepository propertyRepository, ObjectMapper mapper, WorkflowService workflowService,
+			PropertyUtil util, RentEnrichmentService rentEnrichmentService) {
 		this.ownershipTransferService = ownershipTransferService;
 		this.repositoryOt = repositoryOt;
 		this.duplicateCopyService = duplicateCopyService;
 		this.propertyRepository = propertyRepository;
-		this.enrichmentService = enrichmentService;
 		this.mapper = mapper;
 		this.workflowService = workflowService;
 		this.util = util;
+		this.rentEnrichmentService = rentEnrichmentService;
 	}
 
 	final String tenantId = "tenantId";
@@ -93,79 +96,91 @@ public class PaymentUpdateService {
 			for (PaymentDetail paymentDetail : paymentDetails) {
 				if (allowedservices.contains(paymentDetail.getBusinessService())) {
 
-					String wfbusinessServiceName = null;
 					switch (paymentDetail.getBusinessService()) {
-					case PTConstants.BUSINESS_SERVICE_OT:
-						wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_OT;
+						case PTConstants.BILLING_BUSINESS_SERVICE_OT: {
 
-						DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
-						searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
+							DuplicateCopySearchCriteria searchCriteria = new DuplicateCopySearchCriteria();
+							searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
 
-						List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria,
-								requestInfo);
+							List<Owner> owners = ownershipTransferService.searchOwnershipTransfer(searchCriteria,
+									requestInfo);
 
-						BusinessService otBusinessService = workflowService
-								.getBusinessService(owners.get(0).getTenantId(), requestInfo, wfbusinessServiceName);
+							BusinessService otBusinessService = workflowService.getBusinessService(
+									owners.get(0).getTenantId(), requestInfo, PTConstants.BUSINESS_SERVICE_OT);
 
-						if (CollectionUtils.isEmpty(owners))
-							throw new CustomException("INVALID RECEIPT",
-									"No Owner found for the comsumerCode " + searchCriteria.getApplicationNumber());
+							if (CollectionUtils.isEmpty(owners))
+								throw new CustomException("INVALID RECEIPT",
+										"No Owner found for the comsumerCode " + searchCriteria.getApplicationNumber());
 
-						owners.forEach(owner -> owner.setApplicationAction(PTConstants.ACTION_PAY));
+							owners.forEach(owner -> owner.setApplicationAction(PTConstants.ACTION_PAY));
 
-						Role role = Role.builder().code("SYSTEM_PAYMENT").build();
-						requestInfo.getUserInfo().getRoles().add(role);
-						OwnershipTransferRequest updateRequest = OwnershipTransferRequest.builder()
-								.requestInfo(requestInfo).owners(owners).build();
+							Role role = Role.builder().code("SYSTEM_PAYMENT").build();
+							requestInfo.getUserInfo().getRoles().add(role);
+							OwnershipTransferRequest updateRequest = OwnershipTransferRequest.builder()
+									.requestInfo(requestInfo).owners(owners).build();
 
-						updateRequest.getOwners().forEach(
-								obj -> log.info(" the status of the application is : " + obj.getApplicationState()));
+							updateRequest.getOwners().forEach(obj -> log
+									.info(" the status of the application is : " + obj.getApplicationState()));
 
-						List<String> endStates = Collections.nCopies(updateRequest.getOwners().size(),
-								PTConstants.STATUS_APPROVED);
+							/**
+							 * Payment is not the end state for Ownership Transfer. No need to postEnrich
+							 */
 
-//						enrichmentService.postStatusEnrichment(updateRequest, endStates);
+							Map<String, Boolean> idToIsStateUpdatableMap = util
+									.getIdToIsStateUpdatableMap(otBusinessService, owners);
 
-						Map<String, Boolean> idToIsStateUpdatableMap = util
-								.getIdToIsStateUpdatableMap(otBusinessService, owners);
+							repositoryOt.update(updateRequest, idToIsStateUpdatableMap);
+							break;
+						}
+						case PTConstants.BILLING_BUSINESS_SERVICE_DC: {
 
-						repositoryOt.update(updateRequest, idToIsStateUpdatableMap);
-						break;
+							DuplicateCopySearchCriteria searchCriteriaDc = new DuplicateCopySearchCriteria();
+							searchCriteriaDc.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
 
-					case PTConstants.BUSINESS_SERVICE_DC:
-						wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_DC;
+							List<DuplicateCopy> dcApplications = duplicateCopyService
+									.searchApplication(searchCriteriaDc, requestInfo);
 
-						DuplicateCopySearchCriteria searchCriteriaDc = new DuplicateCopySearchCriteria();
-						searchCriteriaDc.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
+							BusinessService dcBusinessService = workflowService.getBusinessService(
+									dcApplications.get(0).getTenantId(), requestInfo, PTConstants.BUSINESS_SERVICE_DC);
 
-						List<DuplicateCopy> dcApplications = duplicateCopyService.searchApplication(searchCriteriaDc,
-								requestInfo);
+							if (CollectionUtils.isEmpty(dcApplications))
+								throw new CustomException("INVALID RECEIPT", "No Owner found for the comsumerCode "
+										+ searchCriteriaDc.getApplicationNumber());
 
-						BusinessService dcBusinessService = workflowService.getBusinessService(
-								dcApplications.get(0).getTenantId(), requestInfo, wfbusinessServiceName);
+							dcApplications.forEach(dcApplication -> dcApplication.setAction(PTConstants.ACTION_PAY));
 
-						if (CollectionUtils.isEmpty(dcApplications))
-							throw new CustomException("INVALID RECEIPT",
-									"No Owner found for the comsumerCode " + searchCriteriaDc.getApplicationNumber());
+							DuplicateCopyRequest updateDCRequest = DuplicateCopyRequest.builder()
+									.requestInfo(requestInfo).duplicateCopyApplications(dcApplications).build();
 
-						dcApplications.forEach(dcApplication -> dcApplication.setAction(PTConstants.ACTION_PAY));
+							updateDCRequest.getDuplicateCopyApplications()
+									.forEach(obj -> log.info(" the status of the application is : " + obj.getState()));
 
-						DuplicateCopyRequest updateDCRequest = DuplicateCopyRequest.builder().requestInfo(requestInfo)
-								.duplicateCopyApplications(dcApplications).build();
+							/**
+							 * Nothing to enrich for Duplicate Copy Letter
+							 */
 
-						updateDCRequest.getDuplicateCopyApplications()
-								.forEach(obj -> log.info(" the status of the application is : " + obj.getState()));
+							Map<String, Boolean> idToIsStateUpdatableMapDc = util
+									.getIdToIsStateUpdatableMapDc(dcBusinessService, dcApplications);
 
-						List<String> dcEndStates = Collections.nCopies(
-								updateDCRequest.getDuplicateCopyApplications().size(), PTConstants.STATUS_APPROVED);
+							propertyRepository.updateDcPayment(updateDCRequest, idToIsStateUpdatableMapDc);
+							break;
+						}
+						case PTConstants.BILLING_BUSINESS_SERVICE_RENT: {
+							String consumerCode = paymentDetail.getBill().getConsumerCode();
 
-//						enrichmentService.postStatusEnrichmentDC(updateDCRequest, dcEndStates);
+							PropertyCriteria searchCriteria = new PropertyCriteria();
+							searchCriteria.setTransitNumber(util.getTransitNumberFromConsumerCode(consumerCode));
 
-						Map<String, Boolean> idToIsStateUpdatableMapDc = util
-								.getIdToIsStateUpdatableMapDc(dcBusinessService, dcApplications);
+							List<Property> properties = propertyService.searchProperty(searchCriteria, requestInfo);
 
-						propertyRepository.updateDcPayment(updateDCRequest, idToIsStateUpdatableMapDc);
-						break;
+							if (CollectionUtils.isEmpty(properties))
+								throw new CustomException("INVALID RECEIPT",
+										"No Property found for the comsumerCode " + consumerCode);
+
+							rentEnrichmentService.postEnrichmentForRentPayment(requestInfo, properties, paymentDetails);
+
+							break;
+						}
 					}
 				}
 			}

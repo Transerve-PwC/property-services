@@ -41,7 +41,7 @@ public class Owner {
 	private String serialNumber;
 
 	@JsonProperty("share")
-	private String share;
+	private double share;
 
 	@JsonProperty("cpNumber")
 	private String cpNumber;
@@ -57,5 +57,8 @@ public class Owner {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+	
+	@JsonProperty("mortgageDetails")
+	private MortgageDetails mortgageDetails;
 
 }

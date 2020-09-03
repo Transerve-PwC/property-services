@@ -1,9 +1,6 @@
 package org.egov.cpt.models;
 
-import java.util.List;
 import java.util.Set;
-
-import javax.validation.Valid;
 
 import org.egov.common.contract.request.RequestInfo;
 
@@ -90,13 +87,8 @@ public class UserSearchRequest {
 	private String revisionPercentage;
 
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
+	private AuditDetails auditDetails;
 
-	@Valid
-	@JsonProperty("payment")
-	private List<Payment> payment;
-
-//	TODO doubt
 	@JsonProperty("pageSize")
 	private int pageSize;
 
@@ -104,14 +96,14 @@ public class UserSearchRequest {
 	@Default
 	private int pageNumber = 0;
 
-//	@JsonProperty("sort")
-//	@Default
-//	private List<String> sort = Collections.singletonList("name");
-//
-//	@JsonProperty("userType")
-//	private String userType;
-//
-//	@JsonProperty("roleCodes")
-//	private List<String> roleCodes;
+	// @JsonProperty("sort")
+	// @Default
+	// private List<String> sort = Collections.singletonList("name");
+	//
+	// @JsonProperty("userType")
+	// private String userType;
+	//
+	// @JsonProperty("roleCodes")
+	// private List<String> roleCodes;
 
 }

@@ -14,9 +14,9 @@ CREATE TABLE cs_pt_demand (
    generationDate       bigint,
    collectionPrincipal  numeric(13,6),
    remainingPrincipal   numeric(13,6),
-   interestSince		bigint,
-   mode					CHARACTER VARYING (64),
-   tenantid			    CHARACTER VARYING (256),
+   interestSince		   bigint,
+   mode					   CHARACTER VARYING (64),
+   status               CHARACTER VARYING (64),
   
    created_by           CHARACTER VARYING (128),
    created_date         bigint,
@@ -29,13 +29,13 @@ CREATE TABLE cs_pt_demand (
 
 --> Payment Table
 CREATE TABLE cs_pt_payment (
-   id           		CHARACTER VARYING (256) NOT NULL,
+   id           		   CHARACTER VARYING (256) NOT NULL,
    property_id          CHARACTER VARYING (256) NOT NULL,
-   receiptNo	    	CHARACTER VARYING(64),
-   amountPaid   		numeric(13,6),
+   receiptNo	    	   CHARACTER VARYING(64),
+   amountPaid   		   numeric(13,6),
    dateOfPayment   		bigint,
-   mode					CHARACTER VARYING (64),
-   tenantid			    CHARACTER VARYING (256),
+   mode					   CHARACTER VARYING (64),
+   processed            BOOLEAN,
   
    created_by           CHARACTER VARYING (128),
    created_date         bigint,
@@ -50,20 +50,17 @@ CREATE TABLE cs_pt_payment (
 CREATE TABLE cs_pt_collection (
    id           		CHARACTER VARYING (256) NOT NULL,
    demand_id            CHARACTER VARYING (256) NOT NULL,
-   payment_id   		CHARACTER VARYING (256) ,
    interestCollected    numeric(13,6),
    principalCollected   numeric(13,6),
-   tenantid			    CHARACTER VARYING (256),
-   collectionAgainst    CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128),
    created_date         bigint,
+   collectedAt         bigint,
    modified_by     		CHARACTER VARYING (128),
    modified_date       	bigint,
 
   CONSTRAINT pk_cs_pt_collection PRIMARY KEY (id), 
-  CONSTRAINT fk_cs_pt_collection_demand FOREIGN KEY (demand_id) REFERENCES cs_pt_demand (id),
-  CONSTRAINT fk_cs_pt_collection_payment FOREIGN KEY (payment_id) REFERENCES cs_pt_payment (id)
+  CONSTRAINT fk_cs_pt_collection_demand FOREIGN KEY (demand_id) REFERENCES cs_pt_demand (id) ON DELETE CASCADE
 );
 
 --> Account Table
@@ -71,7 +68,6 @@ CREATE TABLE cs_pt_account (
    id           		CHARACTER VARYING (256) NOT NULL,
    property_id          CHARACTER VARYING (256) NOT NULL,
    remainingAmount	    numeric(13,6),
-   tenantid			    CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128),
    created_date         bigint,
@@ -79,7 +75,7 @@ CREATE TABLE cs_pt_account (
    modified_date       	bigint,
 	
   CONSTRAINT pk_cs_pt_account PRIMARY KEY (id), 
-  CONSTRAINT fk_cs_pt_payment FOREIGN KEY (property_id) REFERENCES cs_pt_property_v1 (id)
+  CONSTRAINT fk_cs_pt_account_payment FOREIGN KEY (property_id) REFERENCES cs_pt_property_v1 (id)
 );
 
 --> Audit Tables
@@ -92,7 +88,7 @@ CREATE TABLE cs_pt_demand_audit(
    remainingPrincipal   numeric(13,6),
    interestSince		bigint,
    mode					CHARACTER VARYING (64),
-   tenantid			    CHARACTER VARYING (256),
+   status            CHARACTER VARYING (64),
   
    created_by           CHARACTER VARYING (128),
    created_date         bigint,
@@ -104,7 +100,6 @@ CREATE TABLE cs_pt_account_audit (
    id           		CHARACTER VARYING (256) NOT NULL,
    property_id          CHARACTER VARYING (256) NOT NULL,
    remainingAmount	    numeric(13,6),
-   tenantid			    CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128),
    created_date         bigint,

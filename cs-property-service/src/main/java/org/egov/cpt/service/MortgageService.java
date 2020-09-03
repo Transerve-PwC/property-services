@@ -6,10 +6,8 @@ import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
-import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
-import org.egov.cpt.models.Property;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.producer.Producer;
@@ -46,15 +44,15 @@ public class MortgageService {
 
 	@Autowired
 	private WorkflowIntegrator wfIntegrator;
-	
+
 	@Autowired
 	MortgageNotificationService notificationService;
-	
+
 	@Autowired
 	private WorkflowService workflowService;
 
 	public List<Mortgage> createApplication(MortgageRequest mortgageRequest) {
-		List<Property> propertiesFromDb = propertyValidator.isPropertyExist(mortgageRequest);
+		propertyValidator.isPropertyExist(mortgageRequest);
 		propertyValidator.validateMortgageCreateRequest(mortgageRequest);
 		enrichmentService.enrichMortgageCreateRequest(mortgageRequest);
 		if (config.getIsWorkflowEnabled()) {
@@ -66,21 +64,23 @@ public class MortgageService {
 
 	public List<Mortgage> searchApplication(DuplicateCopySearchCriteria criteria, RequestInfo requestInfo) {
 		propertyValidator.validateMortgageSearch(requestInfo, criteria);
-	    enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo,criteria);
-	    if(requestInfo.getUserInfo().getType().equalsIgnoreCase(PTConstants.ROLE_EMPLOYEE)&& CollectionUtils.isEmpty(criteria.getStatus())){
+		enrichmentService.enrichDuplicateCopySearchCriteria(requestInfo, criteria);
+		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(PTConstants.ROLE_EMPLOYEE)
+				&& CollectionUtils.isEmpty(criteria.getStatus())) {
 			String wfbusinessServiceName = PTConstants.BUSINESS_SERVICE_MG;
-			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, wfbusinessServiceName);
-			List<State> stateList= otBusinessService.getStates();
+			BusinessService otBusinessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo,
+					wfbusinessServiceName);
+			List<State> stateList = otBusinessService.getStates();
 			List<String> states = new ArrayList<String>();
-			
-			for(State state: stateList){
-					states.add(state.getState());
+
+			for (State state : stateList) {
+				states.add(state.getState());
 			}
 			states.remove("");
 			states.remove(PTConstants.MG_DRAFTED);
-			
-			log.info("states:"+states);
-		
+
+			log.info("states:" + states);
+
 			criteria.setStatus(states);
 		}
 		return getApplication(criteria, requestInfo);
@@ -94,12 +94,12 @@ public class MortgageService {
 	}
 
 	public List<Mortgage> updateApplication(MortgageRequest mortgageRequest) {
-		List<Mortgage> searchedProperty = propertyValidator.validateMOrtgageUpdateRequest(mortgageRequest); 
-		enrichmentService.enrichMortgageUpdateRequest(mortgageRequest,searchedProperty);
+		List<Mortgage> searchedProperty = propertyValidator.validateMOrtgageUpdateRequest(mortgageRequest);
+		enrichmentService.enrichMortgageUpdateRequest(mortgageRequest, searchedProperty);
 		propertyValidator.validateMortgageUpdate(mortgageRequest);
 		if (config.getIsWorkflowEnabled()) {
-            wfIntegrator.callMortgageWorkFlow(mortgageRequest);
-        } 
+			wfIntegrator.callMortgageWorkFlow(mortgageRequest);
+		}
 		producer.push(config.getUpdateMortgageTopic(), mortgageRequest);
 		notificationService.process(mortgageRequest);
 		return mortgageRequest.getMortgageApplications();

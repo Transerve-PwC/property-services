@@ -89,4 +89,10 @@ public class MDMSService {
 		return allowedValues;
 	}
 
+	public List<Map<String, Object>> getMortgageDocumentConfig(String mortgageType, RequestInfo requestInfo,
+			String tenantId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

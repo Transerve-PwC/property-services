@@ -45,21 +45,15 @@ public class WorkflowIntegrator {
 
 	private static final String MODULENAMEKEY = "moduleName";
 
-	private static final String STATEKEY = "state";
-
 	private static final String COMMENTKEY = "comment";
 
 	private static final String DOCUMENTSKEY = "documents";
-
-	private static final String ASSIGNERKEY = "assigner";
 
 	private static final String ASSIGNEEKEY = "assignee";
 
 	private static final String UUIDKEY = "uuid";
 
 	private static final String MODULENAMEVALUE = "csp";
-
-	private static final String BPAMODULENAMEVALUE = "BPAREG";
 
 	private static final String WORKFLOWREQUESTARRAYKEY = "ProcessInstances";
 
@@ -140,10 +134,10 @@ public class WorkflowIntegrator {
 		}
 		Map<String, String> idStatusMap = callCommonWorkflow(array, request.getRequestInfo());
 
-			// setting the status back to Property object from wf response
-			request.getProperties().forEach(property -> {
-				property.setMasterDataState(idStatusMap.get(property.getTransitNumber()));
-			});
+		// setting the status back to Property object from wf response
+		request.getProperties().forEach(property -> {
+			property.setMasterDataState(idStatusMap.get(property.getTransitNumber()));
+		});
 	}
 
 	public void callDuplicateCopyWorkFlow(DuplicateCopyRequest request) {
@@ -184,14 +178,14 @@ public class WorkflowIntegrator {
 					obj.put(ASSIGNEEKEY, assigneeUuidmaps);
 				}
 			}
-			
+
 			array.add(obj);
 		}
 		Map<String, String> idStatusMap = callCommonWorkflow(array, request.getRequestInfo());
 
-			// setting the status back to Application object from wf response
-			request.getDuplicateCopyApplications()
-					.forEach(application -> application.setState(idStatusMap.get(application.getApplicationNumber())));
+		// setting the status back to Application object from wf response
+		request.getDuplicateCopyApplications()
+				.forEach(application -> application.setState(idStatusMap.get(application.getApplicationNumber())));
 	}
 
 	public void callOwnershipTransferWorkFlow(OwnershipTransferRequest request) {
@@ -224,15 +218,15 @@ public class WorkflowIntegrator {
 					obj.put(ASSIGNEEKEY, assigneeUuidmaps);
 				}
 			}
-			
+
 			array.add(obj);
 		}
 		Map<String, String> idStatusMap = callCommonWorkflow(array, request.getRequestInfo());
 
-			// setting the status back to Application object from wf response
-			request.getOwners().forEach(owner -> {
-				owner.setApplicationState(idStatusMap.get(owner.getOwnerDetails().getApplicationNumber()));
-			});
+		// setting the status back to Application object from wf response
+		request.getOwners().forEach(owner -> {
+			owner.setApplicationState(idStatusMap.get(owner.getOwnerDetails().getApplicationNumber()));
+		});
 	}
 
 	public void callMortgageWorkFlow(MortgageRequest request) {
@@ -271,7 +265,7 @@ public class WorkflowIntegrator {
 					obj.put(ASSIGNEEKEY, assigneeUuidmaps);
 				}
 			}
-			
+
 			array.add(obj);
 		}
 		Map<String, String> idStatusMap = callCommonWorkflow(array, request.getRequestInfo());

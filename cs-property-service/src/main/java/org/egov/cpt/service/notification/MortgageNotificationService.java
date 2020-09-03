@@ -9,30 +9,22 @@ import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.EmailRequest;
 import org.egov.cpt.models.Mortgage;
 import org.egov.cpt.models.SMSRequest;
-import org.egov.cpt.repository.ServiceRequestRepository;
 import org.egov.cpt.util.NotificationUtil;
 import org.egov.cpt.web.contracts.MortgageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Service
 public class MortgageNotificationService {
 
 	private PropertyConfiguration config;
 
-	private ServiceRequestRepository serviceRequestRepository;
-
 	private NotificationUtil util;
 
 	@Autowired
-	public MortgageNotificationService(PropertyConfiguration config, ServiceRequestRepository serviceRequestRepository,
-			NotificationUtil util) {
+	public MortgageNotificationService(PropertyConfiguration config, NotificationUtil util) {
 		this.config = config;
-		this.serviceRequestRepository = serviceRequestRepository;
 		this.util = util;
 	}
 
