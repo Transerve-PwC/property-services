@@ -175,8 +175,8 @@ public class PropertyValidator {
 
 			String filter = "$.*.code";
 			Map<String, List<String>> colonies = (Map<String, List<String>>) mdmsService.getMDMSResponse(requestInfo,
-					tenantId.split("\\.")[0], PTConstants.MDMS_PT_EGF_PROPERTY_SERVICE, "colonies", filter,
-					PTConstants.JSONPATH_COLONY);
+					tenantId.split("\\.")[0], PTConstants.MDMS_PT_MOD_NAME, "colonies", filter,
+					PTConstants.JSONPATH_CODES);
 
 			if (!colonies.get(PTConstants.MDMS_PT_COLONY).contains(property.getColony())
 					|| (property.getColony().length() < 5 || property.getColony().length() > 45)) {
@@ -275,10 +275,13 @@ public class PropertyValidator {
 						errorMap);
 				compareIds(propertySearch.getTransitNumber(),
 						property.getPropertyDetails().getAddress().getTransitNumber(), errorMap);
-				List<String> oIdList=propertySearch.getOwners().stream().map(Owner::getId).collect(Collectors.toList());
+				List<String> oIdList = propertySearch.getOwners().stream().map(Owner::getId)
+						.collect(Collectors.toList());
 				property.getOwners().forEach(owner -> {
-					if(!oIdList.contains(owner.getId())){
-						errorMap.put("INVALID ID",String.format("Existing user with id '%s' is missing during update. All the owners should be present during the update API", owner.getId()));
+					if (!oIdList.contains(owner.getId())) {
+						errorMap.put("INVALID ID", String.format(
+								"Existing user with id '%s' is missing during update. All the owners should be present during the update API",
+								owner.getId()));
 					}
 				});
 
@@ -938,8 +941,7 @@ public class PropertyValidator {
 		 * Get list of application documents from MDMS
 		 */
 		List<Map<String, Object>> data = (List<Map<String, Object>>) mdmsService.getMDMSResponse(requestInfo, tenantId,
-				PTConstants.MDMS_PT_EGF_PROPERTY_SERVICE, "applications", filter,
-				"$.MdmsRes.PropertyServices.applications");
+				PTConstants.MDMS_PT_MOD_NAME, "applications", filter, PTConstants.JSONPATH_CODES + ".applications");
 		List<Map<String, Object>> mdmsDocuments = (List<Map<String, Object>>) (data.get(0));
 
 		/**

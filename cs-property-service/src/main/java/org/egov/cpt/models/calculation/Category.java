@@ -21,7 +21,11 @@ public enum Category {
 
 	DUE("DUE"),
 
-	CHARGES("CHARGES");
+	CHARGES("CHARGES"),
+	
+	INTEREST("INTEREST"),
+	
+	PRINCIPAL("PRINCIPAL");
 
 	private String value;
 

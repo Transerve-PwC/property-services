@@ -31,6 +31,8 @@ import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.PropertyImages;
+import org.egov.cpt.models.RentDetail;
+import org.egov.cpt.models.RentSummary;
 import org.egov.cpt.models.UserDetailResponse;
 import org.egov.cpt.models.Idgen.IdResponse;
 import org.egov.cpt.models.calculation.Calculation;
@@ -426,7 +428,6 @@ public class EnrichmentService {
 				application.getProperty()
 						.setId(duplicateCopyRequest.getDuplicateCopyApplications().get(0).getProperty().getId());
 				application.setAuditDetails(propertyAuditDetails);
-				System.out.println(propertyAuditDetails.toString() + " audit details here");
 
 				if (!CollectionUtils.isEmpty(application.getApplicant())) {
 					application.getApplicant().forEach(applicant -> {
@@ -871,6 +872,64 @@ public class EnrichmentService {
 			document.setAuditDetails(documentAuditDetails);
 			document.setTenantId(tenantId);
 		});
+	}
+
+	public void enrichRentDemand(RentDetail rentDetail, RentSummary rentSummary, Property property) {
+		if (rentSummary == null)
+			return;
+		List<TaxHeadEstimate> estimates = new LinkedList<>();
+		double amount = rentDetail.getAmount();
+		double balPrincipal = rentSummary.getBalancePrincipal();
+		double balInterest = rentSummary.getBalanceInterest();
+		double balAmmount = rentSummary.getBalanceAmount();
+		double remainingAmmount;
+
+		if (amount >= balInterest) {
+			TaxHeadEstimate estimate1 = new TaxHeadEstimate();
+			estimate1.setEstimateAmount(new BigDecimal(balInterest));
+			estimate1.setCategory(Category.INTEREST);
+			estimate1.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_RENT, Category.INTEREST));
+			estimates.add(estimate1);
+			remainingAmmount = amount - balInterest;
+			if (remainingAmmount >= balPrincipal) {
+				TaxHeadEstimate estimate2 = new TaxHeadEstimate();
+				estimate2.setEstimateAmount(new BigDecimal(balPrincipal));
+				estimate2.setCategory(Category.PRINCIPAL);
+				estimate2.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_RENT, Category.PRINCIPAL));
+				estimates.add(estimate2);
+			} else {
+				TaxHeadEstimate estimate2 = new TaxHeadEstimate();
+				estimate2.setEstimateAmount(new BigDecimal(remainingAmmount));
+				estimate2.setCategory(Category.PRINCIPAL);
+				estimate2.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_RENT, Category.PRINCIPAL));
+				estimates.add(estimate2);
+			}
+			remainingAmmount = amount - balInterest - balPrincipal;
+			if (remainingAmmount > 0) {
+				TaxHeadEstimate estimate3 = new TaxHeadEstimate();
+				estimate3.setEstimateAmount(new BigDecimal(remainingAmmount));
+				estimate3.setCategory(Category.ADVANCE_COLLECTION);
+				estimate3.setTaxHeadCode(
+						getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_RENT, Category.ADVANCE_COLLECTION));
+				estimates.add(estimate3);
+			}
+		} else {
+			TaxHeadEstimate estimate2 = new TaxHeadEstimate();
+			estimate2.setEstimateAmount(new BigDecimal(amount));
+			estimate2.setCategory(Category.ADVANCE_COLLECTION);
+			estimate2.setTaxHeadCode(
+					getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_RENT, Category.ADVANCE_COLLECTION));
+			estimates.add(estimate2);
+		}
+
+		// estimates.add(estimate);
+		Calculation calculation = Calculation.builder()
+				.applicationNumber(propertyutil.getPropertyRentConsumerCode(rentDetail.getTransitNumber()))
+				.taxHeadEstimates(estimates).tenantId(rentDetail.getTenantId()).build();
+		log.info("calculation:" + calculation);
+		rentDetail.setCalculation(calculation);
+		property.setCalculation(calculation);
+
 	}
 
 }

@@ -13,13 +13,16 @@ import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RentAccount;
 import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
+import org.egov.cpt.models.RentSummary;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.models.calculation.State;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
+import org.egov.cpt.service.calculation.DemandService;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.validator.PropertyValidator;
 import org.egov.cpt.web.contracts.AccountStatementResponse;
+import org.egov.cpt.web.contracts.PropertyRentRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
 import org.egov.cpt.workflow.WorkflowService;
@@ -62,6 +65,9 @@ public class PropertyService {
 
 	@Autowired
 	private IRentCollectionService rentCollectionService;
+
+	@Autowired
+	private DemandService demandService;
 
 	public List<Property> createProperty(PropertyRequest request) {
 
@@ -132,18 +138,20 @@ public class PropertyService {
 
 		Property property = properties.get(0);
 		List<RentDemand> demands = repository
-				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build())
-				.stream()
-				.filter(rentDemand -> accountStatementCriteria.getToDate() >= rentDemand.getAuditDetails().getCreatedTime())
-				.map(rentDemand-> {	return rentDemand; })
-				.collect(Collectors.toList());
-		
+				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build()).stream()
+				.filter(rentDemand -> accountStatementCriteria.getToDate() >= rentDemand.getAuditDetails()
+						.getCreatedTime())
+				.map(rentDemand -> {
+					return rentDemand;
+				}).collect(Collectors.toList());
+
 		List<RentPayment> payments = repository
-				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build())
-				.stream()
-				.filter(rentPayment  -> accountStatementCriteria.getToDate() >= rentPayment .getAuditDetails().getCreatedTime())
-				.map(rentPayment -> {	return rentPayment ; })
-				.collect(Collectors.toList());
+				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build()).stream()
+				.filter(rentPayment -> accountStatementCriteria.getToDate() >= rentPayment.getAuditDetails()
+						.getCreatedTime())
+				.map(rentPayment -> {
+					return rentPayment;
+				}).collect(Collectors.toList());
 
 		return AccountStatementResponse.builder()
 				.rentAccountStatements(rentCollectionService.getAccountStatement(demands, payments,
@@ -194,6 +202,23 @@ public class PropertyService {
 			});
 		}
 
+		return properties;
+	}
+
+	public List<Property> generateFinanceDemand(PropertyRentRequest rentRequest) {
+		List<Property> properties = repository.getProperties(PropertyCriteria.builder()
+				.transitNumber(rentRequest.getRentDetails().get(0).getTransitNumber()).build());
+		List<RentDemand> demands = repository
+				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
+		RentAccount account = repository.getPropertyRentAccountDetails(
+				PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
+		if (!CollectionUtils.isEmpty(demands) && null != account) {
+			rentRequest.getRentDetails().forEach(rentDetail -> {
+				enrichmentService.enrichRentDemand(rentDetail, rentCollectionService.calculateRentSummary(demands,
+						account, properties.get(0).getPropertyDetails().getInterestRate()), properties.get(0));
+			});
+		}
+		demandService.generateRentDemand(rentRequest.getRequestInfo(), rentRequest.getRentDetails());
 		return properties;
 	}
 }
