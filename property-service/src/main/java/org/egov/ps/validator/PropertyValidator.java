@@ -97,7 +97,7 @@ public class PropertyValidator {
 		});*/
 	}
 	
-	private void validateDocumentsOnType(RequestInfo requestInfo, String tenantId, Owner owner, Map<String, String> errorMap, String code) {
+	public void validateDocumentsOnType(RequestInfo requestInfo, String tenantId, Owner owner, Map<String, String> errorMap, String code) {
 		
 		List<Map<String, Object>> fieldConfigurations = mdmsservice.getDocumentConfig("documents", requestInfo, tenantId);
 		ObjectMapper mapper = new ObjectMapper();

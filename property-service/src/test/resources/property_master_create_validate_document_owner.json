@@ -1,6 +1,6 @@
     {
     	"serialNumber": "pm1",
-    	"share": true,
+    	"share": 0.0,
     	"cpNumber": "cp1",
     	"state": "",
     	"action": "DRAFT",
