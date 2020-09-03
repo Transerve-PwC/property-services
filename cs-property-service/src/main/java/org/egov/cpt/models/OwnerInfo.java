@@ -1,17 +1,26 @@
 package org.egov.cpt.models;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import lombok.*;
 import org.egov.common.contract.request.Role;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * OwnerInfo
@@ -24,7 +33,7 @@ import javax.validation.constraints.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class OwnerInfo extends User  {
+public class OwnerInfo extends User {
 
         @JsonProperty("isPrimaryOwner")
         private Boolean isPrimaryOwner;
@@ -32,11 +41,11 @@ public class OwnerInfo extends User  {
         @JsonProperty("ownerShipPercentage")
         private Double ownerShipPercentage;
 
-        @Size(max=64)
+        @Size(max = 64)
         @JsonProperty("ownerType")
         private String ownerType;
 
-        @Size(max=64)
+        @Size(max = 64)
         @JsonProperty("institutionId")
         private String institutionId;
 
@@ -80,46 +89,45 @@ public class OwnerInfo extends User  {
 
         @Builder
         public OwnerInfo(Long id, String uuid, String userName, String password, String salutation, String name,
-                         String gender, String mobileNumber, String emailId, String altContactNumber,
-                         String pan, String aadhaarNumber, String permanentAddress, String permanentCity,
-                         String permanentPincode, String correspondenceCity, String correspondencePincode,
-                         String correspondenceAddress, Boolean active, Long dob, Long pwdExpiryDate,
-                         String locale, String type, String signature, Boolean accountLocked,
-                         List<Role> roles, String fatherOrHusbandName, String bloodGroup,
-                         String identificationMark, String photo, String createdBy, Long createdDate,
-                         String lastModifiedBy, Long lastModifiedDate, String otpReference, String tenantId,
-                         Boolean isPrimaryOwner, Double ownerShipPercentage, String ownerType,
-                         String institutionId,List<Document> documents,RelationshipEnum relationship,
-                         Boolean userActive) {
+                        String gender, String mobileNumber, String emailId, String altContactNumber, String pan,
+                        String aadhaarNumber, String permanentAddress, String permanentCity, String permanentPincode,
+                        String correspondenceCity, String correspondencePincode, String correspondenceAddress,
+                        Boolean active, Long dob, Long pwdExpiryDate, String locale, String type, String signature,
+                        Boolean accountLocked, List<Role> roles, String fatherOrHusbandName, String bloodGroup,
+                        String identificationMark, String photo, String createdBy, Long createdDate,
+                        String lastModifiedBy, Long lastModifiedDate, String otpReference, String tenantId,
+                        Boolean isPrimaryOwner, Double ownerShipPercentage, String ownerType, String institutionId,
+                        List<Document> documents, RelationshipEnum relationship, Boolean userActive) {
                 super();
                 this.isPrimaryOwner = isPrimaryOwner;
                 this.ownerShipPercentage = ownerShipPercentage;
                 this.ownerType = ownerType;
                 this.userActive = userActive;
-                this.relationship=relationship;
-                this.institutionId=institutionId;
-                this.documents=documents;
+                this.relationship = relationship;
+                this.institutionId = institutionId;
+                this.documents = documents;
         }
 
         public OwnerInfo addDocumentsItem(Document documentsItem) {
                 if (this.documents == null) {
                         this.documents = new ArrayList<>();
                 }
-                if(!this.documents.contains(documentsItem))
+                if (!this.documents.contains(documentsItem))
                         this.documents.add(documentsItem);
                 return this;
         }
 
         /**
          * Populates Owner fields from the given User object
+         * 
          * @param user User object obtained from user service
          */
-        public void addUserDetail(User user){
+        public void addUserDetail(User user) {
                 this.setId(user.getId());
-//                this.setLastModifiedDate(user.getLastModifiedDate());
+                // this.setLastModifiedDate(user.getLastModifiedDate());
                 this.setLastModifiedBy(user.getLastModifiedBy());
                 this.setCreatedBy(user.getCreatedBy());
-//                this.setCreatedDate(user.getCreatedDate());
+                // this.setCreatedDate(user.getCreatedDate());
                 this.setUserName(user.getUserName());
                 this.setPassword(user.getPassword());
                 this.setSalutation(user.getSalutation());
@@ -137,8 +145,8 @@ public class OwnerInfo extends User  {
                 this.setCorrespondenceCity(user.getCorrespondenceCity());
                 this.setCorrespondencePincode(user.getCorrespondencePincode());
                 this.setActive(user.getActive());
-//                this.setDob(user.getDob());
-//                this.setPwdExpiryDate(user.getPwdExpiryDate());
+                // this.setDob(user.getDob());
+                // this.setPwdExpiryDate(user.getPwdExpiryDate());
                 this.setLocale(user.getLocale());
                 this.setType(user.getType());
                 this.setAccountLocked(user.getAccountLocked());
@@ -150,7 +158,7 @@ public class OwnerInfo extends User  {
                 this.setTenantId(user.getTenantId());
         }
 
-        public OwnerInfo(org.egov.common.contract.request.User user){
+        public OwnerInfo(org.egov.common.contract.request.User user) {
                 this.setTenantId(user.getTenantId());
                 this.setUserName(user.getUserName());
                 this.setId(user.getId());
@@ -162,7 +170,7 @@ public class OwnerInfo extends User  {
                 this.setUuid(user.getUuid());
         }
 
-        public void addCitizenDetail(User user){
+        public void addCitizenDetail(User user) {
                 this.setTenantId(user.getTenantId());
                 this.setUserName(user.getUserName());
                 this.setId(user.getId());
@@ -174,7 +182,7 @@ public class OwnerInfo extends User  {
                 this.setUuid(user.getUuid());
         }
 
-        private List<Role> addRoles(List<org.egov.common.contract.request.Role> Roles){
+        private List<Role> addRoles(List<org.egov.common.contract.request.Role> Roles) {
                 LinkedList<Role> addroles = new LinkedList<>();
                 Roles.forEach(role -> {
                         Role addrole = new Role();
@@ -188,9 +196,10 @@ public class OwnerInfo extends User  {
 
         /**
          * Populates Owner fields from the given User object
+         * 
          * @param user User object obtained from user service
          */
-        public void addUserWithoutAuditDetail(OwnerInfo user){
+        public void addUserWithoutAuditDetail(OwnerInfo user) {
                 this.setUuid(user.getUuid());
                 this.setId(user.getId());
                 this.setUserName(user.getUserName());
@@ -210,8 +219,8 @@ public class OwnerInfo extends User  {
                 this.setCorrespondenceCity(user.getCorrespondenceCity());
                 this.setCorrespondencePincode(user.getCorrespondencePincode());
                 this.setActive(user.getActive());
-//                this.setDob(user.getDob());
-//                this.setPwdExpiryDate(user.getPwdExpiryDate());
+                // this.setDob(user.getDob());
+                // this.setPwdExpiryDate(user.getPwdExpiryDate());
                 this.setLocale(user.getLocale());
                 this.setType(user.getType());
                 this.setAccountLocked(user.getAccountLocked());
@@ -223,18 +232,19 @@ public class OwnerInfo extends User  {
                 this.setTenantId(user.getTenantId());
         }
 
-
         @Override
         public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                if (!super.equals(o)) return false;
+                if (this == o)
+                        return true;
+                if (o == null || getClass() != o.getClass())
+                        return false;
+                if (!super.equals(o))
+                        return false;
 
                 User user = (User) o;
 
-                return Objects.equals(this.getUuid(), user.getUuid()) &&
-                        Objects.equals(this.getName(), user.getName()) &&
-                        Objects.equals(this.getMobileNumber(), user.getMobileNumber());
+                return Objects.equals(this.getUuid(), user.getUuid()) && Objects.equals(this.getName(), user.getName())
+                                && Objects.equals(this.getMobileNumber(), user.getMobileNumber());
         }
 
         @Override
@@ -243,4 +253,3 @@ public class OwnerInfo extends User  {
                 return super.hashCode();
         }
 }
-

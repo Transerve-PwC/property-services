@@ -19,6 +19,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.Address;
 import org.egov.cpt.models.AuditDetails;
+import org.egov.cpt.models.Document;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.DuplicateCopySearchCriteria;
 import org.egov.cpt.models.Mortgage;
@@ -26,14 +27,11 @@ import org.egov.cpt.models.NoticeGeneration;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.OwnerDetails.ApplicationTypeEnum;
-import org.egov.cpt.models.Document;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.PropertyDetails;
 import org.egov.cpt.models.PropertyImages;
-import org.egov.cpt.models.RentDetail;
 import org.egov.cpt.models.RentSummary;
-import org.egov.cpt.models.UserDetailResponse;
 import org.egov.cpt.models.Idgen.IdResponse;
 import org.egov.cpt.models.calculation.Calculation;
 import org.egov.cpt.models.calculation.Category;
@@ -232,22 +230,22 @@ public class EnrichmentService {
 	 * @param properties         List of property whose owner's are to be populated
 	 *                           from userDetailResponse
 	 */
-	/*public void enrichOwner(UserDetailResponse userDetailResponse, List<Property> properties) {
-
-		List<Owner> users = userDetailResponse.getUser();
-		Map<String, Owner> userIdToOwnerMap = new HashMap<>();
-		users.forEach(user -> userIdToOwnerMap.put(user.getId(), user));
-
-		properties.forEach(property -> {
-
-			property.getOwners().forEach(owner -> {
-
-				if (userIdToOwnerMap.get(owner.getId()) == null)
-					throw new CustomException("OWNER SEARCH ERROR",
-							"The owner of the propertyDetail " + property.getId() + " is not coming in user search");
-			});
-		});
-	}*/
+	/*
+	 * public void enrichOwner(UserDetailResponse userDetailResponse, List<Property>
+	 * properties) {
+	 * 
+	 * List<Owner> users = userDetailResponse.getUser(); Map<String, Owner>
+	 * userIdToOwnerMap = new HashMap<>(); users.forEach(user ->
+	 * userIdToOwnerMap.put(user.getId(), user));
+	 * 
+	 * properties.forEach(property -> {
+	 * 
+	 * property.getOwners().forEach(owner -> {
+	 * 
+	 * if (userIdToOwnerMap.get(owner.getId()) == null) throw new
+	 * CustomException("OWNER SEARCH ERROR", "The owner of the propertyDetail " +
+	 * property.getId() + " is not coming in user search"); }); }); }
+	 */
 
 	/*
 	 * Ownership Transfer
@@ -874,15 +872,13 @@ public class EnrichmentService {
 		});
 	}
 
-	public void enrichRentDemand(RentDetail rentDetail, RentSummary rentSummary, Property property) {
+	public void enrichRentDemand(Property property, RentSummary rentSummary) {
 		if (rentSummary == null)
 			return;
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		double amount = rentDetail.getAmount();
+		double amount = property.getPaymentAmount();
 		double balPrincipal = rentSummary.getBalancePrincipal();
 		double balInterest = rentSummary.getBalanceInterest();
-		double balAmmount = rentSummary.getBalanceAmount();
-		double remainingAmmount;
 
 		if (amount >= balInterest) {
 			TaxHeadEstimate estimate1 = new TaxHeadEstimate();
@@ -890,7 +886,7 @@ public class EnrichmentService {
 			estimate1.setCategory(Category.INTEREST);
 			estimate1.setTaxHeadCode(getTaxHeadCode(PTConstants.BILLING_BUSINESS_SERVICE_RENT, Category.INTEREST));
 			estimates.add(estimate1);
-			remainingAmmount = amount - balInterest;
+			double remainingAmmount = amount - balInterest;
 			if (remainingAmmount >= balPrincipal) {
 				TaxHeadEstimate estimate2 = new TaxHeadEstimate();
 				estimate2.setEstimateAmount(new BigDecimal(balPrincipal));
@@ -924,10 +920,9 @@ public class EnrichmentService {
 
 		// estimates.add(estimate);
 		Calculation calculation = Calculation.builder()
-				.applicationNumber(propertyutil.getPropertyRentConsumerCode(rentDetail.getTransitNumber()))
-				.taxHeadEstimates(estimates).tenantId(rentDetail.getTenantId()).build();
+				.applicationNumber(propertyutil.getPropertyRentConsumerCode(property.getTransitNumber()))
+				.taxHeadEstimates(estimates).tenantId(property.getTenantId()).build();
 		log.info("calculation:" + calculation);
-		rentDetail.setCalculation(calculation);
 		property.setCalculation(calculation);
 
 	}

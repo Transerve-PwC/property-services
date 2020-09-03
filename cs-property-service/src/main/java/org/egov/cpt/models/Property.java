@@ -113,7 +113,7 @@ public class Property {
 	@Valid
 	@JsonProperty
 	private RentSummary rentSummary;
-	
+
 	@Valid
 	@JsonProperty
 	private Calculation calculation;
@@ -227,5 +227,16 @@ public class Property {
 
 	@JsonProperty("area")
 	private String area;
+
+	/**
+	 * Amount to be paid
+	 */
+	private Double paymentAmount;
+
+	/**
+	 * Pending consumer code. This needs to be saved in the database for online
+	 * payments.
+	 */
+	private String rentPaymentConsumerCode;
 
 }

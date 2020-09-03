@@ -1,6 +1,7 @@
 package org.egov.cpt.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,6 +10,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.AccountStatementCriteria;
 import org.egov.cpt.models.BillV2;
+import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RentAccount;
@@ -25,10 +27,10 @@ import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
 import org.egov.cpt.validator.PropertyValidator;
 import org.egov.cpt.web.contracts.AccountStatementResponse;
-import org.egov.cpt.web.contracts.PropertyRentRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.cpt.workflow.WorkflowIntegrator;
 import org.egov.cpt.workflow.WorkflowService;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -71,10 +73,10 @@ public class PropertyService {
 
 	@Autowired
 	private DemandService demandService;
-	
+
 	@Autowired
 	private PropertyUtil utils;
-	
+
 	@Autowired
 	private DemandRepository demandRepository;
 
@@ -83,7 +85,7 @@ public class PropertyService {
 		propertyValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
 		processRentHistory(request);
-//		userService.createUser(request);
+		// userService.createUser(request);
 
 		producer.push(config.getSavePropertyTopic(), request);
 
@@ -109,7 +111,7 @@ public class PropertyService {
 		List<Property> propertyFromSearch = propertyValidator.validateUpdateRequest(request);
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		processRentHistory(request);
-//		userService.createUser(request);
+		// userService.createUser(request);
 		String action = request.getProperties().get(0).getMasterDataAction();
 		String state = request.getProperties().get(0).getMasterDataState();
 		if ((config.getIsWorkflowEnabled() && !action.equalsIgnoreCase(""))
@@ -214,24 +216,83 @@ public class PropertyService {
 		return properties;
 	}
 
-	public List<Property> generateFinanceDemand(PropertyRentRequest rentRequest) {
-		userService.createUser(rentRequest);
-		List<Property> properties = repository.getProperties(PropertyCriteria.builder()
-				.transitNumber(rentRequest.getRentDetails().get(0).getTransitNumber()).build());
-		List<RentDemand> demands = repository
-				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
-		RentAccount account = repository.getPropertyRentAccountDetails(
-				PropertyCriteria.builder().propertyId(properties.get(0).getId()).build());
-		if (!CollectionUtils.isEmpty(demands) && null != account) {
-			rentRequest.getRentDetails().forEach(rentDetail -> {
-				enrichmentService.enrichRentDemand(rentDetail, rentCollectionService.calculateRentSummary(demands,
-						account, properties.get(0).getPropertyDetails().getInterestRate()), properties.get(0));
-			});
+	public List<Property> generateFinanceDemand(PropertyRequest propertyRequest) {
+		/**
+		 * Validate not empty
+		 */
+		if (CollectionUtils.isEmpty(propertyRequest.getProperties())) {
+			return Collections.emptyList();
 		}
-		
-		demandService.generateRentDemand(rentRequest.getRequestInfo(), rentRequest.getRentDetails());
-		List<BillV2> billes= demandRepository.fetchBill(rentRequest);
-		demandService.callCollection(rentRequest,billes);
-		return properties;
+		Property propertyFromRequest = propertyRequest.getProperties().get(0);
+		/**
+		 * Validate that this is a valid property id.
+		 */
+		if (propertyFromRequest.getId() == null) {
+			throw new CustomException(
+					Collections.singletonMap("NO_PROPERTY_ID_FOUND", "No Property found to process rent"));
+		}
+		if (propertyFromRequest.getPaymentAmount() == null) {
+			throw new CustomException(
+					Collections.singletonMap("NO_PAYMENT_AMOUNT_FOUND", "No Property tenantId found to process rent"));
+		}
+		PropertyCriteria propertyCriteria = PropertyCriteria.builder().relations(Arrays.asList("owner"))
+				.propertyId(propertyFromRequest.getId()).build();
+
+		/**
+		 * Retrieve properties from db with the given ids.
+		 */
+		List<Property> propertiesFromDB = repository.getProperties(propertyCriteria);
+		if (CollectionUtils.isEmpty(propertiesFromDB)) {
+			throw new CustomException(Collections.singletonMap("PROPERTIES_NOT_FOUND",
+					"Could not find any properties with id " + propertyFromRequest.getId()));
+		}
+
+		Property property = propertiesFromDB.get(0);
+		property.setPaymentAmount(propertyFromRequest.getPaymentAmount());
+		Owner owner = utils.getCurrentOwnerFromProperty(property);
+
+		/**
+		 * Create egov user if not already present.
+		 */
+		userService.createUser(propertyRequest.getRequestInfo(), owner.getOwnerDetails().getPhone(),
+				property.getTenantId());
+
+		/**
+		 * Generate Calculations for the property.
+		 */
+		List<RentDemand> demands = repository.getPropertyRentDemandDetails(propertyCriteria);
+		RentAccount account = repository.getPropertyRentAccountDetails(propertyCriteria);
+		if (!CollectionUtils.isEmpty(demands) && null != account) {
+			RentSummary rentSummary = rentCollectionService.calculateRentSummary(demands, account,
+					property.getPropertyDetails().getInterestRate());
+			enrichmentService.enrichRentDemand(property, rentSummary);
+		}
+
+		/**
+		 * Generate an actual finance demand
+		 */
+		demandService.generateRentDemand(propertyRequest.getRequestInfo(), property);
+
+		/**
+		 * Get the bill generated.
+		 */
+		List<BillV2> bills = demandRepository.fetchBill(propertyRequest.getRequestInfo(),
+				property.getRentPaymentConsumerCode(), property.getTenantId());
+		if (CollectionUtils.isEmpty(bills)) {
+			throw new CustomException("BILL_NOT_GENERATED",
+					"No bills were found for the consumer code " + property.getRentPaymentConsumerCode());
+		}
+
+		if (propertyRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(PTConstants.ROLE_EMPLOYEE)) {
+			/**
+			 * if offline, create a payment.
+			 */
+		} else {
+			/**
+			 * We return the property along with the consumerCode that we set earlier.
+			 */
+		}
+		return Collections.singletonList(property);
 	}
+
 }
