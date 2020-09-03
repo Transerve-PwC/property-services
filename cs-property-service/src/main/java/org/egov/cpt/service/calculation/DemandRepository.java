@@ -81,7 +81,7 @@ public class DemandRepository {
 		String consumerCode = utils.getPropertyRentConsumerCode(rentRequest.getRentDetails(). get(0).getTransitNumber());
 		StringBuilder url = new StringBuilder(config.getBillingHost());
 		String uri= config.getBillGenearateEndpoint().replace("$tenantId", rentRequest.getRentDetails().get(0).getTenantId())
-		.replace("$consumerCode", rentRequest.getRentDetails().get(0).getTenantId())
+		.replace("$consumerCode", consumerCode)
 		.replace("$businessService", PTConstants.BILLING_BUSINESS_SERVICE_RENT);
 		url.append(uri);
 		Object result = serviceRequestRepository.fetchResult(url,rentRequest.getRequestInfo());
