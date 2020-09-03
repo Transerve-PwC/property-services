@@ -9,8 +9,8 @@ import java.util.UUID;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.config.Configuration;
 import org.egov.ps.model.Document;
+import org.egov.ps.model.EstateDocumentList;
 import org.egov.ps.model.MortgageDetails;
-import org.egov.ps.model.MortgageDocuments;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.Property;
 import org.egov.ps.repository.IdGenRepository;
@@ -70,12 +70,12 @@ public class PostMortgageEnrichmentService {
 
 			//To Do :: write code to validate documents base on master json template.
 			ObjectMapper mapper = new ObjectMapper();
-			List<MortgageDocuments> mortgageTypeList = mapper.convertValue(fieldConfigurations, new TypeReference<List<MortgageDocuments>>() { });
+			List<EstateDocumentList> mortgageTypeList = mapper.convertValue(fieldConfigurations, new TypeReference<List<EstateDocumentList>>() { });
 			Map<String, String> errorMap = new HashMap<>();
 
 			if(mortgage.getMortgageDocuments() != null && !mortgage.getMortgageDocuments().isEmpty()) {
 				mortgage.getMortgageDocuments().stream().forEach(document -> {
-					if(!mortgageTypeList.contains(MortgageDocuments.builder().code(document.getDocumentType()).build())) {
+					if(!mortgageTypeList.contains(EstateDocumentList.builder().code(document.getDocumentType()).build())) {
 						errorMap.put("INVALID DOCUMENT",
 								"Document is not valid for user : " + owner.getOwnerDetails().getOwnerName());
 					}

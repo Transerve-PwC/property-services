@@ -120,7 +120,7 @@ public class PostMortgageEnrichmentServiceTest {
 				Map<String, Object> tempMap = new HashMap<String, Object>(0);
 				tempMap.put("code", estateDocumentListObj.getCode());
 				tempMap.put("required", estateDocumentListObj.getRequired());
-				tempMap.put("accept", estateDocumentListObj.getAccept());
+				tempMap.put("acMortgageDocumentscept", estateDocumentListObj.getAccept());
 				tempMap.put("fileType", estateDocumentListObj.getFileType());
 				tempMap.put("description", estateDocumentListObj.getDescription());
 				fieldConfigurations.add(tempMap);
