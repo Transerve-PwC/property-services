@@ -79,7 +79,7 @@ public class PostMortgageEnrichmentServiceTest {
 				fieldConfigurations.add(tempMap);
 			}
 			
-			//Step 3 - Mock mdmservice.
+			//Step 3 - Mock mdmservice. 
 			Mockito.when(mdmsservice.getMortgageDocumentConfig("mortgage", requestInfo, "ch")).thenReturn(fieldConfigurations);
 			
 			ApplicationRequest request = ApplicationRequest.builder().requestInfo(requestInfo).applications(applications).build();

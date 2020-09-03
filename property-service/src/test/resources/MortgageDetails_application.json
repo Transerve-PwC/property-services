@@ -34,7 +34,7 @@
                   "tenantId":"ch",
                   "propertyDetailsId":"a455241a-c991-47bc-9365-14bed0417ceb",
                   "serialNumber":"pm1",
-                  "share":true,
+                  "share":0.0,
                   "cpNumber":"cp1",
                   "state":"",
                   "action":"DRAFT",
@@ -43,12 +43,12 @@
                      "bankName":"Bank Name",
                      "reasonForMortgage":"reasonForMortgage",
                      "loanAmount":"2000000",
-                     "ownerDocuments":[
+                     "mortgageDocuments":[
                         {
                            "id":"6708b18a-837a-4d8e-aa22-1e798d463b3d",
                            "tenantId":"ch",
                            "referenceId":"referenceId",
-                           "documentType":"CERTIFIED_COPY_LEASE",
+                           "documentType":"SELF_ATTESTED_PHOTO_IDENTITY_PROOF",
                            "fileStoreId":"fileStoreId",
                            "isActive":true,
                            "propertyId":"propertyId"
