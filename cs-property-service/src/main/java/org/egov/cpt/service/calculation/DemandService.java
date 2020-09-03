@@ -18,6 +18,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.BillV2;
+import org.egov.cpt.models.CollectionPayment;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
 import org.egov.cpt.models.Property;
@@ -497,8 +498,17 @@ public class DemandService {
 				.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid()).build();
 	}
 
-	public Object callCollection(PropertyRentRequest rentRequest, List<BillV2> billes) {
-		return demandRepository.saveCollection(rentRequest, billes);
+	public Object callCollection(RequestInfo requestInfo,Property property, List<BillV2> billes) {
+		/*
+		CollectionPayment payment = getPaymentFromTransaction(property);
+		payment.setInstrumentDate(request.getTransaction().getAuditDetails().getCreatedTime());
+		payment.setInstrumentNumber(request.getTransaction().getTxnId());
+		payment.setTransactionNumber(request.getTransaction().getTxnId());
+		
+		CollectionPaymentRequest paymentRequest = CollectionPaymentRequest.builder()
+				.requestInfo(request.getRequestInfo()).payment(payment).build();*/
+		
+		return demandRepository.saveCollection(requestInfo,property, billes);
 		
 	}
 

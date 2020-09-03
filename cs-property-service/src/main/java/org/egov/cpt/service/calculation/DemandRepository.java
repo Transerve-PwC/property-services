@@ -8,6 +8,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.BillResponseV2;
 import org.egov.cpt.models.BillV2;
+import org.egov.cpt.models.Property;
 import org.egov.cpt.models.calculation.Demand;
 import org.egov.cpt.models.calculation.DemandRequest;
 import org.egov.cpt.models.calculation.DemandResponse;
@@ -89,9 +90,18 @@ public class DemandRepository {
 		return response.getBill();
 	}
 
-	public Object saveCollection(PropertyRentRequest rentRequest, List<BillV2> billes) {
-		StringBuilder url = new StringBuilder(config.getCollectionPaymentEndPoint());
-		url.append(config.getDemandUpdateEndpoint());
+	public Object saveCollection(RequestInfo requestInfo,Property property, List<BillV2> billes) {
+		StringBuilder url = new StringBuilder(config.getCollectionPaymentHost());
+		url.append(config.getCollectionPaymentEndPoint());
+		/*DemandRequest request = new DemandRequest(requestInfo, demands);
+		Object result = serviceRequestRepository.fetchResult(url, request);
+		DemandResponse response = null;
+		try {
+			response = mapper.convertValue(result, DemandResponse.class);
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("PARSING ERROR", "Failed to parse response of update demand");
+		}
+		return response.getDemands();*/
 		return null;
 	}
 
