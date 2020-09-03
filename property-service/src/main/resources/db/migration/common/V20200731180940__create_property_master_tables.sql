@@ -134,7 +134,7 @@ CREATE TABLE cs_ep_documents_v1 (
 CREATE TABLE cs_ep_court_case_v1 (
    id           				CHARACTER VARYING (256) NOT NULL,
    tenantid       				CHARACTER VARYING (256),
-   property_details_id			CHARACTER VARYING (256) NOT NULL,
+   owner_details_id				CHARACTER VARYING (256) NOT NULL,
    estate_officer_court 		CHARACTER VARYING (256),
    commissioners_court  		CHARACTER VARYING (256),
    chief_administartors_court   CHARACTER VARYING (256),

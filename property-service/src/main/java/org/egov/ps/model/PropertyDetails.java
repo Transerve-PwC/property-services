@@ -48,7 +48,7 @@ public class PropertyDetails {
 	private String typeOfAllocation;
 
 	@JsonProperty("emdAmount")
-	private String emdAmount;
+	private BigDecimal emdAmount;
 
 	@JsonProperty("modeOfAuction")
 	private String modeOfAuction;

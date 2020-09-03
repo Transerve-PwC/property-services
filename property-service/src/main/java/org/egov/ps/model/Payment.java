@@ -39,6 +39,8 @@ public class Payment {
 	@JsonProperty("ownerDetailsId")
 	private String ownerDetailsId;
 
+//	main
+	
 	@JsonProperty("paymentType")
 	private String paymentType;
 
@@ -101,7 +103,9 @@ public class Payment {
 
 	@JsonProperty("chequeNumber")
 	private String chequeNumber;
-
+	
+//  other
+	
 	@JsonProperty("installmentOne")
 	private BigDecimal installmentOne;
 
@@ -109,28 +113,28 @@ public class Payment {
 	private BigDecimal installmentTwo;
 
 	@JsonProperty("installmentTwoDueDate")
-	private BigDecimal installmentTwoDueDate;
+	private Long installmentTwoDueDate;
 
 	@JsonProperty("installmentThree")
 	private BigDecimal installmentThree;
 
 	@JsonProperty("installmentThreeDueDate")
-	private BigDecimal installmentThreeDueDate;
+	private Long installmentThreeDueDate;
 
 	@JsonProperty("monthlyOrAnnually")
-	private BigDecimal monthlyOrAnnually;
+	private String monthlyOrAnnually;
 
 	@JsonProperty("groundRentStartDate")
-	private BigDecimal groundRentStartDate;
+	private Long groundRentStartDate;
 
 	@JsonProperty("rentRevision")
-	private BigDecimal rentRevision;
+	private int rentRevision;
 
 	@JsonProperty("leasePeriod")
-	private BigDecimal leasePeriod;
+	private int leasePeriod;
 
 	@JsonProperty("licenseFeeOfYear")
-	private BigDecimal licenseFeeOfYear;
+	private int licenseFeeOfYear;
 
 	@JsonProperty("licenseFee")
 	private BigDecimal licenseFee;
