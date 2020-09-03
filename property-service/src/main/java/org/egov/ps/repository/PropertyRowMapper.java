@@ -14,7 +14,6 @@ import org.egov.ps.model.OwnerDetails;
 import org.egov.ps.model.Payment;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
-import org.egov.ps.model.PurchaseDetails;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -52,9 +51,14 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 							.propertyId(rs.getString("pdproperty_id")).propertyType(rs.getString("pdproperty_type"))
 							.tenantId(tenantId).typeOfAllocation(rs.getString("type_of_allocation"))
 							.modeOfAuction(rs.getString("mode_of_auction")).schemeName(rs.getString("scheme_name"))
-							.areaSqft(rs.getString("area_sqft")).dateOfAuction(rs.getLong("date_of_auction"))
-							.ratePerSqft(rs.getString("rate_per_sqft")).lastNocDate(rs.getLong("last_noc_date"))
-							.serviceCategory(rs.getString("service_category")).auditDetails(pdAuditdetails).build();
+							.areaSqft(rs.getInt("area_sqft")).dateOfAuction(rs.getLong("date_of_auction"))
+							.ratePerSqft(rs.getBigDecimal("rate_per_sqft")).lastNocDate(rs.getLong("last_noc_date"))
+							.serviceCategory(rs.getString("service_category"))
+							.isPropertyActive(rs.getBoolean("is_property_active")).tradeType(rs.getString("trade_type"))
+							.companyName(rs.getString("company_name")).companyAddress(rs.getString("company_address"))
+							.companyRegistrationNumber(rs.getString("company_registration_number"))
+							.companyType(rs.getString("company_type")).emdAmount(rs.getBigDecimal("emd_amount"))
+							.auditDetails(pdAuditdetails).build();
 
 					currentProperty = Property.builder().id(propertyId).fileNumber(rs.getString("file_number"))
 							.tenantId(tenantId).category(rs.getString("category"))
@@ -92,7 +96,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.guardianName(rs.getString("guardian_name")).guardianRelation(rs.getString("guardian_relation"))
 						.mobileNumber(rs.getString("mobile_number")).allotmentNumber(rs.getString("allotment_number"))
 						.dateOfAllotment(rs.getLong("date_of_allotment")).possesionDate(rs.getLong("possesion_date"))
-						.isCurrentOwner(rs.getBoolean("is_current_owner"))
+						.isApproved(rs.getBoolean("is_approved")).isCurrentOwner(rs.getBoolean("is_current_owner"))
 						.isMasterEntry(rs.getBoolean("is_master_entry")).dueAmount(rs.getBigDecimal("due_amount"))
 						.address(rs.getString("address")).auditDetails(auditdetails).build();
 
@@ -161,38 +165,34 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 									.lastModifiedTime(rs.getLong("paymodified_time")).build();
 
 							Payment paymentItem = Payment.builder().id(payId).tenantId(payTenentId)
-									.ownerDetailsId(payOwnerDetailId)
-									.grDueDateOfPayment(rs.getLong("gr_due_date_of_payment"))
-									.grPayable(rs.getBigDecimal("gr_payable"))
-									.grAmountOfGr(rs.getBigDecimal("gr_amount_of_gr"))
-									.grTotalGr(rs.getBigDecimal("gr_total_gr"))
-									.grDateOfDeposit(rs.getLong("gr_date_of_deposit"))
-									.grDelayInPayment(rs.getBigDecimal("gr_delay_in_payment"))
-									.grInterestForDelay(rs.getBigDecimal("gr_interest_for_delay"))
-									.grTotalAmountDueWithInterest(rs.getBigDecimal("gr_total_amount_due_with_interest"))
-									.grAmountDepositedGr(rs.getBigDecimal("gr_amount_deposited_gr"))
-									.grAmountDepositedIntt(rs.getBigDecimal("gr_amount_deposited_intt"))
-									.grBalanceGr(rs.getBigDecimal("gr_balance_gr"))
-									.grBalanceIntt(rs.getBigDecimal("gr_balance_intt"))
-									.grTotalDue(rs.getBigDecimal("gr_total_due"))
-									.grReceiptNumber(rs.getString("gr_receipt_number"))
-									.grReceiptDate(rs.getLong("gr_receipt_date"))
+									.ownerDetailsId(payOwnerDetailId).paymentType(rs.getString("payment_type"))
+									.dueDateOfPayment(rs.getLong("due_date_of_payment"))
+									.payable(rs.getBigDecimal("payable")).amount(rs.getBigDecimal("amount"))
+									.total(rs.getBigDecimal("total")).dateOfDeposit(rs.getLong("date_of_deposit"))
+									.delayInPayment(rs.getBigDecimal("delay_in_payment"))
+									.interestForDelay(rs.getBigDecimal("interest_for_delay"))
+									.totalAmountDueWithInterest(rs.getBigDecimal("total_amount_due_with_interest"))
+									.amountDeposited(rs.getBigDecimal("amount_deposited"))
+									.amountDepositedIntt(rs.getBigDecimal("amount_deposited_intt"))
+									.balance(rs.getBigDecimal("balance")).balanceIntt(rs.getBigDecimal("balance_intt"))
+									.totalDue(rs.getBigDecimal("total_due"))
+									.receiptNumber(rs.getString("receipt_number"))
+									.receiptDate(rs.getLong("receipt_date"))
 									.stRateOfStGst(rs.getBigDecimal("st_rate_of_st_gst"))
 									.stAmountOfGst(rs.getBigDecimal("st_amount_of_gst"))
-									.stAmountDue(rs.getBigDecimal("st_amount_due"))
-									.stDateOfDeposit(rs.getLong("st_date_of_deposit"))
-									.stDelayInPayment(rs.getBigDecimal("st_delay_in_payment"))
-									.stInterestForDelay(rs.getBigDecimal("st_interest_for_delay"))
-									.stTotalAmountDueWithInterest(rs.getBigDecimal("st_total_amount_due_with_interest"))
-									.stAmountDepositedStGst(rs.getBigDecimal("st_amount_deposited_st_gst"))
-									.stAmountDepositedIntt(rs.getBigDecimal("st_amount_deposited_intt"))
-									.stBalanceStGst(rs.getBigDecimal("st_balance_st_gst"))
-									.stBalanceIntt(rs.getBigDecimal("st_balance_intt"))
-									.stTotalDue(rs.getBigDecimal("st_total_due"))
-									.stReceiptNumber(rs.getString("st_receipt_number"))
-									.stReceiptDate(rs.getLong("st_receipt_date"))
-									.stPaymentMadeBy(rs.getString("st_payment_made_by")).auditDetails(payAuditdetails)
-									.build();
+									.stPaymentMadeBy(rs.getString("st_payment_made_by"))
+									.bankName(rs.getString("bank_name")).chequeNumber(rs.getString("cheque_number"))
+									.installmentOne(rs.getBigDecimal("installment_one"))
+									.installmentTwo(rs.getBigDecimal("installment_two"))
+									.installmentThree(rs.getBigDecimal("installment_three"))
+									.installmentTwoDueDate(rs.getLong("installment_two_due_date"))
+									.installmentThreeDueDate(rs.getLong("installment_three_due_date"))
+									.monthlyOrAnnually(rs.getString("monthly_or_annually"))
+									.groundRentStartDate(rs.getLong("ground_rent_start_date"))
+									.rentRevision(rs.getInt("rent_revision")).leasePeriod(rs.getInt("lease_period"))
+									.licenseFee(rs.getBigDecimal("license_fee_of_year"))
+									.licenseFee(rs.getBigDecimal("license_fee")).auditDetails(payAuditdetails).build();
+
 							owner.getOwnerDetails().addPaymentItem(paymentItem);
 						}
 					} catch (SQLException e) {
@@ -204,28 +204,39 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 		if (hasColumn(rs, "ccid")) {
 			String courtCasePropertDetailId = rs.getString("ccproperty_details_id");
+			List<Owner> owners = property.getPropertyDetails().getOwners();
+			if (!CollectionUtils.isEmpty(owners)) {
+				owners.forEach(owner -> {
+					try {
 
-			if (courtCasePropertDetailId != null
-					&& courtCasePropertDetailId.equals(property.getPropertyDetails().getId())) {
+						if (courtCasePropertDetailId != null
+								&& courtCasePropertDetailId.equals(property.getPropertyDetails().getId())) {
 
-				AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("cccreated_by"))
-						.createdTime(rs.getLong("cccreated_time")).lastModifiedBy(rs.getString("ccmodified_by"))
-						.lastModifiedTime(rs.getLong("ccmodified_time")).build();
+							AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("cccreated_by"))
+									.createdTime(rs.getLong("cccreated_time"))
+									.lastModifiedBy(rs.getString("ccmodified_by"))
+									.lastModifiedTime(rs.getLong("ccmodified_time")).build();
 
-				CourtCase courtCase = CourtCase.builder().id(rs.getString("ccid"))
-						.propertyDetailsId(courtCasePropertDetailId).tenantId(rs.getString("cctenantid"))
-						.estateOfficerCourt(rs.getString("ccestate_officer_court"))
-						.commissionersCourt(rs.getString("cccommissioners_court"))
-						.chiefAdministartorsCourt(rs.getString("ccchief_administartors_court"))
-						.advisorToAdminCourt(rs.getString("ccadvisor_to_admin_court"))
-						.honorableDistrictCourt(rs.getString("cchonorable_district_court"))
-						.honorableHighCourt(rs.getString("cchonorable_high_court"))
-						.honorableSupremeCourt(rs.getString("cchonorable_supreme_court")).auditDetails(auditdetails)
-						.build();
+							CourtCase courtCase = CourtCase.builder().id(rs.getString("ccid"))
+									.ownerDetailsId(courtCasePropertDetailId).tenantId(rs.getString("cctenantid"))
+									.estateOfficerCourt(rs.getString("ccestate_officer_court"))
+									.commissionersCourt(rs.getString("cccommissioners_court"))
+									.chiefAdministartorsCourt(rs.getString("ccchief_administartors_court"))
+									.advisorToAdminCourt(rs.getString("ccadvisor_to_admin_court"))
+									.honorableDistrictCourt(rs.getString("cchonorable_district_court"))
+									.honorableHighCourt(rs.getString("cchonorable_high_court"))
+									.honorableSupremeCourt(rs.getString("cchonorable_supreme_court"))
+									.auditDetails(auditdetails).build();
 
-				property.getPropertyDetails().addCourtCaseItem(courtCase);
+							owner.getOwnerDetails().addCourtCaseItem(courtCase);
 
+						}
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				});
 			}
+
 		}
 
 		if (hasColumn(rs, "pdid")) {
@@ -236,21 +247,6 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 				AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("pdcreated_by"))
 						.createdTime(rs.getLong("pdcreated_time")).lastModifiedBy(rs.getString("pdmodified_by"))
 						.lastModifiedTime(rs.getLong("pdmodified_time")).build();
-
-				PurchaseDetails purchaseDetails = PurchaseDetails.builder().id(rs.getString("pdid"))
-						.propertyDetailsId(purchaseDetailPropertyDetailId).tenantId(rs.getString("pdtenantid"))
-						.newOwnerName(rs.getString("pdnew_owner_name"))
-						.newOwnerFatherName(rs.getString("pdnew_owner_father_name"))
-						.newOwnerAddress(rs.getString("pdnew_owner_address"))
-						.newOwnerMobileNumber(rs.getString("pdnew_owner_mobile_number"))
-						.sellerName(rs.getString("pdseller_name"))
-						.sellerFatherName(rs.getString("pdseller_father_name"))
-						.percentageOfShare(rs.getString("pdpercentage_of_share"))
-						.modeOfTransfer(rs.getString("pdmode_of_transfer"))
-						.registrationNumber(rs.getString("pdregistration_number"))
-						.dateOfRegistration(rs.getLong("pddate_of_registration")).auditDetails(auditdetails).build();
-
-				property.getPropertyDetails().addPurchaseDetailsItem(purchaseDetails);
 
 			}
 		}
