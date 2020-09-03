@@ -138,20 +138,10 @@ public class PropertyService {
 
 		Property property = properties.get(0);
 		List<RentDemand> demands = repository
-				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build()).stream()
-				.filter(rentDemand -> accountStatementCriteria.getToDate() >= rentDemand.getAuditDetails()
-						.getCreatedTime())
-				.map(rentDemand -> {
-					return rentDemand;
-				}).collect(Collectors.toList());
+				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
 
 		List<RentPayment> payments = repository
-				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build()).stream()
-				.filter(rentPayment -> accountStatementCriteria.getToDate() >= rentPayment.getAuditDetails()
-						.getCreatedTime())
-				.map(rentPayment -> {
-					return rentPayment;
-				}).collect(Collectors.toList());
+				.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
 
 		return AccountStatementResponse.builder()
 				.rentAccountStatements(rentCollectionService.getAccountStatement(demands, payments,
