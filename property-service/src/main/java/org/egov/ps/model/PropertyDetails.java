@@ -45,7 +45,10 @@ public class PropertyDetails {
 	private String propertyType;
 
 	@JsonProperty("typeOfAllocation")
-	private String typeOfAllocation;
+	private String typeOfAllocation;			
+
+	@JsonProperty("emdAmount")
+	private String emdAmount;
 
 	@JsonProperty("modeOfAuction")
 	private String modeOfAuction;

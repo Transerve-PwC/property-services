@@ -102,6 +102,39 @@ public class Payment {
 	@JsonProperty("chequeNumber")
 	private String chequeNumber;
 
+	@JsonProperty("installmentOne")
+	private BigDecimal installmentOne;
+
+	@JsonProperty("installmentTwo")
+	private BigDecimal installmentTwo;
+
+	@JsonProperty("installmentTwoDueDate")
+	private BigDecimal installmentTwoDueDate;
+
+	@JsonProperty("installmentThree")
+	private BigDecimal installmentThree;
+
+	@JsonProperty("installmentThreeDueDate")
+	private BigDecimal installmentThreeDueDate;
+
+	@JsonProperty("monthlyOrAnnually")
+	private BigDecimal monthlyOrAnnually;
+
+	@JsonProperty("groundRentStartDate")
+	private BigDecimal groundRentStartDate;
+
+	@JsonProperty("rentRevision")
+	private BigDecimal rentRevision;
+
+	@JsonProperty("leasePeriod")
+	private BigDecimal leasePeriod;
+
+	@JsonProperty("licenseFeeOfYear")
+	private BigDecimal licenseFeeOfYear;
+
+	@JsonProperty("licenseFee")
+	private BigDecimal licenseFee;
+
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 

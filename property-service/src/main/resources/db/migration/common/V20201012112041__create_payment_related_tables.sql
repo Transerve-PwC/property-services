@@ -26,6 +26,18 @@ CREATE TABLE cs_ep_payment_v1 (
 	st_payment_made_by					CHARACTER VARYING (256),
 	bank_name							CHARACTER VARYING (256),
 	cheque_number						CHARACTER VARYING (256),
+	
+    installment_one						numeric(15,2),
+    installment_two						numeric(15,2),
+	installment_two_due_date			bigint,
+	installment_three					numeric(15,2),
+	installment_three_due_date			bigint,
+	monthly_or_annually					CHARACTER VARYING (256),
+	ground_rent_start_date				bigint,
+	rent_revision						numeric(15,2),
+	lease_period						numeric(2,0),
+	license_fee_of_year					numeric(2,0),
+	license_fee							numeric(15,2),
   
    	created_by           				CHARACTER VARYING (128) NOT NULL,
    	last_modified_by     				CHARACTER VARYING (128),
