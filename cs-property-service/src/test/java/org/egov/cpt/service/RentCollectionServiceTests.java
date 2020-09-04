@@ -47,6 +47,8 @@ public class RentCollectionServiceTests {
     private static final String OCT_1_1999 = "01 10 1999";
     private static final String NOV_1_1999 = "01 11 1999";
     private static final String DEC_1_1999 = "01 12 1999";
+    private static final String APR_1_2020 = "01 04 2020";
+    private static final String DEC_1_2020 = "01 12 2020";
 
     public static final double DEFAULT_INTEREST_RATE = 24D;
     private static final double ZERO_INTEREST_RATE = 0D;
@@ -271,6 +273,38 @@ public class RentCollectionServiceTests {
         List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
                 payments, DEFAULT_INTEREST_RATE, null, null);
         utils.printStatement(accountStatementItems);
+    }
+
+    @Test
+    public void testFutureDemands() throws ParseException {
+        List<RentDemand> demands = Arrays.asList(getDemand(100, DEC_1_2020));
+        List<RentPayment> payments = Collections.emptyList();
+        RentAccount rentAccount = getAccount(200);
+        List<RentCollection> collections = this.rentCollectionService.settle(demands, payments, rentAccount,
+                DEFAULT_INTEREST_RATE);
+        assertEquals(0, collections.size());
+    }
+
+    @Test
+    public void testStatementToDate() throws ParseException {
+        List<RentDemand> demands = Arrays.asList(getDemand(100, DEC_1_1999));
+        List<RentPayment> payments = Arrays.asList(getPayment(400, MAY_1_2020));
+        RentAccount rentAccount = getAccount(200);
+        List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
+                payments, DEFAULT_INTEREST_RATE, null, null);
+        utils.printStatement(accountStatementItems);
+        // TODO: Pooja to verify
+    }
+
+    @Test
+    public void testStatementToDate1() throws ParseException {
+        List<RentDemand> demands = Arrays.asList(getDemand(100, DEC_1_1999));
+        List<RentPayment> payments = Arrays.asList(getPayment(400, MAY_1_2020));
+        RentAccount rentAccount = getAccount(200);
+        List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
+                payments, DEFAULT_INTEREST_RATE, null, getEpochFromDateString(APR_1_2020));
+        utils.printStatement(accountStatementItems);
+        // TODO: Pooja to verify
     }
 
     private long getEpochFromDateString(String date) throws ParseException {

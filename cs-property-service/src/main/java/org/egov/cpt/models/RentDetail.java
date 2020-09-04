@@ -39,6 +39,9 @@ public class RentDetail {
 
 	@JsonProperty("amount")
 	private Double amount;
+	
+	@JsonProperty("ownerMobileNumber")
+	private String ownerMobileNumber;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;

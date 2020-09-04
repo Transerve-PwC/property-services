@@ -64,7 +64,7 @@ public class PaymentUpdateService {
 	public PaymentUpdateService(OwnershipTransferService ownershipTransferService,
 			OwnershipTransferRepository repositoryOt, DuplicateCopyService duplicateCopyService,
 			PropertyRepository propertyRepository, ObjectMapper mapper, WorkflowService workflowService,
-			PropertyUtil util, RentEnrichmentService rentEnrichmentService) {
+			PropertyUtil util, RentEnrichmentService rentEnrichmentService, PropertyService propertyService) {
 		this.ownershipTransferService = ownershipTransferService;
 		this.repositoryOt = repositoryOt;
 		this.duplicateCopyService = duplicateCopyService;
@@ -73,6 +73,7 @@ public class PaymentUpdateService {
 		this.workflowService = workflowService;
 		this.util = util;
 		this.rentEnrichmentService = rentEnrichmentService;
+		this.propertyService = propertyService;
 	}
 
 	final String tenantId = "tenantId";

@@ -100,9 +100,17 @@ public class UserSearchRequest {
 	// @Default
 	// private List<String> sort = Collections.singletonList("name");
 	//
-	// @JsonProperty("userType")
-	// private String userType;
-	//
+	 @JsonProperty("userType")
+	 private String userType;
+	 
+	 @JsonProperty("userName")
+	 private String userName;
+	 
+	 @JsonProperty("tenantId")
+	 private String tenantId;
+	 
+	 
+	
 	// @JsonProperty("roleCodes")
 	// private List<String> roleCodes;
 
