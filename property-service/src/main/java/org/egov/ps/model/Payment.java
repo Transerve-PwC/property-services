@@ -138,6 +138,12 @@ public class Payment {
 
 	@JsonProperty("licenseFee")
 	private BigDecimal licenseFee;
+	
+	@JsonProperty("securityAmount")
+	private BigDecimal securityAmount;
+
+	@JsonProperty("securityDate")
+	private Long securityDate;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;

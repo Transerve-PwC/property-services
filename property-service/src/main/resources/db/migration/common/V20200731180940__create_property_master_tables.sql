@@ -38,6 +38,7 @@ CREATE TABLE cs_ep_property_details_v1 (
    property_type		CHARACTER VARYING (256),
    type_of_allocation   CHARACTER VARYING (256),
    emd_amount			numeric(15,2),
+   emd_date				bigint,
    mode_of_auction      CHARACTER VARYING (256),
    scheme_name        	CHARACTER VARYING (256),
    date_of_auction      bigint,

@@ -38,7 +38,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_ep_property_details_v1 (id, property_id, property_type, tenantid, type_of_allocation, emd_amount, mode_of_auction, scheme_name, date_of_auction, area_sqft, rate_per_sqft, last_noc_date, service_category, is_property_active, trade_type, company_name, company_address, company_registration_number, company_type, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_ep_property_details_v1 (id, property_id, property_type, tenantid, type_of_allocation, emd_amount, emd_date, mode_of_auction, scheme_name, date_of_auction, area_sqft, rate_per_sqft, last_noc_date, service_category, is_property_active, trade_type, company_name, company_address, company_registration_number, company_type, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: Properties.*.propertyDetails
       jsonMaps:
 
@@ -53,6 +53,8 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.typeOfAllocation
 
       - jsonPath: $.Properties.*.propertyDetails.emdAmount
+      
+      - jsonPath: $.Properties.*.propertyDetails.emdDate
 
       - jsonPath: $.Properties.*.propertyDetails.modeOfAuction
 
@@ -221,7 +223,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.courtCases.*.auditDetails.lastModifiedTime
             
           
-    - query: INSERT INTO cs_ep_payment_v1 (id, tenantid, owner_details_id,   payment_type, due_date_of_payment, payable, amount, total, date_of_deposit, delay_in_payment, interest_for_delay, total_amount_due_with_interest, amount_deposited, amount_deposited_intt, balance, balance_intt, total_due, receipt_number, receipt_date, st_rate_of_st_gst, st_amount_of_gst, st_payment_made_by, bank_name, cheque_number,   installment_one, installment_two, installment_two_due_date, installment_three, installment_three_due_date, monthly_or_annually, ground_rent_start_date, rent_revision, lease_period, license_fee_of_year, license_fee,   created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?,   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,   ?, ?, ?, ?);
+    - query: INSERT INTO cs_ep_payment_v1 (id, tenantid, owner_details_id,   payment_type, due_date_of_payment, payable, amount, total, date_of_deposit, delay_in_payment, interest_for_delay, total_amount_due_with_interest, amount_deposited, amount_deposited_intt, balance, balance_intt, total_due, receipt_number, receipt_date, st_rate_of_st_gst, st_amount_of_gst, st_payment_made_by, bank_name, cheque_number,   installment_one, installment_two, installment_two_due_date, installment_three, installment_three_due_date, monthly_or_annually, ground_rent_start_date, rent_revision, lease_period, license_fee_of_year, license_fee, security_amount, security_date,   created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?,   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,   ?, ?, ?, ?);
       basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*
       jsonMaps:
 
@@ -295,7 +297,11 @@ serviceMaps:
       
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.licenseFeeOfYear
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.licenseFee   
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.licenseFee  
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.securityAmount
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.securityDate 
             
       
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.auditDetails.createdBy
@@ -354,7 +360,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.id
 
 
-    - query: UPDATE cs_ep_property_details_v1 SET property_type = ?, tenantid = ?, type_of_allocation = ?, emd_amount = ?, mode_of_auction = ?, scheme_name = ?, date_of_auction = ?, area_sqft = ?, rate_per_sqft = ?, last_noc_date = ?, service_category = ?, is_property_active = ?, trade_type = ?, company_name = ?, company_address = ?, company_registration_number = ?, company_type = ?, last_modified_by = ?, last_modified_time = ? WHERE id = ?;
+    - query: UPDATE cs_ep_property_details_v1 SET property_type = ?, tenantid = ?, type_of_allocation = ?, emd_amount = ?,  emd_date = ?, mode_of_auction = ?, scheme_name = ?, date_of_auction = ?, area_sqft = ?, rate_per_sqft = ?, last_noc_date = ?, service_category = ?, is_property_active = ?, trade_type = ?, company_name = ?, company_address = ?, company_registration_number = ?, company_type = ?, last_modified_by = ?, last_modified_time = ? WHERE id = ?;
       basePath: Properties.*.propertyDetails
       jsonMaps:
 
@@ -365,6 +371,8 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.typeOfAllocation
 
       - jsonPath: $.Properties.*.propertyDetails.emdAmount
+      
+      - jsonPath: $.Properties.*.propertyDetails.emdDate
 
       - jsonPath: $.Properties.*.propertyDetails.modeOfAuction
 
@@ -619,7 +627,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.courtCases.*.auditDetails.lastModifiedTime
                   
       
-    - query: INSERT INTO (id, tenantid, owner_details_id,   payment_type, due_date_of_payment, payable, amount, total, date_of_deposit, delay_in_payment, interest_for_delay, total_amount_due_with_interest, amount_deposited, amount_deposited_intt, balance, balance_intt, total_due, receipt_number, receipt_date, st_rate_of_st_gst, st_amount_of_gst, st_payment_made_by, bank_name, cheque_number,   installment_one, installment_two, installment_two_due_date, installment_three, installment_three_due_date, monthly_or_annually, ground_rent_start_date, rent_revision, lease_period, license_fee_of_year, license_fee,   created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?,   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,   ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET payment_type = ?, due_date_of_payment = ?, payable = ?, amount = ?, total = ?, date_of_deposit = ?, delay_in_payment = ?, interest_for_delay = ?, total_amount_due_with_interest = ?, amount_deposited = ?, amount_deposited_intt = ?, balance = ?, balance_intt = ?, total_due = ?, receipt_number = ?, receipt_date = ?, st_rate_of_st_gst = ?, st_amount_of_gst = ?, st_payment_made_by = ?, bank_name = ?, cheque_number = ?,   installment_one = ?, installment_two = ?, installment_two_due_date = ?, installment_three = ?, installment_three_due_date = ?, monthly_or_annually = ?, ground_rent_start_date = ?, rent_revision = ?, lease_period = ?, license_fee_of_year = ?, license_fee = ?,   last_modified_by = ?, last_modified_time = ?;
+    - query: INSERT INTO cs_ep_payment_v1 (id, tenantid, owner_details_id,   payment_type, due_date_of_payment, payable, amount, total, date_of_deposit, delay_in_payment, interest_for_delay, total_amount_due_with_interest, amount_deposited, amount_deposited_intt, balance, balance_intt, total_due, receipt_number, receipt_date, st_rate_of_st_gst, st_amount_of_gst, st_payment_made_by, bank_name, cheque_number,   installment_one, installment_two, installment_two_due_date, installment_three, installment_three_due_date, monthly_or_annually, ground_rent_start_date, rent_revision, lease_period, license_fee_of_year, license_fee, security_amount, security_date,   created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?,   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,   ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET payment_type = ?, due_date_of_payment = ?, payable = ?, amount = ?, total = ?, date_of_deposit = ?, delay_in_payment = ?, interest_for_delay = ?, total_amount_due_with_interest = ?, amount_deposited = ?, amount_deposited_intt = ?, balance = ?, balance_intt = ?, total_due = ?, receipt_number = ?, receipt_date = ?, st_rate_of_st_gst = ?, st_amount_of_gst = ?, st_payment_made_by = ?, bank_name = ?, cheque_number = ?,   installment_one = ?, installment_two = ?, installment_two_due_date = ?, installment_three = ?, installment_three_due_date = ?, monthly_or_annually = ?, ground_rent_start_date = ?, rent_revision = ?, lease_period = ?, license_fee_of_year = ?, license_fee = ?,  security_amount = ?, security_date = ?,    last_modified_by = ?, last_modified_time = ?;
       basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*
       jsonMaps:
 
@@ -768,7 +776,11 @@ serviceMaps:
       
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.licenseFeeOfYear
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.licenseFee   
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.licenseFee 
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.securityAmount
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.securityDate   
             
       
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.paymentDetails.*.auditDetails.lastModifiedBy

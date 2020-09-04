@@ -49,6 +49,9 @@ public class PropertyDetails {
 
 	@JsonProperty("emdAmount")
 	private BigDecimal emdAmount;
+	
+	@JsonProperty("emdDate")
+	private Long emdDate;
 
 	@JsonProperty("modeOfAuction")
 	private String modeOfAuction;

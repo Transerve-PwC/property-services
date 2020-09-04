@@ -38,6 +38,8 @@ CREATE TABLE cs_ep_payment_v1 (
 	lease_period						numeric(2,0),
 	license_fee_of_year					numeric(2,0),
 	license_fee							numeric(15,2),
+	security_amount						numeric(15,2),
+	security_date						bigint,
   
    	created_by           				CHARACTER VARYING (128) NOT NULL,
    	last_modified_by     				CHARACTER VARYING (128),
