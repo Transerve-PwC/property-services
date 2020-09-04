@@ -5,10 +5,7 @@ import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.cpt.config.PropertyConfiguration;
-import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.ModeEnum;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyDetails;
@@ -19,7 +16,6 @@ import org.egov.cpt.models.RentDemandCriteria;
 import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.producer.Producer;
 import org.egov.cpt.repository.PropertyRepository;
-import org.egov.cpt.util.PropertyUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -44,9 +40,6 @@ public class RentDemandGenerationServiceTest {
 	@Mock
 	private RentCollectionService rentCollectionService;
 
-	@Mock
-	PropertyUtil propertyutil;
-
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
@@ -55,52 +48,49 @@ public class RentDemandGenerationServiceTest {
 
 	@Test
 	public void createDemandTest() {
-		Mockito.when(propertyutil.getAuditDetails(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(buildAuditDetails());
 		Mockito.when(propertyRepository.getPropertyRentDemandDetails(Mockito.any())).thenReturn(buildRentDemandList());
 		Mockito.when(propertyRepository.getPropertyRentPaymentDetails(Mockito.any()))
 				.thenReturn(buildRentPaymentList());
 		Mockito.when(propertyRepository.getPropertyRentAccountDetails(Mockito.any())).thenReturn(buildRentAccount());
-		rentDemandGenerationService.createDemand(buildDemandCriteria(), buildRequestInfo());
+		rentDemandGenerationService.createDemand(buildDemandCriteria());
 	}
 
 	@Test
 	public void createDemandTestWithDemandCriteriaAndDemandAlreadyExists() {
-		Mockito.when(propertyutil.getAuditDetails(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(buildAuditDetails());
 		Mockito.when(propertyRepository.getPropertyRentDemandDetails(Mockito.any())).thenReturn(buildRentDemandList());
 		Mockito.when(propertyRepository.getPropertyRentPaymentDetails(Mockito.any()))
 				.thenReturn(buildRentPaymentList());
 		Mockito.when(propertyRepository.getPropertyRentAccountDetails(Mockito.any())).thenReturn(buildRentAccount());
-		rentDemandGenerationService.createDemand(buildDemandCriteriaWhereDemandAlreadyExists(), buildRequestInfo());
+		rentDemandGenerationService.createDemand(buildDemandCriteriaWhereDemandAlreadyExists());
 	}
 
 	@Test
 	public void createDemandTestWithoutDemandHistory() {
-		Mockito.when(propertyutil.getAuditDetails(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(buildAuditDetails());
 		Mockito.when(propertyRepository.getPropertyRentPaymentDetails(Mockito.any()))
 				.thenReturn(buildRentPaymentList());
 		Mockito.when(propertyRepository.getPropertyRentAccountDetails(Mockito.any())).thenReturn(buildRentAccount());
-		rentDemandGenerationService.createDemand(buildDemandCriteria(), buildRequestInfo());
+		rentDemandGenerationService.createDemand(buildDemandCriteria());
 	}
 
 	@Test
 	public void createDemandTestWithoutDemandCriteria() {
-		Mockito.when(propertyutil.getAuditDetails(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(buildAuditDetails());
+		// Mockito.when(propertyutil.getAuditDetails(Mockito.anyString(),
+		// Mockito.anyBoolean())).thenReturn(buildAuditDetails());
 		Mockito.when(propertyRepository.getPropertyRentDemandDetails(Mockito.any())).thenReturn(buildRentDemandList());
 		Mockito.when(propertyRepository.getPropertyRentPaymentDetails(Mockito.any()))
 				.thenReturn(buildRentPaymentList());
 		Mockito.when(propertyRepository.getPropertyRentAccountDetails(Mockito.any())).thenReturn(buildRentAccount());
-		rentDemandGenerationService.createDemand(new RentDemandCriteria(), buildRequestInfo());
+		rentDemandGenerationService.createDemand(new RentDemandCriteria());
 	}
 
 	@Test
 	public void createDemandTestWithoutDemandCriteriaAndDenandAlreadyExists() {
-		Mockito.when(propertyutil.getAuditDetails(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(buildAuditDetails());
 		Mockito.when(propertyRepository.getPropertyRentDemandDetails(Mockito.any()))
 				.thenReturn(buildRentDemandListWithCurrentDate());
 		Mockito.when(propertyRepository.getPropertyRentPaymentDetails(Mockito.any()))
 				.thenReturn(buildRentPaymentList());
 		Mockito.when(propertyRepository.getPropertyRentAccountDetails(Mockito.any())).thenReturn(buildRentAccount());
-		rentDemandGenerationService.createDemand(new RentDemandCriteria(), buildRequestInfo());
+		rentDemandGenerationService.createDemand(new RentDemandCriteria());
 	}
 
 	@Test
@@ -111,29 +101,26 @@ public class RentDemandGenerationServiceTest {
 		Mockito.when(propertyRepository.getPropertyRentPaymentDetails(Mockito.any()))
 				.thenReturn(buildRentPaymentList());
 		Mockito.when(propertyRepository.getPropertyRentAccountDetails(Mockito.any())).thenReturn(buildRentAccount());
-		rentDemandGenerationService.createDemand(buildDemandCriteria(), buildRequestInfo());
+		rentDemandGenerationService.createDemand(buildDemandCriteria());
 	}
 
 	@Test
 	public void createDemandTestWithoutRentAccount() {
-		Mockito.when(propertyutil.getAuditDetails(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(buildAuditDetails());
 		Mockito.when(propertyRepository.getPropertyRentDemandDetails(Mockito.any())).thenReturn(buildRentDemandList());
 		Mockito.when(propertyRepository.getPropertyRentPaymentDetails(Mockito.any()))
 				.thenReturn(buildRentPaymentList());
-		rentDemandGenerationService.createDemand(buildDemandCriteria(), buildRequestInfo());
+		rentDemandGenerationService.createDemand(buildDemandCriteria());
 	}
 
 	@Test
 	public void createDemandTestWithoutPayments() {
-		Mockito.when(propertyutil.getAuditDetails(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(buildAuditDetails());
 		Mockito.when(propertyRepository.getPropertyRentDemandDetails(Mockito.any())).thenReturn(buildRentDemandList());
 		Mockito.when(propertyRepository.getPropertyRentAccountDetails(Mockito.any())).thenReturn(buildRentAccount());
-		rentDemandGenerationService.createDemand(buildDemandCriteria(), buildRequestInfo());
+		rentDemandGenerationService.createDemand(buildDemandCriteria());
 	}
 
 	@Test
 	public void createDemandTestWithRentCollectionsWithoutId() {
-		Mockito.when(propertyutil.getAuditDetails(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(buildAuditDetails());
 		Mockito.when(rentCollectionService.settle(Mockito.anyListOf(RentDemand.class),
 				Mockito.anyListOf(RentPayment.class), Mockito.any(RentAccount.class), Mockito.anyDouble()))
 				.thenReturn(buildRentCollections());
@@ -141,12 +128,11 @@ public class RentDemandGenerationServiceTest {
 		Mockito.when(propertyRepository.getPropertyRentPaymentDetails(Mockito.any()))
 				.thenReturn(buildRentPaymentList());
 		Mockito.when(propertyRepository.getPropertyRentAccountDetails(Mockito.any())).thenReturn(buildRentAccount());
-		rentDemandGenerationService.createDemand(buildDemandCriteria(), buildRequestInfo());
+		rentDemandGenerationService.createDemand(buildDemandCriteria());
 	}
 
 	@Test
 	public void createDemandTestWithRentCollectionsWithId() {
-		Mockito.when(propertyutil.getAuditDetails(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(buildAuditDetails());
 		Mockito.when(rentCollectionService.settle(Mockito.anyListOf(RentDemand.class),
 				Mockito.anyListOf(RentPayment.class), Mockito.any(RentAccount.class), Mockito.anyDouble()))
 				.thenReturn(buildRentCollectionsWithId());
@@ -154,16 +140,7 @@ public class RentDemandGenerationServiceTest {
 		Mockito.when(propertyRepository.getPropertyRentPaymentDetails(Mockito.any()))
 				.thenReturn(buildRentPaymentList());
 		Mockito.when(propertyRepository.getPropertyRentAccountDetails(Mockito.any())).thenReturn(buildRentAccount());
-		rentDemandGenerationService.createDemand(buildDemandCriteria(), buildRequestInfo());
-	}
-
-	private AuditDetails buildAuditDetails() {
-		AuditDetails auditDetails = new AuditDetails();
-		auditDetails.setCreatedBy("2743bf22-6499-4029-bd26-79e5d0ce6427");
-		auditDetails.setCreatedTime(1599198579675L);
-		auditDetails.setLastModifiedBy("2743bf22-6499-4029-bd26-79e5d0ce6427");
-		auditDetails.setLastModifiedTime(1599198579675L);
-		return auditDetails;
+		rentDemandGenerationService.createDemand(buildDemandCriteria());
 	}
 
 	private RentDemandCriteria buildDemandCriteria() {
@@ -176,18 +153,6 @@ public class RentDemandGenerationServiceTest {
 		RentDemandCriteria rentDemandCriteria = new RentDemandCriteria();
 		rentDemandCriteria.setDate("02/06/2015");
 		return rentDemandCriteria;
-	}
-
-	private RequestInfo buildRequestInfo() {
-		RequestInfo requestInfo = new RequestInfo();
-		requestInfo.setApiId("Rainmaker");
-		requestInfo.setAuthToken("86fb987a-9a56-4ed7-9b96-bcc516a34352");
-		requestInfo.setVer(".01");
-		requestInfo.setMsgId("20170310130900|en_IN");
-		User userInfo = new User();
-		userInfo.setUuid("95fb987a-9a56-4ed7-9b96-bcc516a34352");
-		requestInfo.setUserInfo(userInfo);
-		return requestInfo;
 	}
 
 	private List<Property> buildPropertyList() {
