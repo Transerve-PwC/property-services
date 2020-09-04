@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
+import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.PropertyCriteria;
 import org.egov.cpt.models.RentAccount;
@@ -138,33 +139,33 @@ public class RentDemandGenerationService {
 		rentDemand.setCollectionPrincipal(collectionPrincipal);
 		rentDemand.setRemainingPrincipal(rentDemand.getCollectionPrincipal());
 		rentDemand.setInterestSince(rentDemand.getGenerationDate());
-		// rentDemand.setAuditDetails(property.getAuditDetails());
+		rentDemand.setAuditDetails(propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+				 true));
 
-		rentDemandList.add(rentDemand);
+		List<RentDemand> newRentDemandList = new ArrayList<>(rentDemandList);
+		newRentDemandList.add(rentDemand);
 
 		log.info("rend demand id: " + rendDemandId);
 		log.info("collection principal: " + collectionPrincipal);
-		property.setDemands(rentDemandList);
+		property.setDemands(newRentDemandList);
 		property.setRentAccount(rentAccount);
 		property.setPayments(rentPaymentList);
 
-		if (property.getPayments() != null && property.getRentAccount() != null) {
+		if (!CollectionUtils.isEmpty(property.getPayments()) && property.getRentAccount() != null) {
 
 			property.setRentCollections(rentCollectionService.settle(property.getDemands(), property.getPayments(),
 					property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
 		}
 		PropertyRequest propertyRequest = new PropertyRequest();
 		propertyRequest.setProperties(Collections.singletonList(property));
-		// RequestInfo requestInfo = propertyRequest.getRequestInfo();
 
 		if (!CollectionUtils.isEmpty(property.getRentCollections())) {
 			property.getRentCollections().forEach(collection -> {
 				if (collection.getId() == null) {
-					// AuditDetails rentAuditDetails =
-					// propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(),
-					// true);
+					AuditDetails rentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+							true);
 					collection.setId(UUID.randomUUID().toString());
-					// collection.setAuditDetails(rentAuditDetails);
+					collection.setAuditDetails(rentAuditDetails);
 				}
 
 			});
