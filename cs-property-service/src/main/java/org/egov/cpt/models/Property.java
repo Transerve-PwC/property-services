@@ -231,12 +231,20 @@ public class Property {
 	/**
 	 * Amount to be paid
 	 */
+	@JsonProperty("paymentAmount")
 	private Double paymentAmount;
 
 	/**
 	 * Pending consumer code. This needs to be saved in the database for online
 	 * payments.
 	 */
+	@JsonProperty("rentPaymentConsumerCode")
 	private String rentPaymentConsumerCode;
+	
+	@JsonProperty("transactionId")
+	private String transactionId;
+	
+	@JsonProperty("bankName")
+	private String bankName;
 
 }

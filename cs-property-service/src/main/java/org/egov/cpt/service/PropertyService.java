@@ -225,6 +225,16 @@ public class PropertyService {
 			throw new CustomException(
 					Collections.singletonMap("NO_PAYMENT_AMOUNT_FOUND", "No Property tenantId found to process rent"));
 		}
+		if(propertyRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(PTConstants.ROLE_EMPLOYEE)){
+			if(propertyFromRequest.getTransactionId()==null){
+				throw new CustomException(
+				Collections.singletonMap("NO_TRANSACTION_ID_FOUND", "No TransactionId found to process rent"));
+			}
+			if(propertyFromRequest.getBankName()==null){
+				throw new CustomException(
+				Collections.singletonMap("NO_BANKNAME_FOUND", "No Bank name found to process rent"));
+			}
+		}
 		PropertyCriteria propertyCriteria = PropertyCriteria.builder().relations(Arrays.asList("owner"))
 				.propertyId(propertyFromRequest.getId()).build();
 
@@ -239,6 +249,8 @@ public class PropertyService {
 
 		Property property = propertiesFromDB.get(0);
 		property.setPaymentAmount(propertyFromRequest.getPaymentAmount());
+		property.setTransactionId(propertyFromRequest.getTransactionId());
+		property.setBankName(propertyFromRequest.getBankName());
 		Owner owner = utils.getCurrentOwnerFromProperty(property);
 
 		/**
@@ -284,9 +296,9 @@ public class PropertyService {
 			 * We return the property along with the consumerCode that we set earlier. Also
 			 * save it so the consumer code gets persisted.
 			 */
-			propertyRequest.setProperties(Collections.singletonList(property));
-			producer.push(config.getUpdatePropertyTopic(), propertyRequest);
 		}
+		propertyRequest.setProperties(Collections.singletonList(property));
+		producer.push(config.getUpdatePropertyTopic(), propertyRequest);
 		return Collections.singletonList(property);
 	}
 
