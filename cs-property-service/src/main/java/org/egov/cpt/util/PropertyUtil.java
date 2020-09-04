@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +16,7 @@ import org.egov.cpt.config.PropertyConfiguration;
 import org.egov.cpt.models.AuditDetails;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.Property;
 import org.egov.cpt.models.calculation.BusinessService;
 import org.egov.cpt.workflow.WorkflowService;
 import org.egov.mdms.model.MasterDetail;
@@ -135,7 +137,33 @@ public class PropertyUtil {
 		return idToIsStateUpdatableMapDc;
 	}
 
+	public String getStateLevelTenantId(String tenantId) {
+		String[] components = tenantId.split(".");
+		if (components.length == 0) {
+			return "ch";
+		}
+		return components[0];
+	}
+
 	SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD-HH-MM-SS");
+
+	public Owner getCurrentOwnerFromProperty(Property property) {
+		/**
+		 * Validate that there is an existing active owner.
+		 */
+		Optional<Owner> ownerOptional = property.getOwners().stream().filter(Owner::getActiveState).findAny();
+		if (!ownerOptional.isPresent()) {
+			throw new CustomException(Collections.singletonMap("PROPERTY_OWNER_NOT_FOUND",
+					"Could not find current owner for property with id " + property.getId()));
+		}
+
+		/**
+		 * Make sure we create a user or else billing service will throw an error while
+		 * generating demand.
+		 */
+		Owner owner = ownerOptional.get();
+		return owner;
+	}
 
 	/**
 	 * Generates a new consumer code from a transit number to be sent while creating
@@ -148,7 +176,6 @@ public class PropertyUtil {
 		return String.format("SITE-%s-%s", transitNumber.toUpperCase(), dateFormat.format(new Date()));
 	}
 
-	@SuppressWarnings("finally")
 	/**
 	 * Extracts transit site number from consumer code.
 	 * 
@@ -167,9 +194,9 @@ public class PropertyUtil {
 			log.error("Could not match rent consumer code pattern {}", consumerCode);
 		} catch (Exception e) {
 			log.error("Failed during parsing transit number from consumer code", e);
-		} finally {
 			throw new CustomException(Collections.singletonMap("INVALID_RENT_CONSUMER_CODE",
 					"Transit number could not be extracted from consumer code " + consumerCode));
 		}
+		return null;
 	}
 }

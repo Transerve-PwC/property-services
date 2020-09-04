@@ -14,7 +14,6 @@ import org.egov.cpt.service.PropertyService;
 import org.egov.cpt.util.ResponseInfoFactory;
 import org.egov.cpt.web.contracts.AccountStatementRequest;
 import org.egov.cpt.web.contracts.AccountStatementResponse;
-import org.egov.cpt.web.contracts.PropertyRentRequest;
 import org.egov.cpt.web.contracts.PropertyRequest;
 import org.egov.cpt.web.contracts.PropertyResponse;
 import org.slf4j.Logger;
@@ -104,12 +103,11 @@ public class PropertyController {
 	 * @param propertyRentRequest
 	 * @return
 	 */
-	@PostMapping("/_rentpayment")
-	public ResponseEntity<PropertyResponse> payRent(@Valid @RequestBody PropertyRentRequest propertyRentRequest) {
-
-		List<Property> properties = propertyService.generateFinanceDemand(propertyRentRequest);
-		ResponseInfo resInfo = responseInfoFactory
-				.createResponseInfoFromRequestInfo(propertyRentRequest.getRequestInfo(), true);
+	@PostMapping("/_payrent")
+	public ResponseEntity<PropertyResponse> rentPayment(@Valid @RequestBody PropertyRequest propertyRequest) {
+		List<Property> properties = propertyService.generateFinanceDemand(propertyRequest);
+		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(),
+				true);
 		PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(resInfo).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
