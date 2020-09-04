@@ -17,23 +17,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.cpt.config.PropertyConfiguration;
-import org.egov.cpt.models.BillV2;
 import org.egov.cpt.models.CollectionPayment;
+import org.egov.cpt.models.CollectionPaymentDetail;
+import org.egov.cpt.models.CollectionPaymentRequest;
 import org.egov.cpt.models.DuplicateCopy;
 import org.egov.cpt.models.Owner;
+import org.egov.cpt.models.OwnerDetails;
 import org.egov.cpt.models.Property;
 import org.egov.cpt.models.RequestInfoWrapper;
 import org.egov.cpt.models.UserResponse;
 import org.egov.cpt.models.UserSearchRequestCore;
 import org.egov.cpt.models.calculation.Demand;
 import org.egov.cpt.models.calculation.Demand.StatusEnum;
+import org.egov.cpt.models.enums.CollectionPaymentModeEnum;
 import org.egov.cpt.models.calculation.DemandDetail;
 import org.egov.cpt.models.calculation.DemandResponse;
 import org.egov.cpt.models.calculation.TaxHeadEstimate;
 import org.egov.cpt.repository.ServiceRequestRepository;
 import org.egov.cpt.util.PTConstants;
 import org.egov.cpt.util.PropertyUtil;
-import org.egov.cpt.web.contracts.PropertyRentRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -381,7 +383,7 @@ public class DemandService {
 		return combinedBillDetials;
 	}
 
-	public List<Demand> generateRentDemand(RequestInfo requestInfo, Property property) {
+	public List<Demand> generateFinanceRentDemand(RequestInfo requestInfo, Property property) {
 		List<Demand> demands = new LinkedList<>();
 		String existingConsumerCode = property.getRentPaymentConsumerCode();
 		if (existingConsumerCode != null) {
@@ -475,14 +477,13 @@ public class DemandService {
 
 		Owner owner = utils.getCurrentOwnerFromProperty(property);
 		String mobileNumber = owner.getOwnerDetails().getPhone();
-		List<org.egov.cpt.models.User> ownerUser = null;
 
 		String statelevelTenantId = utils.getStateLevelTenantId(property.getTenantId());
 
 		UserSearchRequestCore userSearchRequest = UserSearchRequestCore.builder().requestInfo(requestInfo)
 				.userName(mobileNumber).tenantId(statelevelTenantId).build();
 
-		ownerUser = mapper
+		List<org.egov.cpt.models.User> ownerUser = mapper
 				.convertValue(serviceRequestRepository.fetchResult(url, userSearchRequest), UserResponse.class)
 				.getUser();
 		List<org.egov.cpt.models.User> requiredOwner = ownerUser.stream()
@@ -498,18 +499,30 @@ public class DemandService {
 				.roles(requestUser.getRoles()).tenantId(requestUser.getTenantId()).uuid(requestUser.getUuid()).build();
 	}
 
-	public Object callCollection(RequestInfo requestInfo,Property property, List<BillV2> billes) {
-		/*
-		CollectionPayment payment = getPaymentFromTransaction(property);
-		payment.setInstrumentDate(request.getTransaction().getAuditDetails().getCreatedTime());
-		payment.setInstrumentNumber(request.getTransaction().getTxnId());
-		payment.setTransactionNumber(request.getTransaction().getTxnId());
-		
-		CollectionPaymentRequest paymentRequest = CollectionPaymentRequest.builder()
-				.requestInfo(request.getRequestInfo()).payment(payment).build();*/
-		
-		return demandRepository.saveCollection(requestInfo,property, billes);
-		
+	/**
+	 * 
+	 * @param requestInfo   RequestInfo object from the original request.
+	 * @param paymentAmount Total amount paid.
+	 * @param billId        The bill that was generated for this payment.
+	 * @param tenantId      The tenantId to look up mdmsService businessService from
+	 *                      bill.
+	 * @return
+	 */
+	public Object createCashPayment(RequestInfo requestInfo, Double paymentAmount, String billId, Owner owner) {
+		String tenantId = owner.getTenantId();
+		OwnerDetails ownerDetails = owner.getOwnerDetails();
+		CollectionPaymentDetail paymentDetail = CollectionPaymentDetail.builder().tenantId(tenantId)
+				.totalAmountPaid(BigDecimal.valueOf(paymentAmount)).receiptDate(System.currentTimeMillis())
+				.businessService(PTConstants.BILLING_BUSINESS_SERVICE_RENT).billId(billId).build();
+		CollectionPayment payment = CollectionPayment.builder().paymentMode(CollectionPaymentModeEnum.CASH)
+				.tenantId(tenantId).totalAmountPaid(BigDecimal.valueOf(paymentAmount)).payerName(ownerDetails.getName())
+				.paidBy("COUNTER").mobileNumber(ownerDetails.getPhone())
+				.paymentDetails(Collections.singletonList(paymentDetail)).build();
+
+		CollectionPaymentRequest paymentRequest = CollectionPaymentRequest.builder().requestInfo(requestInfo)
+				.payment(payment).build();
+
+		return demandRepository.savePayment(paymentRequest);
 	}
 
 }

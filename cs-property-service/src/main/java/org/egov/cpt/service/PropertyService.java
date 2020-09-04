@@ -244,7 +244,7 @@ public class PropertyService {
 		List<Property> propertiesFromDB = repository.getProperties(propertyCriteria);
 		if (CollectionUtils.isEmpty(propertiesFromDB)) {
 			throw new CustomException(Collections.singletonMap("PROPERTIES_NOT_FOUND",
-					"Could not find any properties with id " + propertyFromRequest.getId()));
+					"Could not find any valid properties with id " + propertyFromRequest.getId()));
 		}
 
 		Property property = propertiesFromDB.get(0);
@@ -271,13 +271,13 @@ public class PropertyService {
 		/**
 		 * Generate an actual finance demand
 		 */
-		demandService.generateRentDemand(propertyRequest.getRequestInfo(), property);
+		demandService.generateFinanceRentDemand(propertyRequest.getRequestInfo(), property);
 
 		/**
 		 * Get the bill generated.
 		 */
-		List<BillV2> bills = demandRepository.fetchBill(propertyRequest.getRequestInfo(),
-				property.getTenantId(),property.getRentPaymentConsumerCode());
+		List<BillV2> bills = demandRepository.fetchBill(propertyRequest.getRequestInfo(), property.getTenantId(),
+				property.getRentPaymentConsumerCode());
 		if (CollectionUtils.isEmpty(bills)) {
 			throw new CustomException("BILL_NOT_GENERATED",
 					"No bills were found for the consumer code " + property.getRentPaymentConsumerCode());
@@ -287,11 +287,15 @@ public class PropertyService {
 			/**
 			 * if offline, create a payment.
 			 */
-			demandService.callCollection(propertyRequest.getRequestInfo(),property, bills);
+			demandService.createCashPayment(propertyRequest.getRequestInfo(), property.getPaymentAmount(),
+					bills.get(0).getId(), owner);
 		} else {
 			/**
-			 * We return the property along with the consumerCode that we set earlier.
+			 * We return the property along with the consumerCode that we set earlier. Also
+			 * save it so the consumer code gets persisted.
 			 */
+			propertyRequest.setProperties(Collections.singletonList(property));
+			producer.push(config.getUpdatePropertyTopic(), propertyRequest);
 		}
 		return Collections.singletonList(property);
 	}

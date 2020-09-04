@@ -176,7 +176,6 @@ public class PropertyUtil {
 		return String.format("SITE-%s-%s", transitNumber.toUpperCase(), dateFormat.format(new Date()));
 	}
 
-	@SuppressWarnings("finally")
 	/**
 	 * Extracts transit site number from consumer code.
 	 * 
@@ -195,9 +194,9 @@ public class PropertyUtil {
 			log.error("Could not match rent consumer code pattern {}", consumerCode);
 		} catch (Exception e) {
 			log.error("Failed during parsing transit number from consumer code", e);
-		} finally {
 			throw new CustomException(Collections.singletonMap("INVALID_RENT_CONSUMER_CODE",
 					"Transit number could not be extracted from consumer code " + consumerCode));
 		}
+		return null;
 	}
 }

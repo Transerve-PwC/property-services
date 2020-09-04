@@ -8,6 +8,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.egov.cpt.models.enums.InstrumentStatusEnum;
+import org.egov.cpt.models.enums.CollectionPaymentModeEnum;
+import org.egov.cpt.models.enums.PaymentStatusEnum;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -20,12 +23,12 @@ import java.util.List;
 @EqualsAndHashCode
 public class CollectionPayment {
 
-    @Size(max=64)
+    @Size(max = 64)
     @JsonProperty("id")
     private String id;
 
     @NotNull
-    @Size(max=64)
+    @Size(max = 64)
     @JsonProperty("tenantId")
     private String tenantId;
 
@@ -36,7 +39,7 @@ public class CollectionPayment {
     @JsonProperty("totalAmountPaid")
     private BigDecimal totalAmountPaid;
 
-    @Size(max=128)
+    @Size(max = 128)
     @JsonProperty("transactionNumber")
     private String transactionNumber;
 
@@ -47,18 +50,17 @@ public class CollectionPayment {
     @JsonProperty("paymentMode")
     private CollectionPaymentModeEnum paymentMode;
 
-    
     @JsonProperty("instrumentDate")
     private Long instrumentDate;
 
-    @Size(max=128)
+    @Size(max = 128)
     @JsonProperty("instrumentNumber")
     private String instrumentNumber;
 
     @JsonProperty("instrumentStatus")
     private InstrumentStatusEnum instrumentStatus;
 
-    @Size(max=64)
+    @Size(max = 64)
     @JsonProperty("ifscCode")
     private String ifscCode;
 
@@ -72,35 +74,34 @@ public class CollectionPayment {
     @Valid
     private List<CollectionPaymentDetail> paymentDetails;
 
-    @Size(max=128)
+    @Size(max = 128)
     @NotNull
     @JsonProperty("paidBy")
-    private String paidBy = null;
+    private String paidBy;
 
-    @Size(max=64)
+    @Size(max = 64)
     @NotNull
     @JsonProperty("mobileNumber")
-    private String mobileNumber = null;
+    private String mobileNumber;
 
-    @Size(max=128)
+    @Size(max = 128)
     @JsonProperty("payerName")
-    private String payerName = null;
+    private String payerName;
 
-    @Size(max=1024)
+    @Size(max = 1024)
     @JsonProperty("payerAddress")
-    private String payerAddress = null;
+    private String payerAddress;
 
-    @Size(max=64)
+    @Size(max = 64)
     @JsonProperty("payerEmail")
-    private String payerEmail = null;
+    private String payerEmail;
 
-    @Size(max=64)
+    @Size(max = 64)
     @JsonProperty("payerId")
-    private String payerId = null;
+    private String payerId;
 
     @JsonProperty("paymentStatus")
     private PaymentStatusEnum paymentStatus;
-
 
     public CollectionPayment addpaymentDetailsItem(CollectionPaymentDetail paymentDetail) {
         if (this.paymentDetails == null) {
@@ -109,8 +110,5 @@ public class CollectionPayment {
         this.paymentDetails.add(paymentDetail);
         return this;
     }
-
-
-
 
 }
