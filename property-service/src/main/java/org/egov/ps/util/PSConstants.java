@@ -26,4 +26,6 @@ public class PSConstants {
 
 	public static final String EB_OT_RW = "EstateBranch_OwnershipTransfer_RegisteredWill";
 
+	public static final String MDMS_PS_MORTGAGE_FILTER = ".*.documentList.*";
+
 }

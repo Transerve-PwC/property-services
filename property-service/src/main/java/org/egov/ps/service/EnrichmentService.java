@@ -67,28 +67,6 @@ public class EnrichmentService {
 		}
 	} 
 	
-	public void enrichMortgageDetailsRequest(PropertyRequest request) {
-		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().forEach(property -> {
-				property.getPropertyDetails().getOwners().forEach(owner ->{
-					//checking -  owner is existing and mortgage details bound with user..
-					if(null != owner.getId() && !owner.getId().isEmpty() && null != owner.getMortgageDetails()) {
-						//validate mortgage details - documents 
-						validateMortgageDetails(property, owner, request.getRequestInfo(), owner.getId());
-						owner.setMortgageDetails(getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
-					}
-				});
-			});
-		}
-	}
-
-	public void validateMortgageDetails(Property property, Owner owner, RequestInfo requestInfo, String id) {
-		MortgageDetails mortgage = owner.getMortgageDetails();
-		List<Map<String, Object>> fieldConfigurations = mdmsservice.getMortgageDocumentConfig(mortgage.getMortgageType(), requestInfo, property.getTenantId());
-		
-		//TODO :: write code to validate documents base on master json template.
-	}
-
 	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
 
 		PropertyDetails propertyDetail = property.getPropertyDetails();
@@ -134,17 +112,6 @@ public class EnrichmentService {
 		return owners;
 	}
 	
-	private MortgageDetails getMortgage(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
-		String gen_mortgage_id = UUID.randomUUID().toString();
-		
-		MortgageDetails mortgage = owner.getMortgageDetails();
-		mortgage.setId(gen_mortgage_id);
-		mortgage.setTenantId(property.getTenantId());
-		mortgage.setOwnerId(gen_owner_id);
-		
-		return mortgage;
-	}
-
 	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
 
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
