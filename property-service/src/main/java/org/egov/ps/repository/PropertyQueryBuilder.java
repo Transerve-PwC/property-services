@@ -36,7 +36,8 @@ public class PropertyQueryBuilder {
 			+ " ptdl.id as ptdlid, ptdl.property_id as pdproperty_id, ptdl.property_type as pdproperty_type, "
 			+ " ptdl.tenantid as pdtenantid, ptdl.type_of_allocation, ptdl.mode_of_auction, ptdl.scheme_name,ptdl.date_of_auction, "
 			+ " ptdl.area_sqft, ptdl.rate_per_sqft, ptdl.last_noc_date, ptdl.service_category, "
-			+ " ptdl.is_property_active, ptld.trade_type, ptld.company_name, ptdl.company_address, ptdl.company_registration_number, ptdl.company_type, ptdl.emd_amount ";
+			+ " ptdl.is_property_active, ptld.trade_type, ptld.company_name, ptdl.company_address, ptdl.company_registration_number, "
+			+ " ptdl.company_type, ptdl.emd_amount, ptdl.emd_date ";
 
 	private static final String OWNER_COLUMNS = " ownership.id as oid, ownership.property_details_id as oproperty_details_id, "
 			+ " ownership.tenantid as otenantid, ownership.serial_number as oserial_number, "
@@ -64,7 +65,7 @@ public class PropertyQueryBuilder {
 			+ " payment.bank_name, payment.cheque_number, " 
 			+ " payment.installment_one, payment.installment_two, payment.installment_two_due_date, payment.installment_three, payment.installment_three_due_date, "
 			+ " payment.monthly_or_annually, payment.ground_rent_start_date, payment.rent_revision, "
-			+ " payment.lease_period, payment.license_fee_of_year, payment.license_fee, "
+			+ " payment.lease_period, payment.license_fee_of_year, payment.license_fee, payment.security_amount, payment.security_date, "
 			+ " payment.created_by as paycreated_by, payment.created_time as paycreated_time, payment.last_modified_by as paymodified_by, payment.last_modified_time as paymodified_time ";
 
 	private static final String CC_COLUMNS = " cc.id as ccid, cc.owner_details_id as ccproperty_details_id,"

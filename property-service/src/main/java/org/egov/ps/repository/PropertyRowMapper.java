@@ -58,7 +58,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 							.companyName(rs.getString("company_name")).companyAddress(rs.getString("company_address"))
 							.companyRegistrationNumber(rs.getString("company_registration_number"))
 							.companyType(rs.getString("company_type")).emdAmount(rs.getBigDecimal("emd_amount"))
-							.auditDetails(pdAuditdetails).build();
+							.emdDate(rs.getLong("emd_date")).auditDetails(pdAuditdetails).build();
 
 					currentProperty = Property.builder().id(propertyId).fileNumber(rs.getString("file_number"))
 							.tenantId(tenantId).category(rs.getString("category"))
@@ -191,7 +191,9 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 									.groundRentStartDate(rs.getLong("ground_rent_start_date"))
 									.rentRevision(rs.getInt("rent_revision")).leasePeriod(rs.getInt("lease_period"))
 									.licenseFee(rs.getBigDecimal("license_fee_of_year"))
-									.licenseFee(rs.getBigDecimal("license_fee")).auditDetails(payAuditdetails).build();
+									.licenseFee(rs.getBigDecimal("license_fee"))
+									.securityAmount(rs.getBigDecimal("security_amount"))
+									.securityDate(rs.getLong("security_date")).auditDetails(payAuditdetails).build();
 
 							owner.getOwnerDetails().addPaymentItem(paymentItem);
 						}
