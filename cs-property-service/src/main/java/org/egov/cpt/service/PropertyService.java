@@ -244,8 +244,8 @@ public class PropertyService {
 		/**
 		 * Create egov user if not already present.
 		 */
-		userService.createUser(propertyRequest.getRequestInfo(), owner.getOwnerDetails().getPhone(),
-				property.getTenantId());
+		userService.createUser(propertyRequest.getRequestInfo(), owner.getOwnerDetails().getPhone()
+				,owner.getOwnerDetails().getName(),property.getTenantId());
 
 		/**
 		 * Generate Calculations for the property.
