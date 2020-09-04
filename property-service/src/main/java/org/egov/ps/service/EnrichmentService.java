@@ -58,35 +58,12 @@ public class EnrichmentService {
 				PropertyDetails propertyDetail = getPropertyDetail(property, requestInfo, gen_property_id);
 
 				property.setId(gen_property_id);
-				property.setAuditDetails(propertyAuditDetails);
 				property.setPropertyDetails(propertyDetail);
 				property.setState(PSConstants.PM_DRAFTED);
+				property.setAuditDetails(propertyAuditDetails);
 
 			});
 		}
-	}
-
-	public void enrichMortgageDetailsRequest(PropertyRequest request) {
-		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().forEach(property -> {
-				property.getPropertyDetails().getOwners().forEach(owner -> {
-					// checking - owner is existing and mortgage details bound with user..
-					if (null != owner.getId() && !owner.getId().isEmpty() && null != owner.getMortgageDetails()) {
-						// validate mortgage details - documents
-						validateMortgageDetails(property, owner, request.getRequestInfo(), owner.getId());
-						owner.setMortgageDetails(getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
-					}
-				});
-			});
-		}
-	}
-
-	public void validateMortgageDetails(Property property, Owner owner, RequestInfo requestInfo, String id) {
-		MortgageDetails mortgage = owner.getMortgageDetails();
-		List<Map<String, Object>> fieldConfigurations = mdmsservice
-				.getMortgageDocumentConfig(mortgage.getMortgageType(), requestInfo, property.getTenantId());
-
-		// TODO :: write code to validate documents base on master json template.
 	}
 
 	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
@@ -100,8 +77,8 @@ public class EnrichmentService {
 		propertyDetail.setId(gen_property_details_id);
 		propertyDetail.setTenantId(property.getTenantId());
 		propertyDetail.setPropertyId(gen_property_id);
-		propertyDetail.setAuditDetails(propertyDetailsAuditDetails);
 		propertyDetail.setOwners(owners);
+		propertyDetail.setAuditDetails(propertyDetailsAuditDetails);
 
 		return propertyDetail;
 	}
@@ -122,6 +99,7 @@ public class EnrichmentService {
 				owner.setId(gen_owner_id);
 				owner.setTenantId(property.getTenantId());
 				owner.setPropertyDetailsId(gen_property_details_id);
+//				owner.setSerialNumber(""); TODO: Whether sr.no will be generated from BackEnd or FrontEnd
 				owner.setOwnerDetails(ownerDetails);
 				owner.setAuditDetails(ownerAuditDetails);
 
@@ -130,57 +108,25 @@ public class EnrichmentService {
 		return owners;
 	}
 
-	private MortgageDetails getMortgage(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
-		String gen_mortgage_id = UUID.randomUUID().toString();
-
-		MortgageDetails mortgage = owner.getMortgageDetails();
-		mortgage.setId(gen_mortgage_id);
-		mortgage.setTenantId(property.getTenantId());
-		mortgage.setOwnerId(gen_owner_id);
-
-		return mortgage;
-	}
-
 	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
 
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
 		String gen_owner_details_id = UUID.randomUUID().toString();
 		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
-		List<Payment> paymentDetails = getPaymentDetails(property, owner, requestInfo, gen_owner_details_id);
+		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo);
 		List<CourtCase> courtCases = getCourtCases(owner, requestInfo, gen_owner_details_id);
+		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 
 		ownerDetails.setId(gen_owner_details_id);
 		ownerDetails.setTenantId(property.getTenantId());
 		ownerDetails.setOwnerId(gen_owner_id);
+		ownerDetails.setOwnerDocuments(ownerDocuments);
+		ownerDetails.setCourtCases(courtCases);
 		ownerDetails.setPaymentDetails(paymentDetails);
 		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
-		ownerDetails.setCourtCases(courtCases);
 
 		return ownerDetails;
-	}
-
-	private List<Payment> getPaymentDetails(Property property, Owner owner, RequestInfo requestInfo,
-			String gen_owner_details_id) {
-
-		List<Payment> paymentDetails = owner.getOwnerDetails().getPaymentDetails();
-
-		if (!CollectionUtils.isEmpty(paymentDetails)) {
-
-			AuditDetails paymentDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-
-			paymentDetails.forEach(paymentDetail -> {
-
-				String gen_payment_detail_id = UUID.randomUUID().toString();
-
-				paymentDetail.setId(gen_payment_detail_id);
-				paymentDetail.setTenantId(property.getTenantId());
-				paymentDetail.setOwnerDetailsId(gen_owner_details_id);
-				paymentDetail.setAuditDetails(paymentDetailsAuditDetails);
-
-			});
-		}
-		return paymentDetails;
 	}
 
 	private List<CourtCase> getCourtCases(Owner owner, RequestInfo requestInfo, String gen_owner_details_id) {
@@ -211,49 +157,63 @@ public class EnrichmentService {
 
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
-				AuditDetails modifyAuditDetails = property.getAuditDetails();
-				modifyAuditDetails.setLastModifiedBy(auditDetails.getLastModifiedBy());
-				modifyAuditDetails.setLastModifiedTime(auditDetails.getLastModifiedTime());
-				property.setAuditDetails(modifyAuditDetails);
-				property.getPropertyDetails().setAuditDetails(modifyAuditDetails);
 
-				PropertyDetails propertyDetail = updatePropertyDetail(property, requestInfo);
+				PropertyDetails propertyDetail = updatePropertyDetail(property, requestInfo, auditDetails);
 				property.setPropertyDetails(propertyDetail);
+				property.setAuditDetails(auditDetails);
 
-				if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
-					property.getPropertyDetails().getOwners().forEach(owner -> {
-						if (owner.getId() == null) {
-							List<Owner> ownerUpdate = getOwners(property, requestInfo, propertyDetail.getId());
-							propertyDetail.setOwners(ownerUpdate);
-						} else {
-							owner.setAuditDetails(modifyAuditDetails);
-							owner.getOwnerDetails().setAuditDetails(modifyAuditDetails);
-						}
-					});
-				}
 			});
 		}
 	}
 
-	private PropertyDetails updatePropertyDetail(Property property, RequestInfo requestInfo) {
+	private PropertyDetails updatePropertyDetail(Property property, RequestInfo requestInfo,
+			AuditDetails auditDetails) {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
-		List<Document> ownerDocuments = updateOwnerDocs(propertyDetail, property, requestInfo);
-		List<Payment> paymentDetails = updatePaymentDetails(propertyDetail, property, requestInfo);
+		List<Owner> owners = updateOwners(property, requestInfo);
 
-		propertyDetail.getOwners().forEach(owner -> {
-			owner.getOwnerDetails().setOwnerDocuments(ownerDocuments);
-			owner.getOwnerDetails().setPaymentDetails(paymentDetails);
-		});
+		propertyDetail.setOwners(owners);
+		propertyDetail.setAuditDetails(auditDetails);
 
 		return propertyDetail;
 	}
 
-	private List<Document> updateOwnerDocs(PropertyDetails propertyDetail, Property property, RequestInfo requestInfo) {
+	private List<Owner> updateOwners(Property property, RequestInfo requestInfo) {
+		List<Owner> owners = property.getPropertyDetails().getOwners();
+		AuditDetails ownerAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
+
+		owners.forEach(owner -> {
+			OwnerDetails ownerDetails = updateOwnerDetail(property, owner, requestInfo);
+			owner.setOwnerDetails(ownerDetails);
+			owner.setAuditDetails(ownerAuditDetails);
+		});
+
+		return owners;
+	}
+
+	private OwnerDetails updateOwnerDetail(Property property, Owner owner, RequestInfo requestInfo) {
+
+		OwnerDetails ownerDetails = owner.getOwnerDetails();
+		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
+
+		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo);
+//		List<CourtCase> courtCases = updateCourtCases(owner, requestInfo); TODO: Confirm that court details are not updated again
+		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
+
+		ownerDetails.setOwnerDocuments(ownerDocuments);
+//		ownerDetails.setCourtCases(courtCases); TODO: Confirm that court details are not updated again
+		ownerDetails.setPaymentDetails(paymentDetails);
+		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
+
+		return ownerDetails;
+	}
+
+	private List<Document> createUpdateOwnerDocs(Property property, RequestInfo requestInfo) {
 		List<Document> ownerDocs = new ArrayList<>();
-		propertyDetail.getOwners().forEach(owner -> {
+		property.getPropertyDetails().getOwners().forEach(owner -> {
 			List<Document> ownerDocuments = owner.getOwnerDetails().getOwnerDocuments();
 			if (!CollectionUtils.isEmpty(ownerDocuments)) {
 				AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				AuditDetails updateDocAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 				ownerDocuments.forEach(document -> {
 					if (document.getId() == null) {
 						String gen_doc_id = UUID.randomUUID().toString();
@@ -261,8 +221,9 @@ public class EnrichmentService {
 						document.setTenantId(property.getTenantId());
 						document.setReferenceId(owner.getOwnerDetails().getId());
 						document.setPropertyId(property.getId());
+						document.setAuditDetails(docAuditDetails);
 					}
-					document.setAuditDetails(docAuditDetails);
+					document.setAuditDetails(updateDocAuditDetails);
 				});
 				ownerDocs.addAll(ownerDocuments);
 			}
@@ -270,10 +231,9 @@ public class EnrichmentService {
 		return ownerDocs;
 	}
 
-	private List<Payment> updatePaymentDetails(PropertyDetails propertyDetail, Property property,
-			RequestInfo requestInfo) {
+	private List<Payment> createUpdatePaymentDetails(Property property, RequestInfo requestInfo) {
 		List<Payment> paymentDetails = new ArrayList<>();
-		propertyDetail.getOwners().forEach(owner -> {
+		property.getPropertyDetails().getOwners().forEach(owner -> {
 			List<Payment> payments = owner.getOwnerDetails().getPaymentDetails();
 			if (!CollectionUtils.isEmpty(payments)) {
 				AuditDetails paymentAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
@@ -399,6 +359,40 @@ public class EnrichmentService {
 				}
 			});
 		}
+	}
+
+	public void enrichMortgageDetailsRequest(PropertyRequest request) {
+		if (!CollectionUtils.isEmpty(request.getProperties())) {
+			request.getProperties().forEach(property -> {
+				property.getPropertyDetails().getOwners().forEach(owner -> {
+					// checking - owner is existing and mortgage details bound with user.
+					if (null != owner.getId() && !owner.getId().isEmpty() && null != owner.getMortgageDetails()) {
+						// validate mortgage details - documents
+						validateMortgageDetails(property, owner, request.getRequestInfo(), owner.getId());
+						owner.setMortgageDetails(getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
+					}
+				});
+			});
+		}
+	}
+
+	public void validateMortgageDetails(Property property, Owner owner, RequestInfo requestInfo, String id) {
+		MortgageDetails mortgage = owner.getMortgageDetails();
+		List<Map<String, Object>> fieldConfigurations = mdmsservice
+				.getMortgageDocumentConfig(mortgage.getMortgageType(), requestInfo, property.getTenantId());
+
+		// TODO :: write code to validate documents base on master json template.
+	}
+
+	private MortgageDetails getMortgage(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
+		String gen_mortgage_id = UUID.randomUUID().toString();
+
+		MortgageDetails mortgage = owner.getMortgageDetails();
+		mortgage.setId(gen_mortgage_id);
+		mortgage.setTenantId(property.getTenantId());
+		mortgage.setOwnerId(gen_owner_id);
+
+		return mortgage;
 	}
 
 }
