@@ -149,16 +149,15 @@ public class RentEnrichmentService {
 				.mode(ModeEnum.fromValue(PTConstants.MODE_GENERATED)).processed(false)
 				.receiptNo(paymentDetail.getReceiptNumber()).auditDetails(paymentAuditDetails).build());
 
-		// Get existing demands and rent account.
-		List<RentDemand> demands = propertyRepository
-				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
-		RentAccount account = propertyRepository
-				.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
-
+		if (CollectionUtils.isEmpty(property.getPayments())) {
+			property.setPayments(rentPayments);
+		} else {
+			property.getPayments().addAll(rentPayments);
+		}
 		// Settle the payment
-		if (!CollectionUtils.isEmpty(demands) && null != account) {
-			property.setRentCollections(rentCollectionService.settle(demands, rentPayments, account,
-					property.getPropertyDetails().getInterestRate()));
+		if (!CollectionUtils.isEmpty(property.getDemands()) && null != property.getRentAccount()) {
+			property.setRentCollections(rentCollectionService.settle(property.getDemands(), property.getPayments(),
+					property.getRentAccount(), property.getPropertyDetails().getInterestRate()));
 		}
 
 		// Save everything back to database

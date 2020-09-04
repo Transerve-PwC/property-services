@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import com.google.common.collect.Iterables;
 
+import org.egov.cpt.models.PaymentStatusEnum;
 import org.egov.cpt.models.RentAccount;
 import org.egov.cpt.models.RentAccountStatement;
 import org.egov.cpt.models.RentAccountStatement.Type;
@@ -80,7 +81,7 @@ public class RentCollectionService implements IRentCollectionService {
 		for (RentDemand demand : demandsAfterPayments) {
 			RentPayment payment = RentPayment.builder().amountPaid(0D).dateOfPayment(demand.getGenerationDate())
 					.build();
-			List<RentCollection> settledCollections = settlePayment(demandsToBeSettled, payment, account, 0);
+			List<RentCollection> settledCollections = settlePayment(demandsToBeSettled, payment, account, interestRate);
 			if (settledCollections.size() == 0) {
 				continue;
 			}
@@ -119,7 +120,7 @@ public class RentCollectionService implements IRentCollectionService {
 		 * extracted.
 		 */
 		boolean shouldExtractPrincipal = (effectiveAmount > 0 || interestRate == 0)
-				&& !didExtractAllDemandsInterest(demands, payment.getDateOfPayment());
+				&& didExtractAllDemandsInterest(demands, payment.getDateOfPayment());
 		/**
 		 * Amount is left after deducting interest for all the demands. Extract
 		 * Principal.
@@ -145,19 +146,20 @@ public class RentCollectionService implements IRentCollectionService {
 
 	/**
 	 * For each demand check if payment date is after the initialGracePeriod and
-	 * interest since is behind payment date.
+	 * interest since is on the same date.
 	 * 
 	 * @param demands
 	 * @param dateOfPayment
 	 * @return
 	 */
 	private boolean didExtractAllDemandsInterest(List<RentDemand> demands, long dateOfPayment) {
-		return demands.stream().filter(RentDemand::isUnPaid).filter(demand -> {
+		return demands.stream().filter(RentDemand::isUnPaid).allMatch(demand -> {
 			LocalDate demandGenerationDate = getLocalDate(demand.getGenerationDate());
 			LocalDate paymentDate = getLocalDate(dateOfPayment);
-			return demand.getInitialGracePeriod() < ChronoUnit.DAYS.between(demandGenerationDate, paymentDate)
-					&& dateOfPayment > demand.getInterestSince();
-		}).findAny().isPresent();
+			boolean isPaymentDateWithinGraceperiod = demand.getInitialGracePeriod() >= ChronoUnit.DAYS
+					.between(demandGenerationDate, paymentDate);
+			return isPaymentDateWithinGraceperiod || dateOfPayment == demand.getInterestSince();
+		});
 	}
 
 	private List<RentCollection> extractPrincipal(List<RentDemand> demands, double paymentAmount,
@@ -300,12 +302,12 @@ public class RentCollectionService implements IRentCollectionService {
 						statement);
 				currentPayment = paymentIterator.hasNext() ? paymentIterator.next() : null;
 			} else if (currentPayment == null) {
-				demandsToBeSettled.add(currentDemand);
+				demandsToBeSettled.add(this.cloneDemand(currentDemand));
 				rentSummary = getSummaryForDemand(interestRate, rentAccount, demandsToBeSettled, currentDemand,
 						statement);
 				currentDemand = demandIterator.hasNext() ? demandIterator.next() : null;
 			} else if (currentDemand.getGenerationDate() <= currentPayment.getDateOfPayment()) {
-				demandsToBeSettled.add(currentDemand);
+				demandsToBeSettled.add(this.cloneDemand(currentDemand));
 				rentSummary = getSummaryForDemand(interestRate, rentAccount, demandsToBeSettled, currentDemand,
 						statement);
 				currentDemand = demandIterator.hasNext() ? demandIterator.next() : null;
@@ -325,6 +327,18 @@ public class RentCollectionService implements IRentCollectionService {
 		return accountStatementItems;
 	}
 
+	private RentDemand cloneDemand(RentDemand rentDemand) {
+		return RentDemand.builder().collectionPrincipal(rentDemand.getCollectionPrincipal())
+				.status(PaymentStatusEnum.UNPAID).generationDate(rentDemand.getGenerationDate())
+				.interestSince(rentDemand.getGenerationDate()).initialGracePeriod(rentDemand.getInitialGracePeriod())
+				.remainingPrincipal(rentDemand.getCollectionPrincipal()).build();
+	}
+
+	private RentPayment clonePayment(RentPayment rentPayment) {
+		return RentPayment.builder().amountPaid(rentPayment.getAmountPaid())
+				.dateOfPayment(rentPayment.getDateOfPayment()).processed(false).build();
+	}
+
 	private RentSummary getSummaryForDemand(double interestRate, RentAccount rentAccount,
 			List<RentDemand> demandsToBeSettled, RentDemand currentDemand, RentAccountStatement statement) {
 		RentSummary rentSummary;
@@ -339,6 +353,7 @@ public class RentCollectionService implements IRentCollectionService {
 
 	private RentSummary calculateSummaryForPayment(double interestRate, RentAccount rentAccount,
 			List<RentDemand> demandsToBeSettled, RentPayment currentPayment, RentAccountStatement statement) {
+		currentPayment = this.clonePayment(currentPayment);
 		this.settle(demandsToBeSettled, Collections.singletonList(currentPayment), rentAccount, interestRate);
 		RentSummary rentSummary = calculateRentSummaryAt(demandsToBeSettled, rentAccount, interestRate,
 				currentPayment.getDateOfPayment());
