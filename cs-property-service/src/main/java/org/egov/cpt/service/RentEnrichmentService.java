@@ -143,7 +143,7 @@ public class RentEnrichmentService {
 		AuditDetails paymentAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
 		// Construct a new rent payment object.
-		List<RentPayment> RentPayments = Collections.singletonList(RentPayment.builder()
+		List<RentPayment> rentPayments = Collections.singletonList(RentPayment.builder()
 				.id(UUID.randomUUID().toString()).amountPaid(paymentDetail.getTotalAmountPaid().doubleValue())
 				.propertyId(property.getId()).dateOfPayment(System.currentTimeMillis())
 				.mode(ModeEnum.fromValue(PTConstants.MODE_GENERATED)).processed(false)
@@ -152,12 +152,12 @@ public class RentEnrichmentService {
 		// Get existing demands and rent account.
 		List<RentDemand> demands = propertyRepository
 				.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
-		RentAccount accounts = propertyRepository
+		RentAccount account = propertyRepository
 				.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
 
 		// Settle the payment
-		if (!CollectionUtils.isEmpty(demands) && null != accounts) {
-			property.setRentCollections(rentCollectionService.settle(demands, RentPayments, property.getRentAccount(),
+		if (!CollectionUtils.isEmpty(demands) && null != account) {
+			property.setRentCollections(rentCollectionService.settle(demands, rentPayments, account,
 					property.getPropertyDetails().getInterestRate()));
 		}
 

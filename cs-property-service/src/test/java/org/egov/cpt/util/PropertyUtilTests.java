@@ -29,6 +29,12 @@ public class PropertyUtilTests {
         }
     }
 
+    @Test
+    public void testValidConsumerCodeExtraction() {
+        String consumerCode = "SITE-378-2020-09-248-03-09-614";
+        assertEquals("378", utils.getTransitNumberFromConsumerCode(consumerCode));
+    }
+
     @Test(expected = CustomException.class)
     public void testInvalidConsumerCodes() {
         String[] transitSiteNumbers = { "", "10000", "A-9999", "234a2" };
