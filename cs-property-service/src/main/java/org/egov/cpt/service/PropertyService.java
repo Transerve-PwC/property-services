@@ -239,6 +239,8 @@ public class PropertyService {
 
 		Property property = propertiesFromDB.get(0);
 		property.setPaymentAmount(propertyFromRequest.getPaymentAmount());
+		property.setTransactionId(propertyFromRequest.getTransactionId());
+		property.setBankName(propertyFromRequest.getBankName());
 		Owner owner = utils.getCurrentOwnerFromProperty(property);
 
 		/**
