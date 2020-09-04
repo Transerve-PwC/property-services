@@ -19,7 +19,6 @@ import org.egov.ps.model.OwnerDetails;
 import org.egov.ps.model.Payment;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
-import org.egov.ps.model.PurchaseDetails;
 import org.egov.ps.model.idgen.IdResponse;
 import org.egov.ps.repository.IdGenRepository;
 import org.egov.ps.util.PSConstants;
@@ -46,7 +45,7 @@ public class EnrichmentService {
 
 	@Autowired
 	private MDMSService mdmsservice;
-	
+
 	public void enrichCreateRequest(PropertyRequest request) {
 
 		RequestInfo requestInfo = request.getRequestInfo();
@@ -65,15 +64,15 @@ public class EnrichmentService {
 
 			});
 		}
-	} 
-	
+	}
+
 	public void enrichMortgageDetailsRequest(PropertyRequest request) {
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
-				property.getPropertyDetails().getOwners().forEach(owner ->{
-					//checking -  owner is existing and mortgage details bound with user..
-					if(null != owner.getId() && !owner.getId().isEmpty() && null != owner.getMortgageDetails()) {
-						//validate mortgage details - documents 
+				property.getPropertyDetails().getOwners().forEach(owner -> {
+					// checking - owner is existing and mortgage details bound with user..
+					if (null != owner.getId() && !owner.getId().isEmpty() && null != owner.getMortgageDetails()) {
+						// validate mortgage details - documents
 						validateMortgageDetails(property, owner, request.getRequestInfo(), owner.getId());
 						owner.setMortgageDetails(getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
 					}
@@ -84,9 +83,10 @@ public class EnrichmentService {
 
 	public void validateMortgageDetails(Property property, Owner owner, RequestInfo requestInfo, String id) {
 		MortgageDetails mortgage = owner.getMortgageDetails();
-		List<Map<String, Object>> fieldConfigurations = mdmsservice.getMortgageDocumentConfig(mortgage.getMortgageType(), requestInfo, property.getTenantId());
-		
-		//TODO :: write code to validate documents base on master json template.
+		List<Map<String, Object>> fieldConfigurations = mdmsservice
+				.getMortgageDocumentConfig(mortgage.getMortgageType(), requestInfo, property.getTenantId());
+
+		// TODO :: write code to validate documents base on master json template.
 	}
 
 	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
@@ -96,16 +96,12 @@ public class EnrichmentService {
 		AuditDetails propertyDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
 		List<Owner> owners = getOwners(property, requestInfo, gen_property_details_id);
-		List<CourtCase> courtCases = getCourtCases(property, requestInfo, gen_property_details_id);
-		List<PurchaseDetails> purchaseDetails = getPurchaseDetails(property, requestInfo, gen_property_details_id);
 
 		propertyDetail.setId(gen_property_details_id);
 		propertyDetail.setTenantId(property.getTenantId());
 		propertyDetail.setPropertyId(gen_property_id);
 		propertyDetail.setAuditDetails(propertyDetailsAuditDetails);
 		propertyDetail.setOwners(owners);
-		propertyDetail.setCourtCases(courtCases);
-		propertyDetail.setPurchaseDetails(purchaseDetails);
 
 		return propertyDetail;
 	}
@@ -133,15 +129,15 @@ public class EnrichmentService {
 		}
 		return owners;
 	}
-	
+
 	private MortgageDetails getMortgage(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
 		String gen_mortgage_id = UUID.randomUUID().toString();
-		
+
 		MortgageDetails mortgage = owner.getMortgageDetails();
 		mortgage.setId(gen_mortgage_id);
 		mortgage.setTenantId(property.getTenantId());
 		mortgage.setOwnerId(gen_owner_id);
-		
+
 		return mortgage;
 	}
 
@@ -152,12 +148,14 @@ public class EnrichmentService {
 		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
 		List<Payment> paymentDetails = getPaymentDetails(property, owner, requestInfo, gen_owner_details_id);
+		List<CourtCase> courtCases = getCourtCases(owner, requestInfo, gen_owner_details_id);
 
 		ownerDetails.setId(gen_owner_details_id);
 		ownerDetails.setTenantId(property.getTenantId());
 		ownerDetails.setOwnerId(gen_owner_id);
 		ownerDetails.setPaymentDetails(paymentDetails);
 		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
+		ownerDetails.setCourtCases(courtCases);
 
 		return ownerDetails;
 	}
@@ -185,9 +183,9 @@ public class EnrichmentService {
 		return paymentDetails;
 	}
 
-	private List<CourtCase> getCourtCases(Property property, RequestInfo requestInfo, String gen_property_details_id) {
+	private List<CourtCase> getCourtCases(Owner owner, RequestInfo requestInfo, String gen_owner_details_id) {
 
-		List<CourtCase> courtCases = property.getPropertyDetails().getCourtCases();
+		List<CourtCase> courtCases = owner.getOwnerDetails().getCourtCases();
 
 		if (!CollectionUtils.isEmpty(courtCases)) {
 
@@ -198,36 +196,13 @@ public class EnrichmentService {
 				String gen_court_case_id = UUID.randomUUID().toString();
 
 				courtCase.setId(gen_court_case_id);
-				courtCase.setTenantId(property.getTenantId());
-				courtCase.setPropertyDetailsId(gen_property_details_id);
+				courtCase.setTenantId(owner.getTenantId());
+				courtCase.setOwnerDetailsId(gen_owner_details_id);
 				courtCase.setAuditDetails(courtCaseAuditDetails);
 
 			});
 		}
 		return courtCases;
-	}
-
-	private List<PurchaseDetails> getPurchaseDetails(Property property, RequestInfo requestInfo,
-			String gen_property_details_id) {
-
-		List<PurchaseDetails> purchaseDetails = property.getPropertyDetails().getPurchaseDetails();
-
-		if (!CollectionUtils.isEmpty(purchaseDetails)) {
-
-			AuditDetails purchaseDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-
-			purchaseDetails.forEach(purchaseDetail -> {
-
-				String gen_purchase_details_id = UUID.randomUUID().toString();
-
-				purchaseDetail.setId(gen_purchase_details_id);
-				purchaseDetail.setTenantId(property.getTenantId());
-				purchaseDetail.setPropertyDetailsId(gen_property_details_id);
-				purchaseDetail.setAuditDetails(purchaseDetailsAuditDetails);
-
-			});
-		}
-		return purchaseDetails;
 	}
 
 	public void enrichUpdateRequest(PropertyRequest request, List<Property> propertyFromDb) {
@@ -269,25 +244,6 @@ public class EnrichmentService {
 			owner.getOwnerDetails().setOwnerDocuments(ownerDocuments);
 			owner.getOwnerDetails().setPaymentDetails(paymentDetails);
 		});
-
-		if (!CollectionUtils.isEmpty(propertyDetail.getCourtCases())) {
-			propertyDetail.getCourtCases().forEach(courtCase -> {
-				if (courtCase.getId() == null) {
-					List<CourtCase> courtCases = getCourtCases(property, requestInfo, propertyDetail.getId());
-					propertyDetail.setCourtCases(courtCases);
-				}
-			});
-		}
-
-		if (!CollectionUtils.isEmpty(propertyDetail.getPurchaseDetails())) {
-			propertyDetail.getPurchaseDetails().forEach(purchaseDetail -> {
-				if (purchaseDetail.getId() == null) {
-					List<PurchaseDetails> purchaseDetails = getPurchaseDetails(property, requestInfo,
-							propertyDetail.getId());
-					propertyDetail.setPurchaseDetails(purchaseDetails);
-				}
-			});
-		}
 
 		return propertyDetail;
 	}
@@ -414,7 +370,7 @@ public class EnrichmentService {
 	}
 
 	public void enrichUpdateApplication(ApplicationRequest request) {
-		
+
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
 
@@ -424,7 +380,7 @@ public class EnrichmentService {
 				modifyAuditDetails.setLastModifiedBy(auditDetails.getLastModifiedBy());
 				modifyAuditDetails.setLastModifiedTime(auditDetails.getLastModifiedTime());
 				application.setAuditDetails(modifyAuditDetails);
-				
+
 				List<Document> applicationDocs = new ArrayList<>();
 				List<Document> applicationDocuments = application.getApplicationDocuments();
 				if (!CollectionUtils.isEmpty(applicationDocuments)) {
