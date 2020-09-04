@@ -54,7 +54,7 @@ public class UserService {
 	 * Returns existing user with `ownerMobileNumber` or creates a user with the
 	 * same mobile number.
 	 */
-	public void createUser(RequestInfo requestInfo, String ownerMobileNumber, String tenantId) {
+	public void createUser(RequestInfo requestInfo, String ownerMobileNumber,String ownerName, String tenantId) {
 		Role role = getCitizenRole(tenantId);
 		UserDetailResponse userDetailResponse = searchByUserName(ownerMobileNumber, getStateLevelTenant(tenantId));
 		org.egov.cpt.models.OwnerInfo owner = new org.egov.cpt.models.OwnerInfo();
@@ -63,7 +63,7 @@ public class UserService {
 			addUserDefaultFields(tenantId, role, owner);
 			StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userCreateEndpoint);
 			owner.setUserName(ownerMobileNumber);
-			owner.setName(ownerMobileNumber);
+			owner.setName(ownerName);
 			owner.setMobileNumber(ownerMobileNumber);
 
 			UserDetailResponse userResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
