@@ -54,7 +54,7 @@ public class UserService {
 	 * Returns existing user with `ownerMobileNumber` or creates a user with the
 	 * same mobile number.
 	 */
-	public void createUser(RequestInfo requestInfo, String ownerMobileNumber,String ownerName, String tenantId) {
+	public void createUser(RequestInfo requestInfo, String ownerMobileNumber, String ownerName, String tenantId) {
 		Role role = getCitizenRole(tenantId);
 		UserDetailResponse userDetailResponse = searchByUserName(ownerMobileNumber, getStateLevelTenant(tenantId));
 		org.egov.cpt.models.OwnerInfo owner = new org.egov.cpt.models.OwnerInfo();
@@ -78,18 +78,6 @@ public class UserService {
 				throw new CustomException("INVALID USER RESPONSE",
 						"The user create has failed for the mobileNumber : " + owner.getUserName());
 			}
-		} else {
-			owner.setId(userDetailResponse.getUser().get(0).getId());
-			owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
-			addUserDefaultFields(tenantId, role, owner);
-
-			StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userUpdateEndpoint);
-			userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
-			if (userDetailResponse.getUser().get(0).getUuid() == null) {
-				throw new CustomException("INVALID USER RESPONSE", "The user updated has uuid as null");
-			}
-			log.info("Existing user found with id {}, uuId {}", userDetailResponse.getUser().get(0).getId(),
-					userDetailResponse.getUser().get(0).getUuid());
 		}
 	}
 
