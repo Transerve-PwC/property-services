@@ -29,7 +29,7 @@ public class RentDetailQueryBuilder {
 			+ " FROM  cs_pt_demand demand ";
 
 	private static final String ACCOUNT_SEARCH_QUERY = SELECT + " account.*, "
-			+ " account.id as account_id,account.property_id as account_pid,account.remainingAmount as account_remainingAmount,"
+			+ " account.id as account_id,account.property_id as account_pid,account.remainingAmount as account_remainingAmount, account.remaining_since as account_remaining_since,"
 			+ " account.created_by as account_created_by, account.created_date as account_created_date,"
 			+ " account.modified_by as account_modified_by,account.modified_date as account_modified_date "
 

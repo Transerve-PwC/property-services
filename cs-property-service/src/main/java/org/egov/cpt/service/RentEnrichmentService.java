@@ -77,6 +77,7 @@ public class RentEnrichmentService {
 			property.setInActiveDemands(existingDemands);
 			property.setInActivePayments(existingPayments);
 			account.setRemainingAmount(0D);
+			account.setRemainingSince(0L);
 		} else {
 			property.setInActiveDemands(Collections.emptyList());
 			property.setInActivePayments(Collections.emptyList());

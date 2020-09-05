@@ -38,8 +38,6 @@ public class RentCollectionUtils {
 		});
 	}
 
-	private static final double ERROR_RANGE = 25.0D;
-
 	public void reconcileStatement(List<RentAccountStatement> accountStatementItems, double interestRate) {
 		Iterator<RentAccountStatement> accountStatementIterator = accountStatementItems.iterator();
 		RentAccountStatement prevItem = null;
@@ -90,8 +88,8 @@ public class RentCollectionUtils {
 				double expectedInterest = isPayment
 						? Math.max(0, prevItem.getRemainingInterest() + interestBetweenRange - currentItem.getAmount())
 						: prevItem.getRemainingInterest() + interestBetweenRange;
-				assertEquals(dateFormat.format(currentItem.getDate()), expectedInterest,
-						currentItem.getRemainingInterest(), ERROR_RANGE);
+				assertInRange(dateFormat.format(currentItem.getDate()), expectedInterest,
+						currentItem.getRemainingInterest());
 
 				double expectedPrincipal = isPayment
 						? (expectedInterest > 0 ? prevItem.getRemainingPrincipal()
@@ -99,16 +97,25 @@ public class RentCollectionUtils {
 										(prevItem.getRemainingPrincipal() + prevItem.getRemainingInterest()
 												+ interestBetweenRange) - currentItem.getAmount()))
 						: prevItem.getRemainingPrincipal() + currentItem.getAmount();
-				assertEquals(dateFormat.format(currentItem.getDate()), expectedPrincipal,
-						currentItem.getRemainingPrincipal(), ERROR_RANGE);
+				assertInRange(dateFormat.format(currentItem.getDate()), expectedPrincipal,
+						currentItem.getRemainingPrincipal());
 
 				double expectedBalance = isPayment ? Math.max(0, currentItem.getAmount()
 						- (prevItem.getRemainingPrincipal() + prevItem.getRemainingInterest() + interestBetweenRange))
 						: 0;
-				assertEquals(dateFormat.format(currentItem.getDate()), expectedBalance,
-						currentItem.getRemainingBalance(), ERROR_RANGE);
+				assertInRange(dateFormat.format(currentItem.getDate()), expectedBalance,
+						currentItem.getRemainingBalance());
 			}
 		}
+	}
+
+	private static final double ERROR_RANGE = 20.0D;
+
+	private void assertInRange(String message, Double expected, Double actual) {
+		if (expected - actual >= 0.000001) {
+			System.out.println(String.format("%s, error range %.10f", message, expected - actual));
+		}
+		assertEquals(message, expected, actual, ERROR_RANGE);
 	}
 
 	private long getDaysBetween(long startTimestamp, long endTimestamp) {

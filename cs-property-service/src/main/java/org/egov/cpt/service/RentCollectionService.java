@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.common.collect.Iterables;
-
 import org.egov.cpt.models.PaymentStatusEnum;
 import org.egov.cpt.models.RentAccount;
 import org.egov.cpt.models.RentAccountStatement;
@@ -23,7 +21,6 @@ import org.egov.cpt.models.RentDemand;
 import org.egov.cpt.models.RentPayment;
 import org.egov.cpt.models.RentSummary;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 @Service
 public class RentCollectionService implements IRentCollectionService {
@@ -53,9 +50,10 @@ public class RentCollectionService implements IRentCollectionService {
 		/**
 		 * We have positive account balance.
 		 */
-		List<RentDemand> leftOverDemands = demandsToBeSettled.stream().filter(RentDemand::isUnPaid)
+		List<RentDemand> newerDemands = demandsToBeSettled.stream()
+				.filter(d -> d.getGenerationDate() > account.getRemainingSince()).filter(RentDemand::isUnPaid)
 				.collect(Collectors.toList());
-		if (leftOverDemands.size() == 0) {
+		if (newerDemands.size() == 0) {
 			return collections;
 		}
 
@@ -64,24 +62,15 @@ public class RentCollectionService implements IRentCollectionService {
 		 * payed toward the end which should be adjusted to left over demands.
 		 */
 		ArrayList<RentCollection> result = new ArrayList<RentCollection>(collections);
-		List<RentDemand> demandsAfterPayments;
-		if (CollectionUtils.isEmpty(payments)) {
-			demandsAfterPayments = leftOverDemands;
-		} else {
-			RentPayment lastPayment = Iterables.getLast(payments, null);
-			demandsAfterPayments = leftOverDemands.stream()
-					.filter(demand -> demand.getGenerationDate() > lastPayment.getDateOfPayment())
-					.collect(Collectors.toList());
-		}
 
 		/**
 		 * Settle each demand by creating an empty payment with the demand generation
 		 * date.
 		 */
-		for (RentDemand demand : demandsAfterPayments) {
+		for (RentDemand demand : newerDemands) {
 			RentPayment payment = RentPayment.builder().amountPaid(0D).dateOfPayment(demand.getGenerationDate())
 					.build();
-			List<RentCollection> settledCollections = settlePayment(demandsToBeSettled, payment, account, interestRate);
+			List<RentCollection> settledCollections = settlePayment(demandsToBeSettled, payment, account, 0);
 			if (settledCollections.size() == 0) {
 				continue;
 			}
@@ -119,8 +108,8 @@ public class RentCollectionService implements IRentCollectionService {
 		 * Principal is to be extracted only when there are no demands with interest not
 		 * extracted.
 		 */
-		boolean shouldExtractPrincipal = (effectiveAmount > 0 || interestRate == 0)
-				&& didExtractAllDemandsInterest(demands, payment.getDateOfPayment());
+		boolean shouldExtractPrincipal = effectiveAmount > 0
+				&& (interestRate == 0 || didExtractAllDemandsInterest(demands, payment.getDateOfPayment()));
 		/**
 		 * Amount is left after deducting interest for all the demands. Extract
 		 * Principal.
@@ -135,6 +124,7 @@ public class RentCollectionService implements IRentCollectionService {
 		 * account
 		 */
 		account.setRemainingAmount(effectiveAmount);
+		account.setRemainingSince(payment.getDateOfPayment());
 
 		/**
 		 * Mark payment as processed.

@@ -232,7 +232,7 @@ public class RentCollectionServiceTests {
         List<RentPayment> payments = Arrays.asList();
         List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
                 payments, DEFAULT_INTEREST_RATE, null, null);
-        assertEquals(accountStatementItems.size(), 0);
+        assertEquals(accountStatementItems.size(), 1);
     }
 
     @Test
@@ -285,7 +285,7 @@ public class RentCollectionServiceTests {
         RentAccount rentAccount = getAccount(200);
         List<RentCollection> collections = this.rentCollectionService.settle(demands, payments, rentAccount,
                 DEFAULT_INTEREST_RATE);
-        assertEquals(0, collections.size());
+        assertEquals(1, collections.size());
     }
 
     @Test
