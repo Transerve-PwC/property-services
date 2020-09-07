@@ -41,8 +41,11 @@ public class PropertyRepository {
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, propertyRowMapper);
 	}
 
-	public Property findPropertyById(String propertyId) {
-		PropertyCriteria propertySearchCriteria = PropertyCriteria.builder().propertyId(propertyId).build();
+	public Property findPropertyById(String branchType, String propertyId) {
+		PropertyCriteria propertySearchCriteria = PropertyCriteria.builder()
+														.propertyId(propertyId)
+														.branchType(branchType)
+														.build();
 		List<Property> properties = this.getProperties(propertySearchCriteria);
 		if (properties == null || properties.isEmpty()) {
 			return null;

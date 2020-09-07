@@ -79,7 +79,7 @@ public class ApplicationValidatorService {
 		List<Application> applications = request.getApplications();
 		applications.stream().forEach(application -> {
 			String propertyId = application.getProperty().getId();
-			validatePropertyExists(request.getRequestInfo(), propertyId);
+			validatePropertyExists(application, propertyId);
 			JsonNode applicationDetails = application.getApplicationDetails();
 			try {
 				String applicationDetailsString = this.objectMapper.writeValueAsString(applicationDetails);
@@ -100,8 +100,8 @@ public class ApplicationValidatorService {
 		});
 	}
 
-	private void validatePropertyExists(RequestInfo requestInfo, String propertyId) {
-		Property property = propertyRepository.findPropertyById(propertyId);
+	private void validatePropertyExists(Application application, String propertyId) {
+		Property property = propertyRepository.findPropertyById(application.getBranchType(), propertyId);
 		if (property == null || !property.getState().contentEquals(PSConstants.PM_APPROVED)) {
 			throw new CustomException("INVALID_PROPERTY", "Could not find property with the given id");
 		}

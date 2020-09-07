@@ -32,6 +32,8 @@ public class PropertyCriteria {
 	private Long limit;
 
 	private String propertyId;
+	
+	private String branchType;
 
 	private List<String> relations;
 

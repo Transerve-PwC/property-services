@@ -47,7 +47,9 @@ public class PostApprovalEnrichmentService {
 
 				if (application.getProperty().getId() != null) {
 					PropertyCriteria propertySearchCriteria = PropertyCriteria.builder()
-							.propertyId(application.getProperty().getId()).build();
+									.branchType(application.getBranchType())
+									.propertyId(application.getProperty().getId())
+									.build();
 
 					List<Property> properties = propertyRepository.getProperties(propertySearchCriteria);
 

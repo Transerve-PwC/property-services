@@ -30,7 +30,7 @@ public class PropertyQueryBuilder {
 	private static final String CC_ALL = " cc.*, ";
 	private static final String PD_ALL = "  pd.*, ";
 
-	private static final String PT_COLUMNS = " pt.id as pid, pt.file_number, pt.tenantid as pttenantid, pt.category, pt.sub_category, "
+	private static final String PT_COLUMNS = " pt.id as pid, pm_app.branch_type as branch_type, pt.file_number, pt.tenantid as pttenantid, pt.category, pt.sub_category, "
 			+ " pt.site_number, pt.sector_number, pt.state as pstate, pt.action as paction, pt.created_by as pcreated_by, pt.created_time as pcreated_time, "
 			+ " pt.last_modified_by as pmodified_by, pt.last_modified_time as pmodified_time,"
 
@@ -80,8 +80,9 @@ public class PropertyQueryBuilder {
 			+ " pd.created_by as pdcreated_by, pd.created_time as pdcreated_time, pd.last_modified_by as pdmodified_by, pd.last_modified_time as pdmodified_time ";
 
 	private static final String PT_TABLE = " FROM cs_pm_property_v1 pt " + INNER_JOIN
-			+ " cs_pm_property_details_v1 ptdl  ON pt.id =ptdl.property_id ";
-
+			+ " cs_pm_property_details_v1 ptdl  ON pt.id =ptdl.property_id " + INNER_JOIN
+			+ " cs_pm_application_v1 pm_app ON pt.id= ptdl.property_id ";
+	
 	private static final String OWNER_TABLE = " cs_pm_owner_v1 ownership  ON ptdl.id=ownership.property_details_id "
 			+ LEFT_JOIN + " cs_pm_owner_details_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
 			+ " cs_pm_documents_v1 doc ON od.id=doc.reference_id " + LEFT_JOIN
@@ -247,6 +248,12 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append("pt.id = :id");
 			preparedStmtList.put("id", criteria.getPropertyId());
+		}
+		
+		if (null != criteria.getBranchType()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("pm_app.branch_type = :branch_type");
+			preparedStmtList.put("branch_type", criteria.getBranchType());
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
