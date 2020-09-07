@@ -315,6 +315,8 @@ serviceMaps:
 
       - jsonPath: $.Properties.*.rentAccount.remainingAmount
 
+      - jsonPath: $.Properties.*.rentAccount.remainingSince
+
       - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedBy
 
       - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedTime
@@ -665,6 +667,8 @@ serviceMaps:
       - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedTime
 
       - jsonPath: $.Properties.*.rentAccount.remainingAmount
+
+      - jsonPath: $.Properties.*.rentAccount.remainingSince
 
       - jsonPath: $.Properties.*.rentAccount.auditDetails.lastModifiedBy
 
