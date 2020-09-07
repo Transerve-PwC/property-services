@@ -66,7 +66,7 @@ public class PropertyValidator {
 
 	private void validateRole(PropertyRequest request, Map<String, String> errorMap) {
 		
-		boolean errorFlag = true;
+		//fetch all userinfo roles...
 		RequestInfo requestInfo = request.getRequestInfo();
 		List<org.egov.common.contract.request.Role> roleList = null;
 		if(null != requestInfo.getUserInfo()) {
@@ -76,16 +76,19 @@ public class PropertyValidator {
 			roleList.stream().forEach(r -> {
 				roleCode.add(r.getCode());
 			});
-			
-			if(roleCode.contains("Estate")) {
-				errorFlag = false;
+		}
+		
+		
+		//check with proerpty have branch type as per userinfo role
+		List<Property> propertyList = request.getProperties();
+		for (Property property_ : propertyList) {
+			if(null != property_.getPropertyDetails() && 
+					!roleList.contains(property_.getPropertyDetails().getBranchType())){
+				errorMap.put("INVALID ROLE",
+						"ROLE is not valid for user : " + requestInfo.getUserInfo().getName());
 			}
 		}
 		
-		if(errorFlag) {
-			errorMap.put("INVALID ROLE",
-					"ROLE is not valid for user : " + requestInfo.getUserInfo().getName());
-		}
 	}
 
 	private void validateOwner(PropertyRequest request, Map<String, String> errorMap) {
