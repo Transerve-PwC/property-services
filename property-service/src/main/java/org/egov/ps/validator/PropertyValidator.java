@@ -1,17 +1,15 @@
 package org.egov.ps.validator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
-import org.egov.ps.model.Document;
 import org.egov.ps.model.EstateDocumentList;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.Property;
@@ -61,8 +59,33 @@ public class PropertyValidator {
 
 		Map<String, String> errorMap = new HashMap<>();
 
+		validateRole(request, errorMap);
 		validateOwner(request, errorMap);
 
+	}
+
+	private void validateRole(PropertyRequest request, Map<String, String> errorMap) {
+		
+		boolean errorFlag = true;
+		RequestInfo requestInfo = request.getRequestInfo();
+		List<org.egov.common.contract.request.Role> roleList = null;
+		if(null != requestInfo.getUserInfo()) {
+			roleList = requestInfo.getUserInfo().getRoles();
+			List<String> roleCode =  new ArrayList<String>(0);
+					
+			roleList.stream().forEach(r -> {
+				roleCode.add(r.getCode());
+			});
+			
+			if(roleCode.contains("Estate")) {
+				errorFlag = false;
+			}
+		}
+		
+		if(errorFlag) {
+			errorMap.put("INVALID ROLE",
+					"ROLE is not valid for user : " + requestInfo.getUserInfo().getName());
+		}
 	}
 
 	private void validateOwner(PropertyRequest request, Map<String, String> errorMap) {
@@ -127,6 +150,8 @@ public class PropertyValidator {
 	public List<Property> validateUpdateRequest(PropertyRequest request) {
 
 		Map<String, String> errorMap = new HashMap<>();
+
+		validateRole(request, errorMap);
 
 		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
 		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);

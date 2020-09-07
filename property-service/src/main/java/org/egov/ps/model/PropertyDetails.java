@@ -39,6 +39,9 @@ public class PropertyDetails {
 
 	@JsonProperty("propertyId")
 	private String propertyId;
+	
+	@JsonProperty("branchType")
+	private String branchType;
 
 	@JsonProperty("propertyType")
 	private String propertyType;
