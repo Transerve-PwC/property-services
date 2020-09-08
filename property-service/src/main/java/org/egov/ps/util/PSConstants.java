@@ -19,7 +19,7 @@ public class PSConstants {
 	public static final String MDMS_PS_CODE_FILTER = "$.*.code";
 
 	public static final String MDMS_PS_FIELD_FILTER = ".*.fields.*";
-	
+
 	public static final String MDMS_DOCUMENT_FIELD_FILTER = ".*.documentList.*";
 
 	public static final String EB_OT_SD = "EstateBranch_OwnershipTransfer_SaleDeed";
@@ -27,5 +27,11 @@ public class PSConstants {
 	public static final String EB_OT_RW = "EstateBranch_OwnershipTransfer_RegisteredWill";
 
 	public static final String MDMS_PS_MORTGAGE_FILTER = ".*.documentList.*";
+
+	public static final String MDMS_PS_BRANCH_ESTATE_FILTER = "[?(@.code=='BRANCH_ESTATE')]";
+
+	public static final String MDMS_PS_BRANCH_BUILDING_FILTER = "[?(@.code=='BRANCH_BUILDING')]";
+
+	public static final String MDMS_PS_BRANCH_MANIMAJRA_FILTER = "[?(@.code=='BRANCH_MANIMAJRA')]";
 
 }

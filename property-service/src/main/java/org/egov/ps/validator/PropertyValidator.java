@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
+import org.egov.ps.model.Role;
 import org.egov.ps.model.EstateDocumentList;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.Property;
@@ -59,14 +60,13 @@ public class PropertyValidator {
 
 		Map<String, String> errorMap = new HashMap<>();
 
-		validateRole(request, errorMap);
+		validateUserRole(request, errorMap);
 		validateOwner(request, errorMap);
 
 	}
 
-	private void validateRole(PropertyRequest request, Map<String, String> errorMap) {
-		
-		//fetch all userinfo roles...
+	private void validateUserRole(PropertyRequest request, Map<String, String> errorMap) {
+		//fetch all user info roles...
 		RequestInfo requestInfo = request.getRequestInfo();
 		List<org.egov.common.contract.request.Role> roleList = null;
 		if(null != requestInfo.getUserInfo()) {
@@ -74,16 +74,28 @@ public class PropertyValidator {
 			List<String> roleCode =  new ArrayList<String>(0);
 					
 			roleList.stream().forEach(r -> {
-				roleCode.add(r.getCode());
+				roleCode.add(r.getName());
 			});
 		}
 		
-		
-		//check with proerpty have branch type as per userinfo role
+		//fetch all mdms data for branch type and check with user role is present...
 		List<Property> propertyList = request.getProperties();
 		for (Property property_ : propertyList) {
-			if(null != property_.getPropertyDetails() && 
-					!roleList.contains(property_.getPropertyDetails().getBranchType())){
+			
+			List<Map<String, Object>> fieldConfigurations = mdmsservice.getBranchRoles("branchtype", request.getRequestInfo(), "ch", property_.getPropertyDetails().getBranchType());
+			System.out.println(fieldConfigurations);
+			
+			ObjectMapper mapper = new ObjectMapper();
+			List<Role> roleListMdMS = mapper.convertValue(fieldConfigurations, new TypeReference<List<Role>>() { });
+			
+			boolean error = true;
+			for (Role r : roleListMdMS) {
+				if(null != roleList && !roleList.isEmpty() && roleList.contains(r.getRole())) {
+					error = false;
+				}
+			}
+			
+			if(error){
 				errorMap.put("INVALID ROLE",
 						"ROLE is not valid for user : " + requestInfo.getUserInfo().getName());
 			}
@@ -154,7 +166,7 @@ public class PropertyValidator {
 
 		Map<String, String> errorMap = new HashMap<>();
 
-		validateRole(request, errorMap);
+		validateUserRole(request, errorMap);
 
 		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
 		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);

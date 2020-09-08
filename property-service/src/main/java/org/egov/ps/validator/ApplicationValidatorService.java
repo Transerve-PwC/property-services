@@ -11,6 +11,7 @@ import org.egov.ps.annotation.ApplicationValidator;
 import org.egov.ps.model.Application;
 import org.egov.ps.model.ApplicationCriteria;
 import org.egov.ps.model.Property;
+import org.egov.ps.model.Role;
 import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.service.MDMSService;
 import org.egov.ps.util.PSConstants;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
@@ -77,7 +79,7 @@ public class ApplicationValidatorService {
 	}
 
 	public void validateCreateRequest(ApplicationRequest request) {
-		validateRole(request);
+		validateUserRole(request);
 		List<Application> applications = request.getApplications();
 		applications.stream().forEach(application -> {
 			String propertyId = application.getProperty().getId();
@@ -102,26 +104,37 @@ public class ApplicationValidatorService {
 		});
 	}
 
-	private void validateRole(ApplicationRequest request) {
-
-		//fetch all userinfo roles... 
+	private void validateUserRole(ApplicationRequest request) {
+		//fetch all user info roles...
 		RequestInfo requestInfo = request.getRequestInfo();
 		List<org.egov.common.contract.request.Role> roleList = null;
 		if(null != requestInfo.getUserInfo()) {
 			roleList = requestInfo.getUserInfo().getRoles();
 			List<String> roleCode =  new ArrayList<String>(0);
-
+					
 			roleList.stream().forEach(r -> {
-				roleCode.add(r.getCode());
+				roleCode.add(r.getName());
 			});
 		}
 
-
-		//check with proerpty have branch type as per userinfo role
+		//fetch all mdms data for branch type and check with user role is present...
 		List<Application> applicationList = request.getApplications();
 		for (Application application_ : applicationList) {
-			if(null != application_.getBranchType() && 
-					!roleList.contains(application_.getBranchType())){
+			
+			List<Map<String, Object>> fieldConfigurations = mdmsService.getBranchRoles("branchtype", request.getRequestInfo(), "ch", application_.getBranchType());
+			System.out.println(fieldConfigurations);
+			
+			ObjectMapper mapper = new ObjectMapper();
+			List<Role> roleListMdMS = mapper.convertValue(fieldConfigurations, new TypeReference<List<Role>>() { });
+			
+			boolean error = true;
+			for (Role r : roleListMdMS) {
+				if(null != roleList && !roleList.isEmpty() && roleList.contains(r.getRole())) {
+					error = false;
+				}
+			}
+			
+			if(error){
 				throw new CustomException("INVALID ROLE",
 						"ROLE is not valid for user : " + requestInfo.getUserInfo().getName());
 			}
@@ -225,7 +238,7 @@ public class ApplicationValidatorService {
 	}
 
 	public List<Application> getApplications(ApplicationRequest applicationRequest) {
-		validateRole(applicationRequest);
+		validateUserRole(applicationRequest);
 		ApplicationCriteria criteria = getApplicationCriteria(applicationRequest);
 		List<Application> applications = propertyRepository.getApplications(criteria);
 
