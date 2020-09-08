@@ -30,4 +30,6 @@ public class RentAccount {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 
+	@Builder.Default
+	private Long remainingSince = 0L;
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.cpt.config.PropertyConfiguration;
@@ -192,13 +191,14 @@ public class PropertyService {
 						.getPropertyRentDemandDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
 				List<RentPayment> payments = repository
 						.getPropertyRentPaymentDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
-				RentAccount accounts = repository
+				RentAccount rentAccount = repository
 						.getPropertyRentAccountDetails(PropertyCriteria.builder().propertyId(property.getId()).build());
-				if (!CollectionUtils.isEmpty(demands) && null != accounts) {
-					property.setRentSummary(rentCollectionService.calculateRentSummary(demands, accounts,
+				if (!CollectionUtils.isEmpty(demands) && null != rentAccount) {
+					property.setRentSummary(rentCollectionService.calculateRentSummary(demands, rentAccount,
 							property.getPropertyDetails().getInterestRate()));
 					property.setDemands(demands);
 					property.setPayments(payments);
+					property.setRentAccount(rentAccount);
 				}
 			});
 		}
@@ -239,6 +239,8 @@ public class PropertyService {
 
 		Property property = propertiesFromDB.get(0);
 		property.setPaymentAmount(propertyFromRequest.getPaymentAmount());
+		property.setTransactionId(propertyFromRequest.getTransactionId());
+		property.setBankName(propertyFromRequest.getBankName());
 		Owner owner = utils.getCurrentOwnerFromProperty(property);
 
 		/**

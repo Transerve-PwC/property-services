@@ -64,7 +64,7 @@ public class EnrichmentService {
 
 			});
 		}
-	}
+	} 
 
 	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
 
@@ -109,6 +109,7 @@ public class EnrichmentService {
 	}
 
 	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id, String gen_property_id) {
+
 
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
 		String gen_owner_details_id = UUID.randomUUID().toString();
