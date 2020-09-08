@@ -12,7 +12,6 @@ CREATE TABLE cs_ep_application_v1 (
    hardcopy_received_date 	bigint,
    state   					CHARACTER VARYING (256),
    action    				CHARACTER VARYING (256),
-   application_details 		jsonb,
   
    created_by           	CHARACTER VARYING (128) NOT NULL,
    last_modified_by     	CHARACTER VARYING (128),
