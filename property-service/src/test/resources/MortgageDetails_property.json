@@ -26,7 +26,7 @@
 				"tenantId": "ch",
 				"propertyDetailsId":"a455241a-c991-47bc-9365-14bed0417ceb",
 				"serialNumber": "pm1",
-				"share": true,
+				"share": 0.0,
 				"cpNumber": "cp1",
 				"state": "",
 				"action": "DRAFT",

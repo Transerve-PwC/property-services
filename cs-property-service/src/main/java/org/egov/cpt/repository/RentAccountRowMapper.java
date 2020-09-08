@@ -21,7 +21,8 @@ public class RentAccountRowMapper implements ResultSetExtractor<RentAccount> {
 					.createdTime(rs.getLong("account_created_date")).lastModifiedBy(rs.getString("account_modified_by"))
 					.lastModifiedTime(rs.getLong("account_modified_date")).build();
 			rentAccount = RentAccount.builder().id(rs.getString("account_id")).propertyId("account_pid")
-					.remainingAmount(rs.getDouble("account_remainingAmount")).auditDetails(accountAuditDetails).build();
+					.remainingAmount(rs.getDouble("account_remainingAmount"))
+					.remainingSince(rs.getLong("account_remaining_since")).auditDetails(accountAuditDetails).build();
 		}
 		return rentAccount;
 	}

@@ -1,5 +1,7 @@
 package org.egov.ps.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -41,5 +43,8 @@ public class MortgageDetails {
 
 	@JsonProperty("loanAmount")
 	private String loanAmount;
+	
+	@JsonProperty("mortgageDocuments")
+	private List<Document> mortgageDocuments;
 	
 }

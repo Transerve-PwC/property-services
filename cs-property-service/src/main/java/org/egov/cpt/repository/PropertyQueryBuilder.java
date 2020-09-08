@@ -251,6 +251,9 @@ public class PropertyQueryBuilder {
 			preparedStmtList.put("id", criteria.getPropertyId());
 		}
 
+		if (relations == null || relations.contains(PTConstants.RELATION_OWNER)) {
+			builder.append(" ORDER BY ownership.active_state desc, ownership.created_date desc ");
+		}
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
 

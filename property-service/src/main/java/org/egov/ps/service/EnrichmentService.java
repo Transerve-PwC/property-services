@@ -83,7 +83,8 @@ public class EnrichmentService {
 		return propertyDetail;
 	}
 
-	private List<Owner> getOwners(Property property, RequestInfo requestInfo, String gen_property_details_id, String gen_property_id) {
+	private List<Owner> getOwners(Property property, RequestInfo requestInfo, String gen_property_details_id,
+			String gen_property_id) {
 
 		List<Owner> owners = property.getPropertyDetails().getOwners();
 
@@ -108,13 +109,15 @@ public class EnrichmentService {
 		return owners;
 	}
 
-	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id, String gen_property_id) {
+	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id,
+			String gen_property_id) {
 
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
 		String gen_owner_details_id = UUID.randomUUID().toString();
 		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
-		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, gen_owner_details_id, gen_property_id);
+		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, gen_owner_details_id,
+				gen_property_id);
 		List<CourtCase> courtCases = getCourtCases(owner, requestInfo, gen_owner_details_id);
 		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 
@@ -195,7 +198,8 @@ public class EnrichmentService {
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
 		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 
-		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, ownerDetails.getId(), property.getId());
+		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, ownerDetails.getId(),
+				property.getId());
 //		List<CourtCase> courtCases = updateCourtCases(owner, requestInfo); TODO: Confirm that court details are not updated again
 		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 
@@ -207,7 +211,8 @@ public class EnrichmentService {
 		return ownerDetails;
 	}
 
-	private List<Document> createUpdateOwnerDocs(Property property, RequestInfo requestInfo, String reference_id, String gen_property_id) {
+	private List<Document> createUpdateOwnerDocs(Property property, RequestInfo requestInfo, String reference_id,
+			String gen_property_id) {
 		List<Document> ownerDocs = new ArrayList<>();
 		property.getPropertyDetails().getOwners().forEach(owner -> {
 			List<Document> ownerDocuments = owner.getOwnerDetails().getOwnerDocuments();

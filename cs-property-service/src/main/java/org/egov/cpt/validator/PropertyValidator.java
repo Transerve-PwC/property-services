@@ -950,7 +950,7 @@ public class PropertyValidator {
 		 */
 		mdmsDocuments.stream().filter(d -> ((boolean) (d.get("required")))).map(d -> d.get("code"))
 				.forEach(documentCode -> {
-					long count = documents.stream().map(Document::getDocumentType)
+					long count = documents.stream().filter(Document::getActive).map(Document::getDocumentType)
 							.filter(type -> type.equalsIgnoreCase(String.valueOf(documentCode))).count();
 					if (count == 0) {
 						errorMap.put("REQUIRED DOCUMENT NOT FOUND",

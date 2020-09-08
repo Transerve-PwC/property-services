@@ -38,28 +38,28 @@ public class Document {
 
 	@Size(max = 64)
 	@JsonProperty("tenantId")
-	private String tenantId = null;
+	private String tenantId;
 
 	@JsonProperty("active")
 	private Boolean active;
 
 	@Size(max = 64)
 	@JsonProperty("documentType")
-	private String documentType = null;
+	private String documentType;
 
 	@Size(max = 64)
 	@JsonProperty("fileStoreId")
-	private String fileStoreId = null;
+	private String fileStoreId;
 
 	@Size(max = 64)
 	@JsonProperty("documentUid")
 	private String documentUid;
-	
+
 	@Size(max = 64)
 	@JsonProperty("propertyId")
 	private String propertyId;
 
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
+	private AuditDetails auditDetails;
 
 }

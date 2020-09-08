@@ -217,6 +217,9 @@ public class RentCollectionServiceTests {
     public void testUsecase1() throws ParseException {
         List<RentDemand> demands = Arrays.asList(getDemand(10000, DEC_1_1998));
         List<RentPayment> payments = Arrays.asList(getPayment(200, FEB_16_1999), getPayment(200, APR_1_1999));
+        RentAccount account = getAccount(0);
+        List<RentCollection> collections = this.rentCollectionService.settle(demands, payments, account,
+                DEFAULT_INTEREST_RATE);
         List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
                 payments, DEFAULT_INTEREST_RATE, null, null);
         utils.printStatement(accountStatementItems);
@@ -229,7 +232,7 @@ public class RentCollectionServiceTests {
         List<RentPayment> payments = Arrays.asList();
         List<RentAccountStatement> accountStatementItems = this.rentCollectionService.getAccountStatement(demands,
                 payments, DEFAULT_INTEREST_RATE, null, null);
-        assertEquals(accountStatementItems.size(), 0);
+        assertEquals(accountStatementItems.size(), 1);
     }
 
     @Test
@@ -282,7 +285,7 @@ public class RentCollectionServiceTests {
         RentAccount rentAccount = getAccount(200);
         List<RentCollection> collections = this.rentCollectionService.settle(demands, payments, rentAccount,
                 DEFAULT_INTEREST_RATE);
-        assertEquals(0, collections.size());
+        assertEquals(1, collections.size());
     }
 
     @Test
