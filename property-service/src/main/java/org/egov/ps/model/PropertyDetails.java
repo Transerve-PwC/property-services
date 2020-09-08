@@ -1,5 +1,6 @@
 package org.egov.ps.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +47,12 @@ public class PropertyDetails {
 	@JsonProperty("typeOfAllocation")
 	private String typeOfAllocation;
 
+	@JsonProperty("emdAmount")
+	private BigDecimal emdAmount;
+	
+	@JsonProperty("emdDate")
+	private Long emdDate;
+
 	@JsonProperty("modeOfAuction")
 	private String modeOfAuction;
 
@@ -56,10 +63,10 @@ public class PropertyDetails {
 	private Long dateOfAuction;
 
 	@JsonProperty("areaSqft")
-	private String areaSqft;
+	private int areaSqft;
 
 	@JsonProperty("ratePerSqft")
-	private String ratePerSqft;
+	private BigDecimal ratePerSqft;
 
 	@JsonProperty("lastNocDate")
 	private Long lastNocDate;
@@ -67,17 +74,29 @@ public class PropertyDetails {
 	@JsonProperty("serviceCategory")
 	private String serviceCategory;
 
-	@JsonProperty("owners")
-	private List<Owner> owners;
+	@JsonProperty("isPropertyActive")
+	private Boolean isPropertyActive;
 
-	@JsonProperty("courtCases")
-	private List<CourtCase> courtCases;
+	@JsonProperty("tradeType")
+	private String tradeType;
 
-	@JsonProperty("purchaseDetails")
-	private List<PurchaseDetails> purchaseDetails;
+	@JsonProperty("companyName")
+	private String companyName;
+
+	@JsonProperty("companyAddress")
+	private String companyAddress;
+
+	@JsonProperty("companyRegistrationNumber")
+	private String companyRegistrationNumber;
+
+	@JsonProperty("companyType")
+	private String companyType;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+
+	@JsonProperty("owners")
+	private List<Owner> owners;
 
 	public PropertyDetails addOwnerItem(Owner newOwnerItem) {
 		if (this.owners == null) {
@@ -90,35 +109,7 @@ public class PropertyDetails {
 		}
 		this.owners.add(newOwnerItem);
 		return this;
-		
-	}
 
-	public PropertyDetails addCourtCaseItem(CourtCase courtCaseItem) {
-		if (this.courtCases == null) {
-			this.courtCases = new ArrayList<>();
-		}
-		for (CourtCase courtCase : courtCases) {
-			if (courtCase.getId().equalsIgnoreCase(courtCaseItem.getId())) {
-				return this;
-			}
-		}
-		this.courtCases.add(courtCaseItem);
-		return this;
-		
-	}
-	
-	public PropertyDetails addPurchaseDetailsItem(PurchaseDetails purchaseDetailsItem) {
-		if (this.purchaseDetails == null) {
-			this.purchaseDetails = new ArrayList<>();
-		}
-		for (PurchaseDetails purchaseDetail : purchaseDetails) {
-			if (purchaseDetail.getId().equalsIgnoreCase(purchaseDetailsItem.getId())) {
-				return this;
-			}
-		}
-		this.purchaseDetails.add(purchaseDetailsItem);
-		return this;
-		
 	}
 
 }

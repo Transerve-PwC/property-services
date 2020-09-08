@@ -58,7 +58,7 @@ public class Owner {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 	
-	@JsonProperty("mortgageDetails")
+	@JsonProperty("mortgageDetails") // TODO: I think it should be in ownerDetails
 	private MortgageDetails mortgageDetails;
 
 }

@@ -5,8 +5,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.ps.model.WorkFlowResponseDetails;
 import org.egov.ps.service.WorkflowCreationService;
+import org.egov.ps.web.contracts.WorkFlowResponseDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

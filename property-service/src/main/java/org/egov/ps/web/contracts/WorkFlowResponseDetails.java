@@ -1,4 +1,4 @@
-package org.egov.ps.model;
+package org.egov.ps.web.contracts;
 
 import lombok.Builder;
 import lombok.Getter;

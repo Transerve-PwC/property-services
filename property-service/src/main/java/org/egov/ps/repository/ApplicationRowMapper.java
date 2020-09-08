@@ -150,7 +150,7 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 						.guardianRelation(rs.getString("odguardian_relation"))
 						.mobileNumber(rs.getString("odmobile_number"))
 						.allotmentNumber(rs.getString("odallotment_number"))
-						.dateOfAllotment(rs.getLong("oddate_of_allotment")).dueAmount(rs.getBigDecimal("oddue_amount"))
+						.dateOfAllotment(rs.getLong("oddate_of_allotment"))
 						.address(rs.getString("odaddress")).build();
 
 				Owner owners = Owner.builder().id(ownerId).propertyDetailsId(OwnerPropertyDetailId)
