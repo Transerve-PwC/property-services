@@ -72,7 +72,7 @@ public class EnrichmentService {
 		String gen_property_details_id = UUID.randomUUID().toString();
 		AuditDetails propertyDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
-		List<Owner> owners = getOwners(property, requestInfo, gen_property_details_id);
+		List<Owner> owners = getOwners(property, requestInfo, gen_property_details_id, gen_property_id);
 
 		propertyDetail.setId(gen_property_details_id);
 		propertyDetail.setTenantId(property.getTenantId());
@@ -83,7 +83,7 @@ public class EnrichmentService {
 		return propertyDetail;
 	}
 
-	private List<Owner> getOwners(Property property, RequestInfo requestInfo, String gen_property_details_id) {
+	private List<Owner> getOwners(Property property, RequestInfo requestInfo, String gen_property_details_id, String gen_property_id) {
 
 		List<Owner> owners = property.getPropertyDetails().getOwners();
 
@@ -94,7 +94,7 @@ public class EnrichmentService {
 			owners.forEach(owner -> {
 
 				String gen_owner_id = UUID.randomUUID().toString();
-				OwnerDetails ownerDetails = getOwnerDetail(property, owner, requestInfo, gen_owner_id);
+				OwnerDetails ownerDetails = getOwnerDetail(property, owner, requestInfo, gen_owner_id, gen_property_id);
 
 				owner.setId(gen_owner_id);
 				owner.setTenantId(property.getTenantId());
@@ -108,13 +108,13 @@ public class EnrichmentService {
 		return owners;
 	}
 
-	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id) {
+	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id, String gen_property_id) {
 
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
 		String gen_owner_details_id = UUID.randomUUID().toString();
 		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
-		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo);
+		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, gen_owner_details_id, gen_property_id);
 		List<CourtCase> courtCases = getCourtCases(owner, requestInfo, gen_owner_details_id);
 		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 
@@ -195,7 +195,7 @@ public class EnrichmentService {
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
 		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 
-		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo);
+		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, ownerDetails.getId(), property.getId());
 //		List<CourtCase> courtCases = updateCourtCases(owner, requestInfo); TODO: Confirm that court details are not updated again
 		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 
@@ -207,23 +207,22 @@ public class EnrichmentService {
 		return ownerDetails;
 	}
 
-	private List<Document> createUpdateOwnerDocs(Property property, RequestInfo requestInfo) {
+	private List<Document> createUpdateOwnerDocs(Property property, RequestInfo requestInfo, String reference_id, String gen_property_id) {
 		List<Document> ownerDocs = new ArrayList<>();
 		property.getPropertyDetails().getOwners().forEach(owner -> {
 			List<Document> ownerDocuments = owner.getOwnerDetails().getOwnerDocuments();
 			if (!CollectionUtils.isEmpty(ownerDocuments)) {
 				AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-				AuditDetails updateDocAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 				ownerDocuments.forEach(document -> {
 					if (document.getId() == null) {
 						String gen_doc_id = UUID.randomUUID().toString();
 						document.setId(gen_doc_id);
 						document.setTenantId(property.getTenantId());
-						document.setReferenceId(owner.getOwnerDetails().getId());
-						document.setPropertyId(property.getId());
+						document.setReferenceId(reference_id);
+						document.setPropertyId(gen_property_id);
 						document.setAuditDetails(docAuditDetails);
 					}
-					document.setAuditDetails(updateDocAuditDetails);
+					document.setAuditDetails(docAuditDetails);
 				});
 				ownerDocs.addAll(ownerDocuments);
 			}

@@ -11,7 +11,6 @@ import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
-import org.egov.ps.model.Payment;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.web.contracts.AuditDetails;
@@ -97,7 +96,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.mobileNumber(rs.getString("mobile_number")).allotmentNumber(rs.getString("allotment_number"))
 						.dateOfAllotment(rs.getLong("date_of_allotment")).possesionDate(rs.getLong("possesion_date"))
 						.isApproved(rs.getBoolean("is_approved")).isCurrentOwner(rs.getBoolean("is_current_owner"))
-						.isMasterEntry(rs.getBoolean("is_master_entry")).dueAmount(rs.getBigDecimal("due_amount"))
+						.isMasterEntry(rs.getBoolean("is_master_entry"))
 						.address(rs.getString("address")).auditDetails(auditdetails).build();
 
 				Owner owners = Owner.builder().id(ownerId).propertyDetailsId(OwnerPropertyDetailId)
@@ -149,60 +148,60 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			}
 		}
 
-		if (hasColumn(rs, "payid")) {
-			String payId = rs.getString("payid");
-			String payTenentId = rs.getString("paytenantid");
-			String payOwnerDetailId = rs.getString("payowner_details_id");
-			List<Owner> owners = property.getPropertyDetails().getOwners();
-			if (!CollectionUtils.isEmpty(owners)) {
-				owners.forEach(owner -> {
-					try {
-						if (payId != null && payOwnerDetailId.equals(owner.getOwnerDetails().getId())) {
-
-							AuditDetails payAuditdetails = AuditDetails.builder()
-									.createdBy(rs.getString("paycreated_by")).createdTime(rs.getLong("paycreated_time"))
-									.lastModifiedBy(rs.getString("paymodified_by"))
-									.lastModifiedTime(rs.getLong("paymodified_time")).build();
-
-							Payment paymentItem = Payment.builder().id(payId).tenantId(payTenentId)
-									.ownerDetailsId(payOwnerDetailId).paymentType(rs.getString("payment_type"))
-									.dueDateOfPayment(rs.getLong("due_date_of_payment"))
-									.payable(rs.getBigDecimal("payable")).amount(rs.getBigDecimal("amount"))
-									.total(rs.getBigDecimal("total")).dateOfDeposit(rs.getLong("date_of_deposit"))
-									.delayInPayment(rs.getBigDecimal("delay_in_payment"))
-									.interestForDelay(rs.getBigDecimal("interest_for_delay"))
-									.totalAmountDueWithInterest(rs.getBigDecimal("total_amount_due_with_interest"))
-									.amountDeposited(rs.getBigDecimal("amount_deposited"))
-									.amountDepositedIntt(rs.getBigDecimal("amount_deposited_intt"))
-									.balance(rs.getBigDecimal("balance")).balanceIntt(rs.getBigDecimal("balance_intt"))
-									.totalDue(rs.getBigDecimal("total_due"))
-									.receiptNumber(rs.getString("receipt_number"))
-									.receiptDate(rs.getLong("receipt_date"))
-									.stRateOfStGst(rs.getBigDecimal("st_rate_of_st_gst"))
-									.stAmountOfGst(rs.getBigDecimal("st_amount_of_gst"))
-									.stPaymentMadeBy(rs.getString("st_payment_made_by"))
-									.bankName(rs.getString("bank_name")).chequeNumber(rs.getString("cheque_number"))
-									.installmentOne(rs.getBigDecimal("installment_one"))
-									.installmentTwo(rs.getBigDecimal("installment_two"))
-									.installmentThree(rs.getBigDecimal("installment_three"))
-									.installmentTwoDueDate(rs.getLong("installment_two_due_date"))
-									.installmentThreeDueDate(rs.getLong("installment_three_due_date"))
-									.monthlyOrAnnually(rs.getString("monthly_or_annually"))
-									.groundRentStartDate(rs.getLong("ground_rent_start_date"))
-									.rentRevision(rs.getInt("rent_revision")).leasePeriod(rs.getInt("lease_period"))
-									.licenseFee(rs.getBigDecimal("license_fee_of_year"))
-									.licenseFee(rs.getBigDecimal("license_fee"))
-									.securityAmount(rs.getBigDecimal("security_amount"))
-									.securityDate(rs.getLong("security_date")).auditDetails(payAuditdetails).build();
-
-							owner.getOwnerDetails().addPaymentItem(paymentItem);
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				});
-			}
-		}
+//		if (hasColumn(rs, "payid")) {
+//			String payId = rs.getString("payid");
+//			String payTenentId = rs.getString("paytenantid");
+//			String payOwnerDetailId = rs.getString("payowner_details_id");
+//			List<Owner> owners = property.getPropertyDetails().getOwners();
+//			if (!CollectionUtils.isEmpty(owners)) {
+//				owners.forEach(owner -> {
+//					try {
+//						if (payId != null && payOwnerDetailId.equals(owner.getOwnerDetails().getId())) {
+//
+//							AuditDetails payAuditdetails = AuditDetails.builder()
+//									.createdBy(rs.getString("paycreated_by")).createdTime(rs.getLong("paycreated_time"))
+//									.lastModifiedBy(rs.getString("paymodified_by"))
+//									.lastModifiedTime(rs.getLong("paymodified_time")).build();
+//
+//							Payment paymentItem = Payment.builder().id(payId).tenantId(payTenentId)
+//									.ownerDetailsId(payOwnerDetailId).paymentType(rs.getString("payment_type"))
+//									.dueDateOfPayment(rs.getLong("due_date_of_payment"))
+//									.payable(rs.getBigDecimal("payable")).amount(rs.getBigDecimal("amount"))
+//									.total(rs.getBigDecimal("total")).dateOfDeposit(rs.getLong("date_of_deposit"))
+//									.delayInPayment(rs.getBigDecimal("delay_in_payment"))
+//									.interestForDelay(rs.getBigDecimal("interest_for_delay"))
+//									.totalAmountDueWithInterest(rs.getBigDecimal("total_amount_due_with_interest"))
+//									.amountDeposited(rs.getBigDecimal("amount_deposited"))
+//									.amountDepositedIntt(rs.getBigDecimal("amount_deposited_intt"))
+//									.balance(rs.getBigDecimal("balance")).balanceIntt(rs.getBigDecimal("balance_intt"))
+//									.totalDue(rs.getBigDecimal("total_due"))
+//									.receiptNumber(rs.getString("receipt_number"))
+//									.receiptDate(rs.getLong("receipt_date"))
+//									.stRateOfStGst(rs.getBigDecimal("st_rate_of_st_gst"))
+//									.stAmountOfGst(rs.getBigDecimal("st_amount_of_gst"))
+//									.stPaymentMadeBy(rs.getString("st_payment_made_by"))
+//									.bankName(rs.getString("bank_name")).chequeNumber(rs.getString("cheque_number"))
+//									.installmentOne(rs.getBigDecimal("installment_one"))
+//									.installmentTwo(rs.getBigDecimal("installment_two"))
+//									.installmentThree(rs.getBigDecimal("installment_three"))
+//									.installmentTwoDueDate(rs.getLong("installment_two_due_date"))
+//									.installmentThreeDueDate(rs.getLong("installment_three_due_date"))
+//									.monthlyOrAnnually(rs.getString("monthly_or_annually"))
+//									.groundRentStartDate(rs.getLong("ground_rent_start_date"))
+//									.rentRevision(rs.getInt("rent_revision")).leasePeriod(rs.getInt("lease_period"))
+//									.licenseFee(rs.getBigDecimal("license_fee_of_year"))
+//									.licenseFee(rs.getBigDecimal("license_fee"))
+//									.securityAmount(rs.getBigDecimal("security_amount"))
+//									.securityDate(rs.getLong("security_date")).auditDetails(payAuditdetails).build();
+//
+//							owner.getOwnerDetails().addPaymentItem(paymentItem);
+//						}
+//					} catch (SQLException e) {
+//						e.printStackTrace();
+//					}
+//				});
+//			}
+//		}
 
 		if (hasColumn(rs, "ccid")) {
 			String courtCasePropertDetailId = rs.getString("ccproperty_details_id");

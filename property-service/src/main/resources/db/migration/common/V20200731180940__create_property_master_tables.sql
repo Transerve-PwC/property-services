@@ -69,7 +69,7 @@ CREATE TABLE cs_ep_owner_v1 (
    tenantid       		CHARACTER VARYING (256),
    property_details_id	CHARACTER VARYING (256) NOT NULL,
    serial_number   		CHARACTER VARYING (256),
-   share   				numeric(3,2),
+   share   				numeric(12,2),
    cp_number         	CHARACTER VARYING (256),
    state   				CHARACTER VARYING (256),
    action   			CHARACTER VARYING (256),
@@ -150,7 +150,7 @@ CREATE TABLE cs_ep_court_case_v1 (
    last_modified_time   		bigint,
 
   CONSTRAINT pk_cs_ep_court_case_v1 PRIMARY KEY (id),
-  CONSTRAINT fk_cs_ep_court_case_v1 FOREIGN KEY (property_details_id) REFERENCES cs_ep_property_details_v1 (id)
+  CONSTRAINT fk_cs_ep_court_case_v1 FOREIGN KEY (owner_details_id) REFERENCES cs_ep_owner_details_v1 (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
 );
@@ -183,6 +183,7 @@ CREATE TABLE cs_ep_property_details_audit_v1 (
    property_type		CHARACTER VARYING (256),
    type_of_allocation   CHARACTER VARYING (256),
    emd_amount			numeric(15,2),
+   emd_date				bigint,
    mode_of_auction      CHARACTER VARYING (256),
    scheme_name        	CHARACTER VARYING (256),
    date_of_auction      bigint,
@@ -208,7 +209,7 @@ CREATE TABLE cs_ep_owner_audit_v1 (
    tenantid       		CHARACTER VARYING (256),
    property_details_id	CHARACTER VARYING (256) NOT NULL,
    serial_number   		CHARACTER VARYING (256),
-   share   				numeric(3,2),
+   share   				numeric(12,2),
    cp_number         	CHARACTER VARYING (256),
    state   				CHARACTER VARYING (256),
    action   			CHARACTER VARYING (256),

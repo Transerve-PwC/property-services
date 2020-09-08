@@ -1,6 +1,5 @@
 package org.egov.ps.service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -125,7 +124,7 @@ public class PostApprovalEnrichmentService {
 				.possesionDate(null).allotmentNumber(null) // TODO allotment number mandatory field
 				.dateOfAllotment(System.currentTimeMillis()) // TODO what if purchaser is existing owner
 
-				.isCurrentOwner(true).isMasterEntry(false).dueAmount(BigDecimal.ZERO)
+				.isCurrentOwner(true).isMasterEntry(false)
 				.address(transferee.get("address").asText()).auditDetails(newOwnerAuditDetails).build();
 
 		Owner newOwner = Owner.builder().id(gen_new_owner_id).tenantId(application.getTenantId())

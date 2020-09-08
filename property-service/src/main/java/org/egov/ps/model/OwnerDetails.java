@@ -1,6 +1,5 @@
 package org.egov.ps.model;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,9 +69,6 @@ public class OwnerDetails {
 
 	@JsonProperty("isMasterEntry")
 	private Boolean isMasterEntry;
-
-	@JsonProperty("dueAmount")
-	private BigDecimal dueAmount;
 
 	@JsonProperty("address")
 	private String address;
