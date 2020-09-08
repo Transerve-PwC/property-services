@@ -104,7 +104,7 @@ public class ApplicationValidatorService {
 
 	private void validateRole(ApplicationRequest request) {
 
-		//fetch all userinfo roles...
+		//fetch all userinfo roles... 
 		RequestInfo requestInfo = request.getRequestInfo();
 		List<org.egov.common.contract.request.Role> roleList = null;
 		if(null != requestInfo.getUserInfo()) {
