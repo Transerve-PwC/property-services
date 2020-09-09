@@ -11,13 +11,11 @@ import org.egov.ps.annotation.ApplicationValidator;
 import org.egov.ps.model.Application;
 import org.egov.ps.model.ApplicationCriteria;
 import org.egov.ps.model.Property;
-import org.egov.ps.model.Role;
 import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.service.MDMSService;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.validator.application.MDMSValidator;
 import org.egov.ps.web.contracts.ApplicationRequest;
-import org.egov.ps.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -25,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
@@ -63,7 +60,7 @@ public class ApplicationValidatorService {
 		this.mdmsService = mdmsService;
 		this.propertyRepository = propertyRepository;
 		this.objectMapper = objectMapper;
-		//		this.mdmsValidator = mdmsValidator;
+//		this.mdmsValidator = mdmsValidator;
 		Map<String, Object> beans = this.context.getBeansWithAnnotation(ApplicationValidator.class);
 
 		/**
@@ -79,11 +76,10 @@ public class ApplicationValidatorService {
 	}
 
 	public void validateCreateRequest(ApplicationRequest request) {
-		validateUserRole(request);
 		List<Application> applications = request.getApplications();
 		applications.stream().forEach(application -> {
 			String propertyId = application.getProperty().getId();
-			validatePropertyExists(application, propertyId);
+			validatePropertyExists(request.getRequestInfo(), propertyId);
 			JsonNode applicationDetails = application.getApplicationDetails();
 			try {
 				String applicationDetailsString = this.objectMapper.writeValueAsString(applicationDetails);
@@ -104,46 +100,8 @@ public class ApplicationValidatorService {
 		});
 	}
 
-	private void validateUserRole(ApplicationRequest request) {
-		//fetch all user info roles...
-		RequestInfo requestInfo = request.getRequestInfo();
-		List<org.egov.common.contract.request.Role> roleList = null;
-		if(null != requestInfo.getUserInfo()) {
-			roleList = requestInfo.getUserInfo().getRoles();
-			List<String> roleCode =  new ArrayList<String>(0);
-					
-			roleList.stream().forEach(r -> {
-				roleCode.add(r.getName());
-			});
-		}
-
-		//fetch all mdms data for branch type and check with user role is present...
-		List<Application> applicationList = request.getApplications();
-		for (Application application_ : applicationList) {
-			
-			List<Map<String, Object>> fieldConfigurations = mdmsService.getBranchRoles("branchtype", request.getRequestInfo(), "ch", application_.getBranchType());
-			System.out.println(fieldConfigurations);
-			
-			ObjectMapper mapper = new ObjectMapper();
-			List<Role> roleListMdMS = mapper.convertValue(fieldConfigurations, new TypeReference<List<Role>>() { });
-			
-			boolean error = true;
-			for (Role r : roleListMdMS) {
-				if(null != roleList && !roleList.isEmpty() && roleList.contains(r.getRole())) {
-					error = false;
-				}
-			}
-			
-			if(error){
-				throw new CustomException("INVALID ROLE",
-						"ROLE is not valid for user : " + requestInfo.getUserInfo().getName());
-			}
-		}
-
-	}
-
-	private void validatePropertyExists(Application application, String propertyId) {
-		Property property = propertyRepository.findPropertyById(application.getBranchType(), propertyId);
+	private void validatePropertyExists(RequestInfo requestInfo, String propertyId) {
+		Property property = propertyRepository.findPropertyById(propertyId);
 		if (property == null || !property.getState().contentEquals(PSConstants.PM_APPROVED)) {
 			throw new CustomException("INVALID_PROPERTY", "Could not find property with the given id");
 		}
@@ -238,7 +196,6 @@ public class ApplicationValidatorService {
 	}
 
 	public List<Application> getApplications(ApplicationRequest applicationRequest) {
-		validateUserRole(applicationRequest);
 		ApplicationCriteria criteria = getApplicationCriteria(applicationRequest);
 		List<Application> applications = propertyRepository.getApplications(criteria);
 

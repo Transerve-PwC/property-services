@@ -10,11 +10,11 @@ import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
-import org.egov.ps.model.Role;
 import org.egov.ps.model.EstateDocumentList;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyCriteria;
+import org.egov.ps.model.Role;
 import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.repository.ServiceRequestRepository;
 import org.egov.ps.service.MDMSService;
@@ -65,7 +65,7 @@ public class PropertyValidator {
 
 	}
 
-	private void validateUserRole(PropertyRequest request, Map<String, String> errorMap) {
+	public void validateUserRole(PropertyRequest request, Map<String, String> errorMap) {
 		//fetch all user info roles...
 		RequestInfo requestInfo = request.getRequestInfo();
 		List<org.egov.common.contract.request.Role> roleList = null;
@@ -78,16 +78,15 @@ public class PropertyValidator {
 			});
 		}
 		
-		//fetch all mdms data for branch type and check with user role is present...
+		//fetch all mdms data for branch type 
+		List<Map<String, Object>> fieldConfigurations = mdmsservice.getBranchRoles("branchtype", request.getRequestInfo(), request.getProperties().get(0).getTenantId());
+		System.out.println(fieldConfigurations);
+		ObjectMapper mapper = new ObjectMapper();
+		List<Role> roleListMdMS = mapper.convertValue(fieldConfigurations, new TypeReference<List<Role>>() { });
+		
+		// check with user role is present...
 		List<Property> propertyList = request.getProperties();
 		for (Property property_ : propertyList) {
-			
-			List<Map<String, Object>> fieldConfigurations = mdmsservice.getBranchRoles("branchtype", request.getRequestInfo(), "ch", property_.getPropertyDetails().getBranchType());
-			System.out.println(fieldConfigurations);
-			
-			ObjectMapper mapper = new ObjectMapper();
-			List<Role> roleListMdMS = mapper.convertValue(fieldConfigurations, new TypeReference<List<Role>>() { });
-			
 			boolean error = true;
 			for (Role r : roleListMdMS) {
 				if(null != roleList && !roleList.isEmpty() && roleList.contains(r.getRole())) {

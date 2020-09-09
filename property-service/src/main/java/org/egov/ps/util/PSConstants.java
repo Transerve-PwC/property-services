@@ -28,10 +28,4 @@ public class PSConstants {
 
 	public static final String MDMS_PS_MORTGAGE_FILTER = ".*.documentList.*";
 
-	public static final String MDMS_PS_BRANCH_ESTATE_FILTER = "[?(@.code=='BRANCH_ESTATE')]";
-
-	public static final String MDMS_PS_BRANCH_BUILDING_FILTER = "[?(@.code=='BRANCH_BUILDING')]";
-
-	public static final String MDMS_PS_BRANCH_MANIMAJRA_FILTER = "[?(@.code=='BRANCH_MANIMAJRA')]";
-
 }
