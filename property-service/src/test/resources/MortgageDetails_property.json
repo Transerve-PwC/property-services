@@ -18,7 +18,7 @@
 			"modeOfAuction": "offline",
 			"schemeName": "schm1",
 			"dateOfAuction": 1592979121518,
-			"areaSqft": "150sqf",
+			"areaSqft": "150",
 			"ratePerSqft": "300",
 			"lastNocDate": 1592979121518,
 			"serviceCategory": "serv cat",
