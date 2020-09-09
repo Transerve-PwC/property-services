@@ -101,6 +101,22 @@
 			<artifactId>mdms-client</artifactId>
 			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
+		<!-- Apache Poi for Excel read and write operations -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-annotations</artifactId>
+		    <version>2.11.2</version>
+		</dependency>
 
 	</dependencies>
 	<repositories>
