@@ -1,12 +1,16 @@
 package org.egov.ps.validator;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
@@ -27,10 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,30 +68,27 @@ public class PropertyValidator {
 	public void validateUserRole(PropertyRequest request, Map<String, String> errorMap) {
 		//fetch all user info roles...
 		RequestInfo requestInfo = request.getRequestInfo();
-		List<String> roleCode =  requestInfo.getUserInfo().getRoles().stream().map(org.egov.common.contract.request.Role::getName).collect(java.util.stream.Collectors.toList());
+		if (CollectionUtils.isEmpty(requestInfo.getUserInfo().getRoles())) {
+			throw new CustomException("INVALID_USER_ROLE", "User roles not found in request");
+		}
+
+		//roleCodes = {"EMPLOYEE", "ES_EB_APPROVER", "ES_EB_DSO"}
+		List<String> roleCodes =  requestInfo.getUserInfo().getRoles().stream().map(org.egov.common.contract.request.Role::getName).collect(Collectors.toList());
 		
 		//fetch all mdms data for branch type 
 		List<Map<String, Object>> fieldConfigurations = mdmsservice.getBranchRoles("branchtype", request.getRequestInfo(), request.getProperties().get(0).getTenantId());
-		System.out.println(fieldConfigurations);
-		ObjectMapper mapper = new ObjectMapper();
-		List<Role> roleListMdMS = mapper.convertValue(fieldConfigurations, new TypeReference<List<Role>>() { });
+		List<Role> roleListMdMS = new ObjectMapper().convertValue(fieldConfigurations, new TypeReference<List<Role>>() { });
 		
 		// check with user role is present...
-		List<Property> propertyList = request.getProperties();
-		for (Property property_ : propertyList) {
-			boolean error = true;
-			for (Role r : roleListMdMS) {
-				if(null != roleCode && !roleCode.isEmpty() && roleCode.contains(r.getRole())) {
-					error = false;
-				}
+		request.getProperties().forEach(property_ -> {
+			String branchType = property_.getPropertyDetails().getBranchType();
+	
+			Optional<Role> mdmsRoleOptional = roleListMdMS.stream().filter(mdmsRole -> mdmsRole.getRole().equalsIgnoreCase(branchType)).filter(mdmsRole -> roleCodes.contains(mdmsRole.getCode())).findAny();
+			if (!mdmsRoleOptional.isPresent()) {
+				String joinedRoleCodes = roleCodes.stream().reduce("", String::concat);
+				errorMap.put("INVALID_ROLE", String.format("Property %s is not allowed to be created by user with roles %s", property_.getFileNumber(), joinedRoleCodes));
 			}
-			
-			if(error){
-				errorMap.put("INVALID ROLE",
-						"ROLE is not valid for user : " + requestInfo.getUserInfo().getName());
-			}
-		}
-		
+		});
 	}
 
 	private void validateOwner(PropertyRequest request, Map<String, String> errorMap) {
