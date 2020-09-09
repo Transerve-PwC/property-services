@@ -83,7 +83,7 @@ public class PropertyValidator {
 		request.getProperties().forEach(property_ -> {
 			String branchType = property_.getPropertyDetails().getBranchType();
 	
-			Optional<Role> mdmsRoleOptional = roleListMdMS.stream().filter(mdmsRole -> mdmsRole.getRole().equalsIgnoreCase(branchType)).filter(mdmsRole -> roleCodes.contains(mdmsRole.getCode())).findAny();
+			Optional<Role> mdmsRoleOptional = roleListMdMS.stream().filter(mdmsRole -> mdmsRole.getCode().equalsIgnoreCase(branchType)).filter(mdmsRole -> roleCodes.contains(mdmsRole.getRole())).findAny();
 			if (!mdmsRoleOptional.isPresent()) {
 				String joinedRoleCodes = roleCodes.stream().reduce("", String::concat);
 				errorMap.put("INVALID_ROLE", String.format("Property %s is not allowed to be created by user with roles %s", property_.getFileNumber(), joinedRoleCodes));

@@ -12,6 +12,7 @@
 			"id":"a455241a-c991-47bc-9365-14bed0417ceb",
 			"tenantId": "ch",
 			"propertyId":"5cfa5df5-3fbb-4ace-a371-5f4d74d42e62",
+			"branchType":"BRANCH_ESTATE",
 			"propertyType": "type",
 			"typeOfAllocation": "allocation type",
 			"modeOfAuction": "offline",
