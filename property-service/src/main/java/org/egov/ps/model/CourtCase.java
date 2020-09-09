@@ -34,8 +34,8 @@ public class CourtCase {
 	@JsonProperty("tenantId")
 	private String tenantId;
 
-	@JsonProperty("propertyDetailsId")
-	private String propertyDetailsId;
+	@JsonProperty("ownerDetailsId")
+	private String ownerDetailsId;
 
 	@JsonProperty("estateOfficerCourt")
 	private String estateOfficerCourt;

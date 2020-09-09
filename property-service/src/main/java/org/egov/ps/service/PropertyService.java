@@ -62,7 +62,7 @@ public class PropertyService {
 		List<Property> propertyFromSearch = propertyValidator.validateUpdateRequest(request);
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		String action = request.getProperties().get(0).getAction();
-		if (config.getIsWorkflowEnabled() && !action.contentEquals("")) {
+		if (config.getIsWorkflowEnabled() && !action.contentEquals("") && !action.contentEquals("DRAFT")) {
 			wfIntegrator.callWorkFlow(request);
 		}
 		producer.push(config.getUpdatePropertyTopic(), request);

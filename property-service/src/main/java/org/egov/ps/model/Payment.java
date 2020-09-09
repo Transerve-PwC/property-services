@@ -39,54 +39,55 @@ public class Payment {
 	@JsonProperty("ownerDetailsId")
 	private String ownerDetailsId;
 
-//	Ground Rent
+//	main
+	
+	@JsonProperty("paymentType")
+	private String paymentType;
 
-	@JsonProperty("grDueDateOfPayment")
-	private Long grDueDateOfPayment;
+	@JsonProperty("dueDateOfPayment")
+	private Long dueDateOfPayment;
 
-	@JsonProperty("grPayable")
-	private BigDecimal grPayable;
+	@JsonProperty("payable")
+	private BigDecimal payable;
 
-	@JsonProperty("grAmountOfGr")
-	private BigDecimal grAmountOfGr;
+	@JsonProperty("amount")
+	private BigDecimal amount;
 
-	@JsonProperty("grTotalGr")
-	private BigDecimal grTotalGr;
+	@JsonProperty("total")
+	private BigDecimal total;
 
-	@JsonProperty("grDateOfDeposit")
-	private Long grDateOfDeposit;
+	@JsonProperty("dateOfDeposit")
+	private Long dateOfDeposit;
 
-	@JsonProperty("grDelayInPayment")
-	private BigDecimal grDelayInPayment;
+	@JsonProperty("delayInPayment")
+	private BigDecimal delayInPayment;
 
-	@JsonProperty("grInterestForDelay")
-	private BigDecimal grInterestForDelay;
+	@JsonProperty("interestForDelay")
+	private BigDecimal interestForDelay;
 
-	@JsonProperty("grTotalAmountDueWithInterest")
-	private BigDecimal grTotalAmountDueWithInterest;
+	@JsonProperty("totalAmountDueWithInterest")
+	private BigDecimal totalAmountDueWithInterest;
 
-	@JsonProperty("grAmountDepositedGr")
-	private BigDecimal grAmountDepositedGr;
+	@JsonProperty("amountDeposited")
+	private BigDecimal amountDeposited;
 
-	@JsonProperty("grAmountDepositedIntt")
-	private BigDecimal grAmountDepositedIntt;
+	@JsonProperty("amountDepositedIntt")
+	private BigDecimal amountDepositedIntt;
 
-	@JsonProperty("grBalanceGr")
-	private BigDecimal grBalanceGr;
+	@JsonProperty("balance")
+	private BigDecimal balance;
 
-	@JsonProperty("grBalanceIntt")
-	private BigDecimal grBalanceIntt;
+	@JsonProperty("balanceIntt")
+	private BigDecimal balanceIntt;
 
-	@JsonProperty("grTotalDue")
-	private BigDecimal grTotalDue;
+	@JsonProperty("totalDue")
+	private BigDecimal totalDue;
 
-	@JsonProperty("grReceiptNumber")
-	private String grReceiptNumber;
+	@JsonProperty("receiptNumber")
+	private String receiptNumber;
 
-	@JsonProperty("grReceiptDate")
-	private Long grReceiptDate;
-
-//	Service Tax/GST												
+	@JsonProperty("receiptDate")
+	private Long receiptDate;
 
 	@JsonProperty("stRateOfStGst")
 	private BigDecimal stRateOfStGst;
@@ -94,44 +95,55 @@ public class Payment {
 	@JsonProperty("stAmountOfGst")
 	private BigDecimal stAmountOfGst;
 
-	@JsonProperty("stAmountDue")
-	private BigDecimal stAmountDue;
-
-	@JsonProperty("stDateOfDeposit")
-	private Long stDateOfDeposit;
-
-	@JsonProperty("stDelayInPayment")
-	private BigDecimal stDelayInPayment;
-
-	@JsonProperty("stInterestForDelay")
-	private BigDecimal stInterestForDelay;
-
-	@JsonProperty("stTotalAmountDueWithInterest")
-	private BigDecimal stTotalAmountDueWithInterest;
-
-	@JsonProperty("stAmountDepositedStGst")
-	private BigDecimal stAmountDepositedStGst;
-
-	@JsonProperty("stAmountDepositedIntt")
-	private BigDecimal stAmountDepositedIntt;
-
-	@JsonProperty("stBalanceStGst")
-	private BigDecimal stBalanceStGst;
-
-	@JsonProperty("stBalanceIntt")
-	private BigDecimal stBalanceIntt;
-
-	@JsonProperty("stTotalDue")
-	private BigDecimal stTotalDue;
-
-	@JsonProperty("stReceiptNumber")
-	private String stReceiptNumber;
-
-	@JsonProperty("stReceiptDate")
-	private Long stReceiptDate;
-
 	@JsonProperty("stPaymentMadeBy")
 	private String stPaymentMadeBy;
+
+	@JsonProperty("bankName")
+	private String bankName;
+
+	@JsonProperty("chequeNumber")
+	private String chequeNumber;
+	
+//  other
+	
+	@JsonProperty("installmentOne")
+	private BigDecimal installmentOne;
+
+	@JsonProperty("installmentTwo")
+	private BigDecimal installmentTwo;
+
+	@JsonProperty("installmentTwoDueDate")
+	private Long installmentTwoDueDate;
+
+	@JsonProperty("installmentThree")
+	private BigDecimal installmentThree;
+
+	@JsonProperty("installmentThreeDueDate")
+	private Long installmentThreeDueDate;
+
+	@JsonProperty("monthlyOrAnnually")
+	private String monthlyOrAnnually;
+
+	@JsonProperty("groundRentStartDate")
+	private Long groundRentStartDate;
+
+	@JsonProperty("rentRevision")
+	private int rentRevision;
+
+	@JsonProperty("leasePeriod")
+	private int leasePeriod;
+
+	@JsonProperty("licenseFeeOfYear")
+	private int licenseFeeOfYear;
+
+	@JsonProperty("licenseFee")
+	private BigDecimal licenseFee;
+	
+	@JsonProperty("securityAmount")
+	private BigDecimal securityAmount;
+
+	@JsonProperty("securityDate")
+	private Long securityDate;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;

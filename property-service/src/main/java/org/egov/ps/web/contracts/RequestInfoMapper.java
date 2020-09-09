@@ -1,4 +1,4 @@
-package org.egov.ps.model;
+package org.egov.ps.web.contracts;
 
 import org.egov.common.contract.request.RequestInfo;
 
