@@ -82,7 +82,7 @@ public class PropertyValidator {
 		// check with user role is present...
 		request.getProperties().forEach(property_ -> {
 			String branchType = property_.getPropertyDetails().getBranchType();
-	
+	 
 			Optional<Role> mdmsRoleOptional = roleListMdMS.stream().filter(mdmsRole -> mdmsRole.getCode().equalsIgnoreCase(branchType)).filter(mdmsRole -> roleCodes.contains(mdmsRole.getRole())).findAny();
 			if (!mdmsRoleOptional.isPresent()) {
 				String joinedRoleCodes = roleCodes.stream().reduce("", String::concat);
