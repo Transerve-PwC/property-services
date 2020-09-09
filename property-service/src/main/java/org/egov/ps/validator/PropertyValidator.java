@@ -69,9 +69,10 @@ public class PropertyValidator {
 		//fetch all user info roles...
 		RequestInfo requestInfo = request.getRequestInfo();
 		List<org.egov.common.contract.request.Role> roleList = null;
+		List<String> roleCode =  new ArrayList<String>(0);
 		if(null != requestInfo.getUserInfo()) {
 			roleList = requestInfo.getUserInfo().getRoles();
-			List<String> roleCode =  new ArrayList<String>(0);
+			
 					
 			roleList.stream().forEach(r -> {
 				roleCode.add(r.getName());
@@ -89,7 +90,7 @@ public class PropertyValidator {
 		for (Property property_ : propertyList) {
 			boolean error = true;
 			for (Role r : roleListMdMS) {
-				if(null != roleList && !roleList.isEmpty() && roleList.contains(r.getRole())) {
+				if(null != roleList && !roleList.isEmpty() && roleCode.contains(r.getRole())) {
 					error = false;
 				}
 			}
