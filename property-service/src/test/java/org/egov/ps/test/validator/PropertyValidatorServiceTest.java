@@ -174,7 +174,7 @@ public class PropertyValidatorServiceTest {
 		Map<String, String> errorMap = new HashMap<String,String>();
 		propertyValidator.validateUserRole(propertyRequest, errorMap);
 		
-		assertFalse(!errorMap.isEmpty());
+		assertTrue(errorMap.isEmpty());
 	}
 	
 	@Test

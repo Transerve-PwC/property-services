@@ -69,15 +69,7 @@ public class PropertyValidator {
 		//fetch all user info roles...
 		RequestInfo requestInfo = request.getRequestInfo();
 		List<org.egov.common.contract.request.Role> roleList = null;
-		List<String> roleCode =  new ArrayList<String>(0);
-		if(null != requestInfo.getUserInfo()) {
-			roleList = requestInfo.getUserInfo().getRoles();
-			
-					
-			roleList.stream().forEach(r -> {
-				roleCode.add(r.getName());
-			});
-		}
+		List<String> roleCode =  requestInfo.getUserInfo().getRoles().stream().map(org.egov.common.contract.request.Role::getName).collect(java.util.stream.Collectors.toList());
 		
 		//fetch all mdms data for branch type 
 		List<Map<String, Object>> fieldConfigurations = mdmsservice.getBranchRoles("branchtype", request.getRequestInfo(), request.getProperties().get(0).getTenantId());
@@ -90,7 +82,7 @@ public class PropertyValidator {
 		for (Property property_ : propertyList) {
 			boolean error = true;
 			for (Role r : roleListMdMS) {
-				if(null != roleList && !roleList.isEmpty() && roleCode.contains(r.getRole())) {
+				if(null != roleCode && !roleCode.isEmpty() && roleCode.contains(r.getRole())) {
 					error = false;
 				}
 			}
