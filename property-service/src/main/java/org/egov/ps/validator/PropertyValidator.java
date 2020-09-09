@@ -68,7 +68,6 @@ public class PropertyValidator {
 	public void validateUserRole(PropertyRequest request, Map<String, String> errorMap) {
 		//fetch all user info roles...
 		RequestInfo requestInfo = request.getRequestInfo();
-		List<org.egov.common.contract.request.Role> roleList = null;
 		List<String> roleCode =  requestInfo.getUserInfo().getRoles().stream().map(org.egov.common.contract.request.Role::getName).collect(java.util.stream.Collectors.toList());
 		
 		//fetch all mdms data for branch type 
