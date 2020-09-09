@@ -1,11 +1,7 @@
 package org.egov.ps.test.validator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -18,9 +14,12 @@ import org.apache.commons.io.IOUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.model.EstateDocumentList;
 import org.egov.ps.model.Owner;
+import org.egov.ps.model.Property;
+import org.egov.ps.model.Role;
 import org.egov.ps.service.MDMSService;
 import org.egov.ps.service.WorkflowCreationService;
 import org.egov.ps.validator.PropertyValidator;
+import org.egov.ps.web.contracts.PropertyRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -29,10 +28,10 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import junit.framework.Assert;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -121,6 +120,116 @@ public class PropertyValidatorServiceTest {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	@Test
+	public void testValidateUserRolePositive() throws Exception {
+		//Step 1 - Request Info 
+		String requestInfoJson = "{\n" + 
+				"	\"apiId\": \"Rainmaker\",\n" + 
+				"	\"ver\": \"01\",\n" + 
+				"	\"action\": \"_create\",\n" + 
+				"	\"key\": \"\",\n" + 
+				"	\"msgId\": \"20170310130900|en_IN\",\n" + 
+				"	\"authToken\": \"833b0a57-bbc5-4194-a961-bdb3794fa284\",\n" + 
+				"	\"userInfo\": {\n" + 
+				"		\"tenantId\": \"ch\",\n" + 
+				"		\"id\": 8,\n" + 
+				"		\"username\": \"any\",\n" + 
+				"		\"mobile\": \"8866581197\",\n" + 
+				"		\"email\": \"mineshbhadeshia@gmail.com\",\n" + 
+				"		\"roles\": [{\n" + 
+				"			\"id\":1,\n" + 
+				"			\"code\": \"BRANCH_ESTATE\",\n" + 
+				"			\"name\": \"ES_EB_APPROVER\"\n" + 
+				"		}]\n" + 
+				"	}\n" + 
+				"}";
+		RequestInfo requestInfo = new Gson().fromJson(requestInfoJson, RequestInfo.class);
+		
+		//Step 2 - read property file master data
+		String json = getFileContents("MortgageDetails_property.json");
+		Type type = new TypeToken<ArrayList<Property>>(){}.getType();
+		List<Property> propertyList = new Gson().fromJson(json, type);
+		
+		PropertyRequest propertyRequest = PropertyRequest.builder().requestInfo(requestInfo).properties(propertyList).build();
+		
+		String branchJson = "[{\"code\":\"BRANCH_ESTATE\",\"role\":\"ES_EB_APPROVER\"},{\"code\":\"BRANCH_BUILDING\",\"role\":\"ES_BB_APPROVER\"},{\"code\":\"BRANCH_MANIMAJRA\",\"role\":\"ES_MM_APPROVER\"}]";
+		
+		Type listType = new TypeToken<List<Role>>() {}.getType();
+		List<Role>  list = new Gson().fromJson(branchJson, listType);
+		
+		List<Map<String, Object>> fieldConfigurations = new ArrayList<Map<String,Object>>(0);
+		for (Role obj : list) {
+			Map<String, Object> tempMap = new HashMap<String, Object>(0);
+			tempMap.put("code", obj.getCode());
+			tempMap.put("role", obj.getRole());
+			fieldConfigurations.add(tempMap);
+		}
+		
+		//Step 3 - Mock mdmservice.
+		Mockito.when(mdmsservice.getBranchRoles("branchtype", requestInfo, propertyRequest.getProperties().get(0).getTenantId())).thenReturn(fieldConfigurations);
+		
+		//Step 4 - Test case
+		Map<String, String> errorMap = new HashMap<String,String>();
+		propertyValidator.validateUserRole(propertyRequest, errorMap);
+		
+		assertTrue(errorMap.isEmpty());
+	}
+	
+	@Test
+	public void testValidateUserRoleNegative() throws Exception {
+		//Step 1 - Request Info 
+		String requestInfoJson = "{\n" + 
+				"	\"apiId\": \"Rainmaker\",\n" + 
+				"	\"ver\": \"01\",\n" + 
+				"	\"action\": \"_create\",\n" + 
+				"	\"key\": \"\",\n" + 
+				"	\"msgId\": \"20170310130900|en_IN\",\n" + 
+				"	\"authToken\": \"833b0a57-bbc5-4194-a961-bdb3794fa284\",\n" + 
+				"	\"userInfo\": {\n" + 
+				"		\"tenantId\": \"ch\",\n" + 
+				"		\"id\": 8,\n" + 
+				"		\"username\": \"any\",\n" + 
+				"		\"mobile\": \"8866581197\",\n" + 
+				"		\"email\": \"mineshbhadeshia@gmail.com\",\n" + 
+				"		\"roles\": [{\n" + 
+				"			\"id\":1,\n" + 
+				"			\"code\": \"BRANCH_ESTATE\",\n" + 
+				"			\"name\": \"ES_EB_APPROVER_\"\n" + 
+				"		}]\n" + 
+				"	}\n" + 
+				"}";
+		RequestInfo requestInfo = new Gson().fromJson(requestInfoJson, RequestInfo.class);
+		
+		//Step 2 - read property file master data
+		String json = getFileContents("MortgageDetails_property.json");
+		Type type = new TypeToken<ArrayList<Property>>(){}.getType();
+		List<Property> propertyList = new Gson().fromJson(json, type);
+		
+		PropertyRequest propertyRequest = PropertyRequest.builder().requestInfo(requestInfo).properties(propertyList).build();
+		
+		String branchJson = "[{\"code\":\"BRANCH_ESTATE\",\"role\":\"ES_EB_APPROVER\"},{\"code\":\"BRANCH_BUILDING\",\"role\":\"ES_BB_APPROVER\"},{\"code\":\"BRANCH_MANIMAJRA\",\"role\":\"ES_MM_APPROVER\"}]";
+		
+		Type listType = new TypeToken<List<Role>>() {}.getType();
+		List<Role>  list = new Gson().fromJson(branchJson, listType);
+		
+		List<Map<String, Object>> fieldConfigurations = new ArrayList<Map<String,Object>>(0);
+		for (Role obj : list) {
+			Map<String, Object> tempMap = new HashMap<String, Object>(0);
+			tempMap.put("code", obj.getCode());
+			tempMap.put("role", obj.getRole());
+			fieldConfigurations.add(tempMap);
+		}
+		
+		//Step 3 - Mock mdmservice.
+		Mockito.when(mdmsservice.getBranchRoles("branchtype", requestInfo, propertyRequest.getProperties().get(0).getTenantId())).thenReturn(fieldConfigurations);
+		
+		//Step 4 - Test case
+		Map<String, String> errorMap = new HashMap<String,String>();
+		propertyValidator.validateUserRole(propertyRequest, errorMap);
+		
+		assertTrue(!errorMap.isEmpty());
 	}
 
 }
