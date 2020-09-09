@@ -90,6 +90,11 @@ public class NotificationUtil {
 				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
 				message = getInitiatedOtMsg(owner, messageTemplate);
 				break;
+				
+			case PTConstants.OT_ACTION_STATUS_REJECTED_AFTER_PAYMENT:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
+				message = getInitiatedOtMsg(owner, messageTemplate);
+				break;
 		}
 		return message;
 	}
@@ -166,7 +171,9 @@ public class NotificationUtil {
 			if (CollectionUtils.isEmpty(emailRequestList))
 				log.info("Messages from localization couldn't be fetched!");
 			for (EmailRequest emailRequest : emailRequestList) {
-				producer.pushEmail(config.getEmailNotifTopic(), emailRequest.getEmail(), emailRequest.getBody(),
+				String body = new StringBuilder(emailRequest.getBody()).toString();
+				body = body.replace("\\n", "\n");
+				producer.pushEmail(config.getEmailNotifTopic(), emailRequest.getEmail(), body,
 						PTConstants.EMAIL_SUBJECT, false);
 				log.info("EmailAddress: " + emailRequest.getEmail() + " Messages: " + emailRequest.getBody());
 			}
@@ -229,6 +236,11 @@ public class NotificationUtil {
 
 			case PTConstants.DC_ACTION_STATUS_PAYMENT:
 				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_PAYMENT, localizationMessage);
+				message = getInitiatedDcMsg(copy, messageTemplate);
+				break;
+				
+			case PTConstants.DC_ACTION_STATUS_REJECTED_AFTER_PAYMENT:
+				messageTemplate = getMessageTemplate(PTConstants.NOTIFICATION_OT_REJECTED, localizationMessage);
 				message = getInitiatedDcMsg(copy, messageTemplate);
 				break;
 		}
