@@ -272,7 +272,26 @@ public class EnrichmentService {
 			setIdgenIds(request);
 		}
 	}
+	
+	public void enrichProcessNotifications(ApplicationRequest request) {
+		// TODO Auto-generated method stub
+		// call processNotification method
+		
+		request.getApplications().forEach(application -> {
+		
+			List<Map<String, Object>> notificationConfigs = mdmsservice.getNotificationConfig("notifications", request.getRequestInfo(), application.getTenantId(), application);
+			processNotification(notificationConfigs, application);
+			
+		});
+		
+	}
 
+	
+	public void processNotification(List<Map<String, Object>> notificationConfigs, Application enrichedApplication) {
+		 
+	}
+
+	
 	/**
 	 * Returns a list of numbers generated from idgen
 	 *
