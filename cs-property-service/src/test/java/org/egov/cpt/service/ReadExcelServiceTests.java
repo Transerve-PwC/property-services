@@ -2,6 +2,9 @@ package org.egov.cpt.service;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.time.format.DateTimeParseException;
@@ -23,11 +26,16 @@ import org.junit.runners.JUnit4;
 public class ReadExcelServiceTests {
 
     ReadExcelService readExcelService;
+    
+    ReadExcelNewFormatService readExcelNewFormatService;
 
     @Before
     public void setup() {
         this.readExcelService = new ReadExcelService();
+        this.readExcelNewFormatService = new ReadExcelNewFormatService();
     }
+    
+    
 
     private void _testExcelParsing(String excelFileToParse, int sheetNo, double expectedTotalRent, double expectedTotalPaid) {
         InputStream inputStream = ReadExcelServiceTests.class.getClassLoader().getResourceAsStream(excelFileToParse);
@@ -37,6 +45,12 @@ public class ReadExcelServiceTests {
         assertEquals(0 , rentDemandResponse.getPayment().stream().map(RentPayment::getDateOfPayment).filter(date -> date == null).count());
         assertEquals(expectedTotalRent, totalRent, 1.0);
         assertEquals(expectedTotalPaid, totalPaid, 1.0);
+    }
+    
+    @Test
+    public void testReadExcelWithNewFormat() throws FileNotFoundException {
+        InputStream inputStream = new FileInputStream(new File("D:\\Projects\\Transerve\\Docs\\Sector 52-53 T (Autosaved).xlsx"));
+        readExcelNewFormatService.getDatafromExcel(inputStream, 0);
     }
 
     @Test
