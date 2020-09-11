@@ -14,6 +14,7 @@ import org.egov.ps.model.Application;
 import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.MortgageDetails;
+import org.egov.ps.model.Notifications;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
 import org.egov.ps.model.Payment;
@@ -30,6 +31,10 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
 @Service
 public class EnrichmentService {
@@ -272,26 +277,46 @@ public class EnrichmentService {
 			setIdgenIds(request);
 		}
 	}
-	
+
 	public void enrichProcessNotifications(ApplicationRequest request) {
 		// TODO Auto-generated method stub
 		// call processNotification method
-		
+
 		request.getApplications().forEach(application -> {
-		
+
 			List<Map<String, Object>> notificationConfigs = mdmsservice.getNotificationConfig("notifications", request.getRequestInfo(), application.getTenantId(), application);
 			processNotification(notificationConfigs, application);
-			
+
 		});
-		
+
 	}
 
-	
 	public void processNotification(List<Map<String, Object>> notificationConfigs, Application enrichedApplication) {
-		 
+		if (!CollectionUtils.isEmpty(notificationConfigs)) {
+			ObjectMapper mapper = new ObjectMapper();
+			List<Notifications> notificationList = mapper.convertValue(notificationConfigs, new TypeReference<List<Notifications>>() { });
+
+			notificationList.forEach(data -> {
+				data.setContent(data.getContent()
+						//app.getModuleType() == null ? "" : app.getModuleType()
+						.replace("{createdBy.name}",enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy())
+						.replace("{moduleType}", enrichedApplication.getModuleType() == null ? "" : enrichedApplication.getModuleType())
+						.replace("{applicationType}", enrichedApplication.getApplicationType() == null ? "" : enrichedApplication.getApplicationType())
+						.replace("{property.fileNumber}", enrichedApplication.getProperty() == null ? "" : enrichedApplication.getProperty().getFileNumber())
+						.replace("{applicationNumber}", enrichedApplication.getApplicationNumber() == null ? "" : enrichedApplication.getApplicationNumber())
+						);
+				data.getModes().getEmail().setTo(enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy());
+				data.getModes().getSms().setTo(enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy());
+				data.getModes().getEvent().setTo(enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy());
+			});
+
+			String notificationJson = new Gson().toJson(notificationList );
+
+			System.out.println(notificationJson);
+		}
 	}
 
-	
+
 	/**
 	 * Returns a list of numbers generated from idgen
 	 *
