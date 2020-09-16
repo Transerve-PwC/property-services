@@ -21,6 +21,7 @@ import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.model.idgen.IdResponse;
 import org.egov.ps.repository.IdGenRepository;
+import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.ApplicationRequest;
@@ -30,6 +31,10 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 public class EnrichmentService {
@@ -45,6 +50,12 @@ public class EnrichmentService {
 
 	@Autowired
 	private MDMSService mdmsservice;
+
+	@Autowired
+	private PropertyRepository propertyRepository;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
@@ -118,7 +129,7 @@ public class EnrichmentService {
 
 		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, gen_owner_details_id,
 				gen_property_id);
-		List<CourtCase> courtCases = getCourtCases(owner, requestInfo, gen_owner_details_id);
+		List<CourtCase> courtCases = getCourtCases(owner, property, requestInfo, gen_owner_details_id);
 		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 
 		ownerDetails.setId(gen_owner_details_id);
@@ -132,7 +143,8 @@ public class EnrichmentService {
 		return ownerDetails;
 	}
 
-	private List<CourtCase> getCourtCases(Owner owner, RequestInfo requestInfo, String gen_owner_details_id) {
+	private List<CourtCase> getCourtCases(Owner owner, Property property, RequestInfo requestInfo,
+			String gen_owner_details_id) {
 
 		List<CourtCase> courtCases = owner.getOwnerDetails().getCourtCases();
 
@@ -145,7 +157,7 @@ public class EnrichmentService {
 				String gen_court_case_id = UUID.randomUUID().toString();
 
 				courtCase.setId(gen_court_case_id);
-				courtCase.setTenantId(owner.getTenantId());
+				courtCase.setTenantId(property.getTenantId());
 				courtCase.setOwnerDetailsId(gen_owner_details_id);
 				courtCase.setAuditDetails(courtCaseAuditDetails);
 
@@ -265,12 +277,85 @@ public class EnrichmentService {
 			applications.forEach(application -> {
 				String gen_application_id = UUID.randomUUID().toString();
 				AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				JsonNode applicationDetails = enrichApplicationDetails(application);
+				enrichPropertyDetails(application);
 
 				application.setId(gen_application_id);
 				application.setAuditDetails(auditDetails);
+				application.setApplicationDetails(applicationDetails);
 			});
 			setIdgenIds(request);
 		}
+	}
+
+	private JsonNode enrichApplicationDetails(Application application) {
+		JsonNode applicationDetails = application.getApplicationDetails();
+
+		JsonNode transferor = (applicationDetails.get("transferor") != null) ? applicationDetails.get("transferor") : applicationDetails.get("owner");
+
+		String propertyId = application.getProperty().getId();
+		String transferorId = transferor.get("id").asText();
+
+		Property property = propertyRepository.findPropertyById(propertyId);
+
+		property.getPropertyDetails().getOwners().forEach(owner -> {
+			if (owner.getId().equals(transferorId)) {
+				((ObjectNode) transferor).put("serialNumber", owner.getSerialNumber());
+				((ObjectNode) transferor).put("share", owner.getShare());
+				((ObjectNode) transferor).put("cpNumber", owner.getCpNumber());
+
+				ObjectNode ownerDetails = objectMapper.createObjectNode();
+				ownerDetails.put("ownerName", owner.getOwnerDetails().getOwnerName());
+				ownerDetails.put("guardianName", owner.getOwnerDetails().getGuardianName());
+				ownerDetails.put("guardianRelation", owner.getOwnerDetails().getGuardianRelation());
+				ownerDetails.put("mobileNumber", owner.getOwnerDetails().getMobileNumber());
+				ownerDetails.put("allotmentNumber", owner.getOwnerDetails().getAllotmentNumber());
+				ownerDetails.put("dateOfAllotment", owner.getOwnerDetails().getDateOfAllotment());
+				ownerDetails.put("possesionDate", owner.getOwnerDetails().getPossesionDate());
+				ownerDetails.put("isApproved", owner.getOwnerDetails().getIsApproved());
+				ownerDetails.put("isCurrentOwner", owner.getOwnerDetails().getIsCurrentOwner());
+				ownerDetails.put("isMasterEntry", owner.getOwnerDetails().getIsMasterEntry());
+				ownerDetails.put("address", owner.getOwnerDetails().getAddress());
+
+				((ObjectNode) transferor).set("transferorDetails", ownerDetails);
+			}
+		});
+
+		return applicationDetails;
+	}
+
+	private void enrichPropertyDetails(Application application) {
+		Property property = propertyRepository.findPropertyById(application.getProperty().getId());
+		Property propertyToEnrich = application.getProperty();
+
+		propertyToEnrich.setFileNumber(property.getFileNumber());
+		propertyToEnrich.setTenantId(property.getTenantId());
+		propertyToEnrich.setCategory(property.getCategory());
+		propertyToEnrich.setSubCategory(property.getSubCategory());
+		propertyToEnrich.setSiteNumber(property.getSiteNumber());
+		propertyToEnrich.setSectorNumber(property.getSectorNumber());
+
+		PropertyDetails propertyDetails = new PropertyDetails();
+		propertyDetails.setBranchType(property.getPropertyDetails().getBranchType());
+		propertyDetails.setPropertyType(property.getPropertyDetails().getBranchType());
+		propertyDetails.setTypeOfAllocation(property.getPropertyDetails().getBranchType());
+		propertyDetails.setEmdAmount(property.getPropertyDetails().getEmdAmount());
+		propertyDetails.setEmdDate(property.getPropertyDetails().getEmdDate());
+		propertyDetails.setModeOfAuction(property.getPropertyDetails().getModeOfAuction());
+		propertyDetails.setSchemeName(property.getPropertyDetails().getSchemeName());
+		propertyDetails.setDateOfAuction(property.getPropertyDetails().getDateOfAuction());
+		propertyDetails.setAreaSqft(property.getPropertyDetails().getAreaSqft());
+		propertyDetails.setRatePerSqft(property.getPropertyDetails().getRatePerSqft());
+		propertyDetails.setLastNocDate(property.getPropertyDetails().getLastNocDate());
+		propertyDetails.setServiceCategory(property.getPropertyDetails().getServiceCategory());
+		propertyDetails.setIsPropertyActive(property.getPropertyDetails().getIsPropertyActive());
+		propertyDetails.setTradeType(property.getPropertyDetails().getTradeType());
+		propertyDetails.setCompanyName(property.getPropertyDetails().getCompanyName());
+		propertyDetails.setCompanyAddress(property.getPropertyDetails().getCompanyAddress());
+		propertyDetails.setCompanyRegistrationNumber(property.getPropertyDetails().getCompanyRegistrationNumber());
+		propertyDetails.setCompanyType(property.getPropertyDetails().getCompanyType());
+
+		propertyToEnrich.setPropertyDetails(propertyDetails);
 	}
 
 	/**

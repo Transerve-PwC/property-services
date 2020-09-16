@@ -102,8 +102,11 @@ public class ApplicationValidatorService {
 
 	private void validatePropertyExists(RequestInfo requestInfo, String propertyId) {
 		Property property = propertyRepository.findPropertyById(propertyId);
-		if (property == null || !property.getState().contentEquals(PSConstants.PM_APPROVED)) {
-			throw new CustomException("INVALID_PROPERTY", "Could not find property with the given id");
+		if (property == null) {
+			throw new CustomException("INVALID_PROPERTY", "Could not find property with the given id:"+propertyId);
+		}
+		if (!property.getState().contentEquals(PSConstants.PM_APPROVED)) {
+			throw new CustomException("INVALID_PROPERTY", "Property with the given "+propertyId+" is not approved");
 		}
 	}
 
