@@ -211,7 +211,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					try {
 
 						if (courtCasePropertDetailId != null
-								&& courtCasePropertDetailId.equals(property.getPropertyDetails().getId())) {
+								&& courtCasePropertDetailId.equals(owner.getOwnerDetails().getId())) {
 
 							AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("cccreated_by"))
 									.createdTime(rs.getLong("cccreated_time"))

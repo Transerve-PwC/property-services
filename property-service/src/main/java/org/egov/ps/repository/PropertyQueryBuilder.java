@@ -75,8 +75,8 @@ public class PropertyQueryBuilder {
 			+ " cc.created_by as cccreated_by, cc.created_time as cccreated_time, cc.last_modified_by as ccmodified_by, cc.last_modified_time as ccmodified_time ";
 
 	private static final String PT_TABLE = " FROM cs_ep_property_v1 pt " + INNER_JOIN
-			+ " cs_ep_property_details_v1 ptdl  ON pt.id =ptdl.property_id "+ INNER_JOIN
-			+ " cs_pm_application_v1 pm_app ON pt.id= ptdl.property_id ";
+			+ " cs_ep_property_details_v1 ptdl  ON pt.id =ptdl.property_id "+ LEFT_JOIN
+			+ " cs_ep_application_v1 pm_app ON pt.id= pm_app.property_id ";
 
 	private static final String OWNER_TABLE = " cs_ep_owner_v1 ownership  ON ptdl.id=ownership.property_details_id "
 			+ LEFT_JOIN + " cs_ep_owner_details_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
