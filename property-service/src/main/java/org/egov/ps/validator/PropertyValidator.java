@@ -61,7 +61,7 @@ public class PropertyValidator {
 		Map<String, String> errorMap = new HashMap<>();
 
 		validateProperty(request, errorMap);
-		validateUserRole(request, errorMap);
+//		validateUserRole(request, errorMap);
 		validateOwner(request, errorMap);
 
 	}
@@ -89,7 +89,7 @@ public class PropertyValidator {
 		List<String> roleCodes =  requestInfo.getUserInfo().getRoles().stream().map(org.egov.common.contract.request.Role::getName).collect(Collectors.toList());
 		
 		//fetch all mdms data for branch type 
-		List<Map<String, Object>> fieldConfigurations = mdmsservice.getBranchRoles("branchtype", request.getRequestInfo(), request.getProperties().get(0).getTenantId());
+		List<Map<String, Object>> fieldConfigurations = mdmsservice.getBranchRoles("branchType", request.getRequestInfo(), request.getProperties().get(0).getTenantId());
 		List<Role> roleListMdMS = new ObjectMapper().convertValue(fieldConfigurations, new TypeReference<List<Role>>() { });
 		
 		// check with user role is present...
@@ -167,7 +167,7 @@ public class PropertyValidator {
 
 		Map<String, String> errorMap = new HashMap<>();
 
-		validateUserRole(request, errorMap);
+//		validateUserRole(request, errorMap);
 
 		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
 		List<Property> propertiesFromSearchResponse = repository.getProperties(criteria);
