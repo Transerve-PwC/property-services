@@ -33,12 +33,15 @@ public class ApplicationQueryBuilder {
 			+ " app.created_by as appcreated_by, app.last_modified_by as applast_modified_by,"
 			+ " app.created_time as appcreated_time, app.last_modified_time as applast_modified_time,"
 
-			+ " pt.id as ptid, pt.file_number as ptfile_number, pt.tenantid as pttenantid,"
-			+ " pt.category as ptcategory, pt.sub_category as ptsub_category,"
-			+ " pt.site_number as ptsite_number, pt.sector_number as ptsector_number,"
+			+ " pt.id as pid, app.branch_type as branch_type, pt.file_number, pt.tenantid as pttenantid, pt.category, pt.sub_category, "
+			+ " pt.site_number, pt.sector_number, pt.state as pstate, pt.action as paction, pt.created_by as pcreated_by, pt.created_time as pcreated_time, "
+			+ " pt.last_modified_by as pmodified_by, pt.last_modified_time as pmodified_time,"
 
-			+ " ptdl.id as ptdlid, ptdl.property_id as ptdlproperty_id, ptdl.property_type as ptdlproperty_type,"
-			+ " ptdl.type_of_allocation as ptdltype_of_allocation, ptdl.service_category as ptdlservice_category,"
+			+ " ptdl.id as ptdlid, ptdl.property_id as pdproperty_id, ptdl.property_type as pdproperty_type, "
+			+ " ptdl.tenantid as pdtenantid, ptdl.type_of_allocation, ptdl.mode_of_auction, ptdl.scheme_name,ptdl.date_of_auction, "
+			+ " ptdl.area_sqft, ptdl.rate_per_sqft, ptdl.last_noc_date, ptdl.service_category, "
+			+ " ptdl.is_property_active, ptdl.trade_type, ptdl.company_name, ptdl.company_address, ptdl.company_registration_number, "
+			+ " ptdl.company_type, ptdl.emd_amount, ptdl.emd_date, "
 
 			+ " ownership.id as oid, ownership.property_details_id as oproperty_details_id,"
 			+ " ownership.tenantid as otenantid, ownership.serial_number as oserial_number,"
