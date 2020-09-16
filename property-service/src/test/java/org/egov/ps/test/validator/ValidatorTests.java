@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -168,8 +169,8 @@ public class ValidatorTests {
 
 	}
 
-	@Test
-	public void testDateRangeValidator() {
+	//@Test
+	public void testDateRangeValidatorOLD() {
 		IApplicationField field = ApplicationField.builder().required(true).build();
 
 		/**************************************field require true********************************************/
@@ -276,6 +277,26 @@ public class ValidatorTests {
 
 	}
 
+	@Test
+	public void testDateRangeValidator() {
+		IApplicationField field = ApplicationField.builder().required(true).build();
+		//##########
+		Map<String, String> startDate = Collections.singletonMap("year", "-40");
+		Map<String, String> endDate = Collections.singletonMap("second", "0");
+
+		Map<String, Object> map_1= new HashMap<String, Object>();
+		map_1.put("start", startDate);
+		map_1.put("end", endDate);
+
+		IValidation validation_1 = ApplicationValidation.builder()
+				.type("date-range")
+				.params(map_1)
+				.build();
+
+		assertNull(dateRangeValidator.validate(validation_1, field, 1594899004, null));
+		//assertNull(dateRangeValidator.validate(validation_1, field, "1597827021", null));
+	}
+	
 	@Test
 	public void testMinMaxValidator() {
 		//field require true

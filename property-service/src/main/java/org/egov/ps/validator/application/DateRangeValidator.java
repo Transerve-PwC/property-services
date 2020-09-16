@@ -136,10 +136,13 @@ public class DateRangeValidator implements IApplicationValidator {
 
 	private String calculateDate(Map<String, Object> values) {
 		// TODO Auto-generated method stub
+		//values.get("serialVersionUID");
+		//-6979724477215052911
+		//values.get("k")
 		Date d = null ;
-		if(null != values.get("unit")) {
-			String unit = values.get("unit").toString();
-			int val = Integer.parseInt(values.get("value").toString());
+		if(null != values.get("k")) {
+			String unit = values.get("k").toString();
+			int val = Integer.parseInt(values.get("v").toString());
 
 			if(unit.equalsIgnoreCase("month")) {
 				d = diffDate(Calendar.MONTH, val);
