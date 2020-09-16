@@ -8,10 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
-
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.ps.model.EstateDocumentList;
@@ -31,6 +27,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,8 +60,21 @@ public class PropertyValidator {
 
 		Map<String, String> errorMap = new HashMap<>();
 
+		validateProperty(request, errorMap);
 		validateUserRole(request, errorMap);
 		validateOwner(request, errorMap);
+
+	}
+	
+	private void validateProperty(PropertyRequest request, Map<String, String> errorMap) {
+		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
+		List<Property> properties = repository.getProperties(criteria);
+
+		properties.forEach(property -> {
+			if (property.getFileNumber().equalsIgnoreCase(request.getProperties().get(0).getFileNumber())) {
+				throw new CustomException("FILE_NUMBER_ALREADY_EXIST", "The given File Number already exists");
+			}
+		});
 
 	}
 

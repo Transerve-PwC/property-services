@@ -54,6 +54,9 @@ public class EnrichmentService {
 	@Autowired
 	private PropertyRepository propertyRepository;
 
+	@Autowired
+	private ObjectMapper objectMapper;
+
 	public void enrichCreateRequest(PropertyRequest request) {
 
 		RequestInfo requestInfo = request.getRequestInfo();
@@ -285,10 +288,11 @@ public class EnrichmentService {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	private JsonNode enrichApplicationDetails(Application application) {
 		JsonNode applicationDetails = application.getApplicationDetails();
-		JsonNode transferor = applicationDetails.get("transferor");
+
+		JsonNode transferor = (applicationDetails.get("transferor") != null) ? applicationDetails.get("transferor") : applicationDetails.get("owner");
+
 		String propertyId = application.getProperty().getId();
 		String transferorId = transferor.get("id").asText();
 
@@ -300,11 +304,6 @@ public class EnrichmentService {
 				((ObjectNode) transferor).put("share", owner.getShare());
 				((ObjectNode) transferor).put("cpNumber", owner.getCpNumber());
 
-//				To add complete ownerDetails object along with documents, court cases, payments.
-//				ObjectMapper mapper = new ObjectMapper();
-//				JsonNode ownerDetails = mapper.valueToTree(owner.getOwnerDetails());
-				
-				ObjectMapper objectMapper = new ObjectMapper();
 				ObjectNode ownerDetails = objectMapper.createObjectNode();
 				ownerDetails.put("ownerName", owner.getOwnerDetails().getOwnerName());
 				ownerDetails.put("guardianName", owner.getOwnerDetails().getGuardianName());
@@ -318,24 +317,24 @@ public class EnrichmentService {
 				ownerDetails.put("isMasterEntry", owner.getOwnerDetails().getIsMasterEntry());
 				ownerDetails.put("address", owner.getOwnerDetails().getAddress());
 
-				((ObjectNode) transferor).put("transferorDetails", ownerDetails);
+				((ObjectNode) transferor).set("transferorDetails", ownerDetails);
 			}
 		});
 
 		return applicationDetails;
 	}
-	
+
 	private void enrichPropertyDetails(Application application) {
 		Property property = propertyRepository.findPropertyById(application.getProperty().getId());
 		Property propertyToEnrich = application.getProperty();
-		
+
 		propertyToEnrich.setFileNumber(property.getFileNumber());
 		propertyToEnrich.setTenantId(property.getTenantId());
 		propertyToEnrich.setCategory(property.getCategory());
 		propertyToEnrich.setSubCategory(property.getSubCategory());
 		propertyToEnrich.setSiteNumber(property.getSiteNumber());
 		propertyToEnrich.setSectorNumber(property.getSectorNumber());
-		
+
 		PropertyDetails propertyDetails = new PropertyDetails();
 		propertyDetails.setBranchType(property.getPropertyDetails().getBranchType());
 		propertyDetails.setPropertyType(property.getPropertyDetails().getBranchType());
@@ -355,7 +354,7 @@ public class EnrichmentService {
 		propertyDetails.setCompanyAddress(property.getPropertyDetails().getCompanyAddress());
 		propertyDetails.setCompanyRegistrationNumber(property.getPropertyDetails().getCompanyRegistrationNumber());
 		propertyDetails.setCompanyType(property.getPropertyDetails().getCompanyType());
-		
+
 		propertyToEnrich.setPropertyDetails(propertyDetails);
 	}
 
