@@ -1,15 +1,10 @@
 package org.egov.cpt.web.controllers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-
 import javax.validation.Valid;
 
 import org.egov.cpt.models.ExcelSearchCriteria;
 import org.egov.cpt.models.RentDemandResponse;
 import org.egov.cpt.models.RequestInfoWrapper;
-import org.egov.cpt.service.ReadExcelNewFormatService;
 import org.egov.cpt.service.ReadExcelService;
 import org.egov.cpt.util.FileStoreUtils;
 import org.springframework.core.io.UrlResource;
@@ -29,14 +24,12 @@ import lombok.extern.slf4j.Slf4j;
 public class ReadExcelController {
 
 	private ReadExcelService readExcelService;
-	private ReadExcelNewFormatService readExcelNewFormatService;
 	private FileStoreUtils fileStoreUtils;
 
 	public ReadExcelController(ReadExcelService readExcelService, FileStoreUtils fileStoreUtils) {
 		super();
 		this.readExcelService = readExcelService;
 		this.fileStoreUtils = fileStoreUtils;
-		this.readExcelNewFormatService = new ReadExcelNewFormatService();
 	}
 
 	@PostMapping("/read")
@@ -46,14 +39,8 @@ public class ReadExcelController {
 		RentDemandResponse data = new RentDemandResponse();
 		try {
 			String filePath = fileStoreUtils.fetchFileStoreUrl(searchCriteria);
-			if (!"".equals(filePath)) {
-				if("0".equalsIgnoreCase(searchCriteria.getFileFormat())) {
-					data = readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream(), 0);
-				}else if("1".equalsIgnoreCase(searchCriteria.getFileFormat())) {
-					InputStream inputStream = new FileInputStream(new File("D:\\Projects\\Transerve\\Docs\\Sector 52-53 T (Autosaved).xlsx"));
-					readExcelNewFormatService.getDatafromExcel(inputStream, 0);
-				}
-			}	
+			if (!"".equals(filePath))
+				data = readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream(), 0);
 			log.info("End controller method readExcel");
 		} catch (Exception e) {
 			log.error("Error occur during runnig controller method readExcel():" + e.getMessage());

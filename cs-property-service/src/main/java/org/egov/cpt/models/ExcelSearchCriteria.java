@@ -18,7 +18,5 @@ public class ExcelSearchCriteria {
 	private String tenantId;
 
 	private String fileStoreId;
-	
-	private String fileFormat;
 
 }
