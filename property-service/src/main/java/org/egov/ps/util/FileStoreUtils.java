@@ -34,7 +34,8 @@ public class FileStoreUtils {
 		try {
 			Map<String, Object> response = (Map<String, Object>) (restTemplate.getForObject(uri.toString(),
 					HashMap.class));
-			responseMap = String.valueOf(response.get(searchCriteria.getFileStoreId()));
+		    responseMap = String.valueOf(response.get(searchCriteria.getFileStoreId())).equalsIgnoreCase("null") ? "" : 
+				response.get(searchCriteria.getFileStoreId()).toString();			
 		} catch (Exception e) {
 			log.error("Exception while fetching file url: ", e);
 		}

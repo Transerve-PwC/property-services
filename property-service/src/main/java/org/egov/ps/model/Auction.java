@@ -1,6 +1,9 @@
 package org.egov.ps.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +15,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @Data
+@Builder
 @NoArgsConstructor
 public class Auction {
 	
@@ -28,5 +32,11 @@ public class Auction {
 	private String emdValidityDate;		
 	
 	private String refundStatus;
+	
+	@JsonIgnore
+	private Long createdBy;
+
+	@JsonIgnore
+    private Long lastModifiedBy;
 
 }

@@ -62,7 +62,7 @@ public class ApplicationQueryBuilder {
 			+ LEFT_JOIN + " cs_ep_property_details_v1 ptdl  ON pt.id =ptdl.property_id " + LEFT_JOIN
 			+ " cs_ep_owner_v1 ownership  ON ptdl.id=ownership.property_details_id " + LEFT_JOIN
 			+ " cs_ep_owner_details_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
-			+ " cs_ep_documents_v1 doc ON app.id=doc.reference_id ";
+			+ " cs_ep_documents_v1 doc ON app.id=doc.reference_id ";	
 
 	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList,
 			ApplicationCriteria criteria) {
