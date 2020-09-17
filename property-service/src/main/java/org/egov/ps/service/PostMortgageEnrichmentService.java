@@ -7,13 +7,11 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.ps.config.Configuration;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.EstateDocumentList;
 import org.egov.ps.model.MortgageDetails;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.Property;
-import org.egov.ps.repository.IdGenRepository;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.ApplicationRequest;
@@ -51,11 +49,12 @@ public class PostMortgageEnrichmentService {
 					application.setAuditDetails(auditDetails);
 
 					List<Owner> ownerList = application.getProperty().getPropertyDetails().getOwners();
-
-					ownerList.forEach(owner -> {
+					if (!CollectionUtils.isEmpty(ownerList)) {
+						ownerList.forEach(owner -> {
 						owner.setMortgageDetails(getMortgage(application.getProperty(), owner, request, owner.getId()));
 						validateMortgageDetails(application.getProperty(), owner, request.getRequestInfo(), owner.getId());
 					});
+				}
 				}
 			});
 		}

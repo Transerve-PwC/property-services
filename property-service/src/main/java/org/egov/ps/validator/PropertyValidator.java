@@ -52,7 +52,7 @@ public class PropertyValidator {
 
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndpoint;
-	
+
 	@Autowired
 	private MDMSService mdmsservice;
 
@@ -65,87 +65,97 @@ public class PropertyValidator {
 		validateOwner(request, errorMap);
 
 	}
-	
+
 	private void validateProperty(PropertyRequest request, Map<String, String> errorMap) {
 		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
 		List<Property> properties = repository.getProperties(criteria);
-
-		properties.forEach(property -> {
-			if (property.getFileNumber().equalsIgnoreCase(request.getProperties().get(0).getFileNumber())) {
-				throw new CustomException("FILE_NUMBER_ALREADY_EXIST", "The given File Number already exists");
-			}
-		});
-
+		if (!CollectionUtils.isEmpty(properties)) {
+			properties.forEach(property -> {
+				if (property.getFileNumber().equalsIgnoreCase(request.getProperties().get(0).getFileNumber())) {
+					throw new CustomException("FILE_NUMBER_ALREADY_EXIST", "The given File Number already exists");
+				}
+			});
+		}
 	}
 
 	public void validateUserRole(PropertyRequest request, Map<String, String> errorMap) {
-		//fetch all user info roles...
+		// fetch all user info roles...
 		RequestInfo requestInfo = request.getRequestInfo();
 		if (CollectionUtils.isEmpty(requestInfo.getUserInfo().getRoles())) {
 			throw new CustomException("INVALID_USER_ROLE", "User roles not found in request");
 		}
 
-		//roleCodes = {"EMPLOYEE", "ES_EB_APPROVER", "ES_EB_DSO"}
-		List<String> roleCodes =  requestInfo.getUserInfo().getRoles().stream().map(org.egov.common.contract.request.Role::getName).collect(Collectors.toList());
-		
-		//fetch all mdms data for branch type 
-		List<Map<String, Object>> fieldConfigurations = mdmsservice.getBranchRoles("branchType", request.getRequestInfo(), request.getProperties().get(0).getTenantId());
-		List<Role> roleListMdMS = new ObjectMapper().convertValue(fieldConfigurations, new TypeReference<List<Role>>() { });
-		
-		// check with user role is present...
-		request.getProperties().forEach(property_ -> {
-			String branchType = property_.getPropertyDetails().getBranchType();
-	 
-			Optional<Role> mdmsRoleOptional = roleListMdMS.stream().filter(mdmsRole -> mdmsRole.getCode().equalsIgnoreCase(branchType)).filter(mdmsRole -> roleCodes.contains(mdmsRole.getRole())).findAny();
-			if (!mdmsRoleOptional.isPresent()) {
-				String joinedRoleCodes = roleCodes.stream().reduce("", String::concat);
-				errorMap.put("INVALID_ROLE", String.format("Property %s is not allowed to be created by user with roles %s", property_.getFileNumber(), joinedRoleCodes));
-			}
+		// roleCodes = {"EMPLOYEE", "ES_EB_APPROVER", "ES_EB_DSO"}
+		List<String> roleCodes = requestInfo.getUserInfo().getRoles().stream()
+				.map(org.egov.common.contract.request.Role::getName).collect(Collectors.toList());
+
+		// fetch all mdms data for branch type
+		List<Map<String, Object>> fieldConfigurations = mdmsservice.getBranchRoles("branchType",
+				request.getRequestInfo(), request.getProperties().get(0).getTenantId());
+		List<Role> roleListMdMS = new ObjectMapper().convertValue(fieldConfigurations, new TypeReference<List<Role>>() {
 		});
+
+		// check with user role is present...
+		if (!CollectionUtils.isEmpty(request.getProperties())) {
+			request.getProperties().forEach(property_ -> {
+				String branchType = property_.getPropertyDetails().getBranchType();
+
+				Optional<Role> mdmsRoleOptional = roleListMdMS.stream()
+						.filter(mdmsRole -> mdmsRole.getCode().equalsIgnoreCase(branchType))
+						.filter(mdmsRole -> roleCodes.contains(mdmsRole.getRole())).findAny();
+				if (!mdmsRoleOptional.isPresent()) {
+					String joinedRoleCodes = roleCodes.stream().reduce("", String::concat);
+					errorMap.put("INVALID_ROLE",
+							String.format("Property %s is not allowed to be created by user with roles %s",
+									property_.getFileNumber(), joinedRoleCodes));
+				}
+			});
+		}
 	}
 
 	private void validateOwner(PropertyRequest request, Map<String, String> errorMap) {
 
-
-		Optional<Property> property_Optional = request.getProperties().stream().filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners()))
-				.findAny();
+		Optional<Property> property_Optional = request.getProperties().stream()
+				.filter(p -> !CollectionUtils.isEmpty(p.getPropertyDetails().getOwners())).findAny();
 		if (property_Optional.isPresent()) {
-			property_Optional.get().getPropertyDetails().getOwners().stream()
-				.forEach(o -> {
-					if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
-						throw new CustomException(Collections.singletonMap("INVALID MOBILE NUMBER", String.format("MobileNumber is not valid for user :"+o.getOwnerDetails().getOwnerName(), o.getOwnerDetails().getOwnerName() )));
-					}
-					//Document Validation
-					if(null != o.getOwnerDetails() && null != o.getOwnerDetails().getOwnerDocuments()) {
-						validateDocumentsOnType(request.getRequestInfo(), property_Optional.get().getTenantId(), o, errorMap, "");
-					}
-					
-				});
+			property_Optional.get().getPropertyDetails().getOwners().stream().forEach(o -> {
+				if (!isMobileNumberValid(o.getOwnerDetails().getMobileNumber())) {
+					throw new CustomException(Collections.singletonMap("INVALID MOBILE NUMBER",
+							String.format("MobileNumber is not valid for user :" + o.getOwnerDetails().getOwnerName(),
+									o.getOwnerDetails().getOwnerName())));
+				}
+				// Document Validation
+				if (null != o.getOwnerDetails() && null != o.getOwnerDetails().getOwnerDocuments()) {
+					validateDocumentsOnType(request.getRequestInfo(), property_Optional.get().getTenantId(), o,
+							errorMap, "");
+				}
+
+			});
 		}
 
-		/* Old code ::
-		property.forEach(properties -> {
-			if (!CollectionUtils.isEmpty(properties.getPropertyDetails().getOwners())) {
-				properties.getPropertyDetails().getOwners().forEach(owner -> {
-					if (!isMobileNumberValid(owner.getOwnerDetails().getMobileNumber())) {
-						errorMap.put("INVALID MOBILE NUMBER",
-								"MobileNumber is not valid for user : " + owner.getOwnerDetails().getOwnerName());
-					}
-				});
-			}
-		});*/
+		/*
+		 * Old code :: property.forEach(properties -> { if
+		 * (!CollectionUtils.isEmpty(properties.getPropertyDetails().getOwners())) {
+		 * properties.getPropertyDetails().getOwners().forEach(owner -> { if
+		 * (!isMobileNumberValid(owner.getOwnerDetails().getMobileNumber())) {
+		 * errorMap.put("INVALID MOBILE NUMBER", "MobileNumber is not valid for user : "
+		 * + owner.getOwnerDetails().getOwnerName()); } }); } });
+		 */
 	}
-	
-	public void validateDocumentsOnType(RequestInfo requestInfo, String tenantId, Owner owner, Map<String, String> errorMap, String code) {
-		
-		List<Map<String, Object>> fieldConfigurations = mdmsservice.getDocumentConfig("documents", requestInfo, tenantId);
+
+	public void validateDocumentsOnType(RequestInfo requestInfo, String tenantId, Owner owner,
+			Map<String, String> errorMap, String code) {
+
+		List<Map<String, Object>> fieldConfigurations = mdmsservice.getDocumentConfig("documents", requestInfo,
+				tenantId);
 		ObjectMapper mapper = new ObjectMapper();
-		List<EstateDocumentList> documentTypeList = mapper.convertValue(fieldConfigurations, new TypeReference<List<EstateDocumentList>>() { });
+		List<EstateDocumentList> documentTypeList = mapper.convertValue(fieldConfigurations,
+				new TypeReference<List<EstateDocumentList>>() {
+				});
 		System.out.println(documentTypeList.size());
-		
-		
+
 		owner.getOwnerDetails().getOwnerDocuments().stream().forEach(document -> {
-			if(!documentTypeList.contains(EstateDocumentList.builder().code(document.getDocumentType()).build())) {
+			if (!documentTypeList.contains(EstateDocumentList.builder().code(document.getDocumentType()).build())) {
 				errorMap.put("INVALID DOCUMENT",
 						"Document is not valid for user : " + owner.getOwnerDetails().getOwnerName());
 			}
@@ -232,7 +242,8 @@ public class PropertyValidator {
 
 								if (!values1.get("fields")
 										.contains(application.getApplicationDetails().get(value).asText())) {
-									//									errorMap.put("INVALID ModeOfTransfer", "value will only access types 'SALE', 'GIFT'");
+									// errorMap.put("INVALID ModeOfTransfer", "value will only access types 'SALE',
+									// 'GIFT'");
 									System.out.println("error");
 									String errorFilter = "$.*.[?(@.name=='" + value + "')].validations.*.errorMessage";
 									Map<String, List<String>> error = getAttributeValues(tenantId.split("\\.")[0],
@@ -246,23 +257,29 @@ public class PropertyValidator {
 				}
 			}
 
-			//			String modeOfTransferValue = application.getApplicationDetails().get("modeOfTransfer").asText();
-			//			if (fields.get(PSConstants.MDMS_PS_FIELDS).contains("modeOfTransfer")) {
+			// String modeOfTransferValue =
+			// application.getApplicationDetails().get("modeOfTransfer").asText();
+			// if (fields.get(PSConstants.MDMS_PS_FIELDS).contains("modeOfTransfer")) {
 			//
-			//				String validationFilter = "$.*.[?(@.name=='" + "modeOfTransfer" + "')].validations.*.type";
-			//				Map<String, List<String>> validations = getAttributeValues(tenantId.split("\\.")[0], moduleName,
-			//						Arrays.asList("fields"), validationFilter, jsonPath, requestInfo);
+			// String validationFilter = "$.*.[?(@.name=='" + "modeOfTransfer" +
+			// "')].validations.*.type";
+			// Map<String, List<String>> validations =
+			// getAttributeValues(tenantId.split("\\.")[0], moduleName,
+			// Arrays.asList("fields"), validationFilter, jsonPath, requestInfo);
 			//
-			//				if (validations.get("fields").contains("enum")) {
-			//					String valuesFilter = "$.*.[?(@.name=='" + "modeOfTransfer" + "')].validations.*.values.*";
-			//					Map<String, List<String>> values = getAttributeValues(tenantId.split("\\.")[0], moduleName,
-			//							Arrays.asList("fields"), valuesFilter, jsonPath, requestInfo);
+			// if (validations.get("fields").contains("enum")) {
+			// String valuesFilter = "$.*.[?(@.name=='" + "modeOfTransfer" +
+			// "')].validations.*.values.*";
+			// Map<String, List<String>> values =
+			// getAttributeValues(tenantId.split("\\.")[0], moduleName,
+			// Arrays.asList("fields"), valuesFilter, jsonPath, requestInfo);
 			//
-			//					if (!values.get("fields").contains(modeOfTransferValue)) {
-			//						errorMap.put("INVALID ModeOfTransfer", "modeOfTransfer will only access types 'SALE', 'GIFT'");
-			//					}
-			//				}
-			//			}
+			// if (!values.get("fields").contains(modeOfTransferValue)) {
+			// errorMap.put("INVALID ModeOfTransfer", "modeOfTransfer will only access types
+			// 'SALE', 'GIFT'");
+			// }
+			// }
+			// }
 
 		});
 	}
