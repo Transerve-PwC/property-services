@@ -62,7 +62,7 @@ public class ReadExcelController {
 				log.error("Error,No file is avaliable for provided credentials:" + requestInfoWrapper);
 		} catch (Exception e) {
 			log.error("Error occur during runnig controller method readExcel():" + e.getMessage());
-		}
+			}
 		  log.info("End controller method readExcel auctions :"+auctions.size());
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(),requestStatus);
 		AuctionResponse response = AuctionResponse.builder().auctions(auctions).responseInfo(resInfo).build();
