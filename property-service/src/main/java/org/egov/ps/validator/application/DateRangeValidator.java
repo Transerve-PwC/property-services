@@ -54,11 +54,11 @@ public class DateRangeValidator implements IApplicationValidator {
 
 				Long trimmedValue = null;
 				try {
-					 trimmedValue = isEmpty ? null : Long.parseLong(value.toString().trim());
+					trimmedValue = isEmpty ? null : Long.parseLong(value.toString().trim());
 				}catch (Exception e) {
 					return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
 				}
-				
+
 				if (!isValid(validation, trimmedValue)) {
 					return this.formatErrorMessage(validation.getErrorMessageFormat(), value, field.getPath());
 				}
@@ -136,10 +136,13 @@ public class DateRangeValidator implements IApplicationValidator {
 
 	private String calculateDate(Map<String, Object> values) {
 		// TODO Auto-generated method stub
+		//values.get("serialVersionUID");
+		//-6979724477215052911
+		//values.get("k")
 		Date d = null ;
-		if(null != values.get("unit")) {
-			String unit = values.get("unit").toString();
-			int val = Integer.parseInt(values.get("value").toString());
+		if(null != values.get("k")) {
+			String unit = values.get("k").toString();
+			int val = Integer.parseInt(values.get("v").toString());
 
 			if(unit.equalsIgnoreCase("month")) {
 				d = diffDate(Calendar.MONTH, val);
@@ -184,5 +187,5 @@ public class DateRangeValidator implements IApplicationValidator {
 		}
 		return map;
 	}
-	
+
 }
