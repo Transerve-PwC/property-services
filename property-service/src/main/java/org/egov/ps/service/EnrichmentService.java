@@ -81,6 +81,10 @@ public class EnrichmentService {
 
 		PropertyDetails propertyDetail = property.getPropertyDetails();
 		String gen_property_details_id = UUID.randomUUID().toString();
+		
+		List<CourtCase> courtCases = getCourtCases(property, requestInfo, gen_property_id);
+		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
+		
 		AuditDetails propertyDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
 		List<Owner> owners = getOwners(property, requestInfo, gen_property_details_id, gen_property_id);
@@ -89,6 +93,8 @@ public class EnrichmentService {
 		propertyDetail.setTenantId(property.getTenantId());
 		propertyDetail.setPropertyId(gen_property_id);
 		propertyDetail.setOwners(owners);
+		propertyDetail.setCourtCases(courtCases);
+		propertyDetail.setPaymentDetails(paymentDetails);
 		propertyDetail.setAuditDetails(propertyDetailsAuditDetails);
 
 		return propertyDetail;
@@ -129,24 +135,21 @@ public class EnrichmentService {
 
 		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, gen_owner_details_id,
 				gen_property_id);
-		List<CourtCase> courtCases = getCourtCases(owner, property, requestInfo, gen_owner_details_id);
-		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
+		
 
 		ownerDetails.setId(gen_owner_details_id);
 		ownerDetails.setTenantId(property.getTenantId());
 		ownerDetails.setOwnerId(gen_owner_id);
 		ownerDetails.setOwnerDocuments(ownerDocuments);
-		ownerDetails.setCourtCases(courtCases);
-		ownerDetails.setPaymentDetails(paymentDetails);
 		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
 
 		return ownerDetails;
 	}
 
-	private List<CourtCase> getCourtCases(Owner owner, Property property, RequestInfo requestInfo,
-			String gen_owner_details_id) {
+	private List<CourtCase> getCourtCases(Property property, RequestInfo requestInfo,
+			String gen_property_details_id) {
 
-		List<CourtCase> courtCases = owner.getOwnerDetails().getCourtCases();
+		List<CourtCase> courtCases = property.getPropertyDetails().getCourtCases();
 
 		if (!CollectionUtils.isEmpty(courtCases)) {
 
@@ -158,7 +161,7 @@ public class EnrichmentService {
 
 				courtCase.setId(gen_court_case_id);
 				courtCase.setTenantId(property.getTenantId());
-				courtCase.setOwnerDetailsId(gen_owner_details_id);
+				courtCase.setPropertyDetailsId(gen_property_details_id);
 				courtCase.setAuditDetails(courtCaseAuditDetails);
 
 			});
@@ -185,8 +188,10 @@ public class EnrichmentService {
 			AuditDetails auditDetails) {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
 		List<Owner> owners = updateOwners(property, requestInfo);
+		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 
 		propertyDetail.setOwners(owners);
+		propertyDetail.setPaymentDetails(paymentDetails);
 		propertyDetail.setAuditDetails(auditDetails);
 
 		return propertyDetail;
@@ -213,11 +218,10 @@ public class EnrichmentService {
 		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, ownerDetails.getId(),
 				property.getId());
 //		List<CourtCase> courtCases = updateCourtCases(owner, requestInfo); TODO: Confirm that court details are not updated again
-		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 
 		ownerDetails.setOwnerDocuments(ownerDocuments);
 //		ownerDetails.setCourtCases(courtCases); TODO: Confirm that court details are not updated again
-		ownerDetails.setPaymentDetails(paymentDetails);
+		
 		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
 
 		return ownerDetails;
@@ -249,8 +253,8 @@ public class EnrichmentService {
 
 	private List<Payment> createUpdatePaymentDetails(Property property, RequestInfo requestInfo) {
 		List<Payment> paymentDetails = new ArrayList<>();
+		List<Payment> payments = property.getPropertyDetails().getPaymentDetails();
 		property.getPropertyDetails().getOwners().forEach(owner -> {
-			List<Payment> payments = owner.getOwnerDetails().getPaymentDetails();
 			if (!CollectionUtils.isEmpty(payments)) {
 				AuditDetails paymentAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 				payments.forEach(payment -> {

@@ -94,6 +94,15 @@ public class PropertyDetails {
 
 	@JsonProperty("companyType")
 	private String companyType;
+	
+	@JsonProperty("decreeDate")
+	private Long decreeDate;
+	
+	@JsonProperty("courtDetails")
+	private String courtDetails;
+	
+	@JsonProperty("civilTitledAs")
+	private String civilTitledAs;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
@@ -113,6 +122,38 @@ public class PropertyDetails {
 		this.owners.add(newOwnerItem);
 		return this;
 
+	}
+	@JsonProperty("courtCases")
+	private List<CourtCase> courtCases;
+
+	public PropertyDetails addCourtCaseItem(CourtCase courtCaseItem) {
+		if (this.courtCases == null) {
+			this.courtCases = new ArrayList<>();
+		}
+		for (CourtCase courtCase : courtCases) {
+			if (courtCase.getId().equalsIgnoreCase(courtCaseItem.getId())) {
+				return this;
+			}
+		}
+		this.courtCases.add(courtCaseItem);
+		return this;
+
+	}
+
+	@JsonProperty("paymentDetails")
+	private List<Payment> paymentDetails;
+
+	public PropertyDetails addPaymentItem(Payment paymentItem) {
+		if (this.paymentDetails == null) {
+			this.paymentDetails = new ArrayList<>();
+		}
+		for (Payment paymentDetail : paymentDetails) {
+			if (paymentDetail.getId().equalsIgnoreCase(paymentItem.getId())) {
+				return this;
+			}
+		}
+		this.paymentDetails.add(paymentItem);
+		return this;
 	}
 
 }
