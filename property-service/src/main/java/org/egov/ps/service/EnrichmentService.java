@@ -82,7 +82,7 @@ public class EnrichmentService {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
 		String gen_property_details_id = UUID.randomUUID().toString();
 		
-		List<CourtCase> courtCases = getCourtCases(property, requestInfo, gen_property_id);
+		List<CourtCase> courtCases = getCourtCases(property, requestInfo, gen_property_details_id);
 		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 		
 		AuditDetails propertyDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
