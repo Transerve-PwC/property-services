@@ -93,4 +93,23 @@ public class SampleTest {
             System.out.println("The Object is not an Array");
         }
     }
+
+    @Test
+    public void testPrefixExtraction() {
+        String[] inputs = {"EstateBranch", "BuildingBranch", "ManimajraBranch", "OwnershipTransfer", "DuplicateCopy"};
+        String[] outputs = {"EB", "BB", "MB", "OT", "DC" };
+        for (int i = 0; i < inputs.length; i++) {
+            assertEquals(outputs[i], extractPrefix(inputs[i]));
+        }
+    }
+
+    private String extractPrefix(String inputString) {
+        String outputString = "";
+
+        for (int i = 0; i < inputString.length(); i++) {
+            char c = inputString.charAt(i);
+            outputString += Character.isUpperCase(c) ? c : "";
+        }
+        return outputString;
+    }
 }

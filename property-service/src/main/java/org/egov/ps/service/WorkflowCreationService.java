@@ -53,19 +53,19 @@ public class WorkflowCreationService {
 	public WorkflowCreationService() {
 		templateMapping.put("template-ownership-transfer", Arrays.asList(
 				//ES_EB_SD_ = Estate Service Estate Branch Sale Deed
-				ApplicationType.builder().name("EstateProperty-OwnershipTransfer-SaleDeed").prefix("ES_EB_SD_").build(),
-				ApplicationType.builder().name("EstateProperty-OwnershipTransfer-RegisteredWill").prefix("ES_EB_RW_").build(),
-				ApplicationType.builder().name("EstateProperty-OwnershipTransfer-UnRegisteredWill").prefix("ES_EB_URW_").build(),
-				ApplicationType.builder().name("EstateProperty-OwnershipTransfer-InstestateDeath").prefix("ES_EB_ID_").build(),
-				ApplicationType.builder().name("EstateProperty-OwnershipTransfer-PatnershipDeed").prefix("ES_EB_PD_").build(),
-				ApplicationType.builder().name("EstateProperty-OwnershipTransfer-FamilySettlement").prefix("ES_EB_FS_").build(),
+				ApplicationType.builder().name("EB-OT-SaleDeed").prefix("ES_EB_SD_").build(),
+				ApplicationType.builder().name("EB-OT-RegisteredWill").prefix("ES_EB_RW_").build(),
+				ApplicationType.builder().name("EB-OT-UnRegisteredWill").prefix("ES_EB_URW_").build(),
+				ApplicationType.builder().name("EB-OT-InstestateDeath").prefix("ES_EB_ID_").build(),
+				ApplicationType.builder().name("EB-OT-PatnershipDeed").prefix("ES_EB_PD_").build(),
+				ApplicationType.builder().name("EB-OT-FamilySettlement").prefix("ES_EB_FS_").build(),
 
-				ApplicationType.builder().name("EstateProperty-OtherCitizenService-NOC").prefix("ES_EB_NOC_").build(),
-				ApplicationType.builder().name("EstateProperty-OtherCitizenService-NDC").prefix("ES_EB_NDC_").build(),
-				ApplicationType.builder().name("EstateProperty-OtherCitizenService-Mortgage").prefix("ES_EB_MORTGAGE_").build(),
-				ApplicationType.builder().name("EstateProperty-OtherCitizenService-DuplicateCopy").prefix("ES_EB_DC_").build(),
-				ApplicationType.builder().name("EstateProperty-OtherCitizenService-ResidentailToCommercial").prefix("ES_EB_RTC_").build(),
-				ApplicationType.builder().name("EstateProperty-OtherCitizenService-ChangeInTrade").prefix("ES_EB_CIT_").build()
+				ApplicationType.builder().name("EB-OCS-NOC").prefix("ES_EB_NOC_").build(),
+				ApplicationType.builder().name("EB-OCS-NDC").prefix("ES_EB_NDC_").build(),
+				ApplicationType.builder().name("EB-OCS-Mortgage").prefix("ES_EB_MORTGAGE_").build(),
+				ApplicationType.builder().name("EB-OCS-DuplicateCopy").prefix("ES_EB_DC_").build(),
+				ApplicationType.builder().name("EB-OCS-ResidentailToCommercial").prefix("ES_EB_RTC_").build(),
+				ApplicationType.builder().name("EB-OCS-ChangeInTrade").prefix("ES_EB_CIT_").build()
 				));
 	}
 

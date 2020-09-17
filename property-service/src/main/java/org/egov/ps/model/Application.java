@@ -106,6 +106,22 @@ public class Application {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 	
+	@JsonProperty("businessService")
+	private String businessService;	
+
+	public String getBusinessService() {
+		return String.format("%s-%s-%s", extractPrefix(this.getBranchType()), extractPrefix(this.getModuleType()), this.getApplicationType());
+	}
+
+	private String extractPrefix(String inputString) {
+        String outputString = "";
+
+        for (int i = 0; i < inputString.length(); i++) {
+            char c = inputString.charAt(i);
+            outputString += Character.isUpperCase(c) ? c : "";
+        }
+        return outputString;
+    }
 	/**
 	 * Documents uploaded for this application.
 	 */
