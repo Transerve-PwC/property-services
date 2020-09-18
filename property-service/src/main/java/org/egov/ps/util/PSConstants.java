@@ -25,6 +25,12 @@ public class PSConstants {
 	public static final String EB_OT_SD = "EstateBranch_OwnershipTransfer_SaleDeed";
 
 	public static final String EB_OT_RW = "EstateBranch_OwnershipTransfer_RegisteredWill";
+	
+	public static final String EB_OC_LH_FH = "EstateBranch_OtherCitizen_LeaseholdToFreehold";
+
+	public static final String EB_OC_SCF_SCO = "EstateBranch_OtherCitizen_ScfToSco";
+
+	public static final String EB_IS_AOS = "EstateBranch_InternalServices_AllotmentOfSite";
 
 	public static final String MDMS_PS_MORTGAGE_FILTER = ".*.documentList.*";
 
