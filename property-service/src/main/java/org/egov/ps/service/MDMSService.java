@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.ps.config.Configuration;
+import org.egov.ps.model.Application;
 import org.egov.ps.repository.ServiceRequestRepository;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
@@ -109,6 +110,24 @@ public class MDMSService {
 		MdmsCriteriaReq mdmsCriteriaReq = new MdmsCriteriaReq();
 			mdmsCriteriaReq = util.prepareMdMsRequest(tenantId, PSConstants.MDMS_PS_MODULE_NAME,
 					Arrays.asList(applicationType), null, requestInfo);
+		
+		StringBuilder url = getMdmsSearchUrl(tenantId, applicationType, PSConstants.MDMS_PS_MODULE_NAME);
+		Object response = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
+
+		String MDMSResponsePath = "$.MdmsRes." + PSConstants.MDMS_PS_MODULE_NAME + "." + applicationType;
+
+		List<Map<String, Object>> fieldConfigurations = JsonPath.read(response, MDMSResponsePath);
+		return fieldConfigurations;
+	}
+	
+	public List<Map<String, Object>> getNotificationConfig(String applicationType, RequestInfo requestInfo, String tenantId, Application application) {
+		// TODO Auto-generated method stub
+		tenantId = tenantId.split("\\.")[0];
+		//String filter = "[?(@.state=='EM_ES_PENDING_CLERK_VERIFICATION'&&@.applicationType=='SaleDeed'&&@.moduleType=='OwnershipTransfer')]";
+		String filter = "[?(@.state=='"+application.getState()+"'&&@.applicationType=='"+application.getApplicationType()+"'&&@.moduleType=='"+application.getModuleType()+"')]";
+		MdmsCriteriaReq mdmsCriteriaReq = new MdmsCriteriaReq();
+			mdmsCriteriaReq = util.prepareMdMsRequest(tenantId, PSConstants.MDMS_PS_MODULE_NAME,
+					Arrays.asList(applicationType), filter, requestInfo);
 		
 		StringBuilder url = getMdmsSearchUrl(tenantId, applicationType, PSConstants.MDMS_PS_MODULE_NAME);
 		Object response = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
