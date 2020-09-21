@@ -52,6 +52,9 @@ CREATE TABLE cs_ep_property_details_v1 (
    company_address		CHARACTER VARYING (256),
    company_registration_number	CHARACTER VARYING (256),
    company_type			CHARACTER VARYING (256),
+   decree_date			bigint,
+   court_details		CHARACTER VARYING (256),
+   civil_titled_as		CHARACTER VARYING (256),
 
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
@@ -73,6 +76,7 @@ CREATE TABLE cs_ep_owner_v1 (
    cp_number         	CHARACTER VARYING (256),
    state   				CHARACTER VARYING (256),
    action   			CHARACTER VARYING (256),
+   owner_or_partner		CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
@@ -101,6 +105,7 @@ CREATE TABLE cs_ep_owner_details_v1 (
    is_master_entry    	BOOLEAN,
    due_amount  			numeric(12,2),
    address    			CHARACTER VARYING (256),
+   is_director			CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
@@ -135,7 +140,7 @@ CREATE TABLE cs_ep_documents_v1 (
 CREATE TABLE cs_ep_court_case_v1 (
    id           				CHARACTER VARYING (256) NOT NULL,
    tenantid       				CHARACTER VARYING (256),
-   owner_details_id				CHARACTER VARYING (256) NOT NULL,
+   property_details_id			CHARACTER VARYING (256) NOT NULL,
    estate_officer_court 		CHARACTER VARYING (256),
    commissioners_court  		CHARACTER VARYING (256),
    chief_administartors_court   CHARACTER VARYING (256),
@@ -150,7 +155,7 @@ CREATE TABLE cs_ep_court_case_v1 (
    last_modified_time   		bigint,
 
   CONSTRAINT pk_cs_ep_court_case_v1 PRIMARY KEY (id),
-  CONSTRAINT fk_cs_ep_court_case_v1 FOREIGN KEY (owner_details_id) REFERENCES cs_ep_owner_details_v1 (id)
+  CONSTRAINT fk_cs_ep_court_case_v1 FOREIGN KEY (property_details_id) REFERENCES cs_ep_property_details_v1 (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
 );
@@ -197,6 +202,9 @@ CREATE TABLE cs_ep_property_details_audit_v1 (
    company_address		CHARACTER VARYING (256),
    company_registration_number	CHARACTER VARYING (256),
    company_type			CHARACTER VARYING (256),
+   decree_date			bigint,
+   court_details		CHARACTER VARYING (256),
+   civil_titled_as		CHARACTER VARYING (256),
 
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
@@ -213,6 +221,7 @@ CREATE TABLE cs_ep_owner_audit_v1 (
    cp_number         	CHARACTER VARYING (256),
    state   				CHARACTER VARYING (256),
    action   			CHARACTER VARYING (256),
+   owner_or_partner		CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
@@ -236,6 +245,7 @@ CREATE TABLE cs_ep_owner_details_audit_v1 (
    is_master_entry    	BOOLEAN,
    due_amount  			numeric(12,2),
    address    			CHARACTER VARYING (256),
+   is_director			CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),

@@ -48,7 +48,10 @@ public class Owner {
 
 	@JsonProperty("state")
 	private String state;
-
+	
+	@JsonProperty("ownerOrPartner")
+	private String ownerOrPartner;
+	
 	@JsonProperty("action")
 	private String action;
 

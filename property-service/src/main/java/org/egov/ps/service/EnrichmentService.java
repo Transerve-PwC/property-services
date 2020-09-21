@@ -81,6 +81,10 @@ public class EnrichmentService {
 
 		PropertyDetails propertyDetail = property.getPropertyDetails();
 		String gen_property_details_id = UUID.randomUUID().toString();
+
+		List<CourtCase> courtCases = getCourtCases(property, requestInfo, gen_property_details_id);
+		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
+
 		AuditDetails propertyDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
 		List<Owner> owners = getOwners(property, requestInfo, gen_property_details_id, gen_property_id);
@@ -89,6 +93,8 @@ public class EnrichmentService {
 		propertyDetail.setTenantId(property.getTenantId());
 		propertyDetail.setPropertyId(gen_property_id);
 		propertyDetail.setOwners(owners);
+		propertyDetail.setCourtCases(courtCases);
+		propertyDetail.setPaymentDetails(paymentDetails);
 		propertyDetail.setAuditDetails(propertyDetailsAuditDetails);
 
 		return propertyDetail;
@@ -129,24 +135,19 @@ public class EnrichmentService {
 
 		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, gen_owner_details_id,
 				gen_property_id);
-		List<CourtCase> courtCases = getCourtCases(owner, property, requestInfo, gen_owner_details_id);
-		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 
 		ownerDetails.setId(gen_owner_details_id);
 		ownerDetails.setTenantId(property.getTenantId());
 		ownerDetails.setOwnerId(gen_owner_id);
 		ownerDetails.setOwnerDocuments(ownerDocuments);
-		ownerDetails.setCourtCases(courtCases);
-		ownerDetails.setPaymentDetails(paymentDetails);
 		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
 
 		return ownerDetails;
 	}
 
-	private List<CourtCase> getCourtCases(Owner owner, Property property, RequestInfo requestInfo,
-			String gen_owner_details_id) {
+	private List<CourtCase> getCourtCases(Property property, RequestInfo requestInfo, String gen_property_details_id) {
 
-		List<CourtCase> courtCases = owner.getOwnerDetails().getCourtCases();
+		List<CourtCase> courtCases = property.getPropertyDetails().getCourtCases();
 
 		if (!CollectionUtils.isEmpty(courtCases)) {
 
@@ -158,7 +159,7 @@ public class EnrichmentService {
 
 				courtCase.setId(gen_court_case_id);
 				courtCase.setTenantId(property.getTenantId());
-				courtCase.setOwnerDetailsId(gen_owner_details_id);
+				courtCase.setPropertyDetailsId(gen_property_details_id);
 				courtCase.setAuditDetails(courtCaseAuditDetails);
 
 			});
@@ -185,8 +186,10 @@ public class EnrichmentService {
 			AuditDetails auditDetails) {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
 		List<Owner> owners = updateOwners(property, requestInfo);
+		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 
 		propertyDetail.setOwners(owners);
+		propertyDetail.setPaymentDetails(paymentDetails);
 		propertyDetail.setAuditDetails(auditDetails);
 
 		return propertyDetail;
@@ -213,11 +216,10 @@ public class EnrichmentService {
 		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, ownerDetails.getId(),
 				property.getId());
 //		List<CourtCase> courtCases = updateCourtCases(owner, requestInfo); TODO: Confirm that court details are not updated again
-		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
 
 		ownerDetails.setOwnerDocuments(ownerDocuments);
 //		ownerDetails.setCourtCases(courtCases); TODO: Confirm that court details are not updated again
-		ownerDetails.setPaymentDetails(paymentDetails);
+
 		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
 
 		return ownerDetails;
@@ -249,8 +251,8 @@ public class EnrichmentService {
 
 	private List<Payment> createUpdatePaymentDetails(Property property, RequestInfo requestInfo) {
 		List<Payment> paymentDetails = new ArrayList<>();
+		List<Payment> payments = property.getPropertyDetails().getPaymentDetails();
 		property.getPropertyDetails().getOwners().forEach(owner -> {
-			List<Payment> payments = owner.getOwnerDetails().getPaymentDetails();
 			if (!CollectionUtils.isEmpty(payments)) {
 				AuditDetails paymentAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 				payments.forEach(payment -> {
@@ -272,8 +274,8 @@ public class EnrichmentService {
 	public void enrichCreateApplication(ApplicationRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		List<Application> applications = request.getApplications();
-		if (!CollectionUtils.isEmpty(applications)) {
 
+		if (!CollectionUtils.isEmpty(applications)) {
 			applications.forEach(application -> {
 				String gen_application_id = UUID.randomUUID().toString();
 				AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
@@ -291,36 +293,57 @@ public class EnrichmentService {
 	private JsonNode enrichApplicationDetails(Application application) {
 		JsonNode applicationDetails = application.getApplicationDetails();
 
-		JsonNode transferor = (applicationDetails.get("transferor") != null) ? applicationDetails.get("transferor") : applicationDetails.get("owner");
+		JsonNode transferor = (applicationDetails.get("transferor") != null) ? applicationDetails.get("transferor")
+				: applicationDetails.get("owner");
 
 		String propertyId = application.getProperty().getId();
 		String transferorId = transferor.get("id").asText();
 
 		Property property = propertyRepository.findPropertyById(propertyId);
 
-		property.getPropertyDetails().getOwners().forEach(owner -> {
-			if (owner.getId().equals(transferorId)) {
-				((ObjectNode) transferor).put("serialNumber", owner.getSerialNumber());
-				((ObjectNode) transferor).put("share", owner.getShare());
-				((ObjectNode) transferor).put("cpNumber", owner.getCpNumber());
+		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
+			property.getPropertyDetails().getOwners().forEach(owner -> {
+				if (owner.getId().equals(transferorId)) {
+					((ObjectNode) transferor).put("serialNumber", owner.getSerialNumber());
+					((ObjectNode) transferor).put("share", owner.getShare());
+					((ObjectNode) transferor).put("cpNumber", owner.getCpNumber());
 
-				ObjectNode ownerDetails = objectMapper.createObjectNode();
-				ownerDetails.put("ownerName", owner.getOwnerDetails().getOwnerName());
-				ownerDetails.put("guardianName", owner.getOwnerDetails().getGuardianName());
-				ownerDetails.put("guardianRelation", owner.getOwnerDetails().getGuardianRelation());
-				ownerDetails.put("mobileNumber", owner.getOwnerDetails().getMobileNumber());
-				ownerDetails.put("allotmentNumber", owner.getOwnerDetails().getAllotmentNumber());
-				ownerDetails.put("dateOfAllotment", owner.getOwnerDetails().getDateOfAllotment());
-				ownerDetails.put("possesionDate", owner.getOwnerDetails().getPossesionDate());
-				ownerDetails.put("isApproved", owner.getOwnerDetails().getIsApproved());
-				ownerDetails.put("isCurrentOwner", owner.getOwnerDetails().getIsCurrentOwner());
-				ownerDetails.put("isMasterEntry", owner.getOwnerDetails().getIsMasterEntry());
-				ownerDetails.put("address", owner.getOwnerDetails().getAddress());
+					ObjectNode ownerDetails = objectMapper.createObjectNode();
+					ownerDetails.put("ownerName", owner.getOwnerDetails().getOwnerName());
+					ownerDetails.put("guardianName", owner.getOwnerDetails().getGuardianName());
+					ownerDetails.put("guardianRelation", owner.getOwnerDetails().getGuardianRelation());
+					ownerDetails.put("mobileNumber", owner.getOwnerDetails().getMobileNumber());
+					ownerDetails.put("allotmentNumber", owner.getOwnerDetails().getAllotmentNumber());
+					ownerDetails.put("dateOfAllotment", owner.getOwnerDetails().getDateOfAllotment());
+					ownerDetails.put("possesionDate", owner.getOwnerDetails().getPossesionDate());
+					ownerDetails.put("isApproved", owner.getOwnerDetails().getIsApproved());
+					ownerDetails.put("isCurrentOwner", owner.getOwnerDetails().getIsCurrentOwner());
+					ownerDetails.put("isMasterEntry", owner.getOwnerDetails().getIsMasterEntry());
+					ownerDetails.put("address", owner.getOwnerDetails().getAddress());
 
-				((ObjectNode) transferor).set("transferorDetails", ownerDetails);
+					((ObjectNode) transferor).set("transferorDetails", ownerDetails);
+				}
+			});
+		}
+
+		if (applicationDetails.get("transferee") != null && applicationDetails.get("transferee").get("id") != null) {
+			JsonNode transferee = applicationDetails.get("transferee");
+			String transfereeId = transferee.get("id").asText();
+
+			if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
+				property.getPropertyDetails().getOwners().forEach(owner -> {
+					if (owner.getId().equals(transfereeId)) {
+						((ObjectNode) transferee).put("name", owner.getOwnerDetails().getOwnerName());
+						((ObjectNode) transferee).put("fatherOrHusbandName", owner.getOwnerDetails().getGuardianName());
+						((ObjectNode) transferee).put("relation", owner.getOwnerDetails().getGuardianRelation());
+						((ObjectNode) transferee).put("address", owner.getOwnerDetails().getAddress());
+						((ObjectNode) transferee).put("relationWithDeceased",
+								owner.getOwnerDetails().getGuardianRelation());
+						((ObjectNode) transferee).put("mobileNo", owner.getOwnerDetails().getMobileNumber());
+					}
+				});
 			}
-		});
-
+		}
 		return applicationDetails;
 	}
 
