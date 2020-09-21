@@ -198,12 +198,13 @@ public class EnrichmentService {
 	private List<Owner> updateOwners(Property property, RequestInfo requestInfo) {
 		List<Owner> owners = property.getPropertyDetails().getOwners();
 		AuditDetails ownerAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
-
-		owners.forEach(owner -> {
-			OwnerDetails ownerDetails = updateOwnerDetail(property, owner, requestInfo);
-			owner.setOwnerDetails(ownerDetails);
-			owner.setAuditDetails(ownerAuditDetails);
-		});
+		if (!CollectionUtils.isEmpty(owners)) {
+			owners.forEach(owner -> {
+				OwnerDetails ownerDetails = updateOwnerDetail(property, owner, requestInfo);
+				owner.setOwnerDetails(ownerDetails);
+				owner.setAuditDetails(ownerAuditDetails);
+			});
+		}
 
 		return owners;
 	}
@@ -228,46 +229,50 @@ public class EnrichmentService {
 	private List<Document> createUpdateOwnerDocs(Property property, RequestInfo requestInfo, String reference_id,
 			String gen_property_id) {
 		List<Document> ownerDocs = new ArrayList<>();
-		property.getPropertyDetails().getOwners().forEach(owner -> {
-			List<Document> ownerDocuments = owner.getOwnerDetails().getOwnerDocuments();
-			if (!CollectionUtils.isEmpty(ownerDocuments)) {
-				AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-				ownerDocuments.forEach(document -> {
-					if (document.getId() == null) {
-						String gen_doc_id = UUID.randomUUID().toString();
-						document.setId(gen_doc_id);
-						document.setTenantId(property.getTenantId());
-						document.setReferenceId(reference_id);
-						document.setPropertyId(gen_property_id);
+		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
+			property.getPropertyDetails().getOwners().forEach(owner -> {
+				List<Document> ownerDocuments = owner.getOwnerDetails().getOwnerDocuments();
+				if (!CollectionUtils.isEmpty(ownerDocuments)) {
+					AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+					ownerDocuments.forEach(document -> {
+						if (document.getId() == null) {
+							String gen_doc_id = UUID.randomUUID().toString();
+							document.setId(gen_doc_id);
+							document.setTenantId(property.getTenantId());
+							document.setReferenceId(reference_id);
+							document.setPropertyId(gen_property_id);
+							document.setAuditDetails(docAuditDetails);
+						}
 						document.setAuditDetails(docAuditDetails);
-					}
-					document.setAuditDetails(docAuditDetails);
-				});
-				ownerDocs.addAll(ownerDocuments);
-			}
-		});
+					});
+					ownerDocs.addAll(ownerDocuments);
+				}
+			});
+		}
 		return ownerDocs;
 	}
 
 	private List<Payment> createUpdatePaymentDetails(Property property, RequestInfo requestInfo) {
 		List<Payment> paymentDetails = new ArrayList<>();
-		List<Payment> payments = property.getPropertyDetails().getPaymentDetails();
-		property.getPropertyDetails().getOwners().forEach(owner -> {
-			if (!CollectionUtils.isEmpty(payments)) {
-				AuditDetails paymentAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-				payments.forEach(payment -> {
-					if (payment.getId() == null) {
-						String gen_payment_detail_id = UUID.randomUUID().toString();
-						payment.setId(gen_payment_detail_id);
-						payment.setTenantId(property.getTenantId());
-						payment.setOwnerDetailsId(owner.getOwnerDetails().getId());
+		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
+			property.getPropertyDetails().getOwners().forEach(owner -> {
+				List<Payment> payments = owner.getOwnerDetails().getPaymentDetails();
+				if (!CollectionUtils.isEmpty(payments)) {
+					AuditDetails paymentAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+					payments.forEach(payment -> {
+						if (payment.getId() == null) {
+							String gen_payment_detail_id = UUID.randomUUID().toString();
+							payment.setId(gen_payment_detail_id);
+							payment.setTenantId(property.getTenantId());
+							payment.setOwnerDetailsId(owner.getOwnerDetails().getId());
+							payment.setAuditDetails(paymentAuditDetails);
+						}
 						payment.setAuditDetails(paymentAuditDetails);
-					}
-					payment.setAuditDetails(paymentAuditDetails);
-				});
-				paymentDetails.addAll(payments);
-			}
-		});
+					});
+					paymentDetails.addAll(payments);
+				}
+			});
+		}
 		return paymentDetails;
 	}
 
@@ -300,7 +305,6 @@ public class EnrichmentService {
 		String transferorId = transferor.get("id").asText();
 
 		Property property = propertyRepository.findPropertyById(propertyId);
-
 		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 			property.getPropertyDetails().getOwners().forEach(owner -> {
 				if (owner.getId().equals(transferorId)) {
@@ -476,14 +480,17 @@ public class EnrichmentService {
 	public void enrichMortgageDetailsRequest(PropertyRequest request) {
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
-				property.getPropertyDetails().getOwners().forEach(owner -> {
-					// checking - owner is existing and mortgage details bound with user.
-					if (null != owner.getId() && !owner.getId().isEmpty() && null != owner.getMortgageDetails()) {
-						// validate mortgage details - documents
-						validateMortgageDetails(property, owner, request.getRequestInfo(), owner.getId());
-						owner.setMortgageDetails(getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
-					}
-				});
+				if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
+					property.getPropertyDetails().getOwners().forEach(owner -> {
+						// checking - owner is existing and mortgage details bound with user.
+						if (null != owner.getId() && !owner.getId().isEmpty() && null != owner.getMortgageDetails()) {
+							// validate mortgage details - documents
+							validateMortgageDetails(property, owner, request.getRequestInfo(), owner.getId());
+							owner.setMortgageDetails(
+									getMortgage(property, owner, request.getRequestInfo(), owner.getId()));
+						}
+					});
+				}
 			});
 		}
 	}
