@@ -72,6 +72,9 @@ public class OwnerDetails {
 
 	@JsonProperty("address")
 	private String address;
+	
+	@JsonProperty("isDirector")
+	private Boolean isDirector;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
@@ -89,39 +92,6 @@ public class OwnerDetails {
 			}
 		}
 		this.ownerDocuments.add(ownerDocumentItem);
-		return this;
-	}
-
-	@JsonProperty("courtCases")
-	private List<CourtCase> courtCases;
-
-	public OwnerDetails addCourtCaseItem(CourtCase courtCaseItem) {
-		if (this.courtCases == null) {
-			this.courtCases = new ArrayList<>();
-		}
-		for (CourtCase courtCase : courtCases) {
-			if (courtCase.getId().equalsIgnoreCase(courtCaseItem.getId())) {
-				return this;
-			}
-		}
-		this.courtCases.add(courtCaseItem);
-		return this;
-
-	}
-
-	@JsonProperty("paymentDetails")
-	private List<Payment> paymentDetails;
-
-	public OwnerDetails addPaymentItem(Payment paymentItem) {
-		if (this.paymentDetails == null) {
-			this.paymentDetails = new ArrayList<>();
-		}
-		for (Payment paymentDetail : paymentDetails) {
-			if (paymentDetail.getId().equalsIgnoreCase(paymentItem.getId())) {
-				return this;
-			}
-		}
-		this.paymentDetails.add(paymentItem);
 		return this;
 	}
 

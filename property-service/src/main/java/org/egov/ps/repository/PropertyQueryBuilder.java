@@ -37,25 +37,26 @@ public class PropertyQueryBuilder {
 			+ " ptdl.tenantid as pdtenantid, ptdl.type_of_allocation, ptdl.mode_of_auction, ptdl.scheme_name,ptdl.date_of_auction, "
 			+ " ptdl.area_sqft, ptdl.rate_per_sqft, ptdl.last_noc_date, ptdl.service_category, "
 			+ " ptdl.is_property_active, ptdl.trade_type, ptdl.company_name, ptdl.company_address, ptdl.company_registration_number, "
+			+ " ptdl.decree_date, ptdl.court_details, ptdl.civil_titled_as, "
 			+ " ptdl.company_type, ptdl.emd_amount, ptdl.emd_date ";
 
 	private static final String OWNER_COLUMNS = " ownership.id as oid, ownership.property_details_id as oproperty_details_id, "
 			+ " ownership.tenantid as otenantid, ownership.serial_number as oserial_number, "
 			+ " ownership.share as oshare, ownership.cp_number as ocp_number, ownership.state as ostate, ownership.action as oaction, "
-			+ " ownership.created_by as ocreated_by, ownership.created_time as ocreated_time, "
+			+ " ownership.created_by as ocreated_by, ownership.created_time as ocreated_time, ownership.owner_or_partner, "
 			+ " ownership.last_modified_by as omodified_by, ownership.last_modified_time as omodified_time, "
 
 			+ " od.id as odid, od.owner_id as odowner_id,"
 			+ " od.owner_name as odowner_name, od.tenantid as odtenantid,"
 			+ " od.guardian_name, od.guardian_relation, od.mobile_number,"
 			+ " od.allotment_number, od.date_of_allotment, od.possesion_date, od.is_approved, "
-			+ " od.is_current_owner, od.is_master_entry, od.address, "
+			+ " od.is_current_owner, od.is_master_entry, od.address, od.is_director, "
 
 			+ " doc.id as docid, doc.reference_id as docowner_details_id, doc.tenantid as doctenantid,"
 			+ " doc.is_active as docis_active, doc.document_type, doc.file_store_id, doc.property_id as docproperty_id,"
 			+ " doc.created_by as dcreated_by, doc.created_time as dcreated_time, doc.last_modified_by as dmodified_by, doc.last_modified_time as dmodified_time ";
 
-//			+ " payment.id as payid, payment.tenantid as paytenantid, payment.owner_details_id as payowner_details_id, "
+//			+ " payment.id as payid, payment.tenantid as paytenantid, payment.property_details_id as payproperty_details_id, "
 //			+ " payment.payment_type, payment.due_date_of_payment, payment.payable, payment.amount, "
 //			+ " payment.total, payment.date_of_deposit, payment.delay_in_payment, "
 //			+ " payment.interest_for_delay, payment.total_amount_due_with_interest, payment.amount_deposited, "
@@ -68,7 +69,7 @@ public class PropertyQueryBuilder {
 //			+ " payment.lease_period, payment.license_fee_of_year, payment.license_fee, payment.security_amount, payment.security_date, "
 //			+ " payment.created_by as paycreated_by, payment.created_time as paycreated_time, payment.last_modified_by as paymodified_by, payment.last_modified_time as paymodified_time ";
 
-	private static final String CC_COLUMNS = " cc.id as ccid, cc.owner_details_id as ccproperty_details_id,"
+	private static final String CC_COLUMNS = " cc.id as ccid, cc.property_details_id as ccproperty_details_id,"
 			+ " cc.tenantid as cctenantid, cc.estate_officer_court as ccestate_officer_court,"
 			+ " cc.commissioners_court as cccommissioners_court, cc.chief_administartors_court as ccchief_administartors_court, cc.advisor_to_admin_court as ccadvisor_to_admin_court, cc.honorable_district_court as cchonorable_district_court,"
 			+ " cc.honorable_high_court as cchonorable_high_court, cc.honorable_supreme_court as cchonorable_supreme_court,"
@@ -82,9 +83,9 @@ public class PropertyQueryBuilder {
 			+ LEFT_JOIN + " cs_ep_owner_details_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
 			+ " cs_ep_documents_v1 doc ON od.id=doc.reference_id " ;
 //	        + LEFT_JOIN
-//			+ " cs_ep_payment_v1 payment ON od.id=payment.owner_details_id ";
+//			+ " cs_ep_payment_v1 payment ON ptdl.id=payment.property_details_id ";
 
-	private static final String CC_TABLE = " cs_ep_court_case_v1 cc ON od.id=cc.owner_details_id ";
+	private static final String CC_TABLE = " cs_ep_court_case_v1 cc ON ptdl.id=cc.property_details_id ";
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pmodified_time desc) offset_ FROM " + "({})"
