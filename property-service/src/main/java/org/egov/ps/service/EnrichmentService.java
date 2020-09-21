@@ -256,7 +256,7 @@ public class EnrichmentService {
 		List<Payment> paymentDetails = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 			property.getPropertyDetails().getOwners().forEach(owner -> {
-				List<Payment> payments = owner.getOwnerDetails().getPaymentDetails();
+				List<Payment> payments = property.getPropertyDetails().getPaymentDetails();
 				if (!CollectionUtils.isEmpty(payments)) {
 					AuditDetails paymentAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 					payments.forEach(payment -> {
