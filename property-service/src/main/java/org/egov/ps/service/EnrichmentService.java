@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.config.Configuration;
 import org.egov.ps.model.Application;
+import org.egov.ps.model.Auction;
 import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.MortgageDetails;
@@ -25,6 +26,8 @@ import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.ApplicationRequest;
+import org.egov.ps.web.contracts.AuctionSaveRequest;
+import org.egov.ps.web.contracts.AuctionTransactionRequest;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.egov.ps.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
@@ -74,6 +77,20 @@ public class EnrichmentService {
 				property.setAuditDetails(propertyAuditDetails);
 
 			});
+		}
+	}
+	
+	public void enrichAuctionCreateRequest(AuctionSaveRequest request) {
+		
+		RequestInfo requestInfo = request.getRequestInfo();
+		AuditDetails auctionAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		if (!CollectionUtils.isEmpty(request.getAuctions())) {
+			request.getAuctions().forEach(auction->{
+				String gen_auction_id = UUID.randomUUID().toString();
+				auction.setAuditDetails(auctionAuditDetails);
+				auction.setId(gen_auction_id);
+			});
+			
 		}
 	}
 

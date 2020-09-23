@@ -1,0 +1,40 @@
+serviceMaps:
+  serviceName: auction-service
+  mappings:
+  - version: 1.0
+    description: Persists Auctions details in cs_ep_auction table
+    fromTopic: save-auction-master
+    isTransaction: true
+    queryMaps:
+
+    - query: INSERT INTO cs_ep_auction (id, property_id, file_number, tenant_id, auction_description, participated_bidders, deposited_emd_amount, deposit_date, emdValidity_date,refund_status, created_by, last_modified_by,  created_date, last_modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: Auctions.*
+      jsonMaps:
+
+      - jsonPath: $.Auctions.*.id
+
+      - jsonPath: $.Auctions.*.propertyId
+      
+      - jsonPath: $.Auctions.*.fileNumber
+      
+      - jsonPath: $.Auctions.*.tenantId
+
+      - jsonPath: $.Auctions.*.auctionDescription
+
+      - jsonPath: $.Auctions.*.participatedBidders 
+      
+      - jsonPath: $.Auctions.*.depositedEMDAmount 
+      
+      - jsonPath: $.Auctions.*.depositDate 
+      
+      - jsonPath: $.Auctions.*.emdValidityDate
+      
+      - jsonPath: $.Auctions.*.refundStatus 
+      
+      - jsonPath: $.Auctions.*.auditDetails.createdBy
+
+      - jsonPath: $.Auctions.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Auctions.*.auditDetails.createdTime
+
+      - jsonPath: $.Auctions.*.auditDetails.lastModifiedTime            
