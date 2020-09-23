@@ -324,7 +324,7 @@ public class EnrichmentService {
 				List<String> allMatches = new ArrayList<String>();
 				while(m.find()) {
 				    allMatches.add(m.group());
-				} 
+				}
 				
 				data.setContent(data.getContent()
 						//app.getModuleType() == null ? "" : app.getModuleType()
