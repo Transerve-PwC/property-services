@@ -40,6 +40,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
+import com.jayway.jsonpath.JsonPath;
 
 @Service
 public class EnrichmentService {
@@ -326,14 +327,22 @@ public class EnrichmentService {
 				    allMatches.add(m.group());
 				}
 				
-				data.setContent(data.getContent()
-						//app.getModuleType() == null ? "" : app.getModuleType()
-						.replace(allMatches.get(0),enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy())
-						.replace(allMatches.get(1), enrichedApplication.getModuleType() == null ? "" : enrichedApplication.getModuleType())
-						.replace(allMatches.get(2), enrichedApplication.getApplicationType() == null ? "" : enrichedApplication.getApplicationType())
-						.replace(allMatches.get(3), enrichedApplication.getProperty() == null ? "" : enrichedApplication.getProperty().getFileNumber())
-						.replace(allMatches.get(4), enrichedApplication.getApplicationNumber() == null ? "" : enrichedApplication.getApplicationNumber())
-						);
+				String newJson = new Gson().toJson(data);
+				for (String matches : allMatches) {
+					if(matches.equalsIgnoreCase(allMatches.get(0))) 
+						newJson = JsonPath.parse(newJson).set("$.content", data.getContent().replace(allMatches.get(0),enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy())).jsonString();
+					else if(matches.equalsIgnoreCase(allMatches.get(1)))
+						newJson = JsonPath.parse(newJson).set("$.content", data.getContent().replace(allMatches.get(1),enrichedApplication.getModuleType() == null ? "" : enrichedApplication.getModuleType())).jsonString();
+					else if(matches.equalsIgnoreCase(allMatches.get(2)))
+						newJson = JsonPath.parse(newJson).set("$.content", data.getContent().replace(allMatches.get(2),enrichedApplication.getApplicationType() == null ? "" : enrichedApplication.getApplicationType())).jsonString();
+					else if(matches.equalsIgnoreCase(allMatches.get(3)))
+						newJson = JsonPath.parse(newJson).set("$.content", data.getContent().replace(allMatches.get(3),enrichedApplication.getProperty() == null ? "" : enrichedApplication.getProperty().getFileNumber())).jsonString();
+					else if(matches.equalsIgnoreCase(allMatches.get(4)))
+						newJson = JsonPath.parse(newJson).set("$.content", data.getContent().replace(allMatches.get(4),enrichedApplication.getApplicationNumber() == null ? "" : enrichedApplication.getApplicationNumber())).jsonString();
+					
+					data = new Gson().fromJson(newJson, Notifications.class); 
+				}
+				
 				data.getModes().getEmail().setTo(enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy());
 				data.getModes().getSms().setTo(enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy());
 				data.getModes().getEvent().setTo(enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy());
