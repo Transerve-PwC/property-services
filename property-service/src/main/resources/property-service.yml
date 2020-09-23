@@ -97,142 +97,6 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_ep_owner_v1 (id, tenantid, property_details_id, serial_number, share, cp_number, state, action, owner_or_partner, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.propertyDetails.owners.*
-      jsonMaps:
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.id
-
-      - jsonPath: $.Properties.*.tenantId
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.propertyDetailsId
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.serialNumber
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.share
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.cpNumber
-      
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.state
-      
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.action
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerOrPartner
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.createdBy
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.lastModifiedBy
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.createdTime
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.lastModifiedTime
-      
-  
-    - query: INSERT INTO cs_ep_owner_details_v1 (id, owner_id, tenantid, owner_name, guardian_name, guardian_relation, mobile_number, allotment_number, date_of_allotment, possesion_date, is_approved, is_current_owner, is_master_entry, address, is_director, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails
-      jsonMaps:
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.id
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.id
-      
-      - jsonPath: $.Properties.*.tenantId
-      
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerName
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.guardianName
-      
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.guardianRelation
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.mobileNumber
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.allotmentNumber
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.dateOfAllotment
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.possesionDate
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isApproved
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isCurrentOwner
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isMasterEntry
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.address
-      
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isDirector
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.createdBy
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.lastModifiedBy
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.createdTime
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.lastModifiedTime
-
-
-    - query: INSERT INTO cs_ep_documents_v1 (id, tenantid, reference_id, is_active, document_type, file_store_id, property_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*
-      jsonMaps:
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.id
-
-      - jsonPath: $.Properties.*.tenantId
-      
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.referenceId
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.isActive
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.documentType
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.fileStoreId
-      
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.propertyId
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.createdBy
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedBy
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.createdTime
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedTime  
-      
-         
-    - query: INSERT INTO cs_ep_court_case_v1 (id, property_details_id, tenantid, estate_officer_court, commissioners_court, chief_administartors_court, advisor_to_admin_court, honorable_district_court, honorable_high_court, honorable_supreme_court, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: $.Properties.*.propertyDetails.courtCases.*
-      jsonMaps:
-
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.id
-
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.propertyDetailsId
-
-      - jsonPath: $.Properties.*.tenantId
-
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.estateOfficerCourt
-
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.commissionersCourt
-
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.chiefAdministartorsCourt
-      
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.advisorToAdminCourt
-      
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.honorableDistrictCourt
-      
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.honorableHighCourt
-      
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.honorableSupremeCourt
-
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.auditDetails.createdBy
-
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.auditDetails.lastModifiedBy
-
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.auditDetails.createdTime
-
-      - jsonPath: $.Properties.*.propertyDetails.courtCases.*.auditDetails.lastModifiedTime
-            
-          
-    
-
   - version: 1.0
     description: Persists Properties details in cs_ep_property_v1 table
     fromTopic: update-property-master
@@ -337,11 +201,35 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.id
       
 
-    - query: UPDATE cs_ep_owner_v1 SET tenantid = ?, serial_number = ?, share = ?, cp_number = ?, state = ?, action = ?, owner_or_partner = ?, last_modified_by = ?, last_modified_time = ? WHERE id = ?;
+    - query: INSERT INTO cs_ep_owner_v1 (id, tenantid, property_details_id, serial_number, share, cp_number, state, action, owner_or_partner, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET serial_number = ?, share = ?, cp_number = ?, state = ?, action = ?, owner_or_partner = ?, last_modified_by = ?, last_modified_time = ?;
       basePath: $.Properties.*.propertyDetails.owners.*
       jsonMaps:
 
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.id
+
       - jsonPath: $.Properties.*.tenantId
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.propertyDetailsId
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.serialNumber
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.share
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.cpNumber
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.state
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.action
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerOrPartner
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.createdBy
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.createdTime
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.lastModifiedTime
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.serialNumber
 
@@ -358,8 +246,6 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.lastModifiedBy
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.lastModifiedTime
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.id
             
       
     - query: INSERT INTO cs_ep_owner_details_audit_v1 SELECT * FROM cs_ep_owner_details_v1 WHERE id = ?;
@@ -368,10 +254,14 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.id
             
   
-    - query: UPDATE cs_ep_owner_details_v1 SET tenantid = ?, owner_name = ?, guardian_name = ?, guardian_relation = ?, mobile_number = ?, allotment_number = ?, date_of_allotment = ?, possesion_date = ?, is_approved = ?, is_current_owner = ?, is_master_entry = ?, address = ?, is_director = ?, last_modified_by = ?, last_modified_time = ? WHERE id = ?;
+    - query: INSERT INTO cs_ep_owner_details_v1 (id, owner_id, tenantid, owner_name, guardian_name, guardian_relation, mobile_number, allotment_number, date_of_allotment, possesion_date, is_approved, is_current_owner, is_master_entry, address, is_director, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET owner_name = ?, guardian_name = ?, guardian_relation = ?, mobile_number = ?, allotment_number = ?, date_of_allotment = ?, possesion_date = ?, is_approved = ?, is_current_owner = ?, is_master_entry = ?, address = ?, is_director = ?, last_modified_by = ?, last_modified_time = ?;
       basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails
       jsonMaps:
 
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.id
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.id
+      
       - jsonPath: $.Properties.*.tenantId
       
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerName
@@ -387,7 +277,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.dateOfAllotment
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.possesionDate
-      
+
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isApproved
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isCurrentOwner
@@ -395,14 +285,44 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isMasterEntry
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.address
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isDirector
 
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.createdBy
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.createdTime
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerName
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.guardianName
+      
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.guardianRelation
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.mobileNumber
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.allotmentNumber
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.dateOfAllotment
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.possesionDate
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isApproved
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isCurrentOwner
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isMasterEntry
+
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.address
+      
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isDirector
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.lastModifiedBy
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.lastModifiedTime
-
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.id
       
 
     - query: INSERT INTO cs_ep_documents_v1 (id, tenantid, reference_id, is_active, document_type, file_store_id, property_id, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET is_active = ?, document_type = ?, file_store_id = ?, last_modified_by = ?, last_modified_time = ?;
@@ -442,7 +362,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.ownerDocuments.*.auditDetails.lastModifiedTime
       
                   
-    - query: INSERT INTO cs_ep_court_case_v1 (id, property_details_id, tenantid, estate_officer_court, commissioners_court, chief_administartors_court, advisor_to_admin_court, honorable_district_court, honorable_high_court, honorable_supreme_court, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET tenantid = ?, estate_officer_court = ?, commissioners_court = ?, chief_administartors_court = ?, advisor_to_admin_court = ?, honorable_district_court = ?, honorable_high_court = ?, honorable_supreme_court = ?, last_modified_by = ?, last_modified_time = ?;
+    - query: INSERT INTO cs_ep_court_case_v1 (id, property_details_id, tenantid, estate_officer_court, commissioners_court, chief_administartors_court, advisor_to_admin_court, honorable_district_court, honorable_high_court, honorable_supreme_court, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET estate_officer_court = ?, commissioners_court = ?, chief_administartors_court = ?, advisor_to_admin_court = ?, honorable_district_court = ?, honorable_high_court = ?, honorable_supreme_court = ?, last_modified_by = ?, last_modified_time = ?;
       basePath: $.Properties.*.propertyDetails.courtCases.*
       jsonMaps:
       
@@ -473,8 +393,6 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.courtCases.*.auditDetails.createdTime
 
       - jsonPath: $.Properties.*.propertyDetails.courtCases.*.auditDetails.lastModifiedTime
-      
-      - jsonPath: $.Properties.*.tenantId
 
       - jsonPath: $.Properties.*.propertyDetails.courtCases.*.estateOfficerCourt
 

@@ -71,6 +71,7 @@ public class EnrichmentService {
 			request.getProperties().forEach(property -> {
 
 				String gen_property_id = UUID.randomUUID().toString();
+
 				PropertyDetails propertyDetail = getPropertyDetail(property, requestInfo, gen_property_id);
 
 				property.setId(gen_property_id);
@@ -87,89 +88,14 @@ public class EnrichmentService {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
 		String gen_property_details_id = UUID.randomUUID().toString();
 
-		List<CourtCase> courtCases = getCourtCases(property, requestInfo, gen_property_details_id);
-		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
-
 		AuditDetails propertyDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-
-		List<Owner> owners = getOwners(property, requestInfo, gen_property_details_id, gen_property_id);
 
 		propertyDetail.setId(gen_property_details_id);
 		propertyDetail.setTenantId(property.getTenantId());
 		propertyDetail.setPropertyId(gen_property_id);
-		propertyDetail.setOwners(owners);
-		propertyDetail.setCourtCases(courtCases);
-		propertyDetail.setPaymentDetails(paymentDetails);
 		propertyDetail.setAuditDetails(propertyDetailsAuditDetails);
 
 		return propertyDetail;
-	}
-
-	private List<Owner> getOwners(Property property, RequestInfo requestInfo, String gen_property_details_id,
-			String gen_property_id) {
-
-		List<Owner> owners = property.getPropertyDetails().getOwners();
-
-		if (!CollectionUtils.isEmpty(owners)) {
-
-			AuditDetails ownerAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-
-			owners.forEach(owner -> {
-
-				String gen_owner_id = UUID.randomUUID().toString();
-				OwnerDetails ownerDetails = getOwnerDetail(property, owner, requestInfo, gen_owner_id, gen_property_id);
-
-				owner.setId(gen_owner_id);
-				owner.setTenantId(property.getTenantId());
-				owner.setPropertyDetailsId(gen_property_details_id);
-//				owner.setSerialNumber(""); TODO: Whether sr.no will be generated from BackEnd or FrontEnd
-				owner.setOwnerDetails(ownerDetails);
-				owner.setAuditDetails(ownerAuditDetails);
-
-			});
-		}
-		return owners;
-	}
-
-	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo, String gen_owner_id,
-			String gen_property_id) {
-
-		OwnerDetails ownerDetails = owner.getOwnerDetails();
-		String gen_owner_details_id = UUID.randomUUID().toString();
-		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-
-		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, gen_owner_details_id,
-				gen_property_id);
-
-		ownerDetails.setId(gen_owner_details_id);
-		ownerDetails.setTenantId(property.getTenantId());
-		ownerDetails.setOwnerId(gen_owner_id);
-		ownerDetails.setOwnerDocuments(ownerDocuments);
-		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
-
-		return ownerDetails;
-	}
-
-	private List<CourtCase> getCourtCases(Property property, RequestInfo requestInfo, String gen_property_details_id) {
-
-		List<CourtCase> courtCases = property.getPropertyDetails().getCourtCases();
-
-		if (!CollectionUtils.isEmpty(courtCases)) {
-
-			AuditDetails courtCaseAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-
-			courtCases.forEach(courtCase -> {
-
-				String gen_court_case_id = UUID.randomUUID().toString();
-
-				courtCase.setId(gen_court_case_id);
-				courtCase.setTenantId(property.getTenantId());
-				courtCase.setPropertyDetailsId(gen_property_details_id);
-				courtCase.setAuditDetails(courtCaseAuditDetails);
-
-			});
-		}
-		return courtCases;
 	}
 
 	public void enrichUpdateRequest(PropertyRequest request, List<Property> propertyFromDb) {
@@ -190,65 +116,102 @@ public class EnrichmentService {
 	private PropertyDetails updatePropertyDetail(Property property, RequestInfo requestInfo,
 			AuditDetails auditDetails) {
 		PropertyDetails propertyDetail = property.getPropertyDetails();
-		List<Owner> owners = updateOwners(property, requestInfo);
-		List<Payment> paymentDetails = createUpdatePaymentDetails(property, requestInfo);
+		List<Owner> owners = getOwners(property, requestInfo);
+		List<CourtCase> courtCases = getCourtCases(property, requestInfo); // TODO:
+		List<Payment> paymentDetails = getPaymentDetails(property, requestInfo);
 
 		propertyDetail.setOwners(owners);
+		propertyDetail.setCourtCases(courtCases); // TODO: Confirm that court details are not updated again
 		propertyDetail.setPaymentDetails(paymentDetails);
+
 		propertyDetail.setAuditDetails(auditDetails);
 
 		return propertyDetail;
 	}
 
-	private List<Owner> updateOwners(Property property, RequestInfo requestInfo) {
+	private List<Owner> getOwners(Property property, RequestInfo requestInfo) {
+
 		List<Owner> owners = property.getPropertyDetails().getOwners();
-		AuditDetails ownerAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
+
 		if (!CollectionUtils.isEmpty(owners)) {
+
 			owners.forEach(owner -> {
-				OwnerDetails ownerDetails = updateOwnerDetail(property, owner, requestInfo);
-				owner.setOwnerDetails(ownerDetails);
-				owner.setAuditDetails(ownerAuditDetails);
+
+				if (owner.getId() == null || owner.getId().isEmpty()) {
+
+					AuditDetails ownerAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+
+					String gen_owner_id = UUID.randomUUID().toString();
+
+					owner.setId(gen_owner_id);
+					owner.setTenantId(property.getTenantId());
+					owner.setPropertyDetailsId(property.getPropertyDetails().getId());
+
+					OwnerDetails ownerDetails = getOwnerDetail(property, owner, requestInfo);
+
+//				    owner.setSerialNumber(""); TODO: Whether sr.no will be generated from BackEnd or FrontEnd
+					owner.setOwnerDetails(ownerDetails);
+					owner.setAuditDetails(ownerAuditDetails);
+				} else {
+
+					OwnerDetails ownerDetails = getOwnerDetail(property, owner, requestInfo);
+					owner.setOwnerDetails(ownerDetails);
+
+					AuditDetails ownerAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+					owner.setAuditDetails(ownerAuditDetails);
+				}
+
 			});
 		}
-
 		return owners;
 	}
 
-	private OwnerDetails updateOwnerDetail(Property property, Owner owner, RequestInfo requestInfo) {
+	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo) {
 
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
-		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 
-		List<Document> ownerDocuments = createUpdateOwnerDocs(property, requestInfo, ownerDetails.getId(),
-				property.getId());
-//		List<CourtCase> courtCases = updateCourtCases(owner, requestInfo); TODO: Confirm that court details are not updated again
+		if (ownerDetails.getId() == null || ownerDetails.getId().isEmpty()) {
 
-		ownerDetails.setOwnerDocuments(ownerDocuments);
-//		ownerDetails.setCourtCases(courtCases); TODO: Confirm that court details are not updated again
+			AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
-		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
+			String gen_owner_details_id = UUID.randomUUID().toString();
+
+			ownerDetails.setId(gen_owner_details_id);
+			ownerDetails.setTenantId(property.getTenantId());
+			ownerDetails.setOwnerId(owner.getId());
+			ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
+		} else {
+			List<Document> ownerDocuments = getOwnerDocs(property,requestInfo);
+			ownerDetails.setOwnerDocuments(ownerDocuments);
+
+			AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+			ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
+		}
 
 		return ownerDetails;
 	}
 
-	private List<Document> createUpdateOwnerDocs(Property property, RequestInfo requestInfo, String reference_id,
-			String gen_property_id) {
+	private List<Document> getOwnerDocs(Property property, RequestInfo requestInfo) {
 		List<Document> ownerDocs = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 			property.getPropertyDetails().getOwners().forEach(owner -> {
 				List<Document> ownerDocuments = owner.getOwnerDetails().getOwnerDocuments();
 				if (!CollectionUtils.isEmpty(ownerDocuments)) {
-					AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 					ownerDocuments.forEach(document -> {
-						if (document.getId() == null) {
+						if (document.getId() == null || document.getId().isEmpty()) {
+							AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+									true);
 							String gen_doc_id = UUID.randomUUID().toString();
 							document.setId(gen_doc_id);
 							document.setTenantId(property.getTenantId());
-							document.setReferenceId(reference_id);
-							document.setPropertyId(gen_property_id);
+							document.setReferenceId(owner.getOwnerDetails().getId());
+							document.setPropertyId(property.getId());
+							document.setAuditDetails(docAuditDetails);
+						} else {
+							AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+									true);
 							document.setAuditDetails(docAuditDetails);
 						}
-						document.setAuditDetails(docAuditDetails);
 					});
 					ownerDocs.addAll(ownerDocuments);
 				}
@@ -257,22 +220,53 @@ public class EnrichmentService {
 		return ownerDocs;
 	}
 
-	private List<Payment> createUpdatePaymentDetails(Property property, RequestInfo requestInfo) {
+	private List<CourtCase> getCourtCases(Property property, RequestInfo requestInfo) {
+
+		List<CourtCase> courtCases = property.getPropertyDetails().getCourtCases();
+
+		if (!CollectionUtils.isEmpty(courtCases)) {
+
+			courtCases.forEach(courtCase -> {
+				if (courtCase.getId() == null || courtCase.getId().isEmpty()) {
+
+					AuditDetails courtCaseAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+							true);
+					String gen_court_case_id = UUID.randomUUID().toString();
+
+					courtCase.setId(gen_court_case_id);
+					courtCase.setTenantId(property.getTenantId());
+					courtCase.setPropertyDetailsId(property.getPropertyDetails().getId());
+					courtCase.setAuditDetails(courtCaseAuditDetails);
+				} else {
+					AuditDetails courtCaseAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+							true);
+					courtCase.setAuditDetails(courtCaseAuditDetails);
+				}
+			});
+		}
+		return courtCases;
+	}
+
+	private List<Payment> getPaymentDetails(Property property, RequestInfo requestInfo) {
 		List<Payment> paymentDetails = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 			property.getPropertyDetails().getOwners().forEach(owner -> {
 				List<Payment> payments = property.getPropertyDetails().getPaymentDetails();
 				if (!CollectionUtils.isEmpty(payments)) {
-					AuditDetails paymentAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 					payments.forEach(payment -> {
-						if (payment.getId() == null) {
+						if (payment.getId() == null || payment.getId().isEmpty()) {
+							AuditDetails paymentAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+									true);
 							String gen_payment_detail_id = UUID.randomUUID().toString();
 							payment.setId(gen_payment_detail_id);
 							payment.setTenantId(property.getTenantId());
 							payment.setOwnerDetailsId(owner.getOwnerDetails().getId());
 							payment.setAuditDetails(paymentAuditDetails);
+						} else {
+							AuditDetails paymentAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+									true);
+							payment.setAuditDetails(paymentAuditDetails);
 						}
-						payment.setAuditDetails(paymentAuditDetails);
 					});
 					paymentDetails.addAll(payments);
 				}
@@ -280,6 +274,10 @@ public class EnrichmentService {
 		}
 		return paymentDetails;
 	}
+
+	/**
+	 * Application Related Enrich
+	 */
 
 	public void enrichCreateApplication(ApplicationRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
