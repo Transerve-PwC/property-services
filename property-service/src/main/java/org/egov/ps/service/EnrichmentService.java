@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -317,13 +319,22 @@ public class EnrichmentService {
 			List<Notifications> notificationList = mapper.convertValue(notificationConfigs, new TypeReference<List<Notifications>>() { });
 
 			notificationList.forEach(data -> {
+				
+
+				Pattern p = Pattern.compile("\\{(.*?)\\}");
+				Matcher m = p.matcher(data.getContent());
+				List<String> allMatches = new ArrayList<String>();
+				while(m.find()) {
+				    allMatches.add(m.group());
+				}
+				
 				data.setContent(data.getContent()
 						//app.getModuleType() == null ? "" : app.getModuleType()
-						.replace("{createdBy.name}",enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy())
-						.replace("{moduleType}", enrichedApplication.getModuleType() == null ? "" : enrichedApplication.getModuleType())
-						.replace("{applicationType}", enrichedApplication.getApplicationType() == null ? "" : enrichedApplication.getApplicationType())
-						.replace("{property.fileNumber}", enrichedApplication.getProperty() == null ? "" : enrichedApplication.getProperty().getFileNumber())
-						.replace("{applicationNumber}", enrichedApplication.getApplicationNumber() == null ? "" : enrichedApplication.getApplicationNumber())
+						.replace(allMatches.get(0),enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy())
+						.replace(allMatches.get(1), enrichedApplication.getModuleType() == null ? "" : enrichedApplication.getModuleType())
+						.replace(allMatches.get(2), enrichedApplication.getApplicationType() == null ? "" : enrichedApplication.getApplicationType())
+						.replace(allMatches.get(3), enrichedApplication.getProperty() == null ? "" : enrichedApplication.getProperty().getFileNumber())
+						.replace(allMatches.get(4), enrichedApplication.getApplicationNumber() == null ? "" : enrichedApplication.getApplicationNumber())
 						);
 				data.getModes().getEmail().setTo(enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy());
 				data.getModes().getSms().setTo(enrichedApplication.getAuditDetails() == null ? "" : enrichedApplication.getAuditDetails().getCreatedBy());
@@ -335,7 +346,7 @@ public class EnrichmentService {
 			System.out.println(notificationJson);
 		}
 	}
-
+	
 	private JsonNode enrichApplicationDetails(Application application) {
 		JsonNode applicationDetails = application.getApplicationDetails();
 
