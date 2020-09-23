@@ -1,5 +1,6 @@
 package org.egov.ps.config;
 
+import java.math.BigDecimal;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
@@ -66,7 +67,6 @@ public class Configuration {
 
 	@Value("${create.ps.workflow.name}")
 	private String psBusinessServiceValue;
-	
 
 	@Value("${workflow.context.path}")
 	private String wfHost;
@@ -114,4 +114,27 @@ public class Configuration {
 	@Value("${egov.mdms.get.endpoint}")
 	private String mdmsGetEndpoint;
 
+	// USER
+	@Value("${egov.user.host}")
+	private String userHost;
+
+	@Value("${egov.user.search.path}")
+	private String userSearchEndpoint;
+	
+//	BilllingService generating demand 
+
+	@Value("${egov.billingservice.host}")
+	private String billingHost;
+
+	@Value("${egov.demand.create.endpoint}")
+	private String demandCreateEndpoint;
+
+	@Value("${egov.demand.minimum.payable.amount}")
+	private BigDecimal minimumPayableAmount;
+
+	@Value("${egov.demand.search.endpoint}")
+	private String demandSearchEndpoint;
+	
+	@Value("${egov.demand.update.endpoint}")
+	private String demandUpdateEndpoint;
 }
