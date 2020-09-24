@@ -33,5 +33,10 @@ public class PSConstants {
 	public static final String EB_IS_AOS = "EstateBranch_InternalServices_AllotmentOfSite";
 
 	public static final String MDMS_PS_MORTGAGE_FILTER = ".*.documentList.*";
+	
+	public static final String EM_ACTION_APPROVE = "Approve";
+	
+	public static final String EM_STATE_PENDING_DA_FEE = "PENDING_DA_FEE";
 
+	public static final String TAX_HEAD_CODE_APPLICATION_CHARGE = "APPLICATION";
 }

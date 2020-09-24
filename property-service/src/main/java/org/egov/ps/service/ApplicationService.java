@@ -9,6 +9,8 @@ import org.egov.ps.model.Application;
 import org.egov.ps.model.ApplicationCriteria;
 import org.egov.ps.producer.Producer;
 import org.egov.ps.repository.PropertyRepository;
+import org.egov.ps.service.calculation.DemandService;
+import org.egov.ps.util.PSConstants;
 import org.egov.ps.validator.ApplicationValidatorService;
 import org.egov.ps.web.contracts.ApplicationRequest;
 import org.egov.ps.workflow.WorkflowIntegrator;
@@ -36,6 +38,9 @@ public class ApplicationService {
 	
 	@Autowired
 	WorkflowIntegrator wfIntegrator;
+	
+	@Autowired
+	private DemandService demandService;
 
 	public List<Application> createApplication(ApplicationRequest request) {
 //		validator.validateCreateRequest(request);
@@ -56,6 +61,11 @@ public class ApplicationService {
 //		validator.getApplications(applicationRequest);
 		enrichmentService.enrichUpdateApplication(applicationRequest);
 		String action = applicationRequest.getApplications().get(0).getAction();
+		String state = applicationRequest.getApplications().get(0).getState();
+
+		if (state.contains(PSConstants.EM_STATE_PENDING_DA_FEE)) {
+			demandService.createDemand(applicationRequest.getRequestInfo(), applicationRequest.getApplications());
+		}
 		if (config.getIsWorkflowEnabled() && !action.contentEquals("")) {
 			wfIntegrator.callApplicationWorkFlow(applicationRequest);
 		}

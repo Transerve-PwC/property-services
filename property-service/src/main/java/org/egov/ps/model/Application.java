@@ -3,6 +3,7 @@ package org.egov.ps.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.egov.ps.model.calculation.Calculation;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
@@ -140,5 +141,8 @@ public class Application {
 		this.applicationDocuments.add(applicationDocumentItem);
 		return this;
 	}
+	
+	@JsonProperty("calculation")
+	Calculation calculation;
 
 }

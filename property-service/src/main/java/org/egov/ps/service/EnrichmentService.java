@@ -1,7 +1,9 @@
 package org.egov.ps.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -19,6 +21,9 @@ import org.egov.ps.model.OwnerDetails;
 import org.egov.ps.model.Payment;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
+import org.egov.ps.model.calculation.Calculation;
+import org.egov.ps.model.calculation.Category;
+import org.egov.ps.model.calculation.TaxHeadEstimate;
 import org.egov.ps.model.idgen.IdResponse;
 import org.egov.ps.repository.IdGenRepository;
 import org.egov.ps.repository.PropertyRepository;
@@ -176,7 +181,7 @@ public class EnrichmentService {
 			ownerDetails.setOwnerId(owner.getId());
 			ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
 		} else {
-			List<Document> ownerDocuments = getOwnerDocs(property,requestInfo);
+			List<Document> ownerDocuments = getOwnerDocs(property, requestInfo);
 			ownerDetails.setOwnerDocuments(ownerDocuments);
 
 			AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
@@ -471,6 +476,7 @@ public class EnrichmentService {
 					});
 					applicationDocs.addAll(applicationDocuments);
 				}
+				enrichGenerateDemand(application);
 			});
 		}
 	}
@@ -512,4 +518,45 @@ public class EnrichmentService {
 		return mortgage;
 	}
 
+	private void enrichGenerateDemand(Application application) {
+		List<TaxHeadEstimate> estimates = new LinkedList<>();
+
+		if (application.getState().contains(PSConstants.EM_STATE_PENDING_DA_FEE)) {
+
+			TaxHeadEstimate estimateDue = new TaxHeadEstimate();
+			estimateDue.setEstimateAmount(new BigDecimal(500.00));
+			estimateDue.setCategory(Category.FEE);
+			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(application.getBusinessService(),
+					PSConstants.TAX_HEAD_CODE_APPLICATION_CHARGE, Category.FEE));
+			estimates.add(estimateDue);
+		}
+		Calculation calculation = Calculation.builder().applicationNumber(application.getApplicationNumber())
+				.taxHeadEstimates(estimates).tenantId(application.getTenantId()).build();
+		application.setCalculation(calculation);
+	}
+
+	private void enrichUpdateDemand(Application application) {
+		List<TaxHeadEstimate> estimates = new LinkedList<>();
+
+		if (application.getAction().equalsIgnoreCase(PSConstants.EM_ACTION_APPROVE)) {
+
+			TaxHeadEstimate estimateDue = new TaxHeadEstimate();
+			estimateDue.setEstimateAmount(new BigDecimal(0.0));
+			estimateDue.setCategory(Category.FEE);
+			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(application.getBusinessService(),
+					PSConstants.TAX_HEAD_CODE_APPLICATION_CHARGE, Category.FEE));
+			estimates.add(estimateDue);
+		}
+		Calculation calculation = Calculation.builder().applicationNumber(application.getApplicationNumber())
+				.taxHeadEstimates(estimates).tenantId(application.getTenantId()).build();
+		application.setCalculation(calculation);
+	}
+
+	private String getTaxHeadCode(String billingBusService, Category category) {
+		return String.format("%s_%s", billingBusService, category.toString());
+	}
+
+	private String getTaxHeadCodeWithCharge(String billingBusService, String chargeFor, Category category) {
+		return String.format("%s_%s_%s", billingBusService, chargeFor, category.toString());
+	}
 }
