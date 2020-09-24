@@ -17,4 +17,6 @@ import lombok.ToString;
 public class AuctionSearchCritirea {
 
 	private String fileNumber;
+	
+	private String auctionId;
 }

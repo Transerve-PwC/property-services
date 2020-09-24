@@ -10,9 +10,11 @@ import org.egov.ps.model.Property;
 import org.egov.ps.producer.Producer;
 import org.egov.ps.repository.AuctionRepository;
 import org.egov.ps.util.FileStoreUtils;
+import org.egov.ps.validator.AuctionValidator;
 import org.egov.ps.web.contracts.AuctionSaveRequest;
 import org.egov.ps.web.contracts.AuctionTransactionRequest;
 import org.egov.ps.web.contracts.AutionSearchRequest;
+import org.egov.ps.web.contracts.PropertyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -39,35 +41,34 @@ public class AuctionService {
 	private Producer producer;	
 	
 	@Autowired
+	AuctionValidator auctionValidator;
+	
+	@Autowired
 	private EnrichmentService enrichmentService;	
 
-	public List<Auction> saveAuctionWithMaster(ExcelSearchCriteria searchCriteria, AuctionTransactionRequest auctionTransactionRequest) {
-		Property property = auctionTransactionRequest.getProperty();
-		List<Auction> auctions = new ArrayList<>();
-		AuctionSaveRequest request = AuctionSaveRequest.builder()
-				.requestInfo(auctionTransactionRequest.getRequestInfo()).build();
-		try {
-			String filePath = fileStoreUtils.fetchFileStoreUrl(searchCriteria);
-			if (!filePath.isEmpty()) {
-				auctions = readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream(), 0);
-				auctions.forEach(auction -> {
-					auction.setPropertyId(property.getId());
-					auction.setTenantId(property.getTenantId());
-					auction.setFileNumber(property.getFileNumber());
-				});				
-			}
-			request.setAuctions(auctions);
-			enrichmentService.enrichAuctionCreateRequest(request);
-			producer.push(config.getSaveAuctionTopic(), request);
-		} catch (Exception e) {
-			log.error("Error occur during runnig controller method readExcel():" + e.getMessage());
-		}
+	public List<Auction> saveAuctionWithProperty(ExcelSearchCriteria searchCriteria, AuctionTransactionRequest auctionTransactionRequest) {		
+		AuctionSaveRequest request = enrichmentService.enrichAuctionCreateRequest(searchCriteria,auctionTransactionRequest);
+		producer.push(config.getSaveAuctionTopic(), request);
 		return request.getAuctions();
 	}
 
 	public List<Auction> searhAuctionMaster(AutionSearchRequest autionSearchRequest) {
-		List<Auction> auctions = auctionRepository.searchByFileNumber(autionSearchRequest);
+		List<Auction> auctions = auctionRepository.search(autionSearchRequest.getAuctionSearchCritirea());
 		return auctions;
+	}
+
+
+	/**
+	 * Updates the Auction
+	 *
+	 * @param request AuctionSaveRequest containing list of auction to be update
+	 * @return List of updated auction
+	 */
+	public List<Auction> updateAuction(AuctionSaveRequest auctionSaveRequest) {
+		List<Auction> auctionFromSearch = auctionValidator.validateAuctionUpdate(auctionSaveRequest);
+		enrichmentService.enrichUpdateAuctionRequest(auctionSaveRequest, auctionFromSearch);
+		producer.push(config.getUpdateAuctionTopic(), auctionSaveRequest);
+		return auctionSaveRequest.getAuctions();
 	}
 
 }

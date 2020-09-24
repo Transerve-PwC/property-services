@@ -1,5 +1,6 @@
 package org.egov.ps.model;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import org.egov.ps.web.contracts.AuditDetails;
@@ -43,13 +44,13 @@ public class Auction {
 	private String participatedBidders;	
 	
 	@JsonProperty("depositedEMDAmount")
-	private Double depositedEMDAmount;
+	private BigDecimal depositedEMDAmount;
 	
 	@JsonProperty("depositDate")
-	private BigInteger depositDate;
+	private Long depositDate;
 		
 	@JsonProperty("emdValidityDate")
-	private BigInteger emdValidityDate;
+	private Long emdValidityDate;
 	
 	@JsonProperty("refundStatus")
 	private String refundStatus;

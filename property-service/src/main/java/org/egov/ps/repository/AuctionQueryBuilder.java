@@ -24,25 +24,31 @@ public class AuctionQueryBuilder {
 	private static final String AUT_PT_JOIN = " FROM cs_ep_auction aut " + INNER_JOIN
 			+ " cs_ep_property_v1 pt ON pt.id=aut.property_id";
 
-	public String getInsertQuery() {
-		return "INSERT INTO cs_ep_auction (id, auction_master_id,auctionDescription, participatedBidders, depositedEMDAmount, depositDate, "
-				+ "emdValidityDate, refundStatus,createdby, lastmodifiedby, createddate, lastmodifieddate) values"
-				+ "(nextval('seq_cs_ep_auction'), :auctionMasterId,:auctionDescription, :participatedBidders, :depositedEMDAmount, :depositDate,"
-				+ " :emdValidityDate, :refundStatus,:createdby, :lastmodifiedby, :createddate, :lastmodifieddate)";
-	}
-
+	
 	public String getAuctionSearchQuery(AuctionSearchCritirea auctionSearchCritirea,Map<String, Object> preparedStmtList) {
 		StringBuilder builder = new StringBuilder(SELECT);
 		builder.append(AUT_COLUMNS);
 		builder.append(AUT_PT_JOIN);
-		builder.append(WHERE);
-		builder.append("pt.file_number=:filenumber");
-		preparedStmtList.put("filenumber", auctionSearchCritirea.getFileNumber());
+		if(null != auctionSearchCritirea.getFileNumber()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" pt.file_number=:filenumber ");
+			preparedStmtList.put("filenumber", auctionSearchCritirea.getFileNumber());
+		}
+		if(null != auctionSearchCritirea.getAuctionId()) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" aut.id=:auctionid ");
+			preparedStmtList.put("auctionid", auctionSearchCritirea.getAuctionId());
+		}
+		
 		return builder.toString();
 	}
-
-	public String getPositionSeqQuery() {
-		return "SELECT CURRVAL('seq_cs_ep_auction_master')";
+	
+	private static void addClauseIfRequired(Map<String, Object> values, StringBuilder queryString) {
+		if (values.isEmpty())
+			queryString.append(WHERE);
+		else {
+			queryString.append(" AND ");
+		}
 	}
 
 }

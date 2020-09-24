@@ -35,12 +35,12 @@ public class AuctionRowMapper implements ResultSetExtractor<List<Auction>> {
 					   .tenantId(rs.getString("tenantid"))
 					   .auctionDescription(rs.getString("auctionDescription"))
 					   .fileNumber(rs.getString("filenumber"))
-					   .emdValidityDate(rs.getString("emdValidityDate") == null ? null : new BigInteger(rs.getString("emdValidityDate")))
+					   .emdValidityDate(rs.getLong("emdValidityDate"))
 					   .id(rs.getString("auctionid"))
 					   .participatedBidders(rs.getString("participatedBidders"))
 					   .refundStatus(rs.getString("refundStatus"))
-					   .depositDate(rs.getString("depositDate") == null ? null : new BigInteger(rs.getString("depositDate")))
-					   .depositedEMDAmount(Double.parseDouble(rs.getString("depositedEMDAmount")))
+					   .depositDate(rs.getLong("depositDate"))
+					   .depositedEMDAmount(rs.getBigDecimal("depositedEMDAmount"))
 					   .build();
 				auctionMap.put(auctionId, auction);
 			}			

@@ -37,4 +37,42 @@ serviceMaps:
 
       - jsonPath: $.Auctions.*.auditDetails.createdTime
 
-      - jsonPath: $.Auctions.*.auditDetails.lastModifiedTime            
+      - jsonPath: $.Auctions.*.auditDetails.lastModifiedTime
+  
+  - version: 1.0
+    description: Persists Auctions details in cs_ep_auction table
+    fromTopic: update-auction-master
+    isTransaction: true
+    queryMaps:
+    - query: UPDATE cs_ep_auction SET property_id= ?, file_number= ?, tenant_id= ?, auction_description= ?, participated_bidders= ?, deposited_emd_amount= ?, deposit_date= ?, emdValidity_date= ?,refund_status= ?, created_by= ?, last_modified_by= ?,  created_date= ?, last_modified_date= ? WHERE id = ?;
+      basePath: Auctions.*
+      jsonMaps:
+
+      - jsonPath: $.Auctions.*.propertyId
+      
+      - jsonPath: $.Auctions.*.fileNumber
+      
+      - jsonPath: $.Auctions.*.tenantId
+
+      - jsonPath: $.Auctions.*.auctionDescription
+
+      - jsonPath: $.Auctions.*.participatedBidders 
+      
+      - jsonPath: $.Auctions.*.depositedEMDAmount 
+      
+      - jsonPath: $.Auctions.*.depositDate 
+      
+      - jsonPath: $.Auctions.*.emdValidityDate
+      
+      - jsonPath: $.Auctions.*.refundStatus 
+      
+      - jsonPath: $.Auctions.*.auditDetails.createdBy
+
+      - jsonPath: $.Auctions.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.Auctions.*.auditDetails.createdTime
+
+      - jsonPath: $.Auctions.*.auditDetails.lastModifiedTime
+      
+      - jsonPath: $.Auctions.*.id
+      
