@@ -59,6 +59,12 @@ public class Configuration {
 
 	@Value("${persister.update.application.topic}")
 	private String updateApplicationTopic;
+	
+	@Value("${persister.save.auction.topic}")
+	private String saveAuctionTopic;
+	
+	@Value("${persister.update.auction.topic}")
+	private String updateAuctionTopic;
 
 	// Workflow
 

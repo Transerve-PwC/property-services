@@ -13,8 +13,10 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.config.Configuration;
 import org.egov.ps.model.Application;
+import org.egov.ps.model.Auction;
 import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
+import org.egov.ps.model.ExcelSearchCriteria;
 import org.egov.ps.model.MortgageDetails;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
@@ -27,13 +29,17 @@ import org.egov.ps.model.calculation.TaxHeadEstimate;
 import org.egov.ps.model.idgen.IdResponse;
 import org.egov.ps.repository.IdGenRepository;
 import org.egov.ps.repository.PropertyRepository;
+import org.egov.ps.util.FileStoreUtils;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.ApplicationRequest;
+import org.egov.ps.web.contracts.AuctionSaveRequest;
+import org.egov.ps.web.contracts.AuctionTransactionRequest;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.egov.ps.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -41,7 +47,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class EnrichmentService {
 
 	@Autowired
@@ -61,6 +70,12 @@ public class EnrichmentService {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private ReadExcelService readExcelService;
+
+	@Autowired
+	private FileStoreUtils fileStoreUtils;
 
 	public void enrichCreateRequest(PropertyRequest request) {
 
@@ -558,5 +573,45 @@ public class EnrichmentService {
 
 	private String getTaxHeadCodeWithCharge(String billingBusService, String chargeFor, Category category) {
 		return String.format("%s_%s_%s", billingBusService, chargeFor, category.toString());
+	}
+	
+	public AuctionSaveRequest enrichAuctionCreateRequest(ExcelSearchCriteria searchCriteria,
+			AuctionTransactionRequest auctionTransactionRequest) {
+		Property property = auctionTransactionRequest.getProperty();
+		List<Auction> auctions = new ArrayList<>();
+		AuctionSaveRequest request = AuctionSaveRequest.builder()
+				.requestInfo(auctionTransactionRequest.getRequestInfo()).build();
+		RequestInfo requestInfo = request.getRequestInfo();
+		AuditDetails auctionAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		try {
+			String filePath = fileStoreUtils.fetchFileStoreUrl(searchCriteria);
+			if (!filePath.isEmpty()) {
+				auctions = readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream(), 0);
+				auctions.forEach(auction -> {
+					String gen_auction_id = UUID.randomUUID().toString();
+					auction.setAuditDetails(auctionAuditDetails);
+					auction.setId(gen_auction_id);
+					auction.setPropertyId(property.getId());
+					auction.setTenantId(property.getTenantId());
+					auction.setFileNumber(property.getFileNumber());
+				});
+			}
+			request.setAuctions(auctions);
+		} catch (Exception e) {
+			log.error("Error occur during runnig controller method readExcel():" + e.getMessage());
+		}
+		return request;
+	}
+	
+	public void enrichUpdateAuctionRequest(AuctionSaveRequest request, List<Auction> auctionFromSearch) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
+
+		if (!CollectionUtils.isEmpty(request.getAuctions())) {
+			request.getAuctions().forEach(auction -> {
+				auction.getAuditDetails().setLastModifiedBy(auditDetails.getLastModifiedBy());
+				auction.getAuditDetails().setLastModifiedTime(auditDetails.getLastModifiedTime());
+			});
+		}
 	}
 }
