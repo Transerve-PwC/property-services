@@ -7,7 +7,6 @@ import javax.validation.Valid;
 
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.ps.model.Auction;
-import org.egov.ps.model.AuctionMaster;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
