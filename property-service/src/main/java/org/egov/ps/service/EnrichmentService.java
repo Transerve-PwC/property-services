@@ -541,7 +541,9 @@ public class EnrichmentService {
 			TaxHeadEstimate estimateDue = new TaxHeadEstimate();
 			estimateDue.setEstimateAmount(new BigDecimal(500.00));
 			estimateDue.setCategory(Category.FEE);
-			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(application.getBusinessService(),
+			String businessServiceForDemand = getBusinessServiceForDemand(PSConstants.ESTATE_SERVICE,
+					application.getBranchType(), application.getApplicationType());
+			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(businessServiceForDemand,
 					PSConstants.TAX_HEAD_CODE_APPLICATION_CHARGE, Category.FEE));
 			estimates.add(estimateDue);
 		}
@@ -550,15 +552,18 @@ public class EnrichmentService {
 		application.setCalculation(calculation);
 	}
 
+//	To be used in future
 	private void enrichUpdateDemand(Application application) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
 
 		if (application.getAction().equalsIgnoreCase(PSConstants.EM_ACTION_APPROVE)) {
 
 			TaxHeadEstimate estimateDue = new TaxHeadEstimate();
-			estimateDue.setEstimateAmount(new BigDecimal(0.0));
+			estimateDue.setEstimateAmount(new BigDecimal(500.00));
 			estimateDue.setCategory(Category.FEE);
-			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(application.getBusinessService(),
+			String businessServiceForDemand = getBusinessServiceForDemand(PSConstants.ESTATE_SERVICE,
+					application.getBranchType(), application.getApplicationType());
+			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(businessServiceForDemand,
 					PSConstants.TAX_HEAD_CODE_APPLICATION_CHARGE, Category.FEE));
 			estimates.add(estimateDue);
 		}
@@ -567,8 +572,8 @@ public class EnrichmentService {
 		application.setCalculation(calculation);
 	}
 
-	private String getTaxHeadCode(String billingBusService, Category category) {
-		return String.format("%s_%s", billingBusService, category.toString());
+	private String getBusinessServiceForDemand(String estateService, String branchType, String applicationType) {
+		return String.format("%s.%s.%s", estateService, branchType, applicationType);
 	}
 
 	private String getTaxHeadCodeWithCharge(String billingBusService, String chargeFor, Category category) {

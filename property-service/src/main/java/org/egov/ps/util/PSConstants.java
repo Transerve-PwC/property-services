@@ -39,4 +39,7 @@ public class PSConstants {
 	public static final String EM_STATE_PENDING_DA_FEE = "PENDING_DA_FEE";
 
 	public static final String TAX_HEAD_CODE_APPLICATION_CHARGE = "APPLICATION";
+	
+	public static final String ESTATE_SERVICE = "EstateService";
+
 }

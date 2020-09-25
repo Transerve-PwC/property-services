@@ -23,6 +23,7 @@ import org.egov.ps.model.calculation.DemandDetail;
 import org.egov.ps.model.calculation.DemandResponse;
 import org.egov.ps.model.calculation.TaxHeadEstimate;
 import org.egov.ps.repository.ServiceRequestRepository;
+import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.RequestInfoWrapper;
 import org.egov.tracer.model.CustomException;
@@ -116,10 +117,12 @@ public class DemandService {
 			Long taxPeriodFrom = System.currentTimeMillis();
 			Long taxPeriodTo = System.currentTimeMillis();
 
+			String businessServiceForDemand = getBusinessServiceForDemand(PSConstants.ESTATE_SERVICE,
+					application.getBranchType(), application.getApplicationType());
 			Demand singleDemand = Demand.builder().status(StatusEnum.ACTIVE).consumerCode(consumerCode)
 					.demandDetails(demandDetails).payer(user).minimumAmountPayable(config.getMinimumPayableAmount())
 					.tenantId(tenantId).taxPeriodFrom(taxPeriodFrom).taxPeriodTo(taxPeriodTo)
-					.consumerType("rentedproperties").businessService(application.getBusinessService())
+					.consumerType(PSConstants.ESTATE_SERVICE).businessService(businessServiceForDemand)
 					.additionalDetails(null).build();
 
 			demands.add(singleDemand);
@@ -138,8 +141,10 @@ public class DemandService {
 		List<Demand> demands = new LinkedList<>();
 		for (Application application : applications) {
 
+			String businessServiceForDemand = getBusinessServiceForDemand(PSConstants.ESTATE_SERVICE,
+					application.getBranchType(), application.getApplicationType());
 			List<Demand> searchResult = searchDemand(application.getTenantId(),
-					Collections.singleton(application.getApplicationNumber()), requestInfo,
+					Collections.singleton(businessServiceForDemand), requestInfo,
 					application.getBusinessService());
 
 			if (CollectionUtils.isEmpty(searchResult)) {
@@ -239,6 +244,10 @@ public class DemandService {
 		List<DemandDetail> combinedBillDetials = new LinkedList<>(demandDetails);
 		combinedBillDetials.addAll(newDemandDetails);
 		return combinedBillDetials;
+	}
+	
+	private String getBusinessServiceForDemand(String estateService, String branchType, String applicationType) {
+		return String.format("%s.%s.%s", estateService, branchType, applicationType);
 	}
 
 }
