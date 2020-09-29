@@ -31,19 +31,19 @@ public class PropertyQueryBuilder {
 
 	private static final String PT_COLUMNS = " pt.id as pid, pm_app.branch_type as branch_type, pt.file_number, pt.tenantid as pttenantid, pt.category, pt.sub_category, "
 			+ " pt.site_number, pt.sector_number, pt.state as pstate, pt.action as paction, pt.created_by as pcreated_by, pt.created_time as pcreated_time, "
-			+ " pt.last_modified_by as pmodified_by, pt.last_modified_time as pmodified_time,"
+			+ " pt.last_modified_by as pmodified_by, pt.last_modified_time as pmodified_time, "
 
 			+ " ptdl.id as ptdlid, ptdl.property_id as pdproperty_id, ptdl.property_type as pdproperty_type, "
 			+ " ptdl.tenantid as pdtenantid, ptdl.type_of_allocation, ptdl.mode_of_auction, ptdl.scheme_name,ptdl.date_of_auction, "
 			+ " ptdl.area_sqft, ptdl.rate_per_sqft, ptdl.last_noc_date, ptdl.service_category, "
 			+ " ptdl.is_property_active, ptdl.trade_type, ptdl.company_name, ptdl.company_address, ptdl.company_registration_number, "
-			+ " ptdl.decree_date, ptdl.court_details, ptdl.civil_titled_as, "
-			+ " ptdl.company_type, ptdl.emd_amount, ptdl.emd_date ";
+			+ " ptdl.company_registration_date, ptdl.decree_date, ptdl.court_details, ptdl.civil_titled_as, ptdl.company_or_firm, "
+			+ " ptdl.company_type, ptdl.emd_amount, ptdl.emd_date , ptdl.property_registered_to, ptdl.entity_type ";
 
 	private static final String OWNER_COLUMNS = " ownership.id as oid, ownership.property_details_id as oproperty_details_id, "
 			+ " ownership.tenantid as otenantid, ownership.serial_number as oserial_number, "
 			+ " ownership.share as oshare, ownership.cp_number as ocp_number, ownership.state as ostate, ownership.action as oaction, "
-			+ " ownership.created_by as ocreated_by, ownership.created_time as ocreated_time, ownership.owner_or_partner, "
+			+ " ownership.created_by as ocreated_by, ownership.created_time as ocreated_time, ownership.ownership_type, "
 			+ " ownership.last_modified_by as omodified_by, ownership.last_modified_time as omodified_time, "
 
 			+ " od.id as odid, od.owner_id as odowner_id,"
