@@ -1,7 +1,7 @@
 {
   "tenantId": "ch",
   "businessService": "LeaseDeed",
-  "business": "BranchLeaseDeed",
+  "business": "EstateProperties",
   "businessServiceSla": 86400000,
   "states": [
     {
