@@ -55,6 +55,10 @@ CREATE TABLE cs_ep_property_details_v1 (
    decree_date			bigint,
    court_details		CHARACTER VARYING (256),
    civil_titled_as		CHARACTER VARYING (256),
+   company_registration_date	bigint,
+   company_or_firm				CHARACTER VARYING (256),
+   property_registered_to		CHARACTER VARYING (256),
+   entity_type					CHARACTER VARYING (256),
 
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),
@@ -76,7 +80,7 @@ CREATE TABLE cs_ep_owner_v1 (
    cp_number         	CHARACTER VARYING (256),
    state   				CHARACTER VARYING (256),
    action   			CHARACTER VARYING (256),
-   owner_or_partner		CHARACTER VARYING (256),
+   ownership_type		CHARACTER VARYING (256),
   
    created_by           CHARACTER VARYING (128) NOT NULL,
    last_modified_by     CHARACTER VARYING (128),

@@ -109,6 +109,18 @@ public class PropertyDetails {
 
 	@JsonProperty("owners")
 	private List<Owner> owners;
+	
+	@JsonProperty("companyRegistrationDate")
+	private Long companyRegistrationDate;
+	
+	@JsonProperty("companyOrFirm")
+	private String companyOrFirm;
+	
+	@JsonProperty("propertyRegisteredTo")
+	private String propertyRegisteredTo;
+	
+	@JsonProperty("entityType")
+	private String entityType;
 
 	public PropertyDetails addOwnerItem(Owner newOwnerItem) {
 		if (this.owners == null) {
