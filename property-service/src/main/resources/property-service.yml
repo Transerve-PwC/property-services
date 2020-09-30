@@ -38,7 +38,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.auditDetails.lastModifiedTime
 
 
-    - query: INSERT INTO cs_ep_property_details_v1 (id, property_id, property_type, tenantid, type_of_allocation, emd_amount, emd_date, mode_of_auction, scheme_name, date_of_auction, area_sqft, rate_per_sqft, last_noc_date, service_category, is_property_active, trade_type, company_name, company_address, company_registration_number, company_type, decree_date, court_details, civil_titled_as, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_ep_property_details_v1 (id, property_id, property_type, tenantid, type_of_allocation, emd_amount, emd_date, mode_of_auction, scheme_name, date_of_auction, area_sqft, rate_per_sqft, last_noc_date, service_category, is_property_active, trade_type, company_name, company_address, company_registration_number, company_type, decree_date, court_details, civil_titled_as, company_registration_date, company_or_firm, property_registered_to, entity_type, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: Properties.*.propertyDetails
       jsonMaps:
 
@@ -87,6 +87,14 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.courtDetails
 
       - jsonPath: $.Properties.*.propertyDetails.civilTitledAs
+      
+      - jsonPath: $.Properties.*.propertyDetails.companyRegistrationDate
+
+      - jsonPath: $.Properties.*.propertyDetails.companyOrFirm
+
+      - jsonPath: $.Properties.*.propertyDetails.propertyRegisteredTo
+
+      - jsonPath: $.Properties.*.propertyDetails.entityType
 
       - jsonPath: $.Properties.*.propertyDetails.auditDetails.createdBy
 
@@ -142,7 +150,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.id
 
 
-    - query: UPDATE cs_ep_property_details_v1 SET property_type = ?, tenantid = ?, type_of_allocation = ?, emd_amount = ?,  emd_date = ?, mode_of_auction = ?, scheme_name = ?, date_of_auction = ?, area_sqft = ?, rate_per_sqft = ?, last_noc_date = ?, service_category = ?, is_property_active = ?, trade_type = ?, company_name = ?, company_address = ?, company_registration_number = ?, company_type = ?, decree_date = ?, court_details = ?, civil_titled_as = ?, last_modified_by = ?, last_modified_time = ? WHERE id = ?;
+    - query: UPDATE cs_ep_property_details_v1 SET property_type = ?, tenantid = ?, type_of_allocation = ?, emd_amount = ?,  emd_date = ?, mode_of_auction = ?, scheme_name = ?, date_of_auction = ?, area_sqft = ?, rate_per_sqft = ?, last_noc_date = ?, service_category = ?, is_property_active = ?, trade_type = ?, company_name = ?, company_address = ?, company_registration_number = ?, company_type = ?, decree_date = ?, court_details = ?, civil_titled_as = ?, company_registration_date = ?, company_or_firm = ?, property_registered_to = ?, entity_type = ?, last_modified_by = ?, last_modified_time = ? WHERE id = ?;
       basePath: Properties.*.propertyDetails
       jsonMaps:
 
@@ -187,6 +195,14 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.courtDetails
 
       - jsonPath: $.Properties.*.propertyDetails.civilTitledAs
+      
+      - jsonPath: $.Properties.*.propertyDetails.companyRegistrationDate
+
+      - jsonPath: $.Properties.*.propertyDetails.companyOrFirm
+
+      - jsonPath: $.Properties.*.propertyDetails.propertyRegisteredTo
+
+      - jsonPath: $.Properties.*.propertyDetails.entityType
 
       - jsonPath: $.Properties.*.propertyDetails.auditDetails.lastModifiedBy
 
@@ -201,7 +217,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.propertyDetails.owners.*.id
       
 
-    - query: INSERT INTO cs_ep_owner_v1 (id, tenantid, property_details_id, serial_number, share, cp_number, state, action, owner_or_partner, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET serial_number = ?, share = ?, cp_number = ?, state = ?, action = ?, owner_or_partner = ?, last_modified_by = ?, last_modified_time = ?;
+    - query: INSERT INTO cs_ep_owner_v1 (id, tenantid, property_details_id, serial_number, share, cp_number, state, action, ownership_type, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET serial_number = ?, share = ?, cp_number = ?, state = ?, action = ?, ownership_type = ?, last_modified_by = ?, last_modified_time = ?;
       basePath: $.Properties.*.propertyDetails.owners.*
       jsonMaps:
 
@@ -221,7 +237,7 @@ serviceMaps:
       
       - jsonPath: $.Properties.*.propertyDetails.owners.*.action
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerOrPartner
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownershipType
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.createdBy
 
@@ -241,7 +257,7 @@ serviceMaps:
       
       - jsonPath: $.Properties.*.propertyDetails.owners.*.action
 
-      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerOrPartner
+      - jsonPath: $.Properties.*.propertyDetails.owners.*.ownershipType
 
       - jsonPath: $.Properties.*.propertyDetails.owners.*.auditDetails.lastModifiedBy
 
@@ -532,5 +548,3 @@ serviceMaps:
 
       - jsonPath: $.Applications.*.applicationDocuments.*.auditDetails.lastModifiedTime
       
-                  
-            

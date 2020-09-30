@@ -23,30 +23,30 @@ import org.springframework.util.CollectionUtils;
 public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 	@Override
-	public List<Property> extractData(ResultSet rs) throws SQLException, DataAccessException {
+	public List<Property> extractData(final ResultSet rs) throws SQLException, DataAccessException {
 
-		LinkedHashMap<String, Property> propertyMap = new LinkedHashMap<>();
+		final LinkedHashMap<String, Property> propertyMap = new LinkedHashMap<>();
 
 		while (rs.next()) {
 
 			Property currentProperty = null;
 
 			if (hasColumn(rs, "pid")) {
-				String propertyId = rs.getString("pid");
+				final String propertyId = rs.getString("pid");
 				currentProperty = propertyMap.get(propertyId);
-				String tenantId = rs.getString("pttenantid");
-				String propertyDetailId = rs.getString("ptdlid");
+				final String tenantId = rs.getString("pttenantid");
+				final String propertyDetailId = rs.getString("ptdlid");
 
 				if (null == currentProperty) {
-					AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("pcreated_by"))
+					final AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("pcreated_by"))
 							.createdTime(rs.getLong("pcreated_time")).lastModifiedBy(rs.getString("pmodified_by"))
 							.lastModifiedTime(rs.getLong("pmodified_time")).build();
 
-					AuditDetails pdAuditdetails = AuditDetails.builder().createdBy(rs.getString("pcreated_by"))
+					final AuditDetails pdAuditdetails = AuditDetails.builder().createdBy(rs.getString("pcreated_by"))
 							.createdTime(rs.getLong("pcreated_time")).lastModifiedBy(rs.getString("pmodified_by"))
 							.lastModifiedTime(rs.getLong("pmodified_time")).build();
 
-					PropertyDetails propertyDetails = PropertyDetails.builder().id(propertyDetailId)
+					final PropertyDetails propertyDetails = PropertyDetails.builder().id(propertyDetailId)
 							.propertyId(rs.getString("pdproperty_id")).propertyType(rs.getString("pdproperty_type"))
 							.tenantId(tenantId).typeOfAllocation(rs.getString("type_of_allocation"))
 							.modeOfAuction(rs.getString("mode_of_auction")).schemeName(rs.getString("scheme_name"))
@@ -56,9 +56,14 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 							.isPropertyActive(rs.getBoolean("is_property_active")).tradeType(rs.getString("trade_type"))
 							.companyName(rs.getString("company_name")).companyAddress(rs.getString("company_address"))
 							.companyRegistrationNumber(rs.getString("company_registration_number"))
-							.companyType(rs.getString("company_type")).emdAmount(rs.getBigDecimal("emd_amount"))
+							.companyType(rs.getString("company_type"))
+							.emdAmount(rs.getBigDecimal("emd_amount"))
 							.emdDate(rs.getLong("emd_date")).decreeDate(rs.getLong("decree_date"))
 							.courtDetails(rs.getString("court_details")).civilTitledAs(rs.getString("civil_titled_as"))
+							.companyRegistrationDate(rs.getLong("company_registration_date"))
+							.entityType(rs.getString("entity_type"))
+							.propertyRegisteredTo(rs.getString("property_registered_to"))
+							.companyOrFirm(rs.getString("company_or_firm"))
 							.auditDetails(pdAuditdetails).build();
 
 					currentProperty = Property.builder().id(propertyId).fileNumber(rs.getString("file_number"))
@@ -78,21 +83,21 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 	}
 
-	private void addChildrenToProperty(ResultSet rs, Property property, LinkedHashMap<String, Property> propertyMap)
+	private void addChildrenToProperty(final ResultSet rs, final Property property, final LinkedHashMap<String, Property> propertyMap)
 			throws SQLException {
 
 		if (hasColumn(rs, "oid")) {
-			String ownerId = rs.getString("oid");
-			String ownerDetailId = rs.getString("odid");
-			String OwnerPropertyDetailId = rs.getString("oproperty_details_id");
+			final String ownerId = rs.getString("oid");
+			final String ownerDetailId = rs.getString("odid");
+			final String OwnerPropertyDetailId = rs.getString("oproperty_details_id");
 
 			if (ownerId != null) {
 
-				AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("ocreated_by"))
+				final AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("ocreated_by"))
 						.createdTime(rs.getLong("ocreated_time")).lastModifiedBy(rs.getString("omodified_by"))
 						.lastModifiedTime(rs.getLong("omodified_time")).build();
 
-				OwnerDetails ownerDetails = OwnerDetails.builder().id(ownerDetailId).ownerId(rs.getString("odowner_id"))
+				final OwnerDetails ownerDetails = OwnerDetails.builder().id(ownerDetailId).ownerId(rs.getString("odowner_id"))
 						.ownerName(rs.getString("odowner_name")).tenantId(rs.getString("otenantid"))
 						.guardianName(rs.getString("guardian_name")).guardianRelation(rs.getString("guardian_relation"))
 						.mobileNumber(rs.getString("mobile_number")).allotmentNumber(rs.getString("allotment_number"))
@@ -101,18 +106,18 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.isMasterEntry(rs.getBoolean("is_master_entry")).address(rs.getString("address"))
 						.isDirector(rs.getBoolean("is_director")).auditDetails(auditdetails).build();
 
-				Owner owners = Owner.builder().id(ownerId).propertyDetailsId(OwnerPropertyDetailId)
+				final Owner owners = Owner.builder().id(ownerId).propertyDetailsId(OwnerPropertyDetailId)
 						.tenantId(rs.getString("otenantid")).serialNumber(rs.getString("oserial_number"))
 						.share(rs.getDouble("oshare")).cpNumber(rs.getString("ocp_number"))
 						.state(rs.getString("ostate")).action(rs.getString("oaction"))
-						.ownerOrPartner(rs.getString("owner_or_partner")).ownerDetails(ownerDetails)
+						.ownershipType(rs.getString("ownership_type")).ownerDetails(ownerDetails)
 						.auditDetails(auditdetails).build();
 
 				if (hasColumn(rs, "pid")) {
 					property.getPropertyDetails().addOwnerItem(owners);
 				} else {
-					Property property2 = new Property();
-					PropertyDetails propertyDetails = new PropertyDetails();
+					final Property property2 = new Property();
+					final PropertyDetails propertyDetails = new PropertyDetails();
 					propertyDetails.addOwnerItem(owners);
 					property2.setPropertyDetails(propertyDetails);
 
@@ -123,20 +128,20 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		}
 
 		if (hasColumn(rs, "docid")) {
-			String docOwnerDetailId = rs.getString("docowner_details_id");
-			List<Owner> owners = property.getPropertyDetails().getOwners();
+			final String docOwnerDetailId = rs.getString("docowner_details_id");
+			final List<Owner> owners = property.getPropertyDetails().getOwners();
 			if (!CollectionUtils.isEmpty(owners)) {
 				owners.forEach(owner -> {
 					try {
 						if (rs.getString("docid") != null && rs.getBoolean("docis_active")
 								&& docOwnerDetailId.equals(owner.getOwnerDetails().getId())) {
 
-							AuditDetails docAuditdetails = AuditDetails.builder().createdBy(rs.getString("dcreated_by"))
+							final AuditDetails docAuditdetails = AuditDetails.builder().createdBy(rs.getString("dcreated_by"))
 									.createdTime(rs.getLong("dcreated_time"))
 									.lastModifiedBy(rs.getString("dmodified_by"))
 									.lastModifiedTime(rs.getLong("dmodified_time")).build();
 
-							Document ownerDocument = Document.builder().id(rs.getString("docid"))
+							final Document ownerDocument = Document.builder().id(rs.getString("docid"))
 									.referenceId(rs.getString("docowner_details_id"))
 									.tenantId(rs.getString("doctenantid")).isActive(rs.getBoolean("docis_active"))
 									.documentType(rs.getString("document_type"))
@@ -144,7 +149,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 									.propertyId(rs.getString("docproperty_id")).auditDetails(docAuditdetails).build();
 							owner.getOwnerDetails().addOwnerDocumentsItem(ownerDocument);
 						}
-					} catch (SQLException e) {
+					} catch (final SQLException e) {
 						e.printStackTrace();
 					}
 				});
@@ -201,18 +206,18 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 //		}
 
 		if (hasColumn(rs, "ccid")) {
-			String courtCasePropertDetailId = rs.getString("ccproperty_details_id");
+			final String courtCasePropertDetailId = rs.getString("ccproperty_details_id");
 
 			try {
 
 				if (courtCasePropertDetailId != null
 						&& courtCasePropertDetailId.equals(property.getPropertyDetails().getId())) {
 
-					AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("cccreated_by"))
+					final AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("cccreated_by"))
 							.createdTime(rs.getLong("cccreated_time")).lastModifiedBy(rs.getString("ccmodified_by"))
 							.lastModifiedTime(rs.getLong("ccmodified_time")).build();
 
-					CourtCase courtCase = CourtCase.builder().id(rs.getString("ccid"))
+					final CourtCase courtCase = CourtCase.builder().id(rs.getString("ccid"))
 							.propertyDetailsId(courtCasePropertDetailId).tenantId(rs.getString("cctenantid"))
 							.estateOfficerCourt(rs.getString("ccestate_officer_court"))
 							.commissionersCourt(rs.getString("cccommissioners_court"))
@@ -226,18 +231,18 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					property.getPropertyDetails().addCourtCaseItem(courtCase);
 
 				}
-			} catch (SQLException e) {
+			} catch (final SQLException e) {
 				e.printStackTrace();
 			}
 
 		}
 
 		if (hasColumn(rs, "pdid")) {
-			String purchaseDetailPropertyDetailId = rs.getString("pdproperty_details_id");
+			final String purchaseDetailPropertyDetailId = rs.getString("pdproperty_details_id");
 			if (purchaseDetailPropertyDetailId != null
 					&& purchaseDetailPropertyDetailId.equals(property.getPropertyDetails().getId())) {
 
-				AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("pdcreated_by"))
+				final AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("pdcreated_by"))
 						.createdTime(rs.getLong("pdcreated_time")).lastModifiedBy(rs.getString("pdmodified_by"))
 						.lastModifiedTime(rs.getLong("pdmodified_time")).build();
 
@@ -246,9 +251,9 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 	}
 
-	public static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
-		ResultSetMetaData rsmd = rs.getMetaData();
-		int columns = rsmd.getColumnCount();
+	public static boolean hasColumn(final ResultSet rs, final String columnName) throws SQLException {
+		final ResultSetMetaData rsmd = rs.getMetaData();
+		final int columns = rsmd.getColumnCount();
 		for (int x = 1; x <= columns; x++) {
 			if (columnName.equals(rsmd.getColumnName(x))) {
 				return true;
