@@ -46,7 +46,7 @@ public class PropertyService {
 	private WorkflowService workflowService;
 
 	public List<Property> createProperty(PropertyRequest request) {
-//		propertyValidator.validateCreateRequest(request);
+		propertyValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
 		producer.push(config.getSavePropertyTopic(), request);
 		return request.getProperties();

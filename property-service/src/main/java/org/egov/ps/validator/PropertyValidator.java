@@ -69,12 +69,57 @@ public class PropertyValidator {
 	private void validateProperty(PropertyRequest request, Map<String, String> errorMap) {
 		PropertyCriteria criteria = getPropertyCriteriaForSearch(request);
 		List<Property> properties = repository.getProperties(criteria);
+		Property requestProperty = request.getProperties().get(0);
 		if (!CollectionUtils.isEmpty(properties)) {
 			properties.forEach(property -> {
-				if (property.getFileNumber().equalsIgnoreCase(request.getProperties().get(0).getFileNumber())) {
-					throw new CustomException("FILE_NUMBER_ALREADY_EXIST", "The given File Number already exists");
+				if (property.getFileNumber().equalsIgnoreCase(requestProperty.getFileNumber().trim())) {
+					errorMap.put("FILE_NUMBER_ALREADY_EXIST", "The given File Number already exists");
 				}
 			});
+		}
+
+		if (requestProperty.getFileNumber() == null || requestProperty.getFileNumber().trim().isEmpty()) {
+			errorMap.put("INVALID_FILE_NUMBER", "File Number can not be empty");
+		}
+		if (requestProperty.getCategory() == null || requestProperty.getCategory().trim().isEmpty()) {
+			errorMap.put("INVALID_CATEGORY", "Category can not be empty");
+		}
+		if (requestProperty.getSubCategory() == null || requestProperty.getSubCategory().trim().isEmpty()) {
+			errorMap.put("INVALID_SUB_CATEGORY", "Sub category can not be empty");
+		}
+		if (requestProperty.getSiteNumber() == null || requestProperty.getSiteNumber().trim().isEmpty()) {
+			errorMap.put("INVALID_SITE_NUMBER", "Site number can not be empty");
+		}
+		if (requestProperty.getPropertyDetails().getPropertyType() == null || requestProperty.getPropertyDetails().getPropertyType().trim().isEmpty()) {
+			errorMap.put("INVALID_PROPERTY_TYPE", "Property type can not be empty");
+		}
+		if (requestProperty.getPropertyDetails().getTypeOfAllocation() == null || requestProperty.getPropertyDetails().getTypeOfAllocation().trim().isEmpty()) {
+			errorMap.put("INVALID_TYPE_OF_ALLOCATION", "Type of allocation can not be empty");
+		}
+		if (requestProperty.getPropertyDetails().getEmdAmount().signum() < 0) {
+			errorMap.put("INVALID_EMD_AMOUNT", "EMD amount can not be less than or equals to zero");
+		}
+		if (requestProperty.getPropertyDetails().getEmdDate() == null) {
+			errorMap.put("INVALID_EMD_DATE", "EMD date can not be empty");
+		}
+		if (requestProperty.getPropertyDetails().getModeOfAuction() == null || requestProperty.getPropertyDetails().getModeOfAuction().trim().isEmpty()) {
+			errorMap.put("INVALID_MODE_OF_AUCTION", "Mode of auction can not be empty");
+		}
+		if (requestProperty.getPropertyDetails().getSchemeName() == null || requestProperty.getPropertyDetails().getSchemeName().trim().isEmpty()) {
+			errorMap.put("INVALID_SCHEME_NAME", "Scheme name can not be empty");
+		}
+		if (requestProperty.getPropertyDetails().getDateOfAuction() == null) {
+			errorMap.put("INVALID_DATE_OF_AUCTION", "Date of auction can not be empty");
+		}
+		if (requestProperty.getPropertyDetails().getAreaSqft() <= 0) {
+			errorMap.put("INVALID_AREA_SQ_FT", "Area per sq.ft can not be empty");
+		}
+		if (requestProperty.getPropertyDetails().getRatePerSqft().signum() < 0) {
+			errorMap.put("INVALID_RATE_PER_SQFT", "Rate per sq.ft can not be less than or equals to zero");
+		}
+		
+		if (!errorMap.isEmpty()) {
+			throw new CustomException(errorMap);
 		}
 	}
 
