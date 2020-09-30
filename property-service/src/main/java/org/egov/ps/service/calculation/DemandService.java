@@ -117,12 +117,10 @@ public class DemandService {
 			Long taxPeriodFrom = System.currentTimeMillis();
 			Long taxPeriodTo = System.currentTimeMillis();
 
-			String businessServiceForDemand = getBusinessServiceForDemand(PSConstants.ESTATE_SERVICE,
-					application.getBranchType(), application.getApplicationType());
 			Demand singleDemand = Demand.builder().status(StatusEnum.ACTIVE).consumerCode(consumerCode)
 					.demandDetails(demandDetails).payer(user).minimumAmountPayable(config.getMinimumPayableAmount())
 					.tenantId(tenantId).taxPeriodFrom(taxPeriodFrom).taxPeriodTo(taxPeriodTo)
-					.consumerType(PSConstants.ESTATE_SERVICE).businessService(businessServiceForDemand)
+					.consumerType(PSConstants.ESTATE_SERVICE).businessService(application.getBillingBusinessService())
 					.additionalDetails(null).build();
 
 			demands.add(singleDemand);
@@ -141,11 +139,9 @@ public class DemandService {
 		List<Demand> demands = new LinkedList<>();
 		for (Application application : applications) {
 
-			String businessServiceForDemand = getBusinessServiceForDemand(PSConstants.ESTATE_SERVICE,
-					application.getBranchType(), application.getApplicationType());
 			List<Demand> searchResult = searchDemand(application.getTenantId(),
-					Collections.singleton(businessServiceForDemand), requestInfo,
-					application.getBusinessService());
+					Collections.singleton(application.getApplicationNumber()), requestInfo,
+					application.getBillingBusinessService());
 
 			if (CollectionUtils.isEmpty(searchResult)) {
 				demands = createDemand(requestInfo, applications);
@@ -246,8 +242,4 @@ public class DemandService {
 		return combinedBillDetials;
 	}
 	
-	private String getBusinessServiceForDemand(String estateService, String branchType, String applicationType) {
-		return String.format("%s.%s.%s", estateService, branchType, applicationType);
-	}
-
 }

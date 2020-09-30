@@ -152,7 +152,7 @@ public class WorkflowIntegrator {
 			List<Map<String, String>> assigneeUuidmaps = new LinkedList<>();
 
 			obj.put(TENANTIDKEY, wfTenantId);
-			obj.put(BUSINESSSERVICEKEY, application.getBusinessService());
+			obj.put(BUSINESSSERVICEKEY, application.getWorkFlowBusinessService());
 			obj.put(BUSINESSIDKEY, application.getApplicationNumber());
 			obj.put(ACTIONKEY, application.getAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);

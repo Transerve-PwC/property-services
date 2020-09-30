@@ -541,9 +541,7 @@ public class EnrichmentService {
 			TaxHeadEstimate estimateDue = new TaxHeadEstimate();
 			estimateDue.setEstimateAmount(new BigDecimal(500.00));
 			estimateDue.setCategory(Category.FEE);
-			String businessServiceForDemand = getBusinessServiceForDemand(PSConstants.ESTATE_SERVICE,
-					application.getBranchType(), application.getApplicationType());
-			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(businessServiceForDemand,
+			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(application.getBillingBusinessService(),
 					PSConstants.TAX_HEAD_CODE_APPLICATION_CHARGE, Category.FEE));
 			estimates.add(estimateDue);
 		}
@@ -561,19 +559,13 @@ public class EnrichmentService {
 			TaxHeadEstimate estimateDue = new TaxHeadEstimate();
 			estimateDue.setEstimateAmount(new BigDecimal(500.00));
 			estimateDue.setCategory(Category.FEE);
-			String businessServiceForDemand = getBusinessServiceForDemand(PSConstants.ESTATE_SERVICE,
-					application.getBranchType(), application.getApplicationType());
-			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(businessServiceForDemand,
+			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(application.getBillingBusinessService(),
 					PSConstants.TAX_HEAD_CODE_APPLICATION_CHARGE, Category.FEE));
 			estimates.add(estimateDue);
 		}
 		Calculation calculation = Calculation.builder().applicationNumber(application.getApplicationNumber())
 				.taxHeadEstimates(estimates).tenantId(application.getTenantId()).build();
 		application.setCalculation(calculation);
-	}
-
-	private String getBusinessServiceForDemand(String estateService, String branchType, String applicationType) {
-		return String.format("%s.%s.%s", estateService, branchType, applicationType);
 	}
 
 	private String getTaxHeadCodeWithCharge(String billingBusService, String chargeFor, Category category) {
