@@ -49,8 +49,8 @@ public class Owner {
 	@JsonProperty("state")
 	private String state;
 	
-	@JsonProperty("ownerOrPartner")
-	private String ownerOrPartner;
+	@JsonProperty("ownershipType")
+	private String ownershipType;
 	
 	@JsonProperty("action")
 	private String action;
@@ -63,5 +63,5 @@ public class Owner {
 	
 	@JsonProperty("mortgageDetails") // TODO: I think it should be in ownerDetails
 	private MortgageDetails mortgageDetails;
-
+	
 }

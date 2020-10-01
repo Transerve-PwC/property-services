@@ -544,7 +544,7 @@ public class EnrichmentService {
 			TaxHeadEstimate estimateDue = new TaxHeadEstimate();
 			estimateDue.setEstimateAmount(new BigDecimal(500.00));
 			estimateDue.setCategory(Category.FEE);
-			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(application.getBusinessService(),
+			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(application.getBillingBusinessService(),
 					PSConstants.TAX_HEAD_CODE_APPLICATION_CHARGE, Category.FEE));
 			estimates.add(estimateDue);
 		}
@@ -553,25 +553,22 @@ public class EnrichmentService {
 		application.setCalculation(calculation);
 	}
 
+//	To be used in future
 	private void enrichUpdateDemand(Application application) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
 
 		if (application.getAction().equalsIgnoreCase(PSConstants.EM_ACTION_APPROVE)) {
 
 			TaxHeadEstimate estimateDue = new TaxHeadEstimate();
-			estimateDue.setEstimateAmount(new BigDecimal(0.0));
+			estimateDue.setEstimateAmount(new BigDecimal(500.00));
 			estimateDue.setCategory(Category.FEE);
-			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(application.getBusinessService(),
+			estimateDue.setTaxHeadCode(getTaxHeadCodeWithCharge(application.getBillingBusinessService(),
 					PSConstants.TAX_HEAD_CODE_APPLICATION_CHARGE, Category.FEE));
 			estimates.add(estimateDue);
 		}
 		Calculation calculation = Calculation.builder().applicationNumber(application.getApplicationNumber())
 				.taxHeadEstimates(estimates).tenantId(application.getTenantId()).build();
 		application.setCalculation(calculation);
-	}
-
-	private String getTaxHeadCode(String billingBusService, Category category) {
-		return String.format("%s_%s", billingBusService, category.toString());
 	}
 
 	private String getTaxHeadCodeWithCharge(String billingBusService, String chargeFor, Category category) {

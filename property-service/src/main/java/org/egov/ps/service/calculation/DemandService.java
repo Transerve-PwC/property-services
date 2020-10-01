@@ -23,6 +23,7 @@ import org.egov.ps.model.calculation.DemandDetail;
 import org.egov.ps.model.calculation.DemandResponse;
 import org.egov.ps.model.calculation.TaxHeadEstimate;
 import org.egov.ps.repository.ServiceRequestRepository;
+import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.RequestInfoWrapper;
 import org.egov.tracer.model.CustomException;
@@ -119,7 +120,7 @@ public class DemandService {
 			Demand singleDemand = Demand.builder().status(StatusEnum.ACTIVE).consumerCode(consumerCode)
 					.demandDetails(demandDetails).payer(user).minimumAmountPayable(config.getMinimumPayableAmount())
 					.tenantId(tenantId).taxPeriodFrom(taxPeriodFrom).taxPeriodTo(taxPeriodTo)
-					.consumerType("rentedproperties").businessService(application.getBusinessService())
+					.consumerType(PSConstants.ESTATE_SERVICE).businessService(application.getBillingBusinessService())
 					.additionalDetails(null).build();
 
 			demands.add(singleDemand);
@@ -140,7 +141,7 @@ public class DemandService {
 
 			List<Demand> searchResult = searchDemand(application.getTenantId(),
 					Collections.singleton(application.getApplicationNumber()), requestInfo,
-					application.getBusinessService());
+					application.getBillingBusinessService());
 
 			if (CollectionUtils.isEmpty(searchResult)) {
 				demands = createDemand(requestInfo, applications);
@@ -240,5 +241,5 @@ public class DemandService {
 		combinedBillDetials.addAll(newDemandDetails);
 		return combinedBillDetials;
 	}
-
+	
 }

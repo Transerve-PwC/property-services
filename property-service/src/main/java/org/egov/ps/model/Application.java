@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.ps.model.calculation.Calculation;
+import org.egov.ps.util.PSConstants;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
@@ -87,7 +88,7 @@ public class Application {
 	 * A JSON string that contains all the application details.
 	 */
 	@JsonProperty("applicationDetails")
-	private JsonNode applicationDetails = null;
+	private JsonNode applicationDetails;
 
 	/**
 	 * The current workflow status of application.
@@ -107,11 +108,18 @@ public class Application {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 	
-	@JsonProperty("businessService")
-	private String businessService;	
+	@JsonProperty("workFlowBusinessService")
+	private String workFlowBusinessService;	
+	
+	@JsonProperty("billingBusinessService")
+	private String billingBusinessService;	
 
-	public String getBusinessService() {
+	public String getWorkFlowBusinessService() {
 		return String.format("%s-%s-%s", extractPrefix(this.getBranchType()), extractPrefix(this.getModuleType()), this.getApplicationType());
+	}
+
+	public String getBillingBusinessService() {
+		return String.format("%s.%s.%s", PSConstants.ESTATE_SERVICE, this.getBranchType(), this.getApplicationType());
 	}
 
 	private String extractPrefix(String inputString) {

@@ -51,7 +51,7 @@ public class WorkflowCreationService {
 	private static Map<String, List<ApplicationType>> templateMapping = new HashMap<String, List<ApplicationType>>(0);
 
 	public WorkflowCreationService() {
-		templateMapping.put("template-ownership-transfer", Arrays.asList(
+		templateMapping.put("template-ownership_transfer-estate", Arrays.asList(
 				//ES_EB_SD_ = Estate Service Estate Branch Sale Deed
 				ApplicationType.builder().name("EB-OT-SaleDeed").prefix("ES_EB_SD_").build(),
 				ApplicationType.builder().name("EB-OT-RegisteredWill").prefix("ES_EB_RW_").build(),
@@ -66,6 +66,15 @@ public class WorkflowCreationService {
 				ApplicationType.builder().name("EB-OCS-DuplicateCopy").prefix("ES_EB_DC_").build(),
 				ApplicationType.builder().name("EB-OCS-ResidentailToCommercial").prefix("ES_EB_RTC_").build(),
 				ApplicationType.builder().name("EB-OCS-ChangeInTrade").prefix("ES_EB_CIT_").build()
+				));
+		templateMapping.put("template-lease_deed-estate", Arrays.asList(
+				ApplicationType.builder().name("EB-OCS-LeaseDeed").prefix("ES_EB_LD_").build()
+				));
+		templateMapping.put("template-show_cause_notice-estate", Arrays.asList(
+				ApplicationType.builder().name("EB-IS-IssuanceOfNotice").prefix("ES_EB_ION_").build()
+				));
+		templateMapping.put("template-leasehold_to_freehold-estate", Arrays.asList(
+				ApplicationType.builder().name("EB-OCS-LeaseholdToFreehold").prefix("ES_EB_LTF_").build()
 				));
 	}
 
