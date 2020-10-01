@@ -30,7 +30,12 @@ public class FileStoreUtils {
 	public String fetchFileStoreUrl(ExcelSearchCriteria searchCriteria) {
 		String responseMap = "";
 		StringBuilder uri = new StringBuilder(fileStoreUrl);
-		uri.append("?tenantId=" + searchCriteria.getTenantId() + "&fileStoreIds=" + searchCriteria.getFileStoreId());
+		String tenantId = searchCriteria.getTenantId();
+		if (tenantId.contains(".")) {
+			String array[] = tenantId.split("\\.");
+			tenantId = array[0];
+		}
+		uri.append("?tenantId=" + tenantId + "&fileStoreIds=" + searchCriteria.getFileStoreId());
 		try {
 			Map<String, Object> response = (Map<String, Object>) (restTemplate.getForObject(uri.toString(),
 					HashMap.class));
