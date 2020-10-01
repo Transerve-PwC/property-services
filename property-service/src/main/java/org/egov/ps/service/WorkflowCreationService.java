@@ -53,28 +53,28 @@ public class WorkflowCreationService {
 	public WorkflowCreationService() {
 		templateMapping.put("template-ownership_transfer-estate", Arrays.asList(
 				//ES_EB_SD_ = Estate Service Estate Branch Sale Deed
-				ApplicationType.builder().name("EB-OT-SaleDeed").prefix("ES_EB_SD_").build(),
-				ApplicationType.builder().name("EB-OT-RegisteredWill").prefix("ES_EB_RW_").build(),
-				ApplicationType.builder().name("EB-OT-UnRegisteredWill").prefix("ES_EB_URW_").build(),
-				ApplicationType.builder().name("EB-OT-InstestateDeath").prefix("ES_EB_ID_").build(),
-				ApplicationType.builder().name("EB-OT-PatnershipDeed").prefix("ES_EB_PD_").build(),
-				ApplicationType.builder().name("EB-OT-FamilySettlement").prefix("ES_EB_FS_").build(),
+				ApplicationType.builder().name("ES-EB-OT-SaleDeed").prefix("ES_EB_SD_").build(),
+				ApplicationType.builder().name("ES-EB-OT-RegisteredWill").prefix("ES_EB_RW_").build(),
+				ApplicationType.builder().name("ES-EB-OT-UnRegisteredWill").prefix("ES_EB_URW_").build(),
+				ApplicationType.builder().name("ES-EB-OT-InstestateDeath").prefix("ES_EB_ID_").build(),
+				ApplicationType.builder().name("ES-EB-OT-PatnershipDeed").prefix("ES_EB_PD_").build(),
+				ApplicationType.builder().name("ES-EB-OT-FamilySettlement").prefix("ES_EB_FS_").build(),
 
-				ApplicationType.builder().name("EB-OCS-NOC").prefix("ES_EB_NOC_").build(),
-				ApplicationType.builder().name("EB-OCS-NDC").prefix("ES_EB_NDC_").build(),
-				ApplicationType.builder().name("EB-OCS-Mortgage").prefix("ES_EB_MORTGAGE_").build(),
-				ApplicationType.builder().name("EB-OCS-DuplicateCopy").prefix("ES_EB_DC_").build(),
-				ApplicationType.builder().name("EB-OCS-ResidentailToCommercial").prefix("ES_EB_RTC_").build(),
-				ApplicationType.builder().name("EB-OCS-ChangeInTrade").prefix("ES_EB_CIT_").build()
+				ApplicationType.builder().name("ES-EB-OCS-NOC").prefix("ES_EB_NOC_").build(),
+				ApplicationType.builder().name("ES-EB-OCS-NDC").prefix("ES_EB_NDC_").build(),
+				ApplicationType.builder().name("ES-EB-OCS-Mortgage").prefix("ES_EB_MORTGAGE_").build(),
+				ApplicationType.builder().name("ES-EB-OCS-DuplicateCopy").prefix("ES_EB_DC_").build(),
+				ApplicationType.builder().name("ES-EB-OCS-ResidentailToCommercial").prefix("ES_EB_RTC_").build(),
+				ApplicationType.builder().name("ES-EB-OCS-ChangeInTrade").prefix("ES_EB_CIT_").build()
 				));
 		templateMapping.put("template-lease_deed-estate", Arrays.asList(
-				ApplicationType.builder().name("EB-OCS-LeaseDeed").prefix("ES_EB_LD_").build()
+				ApplicationType.builder().name("ES-EB-OCS-LeaseDeed").prefix("ES_EB_LD_").build()
 				));
 		templateMapping.put("template-show_cause_notice-estate", Arrays.asList(
-				ApplicationType.builder().name("EB-IS-IssuanceOfNotice").prefix("ES_EB_ION_").build()
+				ApplicationType.builder().name("ES-EB-IS-IssuanceOfNotice").prefix("ES_EB_ION_").build()
 				));
 		templateMapping.put("template-leasehold_to_freehold-estate", Arrays.asList(
-				ApplicationType.builder().name("EB-OCS-LeaseholdToFreehold").prefix("ES_EB_LTF_").build()
+				ApplicationType.builder().name("ES-EB-OCS-LeaseholdToFreehold").prefix("ES_EB_LTF_").build()
 				));
 	}
 
