@@ -8,8 +8,6 @@ public class PSConstants {
 
 	public static final String PM_APPROVED = "PS_PM_APPROVED";
 
-	public static final String BUSINESS_SERVICE_PM = "PropertyMaster";
-
 	public static final String JSONPATH_PROPERTY_SERVICE = "$.MdmsRes.OwnershipTransferSaleDeed";
 
 	public static final String MDMS_PS_MODULE_NAME = "EstatePropertyService";

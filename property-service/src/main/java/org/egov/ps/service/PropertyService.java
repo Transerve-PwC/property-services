@@ -73,9 +73,8 @@ public class PropertyService {
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
 
 		if (criteria.isEmpty()) {
-			String wfbusinessServiceName = PSConstants.BUSINESS_SERVICE_PM;
 			BusinessService otBusinessService = workflowService.getBusinessService(PSConstants.TENENT_ID, requestInfo,
-					wfbusinessServiceName);
+					config.getPsBusinessServiceValue());
 			List<State> stateList = otBusinessService.getStates();
 			List<String> states = new ArrayList<String>();
 
