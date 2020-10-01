@@ -1,5 +1,9 @@
 package org.egov.ps.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +13,7 @@ import org.egov.common.contract.response.ResponseInfo;
 import org.egov.ps.model.Auction;
 import org.egov.ps.model.ExcelSearchCriteria;
 import org.egov.ps.service.AuctionService;
+import org.egov.ps.service.ReadExcelService;
 import org.egov.ps.util.ResponseInfoFactory;
 import org.egov.ps.web.contracts.AuctionSaveRequest;
 import org.egov.ps.web.contracts.AuctionSearhResponse;
@@ -34,11 +39,11 @@ public class AuctionController {
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
 	
+	
 	@PostMapping("/_create")
 	public ResponseEntity<AuctionTransactionResponse> create(@Valid @ModelAttribute ExcelSearchCriteria searchCriteria,
-			@Valid @RequestBody AuctionTransactionRequest auctionTransactionRequest) {
-		
-		List<Auction> auctions = auctionService.saveAuctionWithProperty(searchCriteria,auctionTransactionRequest);		
+			@Valid @RequestBody AuctionTransactionRequest auctionTransactionRequest) throws FileNotFoundException {
+		List<Auction> auctions = auctionService.saveAuctionWithProperty(searchCriteria,auctionTransactionRequest);				
 		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(auctionTransactionRequest.getRequestInfo(),
 				true);
 		AuctionTransactionResponse response = AuctionTransactionResponse.builder().auctions(auctions)

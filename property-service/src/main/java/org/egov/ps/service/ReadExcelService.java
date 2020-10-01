@@ -30,9 +30,9 @@ public class ReadExcelService {
 	private static final String HEADER_CELL = "Auction id";
 	private static final String FOOTER_CELL = "Will be same for all users ";
 	private static final String[] EXCELNAME = new String[] { "Auction id","Auction Description","List of Participated Bidders in Auction",
-			"Deposited EMD amount","Deposit date","EMD validity date","Refund status"};
+			"Deposited EMD amount","Deposit date","EMD validity date","Refund status","Comment"};
 	private static final String[] EXCELMAPPINGNAME = new String[] { "id","auctionDescription","participatedBidders","depositedEMDAmount",
-			"depositDate","emdValidityDate","refundStatus"};
+			"depositDate","emdValidityDate","refundStatus","comment"};
 
 							
 

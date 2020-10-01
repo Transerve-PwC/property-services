@@ -7,13 +7,15 @@ serviceMaps:
     isTransaction: true
     queryMaps:
 
-    - query: INSERT INTO cs_ep_auction (id, property_id, file_number, tenant_id, auction_description, participated_bidders, deposited_emd_amount, deposit_date, emdValidity_date,refund_status, created_by, last_modified_by,  created_date, last_modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_ep_auction (id, property_id,auction_id, file_number, tenant_id, auction_description, participated_bidders, deposited_emd_amount, deposit_date, emdValidity_date,refund_status,comment, created_by, last_modified_by,  created_date, last_modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: Auctions.*
       jsonMaps:
 
       - jsonPath: $.Auctions.*.id
 
       - jsonPath: $.Auctions.*.propertyId
+      
+      - jsonPath: $.Auctions.*.auctionId
       
       - jsonPath: $.Auctions.*.fileNumber
       
@@ -30,6 +32,8 @@ serviceMaps:
       - jsonPath: $.Auctions.*.emdValidityDate
       
       - jsonPath: $.Auctions.*.refundStatus 
+      
+      - jsonPath: $.Auctions.*.comment
       
       - jsonPath: $.Auctions.*.auditDetails.createdBy
 
@@ -44,11 +48,13 @@ serviceMaps:
     fromTopic: update-auction-master
     isTransaction: true
     queryMaps:
-    - query: UPDATE cs_ep_auction SET property_id= ?, file_number= ?, tenant_id= ?, auction_description= ?, participated_bidders= ?, deposited_emd_amount= ?, deposit_date= ?, emdValidity_date= ?,refund_status= ?, created_by= ?, last_modified_by= ?,  created_date= ?, last_modified_date= ? WHERE id = ?;
+    - query: UPDATE cs_ep_auction SET property_id= ?,auction_id=?, file_number= ?, tenant_id= ?, auction_description= ?, participated_bidders= ?, deposited_emd_amount= ?, deposit_date= ?, emdValidity_date= ?,refund_status= ?,comment=?, created_by= ?, last_modified_by= ?,  created_date= ?, last_modified_date= ? WHERE id = ?;
       basePath: Auctions.*
       jsonMaps:
 
       - jsonPath: $.Auctions.*.propertyId
+      
+      - jsonPath: $.Auctions.*.auctionId
       
       - jsonPath: $.Auctions.*.fileNumber
       
@@ -65,6 +71,8 @@ serviceMaps:
       - jsonPath: $.Auctions.*.emdValidityDate
       
       - jsonPath: $.Auctions.*.refundStatus 
+      
+      - jsonPath: $.Auctions.*.comment
       
       - jsonPath: $.Auctions.*.auditDetails.createdBy
 
