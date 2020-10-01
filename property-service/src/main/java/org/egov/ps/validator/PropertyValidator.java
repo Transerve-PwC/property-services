@@ -96,7 +96,7 @@ public class PropertyValidator {
 		if (requestProperty.getPropertyDetails().getTypeOfAllocation() == null || requestProperty.getPropertyDetails().getTypeOfAllocation().trim().isEmpty()) {
 			errorMap.put("INVALID_TYPE_OF_ALLOCATION", "Type of allocation can not be empty");
 		}
-		if (requestProperty.getPropertyDetails().getEmdAmount().signum() < 0) {
+		if (requestProperty.getPropertyDetails().getEmdAmount().signum() < 1) {
 			errorMap.put("INVALID_EMD_AMOUNT", "EMD amount can not be less than or equals to zero");
 		}
 		if (requestProperty.getPropertyDetails().getEmdDate() == null) {
@@ -111,10 +111,10 @@ public class PropertyValidator {
 		if (requestProperty.getPropertyDetails().getDateOfAuction() == null) {
 			errorMap.put("INVALID_DATE_OF_AUCTION", "Date of auction can not be empty");
 		}
-		if (requestProperty.getPropertyDetails().getAreaSqft() <= 0) {
+		if (requestProperty.getPropertyDetails().getAreaSqft() < 1) {
 			errorMap.put("INVALID_AREA_SQ_FT", "Area per sq.ft can not be empty");
 		}
-		if (requestProperty.getPropertyDetails().getRatePerSqft().signum() < 0) {
+		if (requestProperty.getPropertyDetails().getRatePerSqft().signum() < 1) {
 			errorMap.put("INVALID_RATE_PER_SQFT", "Rate per sq.ft can not be less than or equals to zero");
 		}
 		
