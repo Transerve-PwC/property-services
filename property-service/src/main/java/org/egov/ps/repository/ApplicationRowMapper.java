@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.egov.ps.model.Application;
 import org.egov.ps.model.Document;
+import org.egov.ps.model.OwnerDetails;
 import org.egov.ps.model.Property;
 import org.egov.ps.model.PropertyDetails;
 import org.egov.ps.web.contracts.AuditDetails;
@@ -35,7 +36,6 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 		while (rs.next()) {
 
 			Application currentApplication = null;
-			String applicationOwnerId = null;
 
 			if (hasColumn(rs, "appid")) {
 				String applicationId = rs.getString("appid");
@@ -60,12 +60,6 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 						JsonNode applicationDetails = null;
 						try {
 							applicationDetails = mapper.readTree(applicationDetailsPgObject.getValue());
-
-							if (applicationDetails.get("owner") != null) {
-								JsonNode owner = applicationDetails.get("owner");
-								applicationOwnerId = owner.get("id").asText();
-							}
-
 							currentApplication.setApplicationDetails(applicationDetails);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -74,7 +68,7 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 					applicationMap.put(applicationId, currentApplication);
 				}
 			}
-			addChildrenToApplication(rs, currentApplication, applicationMap, applicationOwnerId);
+			addChildrenToApplication(rs, currentApplication, applicationMap);
 		}
 
 		return new ArrayList<>(applicationMap.values());
@@ -82,7 +76,7 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 	}
 
 	private void addChildrenToApplication(ResultSet rs, Application currentApplication,
-			LinkedHashMap<String, Application> applicationMap, String applicationOwnerId) throws SQLException {
+			LinkedHashMap<String, Application> applicationMap) throws SQLException {
 
 		if (hasColumn(rs, "docid")) {
 			String docApplicationId = rs.getString("docapplication_id");
@@ -106,12 +100,43 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 				e.printStackTrace();
 			}
 		}
+		
+//		List<Owner> ownersList = new ArrayList<Owner>();
+//		if (hasColumn(rs, "oid")) {
+//			final String ownerId = rs.getString("oid");
+//			final String ownerDetailId = rs.getString("odid");
+//			final String OwnerPropertyDetailId = rs.getString("oproperty_details_id");
+//
+//			if (ownerId != null) {
+//
+//				final OwnerDetails ownerDetails = OwnerDetails.builder().id(ownerDetailId)
+//						.ownerId(rs.getString("odowner_id")).ownerName(rs.getString("odowner_name"))
+//						.tenantId(rs.getString("otenantid")).guardianName(rs.getString("guardian_name"))
+//						.guardianRelation(rs.getString("guardian_relation")).mobileNumber(rs.getString("mobile_number"))
+//						.allotmentNumber(rs.getString("allotment_number"))
+//						.dateOfAllotment(rs.getLong("date_of_allotment")).possesionDate(rs.getLong("possesion_date"))
+//						.isApproved(rs.getBoolean("is_approved")).isCurrentOwner(rs.getBoolean("is_current_owner"))
+//						.isMasterEntry(rs.getBoolean("is_master_entry")).address(rs.getString("address"))
+//						.isDirector(rs.getBoolean("is_director")).build();
+//
+//				Owner owners = Owner.builder().id(ownerId).propertyDetailsId(OwnerPropertyDetailId)
+//						.tenantId(rs.getString("otenantid")).serialNumber(rs.getString("oserial_number"))
+//						.share(rs.getDouble("oshare")).cpNumber(rs.getString("ocp_number"))
+//						.ownershipType(rs.getString("ownership_type")).ownerDetails(ownerDetails).build();
+//
+//				ownersList.add(owners);
+//			}
+//		}
 
 		if (hasColumn(rs, "pid")) {
 			try {
 				if (rs.getString("pid") != null) {
 
-					PropertyDetails propertyDetails = PropertyDetails.builder().id(rs.getString("ptdlid"))
+					final String PropertyDetailId = rs.getString("ptdlid");
+					
+					
+
+					PropertyDetails propertyDetails = PropertyDetails.builder().id(PropertyDetailId)
 							.propertyId(rs.getString("pdproperty_id")).propertyType(rs.getString("pdproperty_type"))
 							.tenantId(rs.getString("pttenantid")).typeOfAllocation(rs.getString("type_of_allocation"))
 							.modeOfAuction(rs.getString("mode_of_auction")).schemeName(rs.getString("scheme_name"))
@@ -124,14 +149,53 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 							.companyType(rs.getString("company_type")).emdAmount(rs.getBigDecimal("emd_amount"))
 							.emdDate(rs.getLong("emd_date")).build();
 
-					Property property = Property.builder().id(rs.getString("pid")).fileNumber(rs.getString("file_number"))
-							.tenantId(rs.getString("pttenantid")).category(rs.getString("category"))
-							.subCategory(rs.getString("sub_category")).sectorNumber(rs.getString("sector_number"))
-							.siteNumber(rs.getString("site_number")).state(rs.getString("state"))
-							.action(rs.getString("action")).propertyDetails(propertyDetails)
-							.build();
+					Property property = Property.builder().id(rs.getString("pid"))
+							.fileNumber(rs.getString("file_number")).tenantId(rs.getString("pttenantid"))
+							.category(rs.getString("category")).subCategory(rs.getString("sub_category"))
+							.sectorNumber(rs.getString("sector_number")).siteNumber(rs.getString("site_number"))
+							.state(rs.getString("state")).action(rs.getString("action"))
+							.propertyDetails(propertyDetails).build();
 
 					currentApplication.setProperty(property);
+					
+//					for (Property owner : currentApplication.getProperty()) {
+//						if (owner.getId().equalsIgnoreCase(rs.getString("oid"))) {
+//							owner.addApplicationDocumentsItem(applicationDocument);
+//						}
+//					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (hasColumn(rs, "oid")) {
+			try {
+				final String ownerId = rs.getString("oid");
+				final String ownerDetailId = rs.getString("odid");
+				final String OwnerPropertyDetailId = rs.getString("oproperty_details_id");
+
+				if (ownerId != null) {
+
+					final OwnerDetails ownerDetails = OwnerDetails.builder().id(ownerDetailId)
+							.ownerId(rs.getString("odowner_id")).ownerName(rs.getString("odowner_name"))
+							.tenantId(rs.getString("otenantid")).guardianName(rs.getString("guardian_name"))
+							.guardianRelation(rs.getString("guardian_relation"))
+							.mobileNumber(rs.getString("mobile_number"))
+							.allotmentNumber(rs.getString("allotment_number"))
+							.dateOfAllotment(rs.getLong("date_of_allotment"))
+							.possesionDate(rs.getLong("possesion_date")).isApproved(rs.getBoolean("is_approved"))
+							.isCurrentOwner(rs.getBoolean("is_current_owner"))
+							.isMasterEntry(rs.getBoolean("is_master_entry")).address(rs.getString("address"))
+							.isDirector(rs.getBoolean("is_director")).build();
+
+					final Owner owners = Owner.builder().id(ownerId).propertyDetailsId(OwnerPropertyDetailId)
+							.tenantId(rs.getString("otenantid")).serialNumber(rs.getString("oserial_number"))
+							.share(rs.getDouble("oshare")).cpNumber(rs.getString("ocp_number"))
+							.ownershipType(rs.getString("ownership_type")).ownerDetails(ownerDetails).build();
+
+					currentApplication.getProperty().getPropertyDetails().addOwnerItem(owners);
+
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
