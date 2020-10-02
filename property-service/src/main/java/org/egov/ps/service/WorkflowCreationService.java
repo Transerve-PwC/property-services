@@ -47,12 +47,12 @@ public class WorkflowCreationService {
 	private String workflowBusinessServiceCreateApi;
 
 	Gson gson = new Gson();
-	
+
 	private static Map<String, List<ApplicationType>> templateMapping = new HashMap<String, List<ApplicationType>>(0);
 
 	public WorkflowCreationService() {
 		templateMapping.put("template-ownership_transfer-estate", Arrays.asList(
-				//ES_EB_SD_ = Estate Service Estate Branch Sale Deed
+				// ES_EB_SD_ = Estate Service Estate Branch Sale Deed
 				ApplicationType.builder().name("ES-EB-OT-SaleDeed").prefix("ES_EB_SD_").build(),
 				ApplicationType.builder().name("ES-EB-OT-RegisteredWill").prefix("ES_EB_RW_").build(),
 				ApplicationType.builder().name("ES-EB-OT-UnRegisteredWill").prefix("ES_EB_URW_").build(),
@@ -65,38 +65,44 @@ public class WorkflowCreationService {
 				ApplicationType.builder().name("ES-EB-OCS-Mortgage").prefix("ES_EB_MORTGAGE_").build(),
 				ApplicationType.builder().name("ES-EB-OCS-DuplicateCopy").prefix("ES_EB_DC_").build(),
 				ApplicationType.builder().name("ES-EB-OCS-ResidentailToCommercial").prefix("ES_EB_RTC_").build(),
-				ApplicationType.builder().name("ES-EB-OCS-ChangeInTrade").prefix("ES_EB_CIT_").build()
-				));
-		templateMapping.put("template-lease_deed-estate", Arrays.asList(
-				ApplicationType.builder().name("ES-EB-OCS-LeaseDeed").prefix("ES_EB_LD_").build()
-				));
-		templateMapping.put("template-show_cause_notice-estate", Arrays.asList(
-				ApplicationType.builder().name("ES-EB-IS-IssuanceOfNotice").prefix("ES_EB_ION_").build()
-				));
-		templateMapping.put("template-leasehold_to_freehold-estate", Arrays.asList(
-				ApplicationType.builder().name("ES-EB-OCS-LeaseholdToFreehold").prefix("ES_EB_LTF_").build()
-				));
+				ApplicationType.builder().name("ES-EB-OCS-ChangeInTrade").prefix("ES_EB_CIT_").build()));
+		templateMapping.put("template-lease_deed-estate",
+				Arrays.asList(ApplicationType.builder().name("ES-EB-OCS-LeaseDeed").prefix("ES_EB_LD_").build()));
+		templateMapping.put("template-show_cause_notice-estate", Arrays
+				.asList(ApplicationType.builder().name("ES-EB-IS-IssuanceOfNotice").prefix("ES_EB_ION_").build()));
+		templateMapping.put("template-leasehold_to_freehold-estate", Arrays
+				.asList(ApplicationType.builder().name("ES-EB-OCS-LeaseholdToFreehold").prefix("ES_EB_LTF_").build()));
+		templateMapping.put("template-property_master-estate", Arrays
+				.asList(ApplicationType.builder().name("ES-EB-PropertyMaster").prefix("ES_").build()));
 	}
 
 	public List<WorkFlowResponseDetails> createWorkflows(RequestInfo requestInfo) throws Exception {
 		List<WorkFlowResponseDetails> workFlowResponseDetailsLst = new ArrayList<WorkFlowResponseDetails>(0);
-		String url = workflowContextPath+"/"+workflowBusinessServiceCreateApi;
+		String url = workflowContextPath + "/" + workflowBusinessServiceCreateApi;
 
 		templateMapping.entrySet().stream().forEach(e -> {
 			try {
-				String workflowJson = getFileContents("workflows/"+e.getKey()+".json");
+				String workflowJson = getFileContents("workflows/" + e.getKey() + ".json");
 				e.getValue().stream().forEach(applicationType -> {
-					//2. convert JSON String to work flow details ....
+					// 2. convert JSON String to work flow details ....
 					BusinessService businessService = gson.fromJson(workflowJson, BusinessService.class);
 					businessService.setBusinessService(applicationType.getName());
 
-					if(null != businessService.getStates()) {
+					if (null != businessService.getStates()) {
 						businessService.getStates().stream().forEach(state -> {
-							state.setState((null != state.getState() && !state.getState().isEmpty()) ? applicationType.getPrefix()+state.getState() :state.getState());
-							if(null != state.getActions()) {
+							state.setState((null != state.getState() && !state.getState().isEmpty())
+									? applicationType.getPrefix() + state.getState()
+									: state.getState());
+							if (null != state.getActions()) {
 								state.getActions().stream().map(action -> {
-									action.setCurrentState((null != action.getCurrentState() && !action.getCurrentState().isEmpty()) ? applicationType.getPrefix()+action.getCurrentState() :action.getCurrentState());
-									action.setNextState((null != action.getNextState() && !action.getNextState().isEmpty()) ? applicationType.getPrefix()+action.getNextState() :action.getNextState());
+									action.setCurrentState(
+											(null != action.getCurrentState() && !action.getCurrentState().isEmpty())
+													? applicationType.getPrefix() + action.getCurrentState()
+													: action.getCurrentState());
+									action.setNextState(
+											(null != action.getNextState() && !action.getNextState().isEmpty())
+													? applicationType.getPrefix() + action.getNextState()
+													: action.getNextState());
 									return action;
 								}).collect(Collectors.toList());
 							}
@@ -106,49 +112,41 @@ public class WorkflowCreationService {
 					List<BusinessService> lst = new ArrayList<BusinessService>(0);
 					lst.add(businessService);
 
-					//3. Build Request object for rest template ..start
-					BusinessServiceRequest requestObj  = BusinessServiceRequest.builder()
-							.businessServices(lst)
-							.requestInfo(requestInfo)
-							.build();
+					// 3. Build Request object for rest template ..start
+					BusinessServiceRequest requestObj = BusinessServiceRequest.builder().businessServices(lst)
+							.requestInfo(requestInfo).build();
 
-					//4. Rest Template  call
-					//System.out.println(new Gson().toJson(requestObj));
+					// 4. Rest Template call
+					// System.out.println(new Gson().toJson(requestObj));
 					try {
-						BusinessServiceResponse response = restTemplate.postForObject( url, requestObj, BusinessServiceResponse.class);
+						BusinessServiceResponse response = restTemplate.postForObject(url, requestObj,
+								BusinessServiceResponse.class);
 						workFlowResponseDetailsLst.add(WorkFlowResponseDetails.builder()
-															.workFlowName(businessService.getBusinessService())
-															.created(true)
-															.message(response.getResponseInfo().getStatus().toString())
-															.build());
+								.workFlowName(businessService.getBusinessService()).created(true)
+								.message(response.getResponseInfo().getStatus().toString()).build());
 
 					} catch (Exception e2) {
 						e2.printStackTrace();
-						workFlowResponseDetailsLst.add(WorkFlowResponseDetails.builder()
-								.workFlowName(businessService.getBusinessService())
-								.created(false)
-								.message(e2.toString())
-								.build());
+						workFlowResponseDetailsLst.add(
+								WorkFlowResponseDetails.builder().workFlowName(businessService.getBusinessService())
+										.created(false).message(e2.toString()).build());
 					}
 				});
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-				workFlowResponseDetailsLst.add(WorkFlowResponseDetails.builder()
-						.workFlowName(null)
-						.created(false)
-						.message(e1.getMessage().toString())
-						.build());
+				workFlowResponseDetailsLst.add(WorkFlowResponseDetails.builder().workFlowName(null).created(false)
+						.message(e1.getMessage().toString()).build());
 			}
 		});
-		//System.out.println("size() ::"+workFlowResponseDetailsLst.size());
+		// System.out.println("size() ::"+workFlowResponseDetailsLst.size());
 		return workFlowResponseDetailsLst;
 	}
 
 	public static String getFileContents(String fileName) {
 		try {
-			return IOUtils.toString(
-					WorkflowCreationService.class.getClassLoader().getResourceAsStream(fileName), "UTF-8");
+			return IOUtils.toString(WorkflowCreationService.class.getClassLoader().getResourceAsStream(fileName),
+					"UTF-8");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
