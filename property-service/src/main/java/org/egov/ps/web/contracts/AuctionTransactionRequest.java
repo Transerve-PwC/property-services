@@ -1,6 +1,7 @@
 package org.egov.ps.web.contracts;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.model.Property;
@@ -22,6 +23,7 @@ public class AuctionTransactionRequest {
 	private RequestInfo requestInfo;
 
 	@JsonProperty("Property")
+	//@NotNull(message="Property should not be empty or null")
 	@Valid
 	private Property property;
 }

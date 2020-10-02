@@ -1,6 +1,7 @@
 package org.egov.ps.model;
 
 import org.egov.ps.web.contracts.AuditDetails;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,12 +29,15 @@ import lombok.ToString;
 @Builder
 public class Property {
 
+	@NotBlank(message="Property id should not be empty or null")
 	@JsonProperty("id")
 	private String id;
 
+	@NotBlank(message="Property tenantId should not be empty or null")
 	@JsonProperty("tenantId")
 	private String tenantId;
 
+	@NotBlank(message="Property fileNumber should not be empty or null")
 	@JsonProperty("fileNumber")
 	private String fileNumber;
 
