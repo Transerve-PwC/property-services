@@ -28,6 +28,9 @@ public class Auction {
 	@JsonProperty("id")
 	private String id;
 	
+	@JsonProperty("auctionId")
+	private String auctionId;
+	
 	@JsonProperty("propertyId")
 	private String propertyId;
 	
@@ -55,7 +58,11 @@ public class Auction {
 	@JsonProperty("refundStatus")
 	private String refundStatus;
 	
+	@JsonProperty("comment")
+	private String comment;
+	
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+	
 
 }

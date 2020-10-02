@@ -28,6 +28,7 @@ public class FileStoreUtils {
 	@Cacheable(value = "fileUrl", sync = true)
 	@SuppressWarnings("unchecked")
 	public String fetchFileStoreUrl(ExcelSearchCriteria searchCriteria) {
+		log.info("Start - fetchFileStoreUrl, request : ", searchCriteria);
 		String responseMap = "";
 		StringBuilder uri = new StringBuilder(fileStoreUrl);
 		String tenantId = searchCriteria.getTenantId();
@@ -44,6 +45,9 @@ public class FileStoreUtils {
 		} catch (Exception e) {
 			log.error("Exception while fetching file url: ", e);
 		}
+		if(responseMap.isEmpty())
+			log.error("No data could found by using this request: ", searchCriteria);
+		log.info("End - fetchFileStoreUrl, resposne : ", responseMap);
 		return responseMap;
 	}
 

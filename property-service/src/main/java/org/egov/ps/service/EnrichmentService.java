@@ -1,5 +1,8 @@
 package org.egov.ps.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -582,11 +585,12 @@ public class EnrichmentService {
 		AuditDetails auctionAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		try {
 			String filePath = fileStoreUtils.fetchFileStoreUrl(searchCriteria);
-			if (!filePath.isEmpty()) {
+			if (!filePath.isEmpty()) {				
 				auctions = readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream(), 0);
 				auctions.forEach(auction -> {
 					String gen_auction_id = UUID.randomUUID().toString();
 					auction.setAuditDetails(auctionAuditDetails);
+					auction.setAuctionId(auction.getId());
 					auction.setId(gen_auction_id);
 					auction.setPropertyId(property.getId());
 					auction.setTenantId(property.getTenantId());
