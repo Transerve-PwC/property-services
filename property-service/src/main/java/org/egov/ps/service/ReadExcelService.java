@@ -15,6 +15,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.egov.ps.model.Auction;
+import org.egov.tracer.model.CustomException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -30,9 +32,9 @@ public class ReadExcelService {
 	private static final String HEADER_CELL = "Auction id";
 	private static final String FOOTER_CELL = "Will be same for all users ";
 	private static final String[] EXCELNAME = new String[] { "Auction id","Auction Description","List of Participated Bidders in Auction",
-			"Deposited EMD amount","Deposit date","EMD validity date","Refund status"};
+			"Deposited EMD amount","Deposit date","EMD validity date","Refund status","Comment"};
 	private static final String[] EXCELMAPPINGNAME = new String[] { "id","auctionDescription","participatedBidders","depositedEMDAmount",
-			"depositDate","emdValidityDate","refundStatus"};
+			"depositDate","emdValidityDate","refundStatus","comment"};
 
 							
 
@@ -71,16 +73,20 @@ public class ReadExcelService {
 					for (int cn = 0; cn < currentRow.getLastCellNum(); cn++) {
 						Cell cell = currentRow.getCell(cn, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 						if(headerCells.size() > cn) {
-							int keyPosition= Arrays.asList(this.EXCELNAME).indexOf(headerCells.get(cn).trim());							
-							cellData.put(this.EXCELMAPPINGNAME[keyPosition], getValueFromCell(cell));
+							int keyPosition= Arrays.asList(this.EXCELNAME).indexOf(headerCells.get(cn).trim());
+							if(keyPosition != -1)
+								cellData.put(this.EXCELMAPPINGNAME[keyPosition], getValueFromCell(cell));
 						}
 					}
 					auctions.add(mapper.convertValue(cellData, Auction.class));
 				}
 				
 			}
+			if(headerCells.isEmpty()) {
+				throw new CustomException(HttpStatus.FORBIDDEN.getReasonPhrase(),
+						"Invalid Excel Fomrat,Could not get create workbook or parse data");
+			}
 		}catch (Exception e) {
-			e.printStackTrace();
 			log.error("File reading operation fails due to :" + e.getMessage());
 		}
 		return auctions;

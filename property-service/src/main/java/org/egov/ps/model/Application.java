@@ -115,7 +115,7 @@ public class Application {
 	private String billingBusinessService;	
 
 	public String getWorkFlowBusinessService() {
-		return String.format("%s-%s-%s", extractPrefix(this.getBranchType()), extractPrefix(this.getModuleType()), this.getApplicationType());
+		return String.format("ES-%s-%s-%s", extractPrefix(this.getBranchType()), extractPrefix(this.getModuleType()), this.getApplicationType());
 	}
 
 	public String getBillingBusinessService() {

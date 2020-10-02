@@ -4,6 +4,7 @@ CREATE TABLE cs_ep_auction
 (
   id CHARACTER VARYING (256) NOT NULL,
   property_id CHARACTER VARYING (256) NOT NULL,
+  auction_id CHARACTER VARYING (256) NOT NULL,
   tenant_id character varying(50),
   file_number character varying(50),
   auction_description character varying(250),
@@ -12,6 +13,7 @@ CREATE TABLE cs_ep_auction
   deposit_date bigint,
   emdValidity_date bigint,
   refund_status VARCHAR(256)NOT NULL,
+  comment character varying(250),
   created_by VARCHAR(256)NOT NULL,
   last_modified_by VARCHAR(256)NOT NULL,
   created_date bigint,
