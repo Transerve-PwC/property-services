@@ -141,11 +141,7 @@ public class EstateCalculationExcelReadService {
 		}
 		return null;
 	}
-	
-	public static void main(String args[]) {
 		
-	}
-	
 	private Object getValueFromCell(Cell cell1) {
 		Object objValue = "";
 		switch (cell1.getCellType()) {
