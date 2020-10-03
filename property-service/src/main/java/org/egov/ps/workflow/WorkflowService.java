@@ -1,15 +1,19 @@
 package org.egov.ps.workflow;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.config.Configuration;
 import org.egov.ps.repository.ServiceRequestRepository;
 import org.egov.ps.web.contracts.BusinessService;
+import org.egov.ps.web.contracts.BusinessServiceRequest;
 import org.egov.ps.web.contracts.BusinessServiceResponse;
 import org.egov.ps.web.contracts.RequestInfoWrapper;
 import org.egov.ps.web.contracts.State;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,6 +34,16 @@ public class WorkflowService {
 		this.mapper = mapper;
 	}
 
+	public BusinessServiceResponse createBusinessService(RequestInfo requestInfo,
+			List<BusinessService> businessServices) {
+		String url = config.getWfHost() + config.getWorkflowBusinessServiceCreatePath();
+		BusinessServiceRequest requestObj = BusinessServiceRequest.builder().businessServices(businessServices)
+				.requestInfo(requestInfo).build();
+		BusinessServiceResponse response = this.serviceRequestRepository.fetchResult(url, requestObj,
+				BusinessServiceResponse.class);
+		return response;
+	}
+
 	/**
 	 * Get the workflow config for the given tenant
 	 * 
@@ -46,7 +60,11 @@ public class WorkflowService {
 		try {
 			response = mapper.convertValue(result, BusinessServiceResponse.class);
 		} catch (IllegalArgumentException e) {
-			throw new CustomException("PARSING ERROR", "Failed to parse response of calculate");
+			throw new CustomException("PARSING ERROR", "Failed to parse response of getBusinessService");
+		}
+		if (CollectionUtils.isEmpty(response.getBusinessServices())) {
+			throw new CustomException("NO BUSINESS SERVICE FOUND",
+					"Could not find business service '" + businessServiceName + "'");
 		}
 		return response.getBusinessServices().get(0);
 	}

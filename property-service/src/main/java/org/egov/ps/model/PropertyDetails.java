@@ -40,19 +40,29 @@ public class PropertyDetails {
 
 	@JsonProperty("propertyId")
 	private String propertyId;
-	
+
+	/**
+	 * One of BRANCH_ESTATE, BRANCH_BUILDING, BRANCH_MANIMAJRA
+	 */
 	@JsonProperty("branchType")
 	private String branchType;
 
+	/**
+	 * One of PROPERTY_TYPE.LEASEHOLD or PROPERTY_TYPE.FREEHOLD defined in mdms at
+	 * `data/ch/EstateProperties/PropertyType.json`
+	 */
 	@JsonProperty("propertyType")
 	private String propertyType;
 
+	/**
+	 * One of ALLOCATION_TYPE.AUCTION or ALLOCATION_TYPE.ALLOTMENT
+	 */
 	@JsonProperty("typeOfAllocation")
 	private String typeOfAllocation;
 
 	@JsonProperty("emdAmount")
 	private BigDecimal emdAmount;
-	
+
 	@JsonProperty("emdDate")
 	private Long emdDate;
 
@@ -94,13 +104,13 @@ public class PropertyDetails {
 
 	@JsonProperty("companyType")
 	private String companyType;
-	
+
 	@JsonProperty("decreeDate")
 	private Long decreeDate;
-	
+
 	@JsonProperty("courtDetails")
 	private String courtDetails;
-	
+
 	@JsonProperty("civilTitledAs")
 	private String civilTitledAs;
 
@@ -109,16 +119,16 @@ public class PropertyDetails {
 
 	@JsonProperty("owners")
 	private List<Owner> owners;
-	
+
 	@JsonProperty("companyRegistrationDate")
 	private Long companyRegistrationDate;
-	
+
 	@JsonProperty("companyOrFirm")
 	private String companyOrFirm;
-	
+
 	@JsonProperty("propertyRegisteredTo")
 	private String propertyRegisteredTo;
-	
+
 	@JsonProperty("entityType")
 	private String entityType;
 
@@ -135,6 +145,7 @@ public class PropertyDetails {
 		return this;
 
 	}
+
 	@JsonProperty("courtCases")
 	private List<CourtCase> courtCases;
 
