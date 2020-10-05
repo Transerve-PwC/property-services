@@ -71,6 +71,9 @@ public class PropertyService {
 	}
 
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
+		if (criteria.getFileNumber() != null) {
+			criteria.setFileNumber(criteria.getFileNumber().toUpperCase());
+		}
 
 		if (criteria.isEmpty()) {
 			BusinessService otBusinessService = workflowService.getBusinessService(PSConstants.TENENT_ID, requestInfo,
