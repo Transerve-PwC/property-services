@@ -1,8 +1,5 @@
 package org.egov.ps.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -117,7 +114,7 @@ public class EnrichmentService {
 		return propertyDetail;
 	}
 
-	public void enrichUpdateRequest(PropertyRequest request, List<Property> propertyFromDb) {
+	public void enrichUpdateRequest(PropertyRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
 

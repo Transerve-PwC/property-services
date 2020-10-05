@@ -46,7 +46,7 @@ public class PropertyService {
 	private WorkflowService workflowService;
 
 	public List<Property> createProperty(PropertyRequest request) {
-//		propertyValidator.validateCreateRequest(request);
+		propertyValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
 		producer.push(config.getSavePropertyTopic(), request);
 		return request.getProperties();
@@ -59,8 +59,8 @@ public class PropertyService {
 	 * @return List of updated properties
 	 */
 	public List<Property> updateProperty(PropertyRequest request) {
-		List<Property> propertyFromSearch = propertyValidator.validateUpdateRequest(request);
-		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
+		propertyValidator.validateUpdateRequest(request);
+		enrichmentService.enrichUpdateRequest(request);
 		String action = request.getProperties().get(0).getAction();
 		if (config.getIsWorkflowEnabled() && !action.contentEquals("") && !action.contentEquals("DRAFT")) {
 			wfIntegrator.callWorkFlow(request);
