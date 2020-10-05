@@ -1,5 +1,6 @@
 package org.egov.ps.validator;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,8 +63,6 @@ public class PropertyValidator {
 
 		validateProperty(request, errorMap);
 //		validateUserRole(request, errorMap);
-		validateOwner(request, errorMap);
-
 	}
 
 	private void validateProperty(PropertyRequest request, Map<String, String> errorMap) {
@@ -90,34 +89,41 @@ public class PropertyValidator {
 		if (requestProperty.getSiteNumber() == null || requestProperty.getSiteNumber().trim().isEmpty()) {
 			errorMap.put("INVALID_SITE_NUMBER", "Site number can not be empty");
 		}
-		if (requestProperty.getPropertyDetails().getPropertyType() == null || requestProperty.getPropertyDetails().getPropertyType().trim().isEmpty()) {
+		if (requestProperty.getPropertyDetails().getPropertyType() == null
+				|| requestProperty.getPropertyDetails().getPropertyType().trim().isEmpty()) {
 			errorMap.put("INVALID_PROPERTY_TYPE", "Property type can not be empty");
 		}
-		if (requestProperty.getPropertyDetails().getTypeOfAllocation() == null || requestProperty.getPropertyDetails().getTypeOfAllocation().trim().isEmpty()) {
+		if (requestProperty.getPropertyDetails().getTypeOfAllocation() == null
+				|| requestProperty.getPropertyDetails().getTypeOfAllocation().trim().isEmpty()) {
 			errorMap.put("INVALID_TYPE_OF_ALLOCATION", "Type of allocation can not be empty");
 		}
-		if (requestProperty.getPropertyDetails().getEmdAmount().signum() < 1) {
-			errorMap.put("INVALID_EMD_AMOUNT", "EMD amount can not be less than or equals to zero");
-		}
-		if (requestProperty.getPropertyDetails().getEmdDate() == null) {
-			errorMap.put("INVALID_EMD_DATE", "EMD date can not be empty");
-		}
-		if (requestProperty.getPropertyDetails().getModeOfAuction() == null || requestProperty.getPropertyDetails().getModeOfAuction().trim().isEmpty()) {
-			errorMap.put("INVALID_MODE_OF_AUCTION", "Mode of auction can not be empty");
-		}
-		if (requestProperty.getPropertyDetails().getSchemeName() == null || requestProperty.getPropertyDetails().getSchemeName().trim().isEmpty()) {
-			errorMap.put("INVALID_SCHEME_NAME", "Scheme name can not be empty");
-		}
-		if (requestProperty.getPropertyDetails().getDateOfAuction() == null) {
-			errorMap.put("INVALID_DATE_OF_AUCTION", "Date of auction can not be empty");
-		}
 		if (requestProperty.getPropertyDetails().getAreaSqft() < 1) {
-			errorMap.put("INVALID_AREA_SQ_FT", "Area per sq.ft can not be empty");
+			errorMap.put("INVALID_AREA_SQFT", "Area per sq.ft can not be empty");
 		}
 		if (requestProperty.getPropertyDetails().getRatePerSqft().signum() < 1) {
 			errorMap.put("INVALID_RATE_PER_SQFT", "Rate per sq.ft can not be less than or equals to zero");
 		}
-		
+
+//		Mandatory for allotment of site 
+
+//		if (requestProperty.getPropertyDetails().getEmdAmount().signum() < 1) {
+//			errorMap.put("INVALID_EMD_AMOUNT", "EMD amount can not be less than or equals to zero");
+//		}
+//		if (requestProperty.getPropertyDetails().getEmdDate() == null) {
+//			errorMap.put("INVALID_EMD_DATE", "EMD date can not be empty");
+//		}
+//		if (requestProperty.getPropertyDetails().getModeOfAuction() == null
+//				|| requestProperty.getPropertyDetails().getModeOfAuction().trim().isEmpty()) {
+//			errorMap.put("INVALID_MODE_OF_AUCTION", "Mode of auction can not be empty");
+//		}
+//		if (requestProperty.getPropertyDetails().getSchemeName() == null
+//				|| requestProperty.getPropertyDetails().getSchemeName().trim().isEmpty()) {
+//			errorMap.put("INVALID_SCHEME_NAME", "Scheme name can not be empty");
+//		}
+//		if (requestProperty.getPropertyDetails().getDateOfAuction() == null) {
+//			errorMap.put("INVALID_DATE_OF_AUCTION", "Date of auction can not be empty");
+//		}
+
 		if (!errorMap.isEmpty()) {
 			throw new CustomException(errorMap);
 		}
@@ -169,6 +175,27 @@ public class PropertyValidator {
 							String.format("MobileNumber is not valid for user :" + o.getOwnerDetails().getOwnerName(),
 									o.getOwnerDetails().getOwnerName())));
 				}
+				if (o.getOwnerDetails().getOwnerName() == null || o.getOwnerDetails().getOwnerName().trim().isEmpty()) {
+					errorMap.put("INVALID_OWNER_NAME", "Owner name can not be empty");
+				}
+				if (o.getOwnerDetails().getGuardianName() == null
+						|| o.getOwnerDetails().getGuardianName().trim().isEmpty()) {
+					errorMap.put("INVALID_GUARDIAN_NAME", "Owner Father/Husband name can not be empty");
+				}
+				if (o.getOwnerDetails().getGuardianRelation() == null
+						|| o.getOwnerDetails().getGuardianRelation().trim().isEmpty()) {
+					errorMap.put("INVALID_GUARDIAN_RELATION", "Owner relation with guardian can not be empty");
+				}
+				if (o.getOwnerDetails().getAddress() == null || o.getOwnerDetails().getAddress().trim().isEmpty()) {
+					errorMap.put("INVALID_ADDRESS", "Address can not be empty");
+				}
+				if (o.getShare() < 1) {
+					errorMap.put("INVALID_SHARE", "Share can not be less than or equals to zero");
+				}
+				if (o.getOwnerDetails().getPossesionDate() == null) {
+					errorMap.put("INVALID_POSSESSION_DATE", "Possesion date can not be empty");
+				}
+
 				// Document Validation
 				if (null != o.getOwnerDetails() && null != o.getOwnerDetails().getOwnerDocuments()) {
 					validateDocumentsOnType(request.getRequestInfo(), property_Optional.get().getTenantId(), o,
@@ -218,7 +245,7 @@ public class PropertyValidator {
 			return true;
 	}
 
-	public List<Property> validateUpdateRequest(PropertyRequest request) {
+	public void validateUpdateRequest(PropertyRequest request) {
 
 		Map<String, String> errorMap = new HashMap<>();
 
@@ -231,7 +258,7 @@ public class PropertyValidator {
 			throw new CustomException("PROPERTY NOT FOUND", "The property to be updated does not exist");
 		}
 
-		return null; // TODO: add next lines
+		validateOwner(request, errorMap);
 	}
 
 	private boolean PropertyExists(List<Property> propertiesFromSearchResponse) {
