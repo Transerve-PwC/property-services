@@ -1,6 +1,5 @@
 package org.egov.ps.validator;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -100,7 +99,7 @@ public class PropertyValidator {
 		if (requestProperty.getPropertyDetails().getAreaSqft() < 1) {
 			errorMap.put("INVALID_AREA_SQFT", "Area per sq.ft can not be empty");
 		}
-		if (requestProperty.getPropertyDetails().getRatePerSqft().signum() < 1) {
+		if (requestProperty.getPropertyDetails().getRatePerSqft() == null || requestProperty.getPropertyDetails().getRatePerSqft().signum() < 1) {
 			errorMap.put("INVALID_RATE_PER_SQFT", "Rate per sq.ft can not be less than or equals to zero");
 		}
 
