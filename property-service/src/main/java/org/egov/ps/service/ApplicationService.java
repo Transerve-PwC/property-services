@@ -50,6 +50,9 @@ public class ApplicationService {
 	}
 
 	public List<Application> searchApplication(ApplicationCriteria criteria, RequestInfo requestInfo) {
+		if (criteria.getFileNumber() != null) {
+			criteria.setFileNumber(criteria.getFileNumber().toUpperCase());
+		}
 		List<Application> applications = repository.getApplications(criteria);
 
 		if (CollectionUtils.isEmpty(applications))

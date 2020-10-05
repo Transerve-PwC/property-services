@@ -95,6 +95,7 @@ public class EnrichmentService {
 				property.setId(gen_property_id);
 				property.setPropertyDetails(propertyDetail);
 				property.setState(PSConstants.PM_DRAFTED);
+				property.setFileNumber(property.getFileNumber().toUpperCase());
 				property.setAuditDetails(propertyAuditDetails);
 
 			});
