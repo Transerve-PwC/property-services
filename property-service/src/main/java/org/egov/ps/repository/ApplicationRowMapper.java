@@ -111,9 +111,7 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 			}
 			addChildrenToApplication(rs, currentApplication, applicationMap);
 		}
-
 		return new ArrayList<>(applicationMap.values());
-
 	}
 
 	private void addChildrenToApplication(ResultSet rs, Application currentApplication,
@@ -168,13 +166,11 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 							.ownershipType(rs.getString("ownership_type")).ownerDetails(ownerDetails).build();
 
 					currentApplication.getProperty().getPropertyDetails().addOwnerItem(owners);
-
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	public static boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
@@ -187,5 +183,4 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 		}
 		return false;
 	}
-
 }
