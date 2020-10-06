@@ -43,7 +43,7 @@ public class ApplicationService {
 	private DemandService demandService;
 
 	public List<Application> createApplication(ApplicationRequest request) {
-//		validator.validateCreateRequest(request);
+		validator.validateCreateRequest(request);
 		enrichmentService.enrichCreateApplication(request);
 		producer.push(config.getSaveApplicationTopic(), request);
 		return request.getApplications();
@@ -61,7 +61,7 @@ public class ApplicationService {
 	}
 
 	public List<Application> updateApplication(ApplicationRequest applicationRequest) {
-//		validator.getApplications(applicationRequest);
+		validator.getApplications(applicationRequest);
 		enrichmentService.enrichUpdateApplication(applicationRequest);
 		String action = applicationRequest.getApplications().get(0).getAction();
 		String state = applicationRequest.getApplications().get(0).getState();
