@@ -56,22 +56,21 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 							.isPropertyActive(rs.getBoolean("is_property_active")).tradeType(rs.getString("trade_type"))
 							.companyName(rs.getString("company_name")).companyAddress(rs.getString("company_address"))
 							.companyRegistrationNumber(rs.getString("company_registration_number"))
-							.companyType(rs.getString("company_type"))
-							.emdAmount(rs.getBigDecimal("emd_amount"))
+							.companyType(rs.getString("company_type")).emdAmount(rs.getBigDecimal("emd_amount"))
 							.emdDate(rs.getLong("emd_date")).decreeDate(rs.getLong("decree_date"))
 							.courtDetails(rs.getString("court_details")).civilTitledAs(rs.getString("civil_titled_as"))
 							.companyRegistrationDate(rs.getLong("company_registration_date"))
 							.entityType(rs.getString("entity_type"))
 							.propertyRegisteredTo(rs.getString("property_registered_to"))
-							.companyOrFirm(rs.getString("company_or_firm"))
-							.auditDetails(pdAuditdetails).build();
+							.companyOrFirm(rs.getString("company_or_firm")).auditDetails(pdAuditdetails).build();
 
 					currentProperty = Property.builder().id(propertyId).fileNumber(rs.getString("file_number"))
 							.tenantId(tenantId).category(rs.getString("category"))
 							.subCategory(rs.getString("sub_category")).sectorNumber(rs.getString("sector_number"))
 							.siteNumber(rs.getString("site_number")).state(rs.getString("state"))
-							.action(rs.getString("action")).propertyDetails(propertyDetails).auditDetails(auditdetails)
-							.build();
+							.isPropertyMasterOrAllotmentOfSite(rs.getBoolean("is_property_master_or_allotment_of_site"))
+							.isCancelationOfSite(rs.getBoolean("is_cancelation_of_site")).action(rs.getString("action"))
+							.propertyDetails(propertyDetails).auditDetails(auditdetails).build();
 					propertyMap.put(propertyId, currentProperty);
 				}
 			}
@@ -83,8 +82,8 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 	}
 
-	private void addChildrenToProperty(final ResultSet rs, final Property property, final LinkedHashMap<String, Property> propertyMap)
-			throws SQLException {
+	private void addChildrenToProperty(final ResultSet rs, final Property property,
+			final LinkedHashMap<String, Property> propertyMap) throws SQLException {
 
 		if (hasColumn(rs, "oid")) {
 			final String ownerId = rs.getString("oid");
@@ -97,10 +96,11 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.createdTime(rs.getLong("ocreated_time")).lastModifiedBy(rs.getString("omodified_by"))
 						.lastModifiedTime(rs.getLong("omodified_time")).build();
 
-				final OwnerDetails ownerDetails = OwnerDetails.builder().id(ownerDetailId).ownerId(rs.getString("odowner_id"))
-						.ownerName(rs.getString("odowner_name")).tenantId(rs.getString("otenantid"))
-						.guardianName(rs.getString("guardian_name")).guardianRelation(rs.getString("guardian_relation"))
-						.mobileNumber(rs.getString("mobile_number")).allotmentNumber(rs.getString("allotment_number"))
+				final OwnerDetails ownerDetails = OwnerDetails.builder().id(ownerDetailId)
+						.ownerId(rs.getString("odowner_id")).ownerName(rs.getString("odowner_name"))
+						.tenantId(rs.getString("otenantid")).guardianName(rs.getString("guardian_name"))
+						.guardianRelation(rs.getString("guardian_relation")).mobileNumber(rs.getString("mobile_number"))
+						.allotmentNumber(rs.getString("allotment_number"))
 						.dateOfAllotment(rs.getLong("date_of_allotment")).possesionDate(rs.getLong("possesion_date"))
 						.isApproved(rs.getBoolean("is_approved")).isCurrentOwner(rs.getBoolean("is_current_owner"))
 						.isMasterEntry(rs.getBoolean("is_master_entry")).address(rs.getString("address"))
@@ -136,8 +136,8 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						if (rs.getString("docid") != null && rs.getBoolean("docis_active")
 								&& docOwnerDetailId.equals(owner.getOwnerDetails().getId())) {
 
-							final AuditDetails docAuditdetails = AuditDetails.builder().createdBy(rs.getString("dcreated_by"))
-									.createdTime(rs.getLong("dcreated_time"))
+							final AuditDetails docAuditdetails = AuditDetails.builder()
+									.createdBy(rs.getString("dcreated_by")).createdTime(rs.getLong("dcreated_time"))
 									.lastModifiedBy(rs.getString("dmodified_by"))
 									.lastModifiedTime(rs.getLong("dmodified_time")).build();
 
