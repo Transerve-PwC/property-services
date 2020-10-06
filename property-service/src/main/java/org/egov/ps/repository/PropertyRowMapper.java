@@ -68,7 +68,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 							.tenantId(tenantId).category(rs.getString("category"))
 							.subCategory(rs.getString("sub_category")).sectorNumber(rs.getString("sector_number"))
 							.siteNumber(rs.getString("site_number")).state(rs.getString("state"))
-							.isPropertyMasterOrAllotmentOfSite(rs.getBoolean("is_property_master_or_allotment_of_site"))
+							.propertyMasterOrAllotmentOfSite(rs.getString("property_master_or_allotment_of_site"))
 							.isCancelationOfSite(rs.getBoolean("is_cancelation_of_site")).action(rs.getString("action"))
 							.propertyDetails(propertyDetails).auditDetails(auditdetails).build();
 					propertyMap.put(propertyId, currentProperty);
