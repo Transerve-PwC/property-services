@@ -82,9 +82,10 @@ public class PropertyValidator {
 		if (requestProperty.getCategory() == null || requestProperty.getCategory().trim().isEmpty()) {
 			errorMap.put("INVALID_CATEGORY", "Category can not be empty");
 		}
-		if (requestProperty.getSubCategory() == null || requestProperty.getSubCategory().trim().isEmpty()) {
-			errorMap.put("INVALID_SUB_CATEGORY", "Sub category can not be empty");
-		}
+//		mandatory with respect to category
+//		if (requestProperty.getSubCategory() == null || requestProperty.getSubCategory().trim().isEmpty()) {
+//			errorMap.put("INVALID_SUB_CATEGORY", "Sub category can not be empty");
+//		}
 		if (requestProperty.getSiteNumber() == null || requestProperty.getSiteNumber().trim().isEmpty()) {
 			errorMap.put("INVALID_SITE_NUMBER", "Site number can not be empty");
 		}
@@ -235,7 +236,7 @@ public class PropertyValidator {
 
 	private boolean isMobileNumberValid(String mobileNumber) {
 		if (mobileNumber == null || mobileNumber == "")
-			return false;
+			return true;
 		else if (mobileNumber.length() != 10)
 			return false;
 		else if (Character.getNumericValue(mobileNumber.charAt(0)) < 5)

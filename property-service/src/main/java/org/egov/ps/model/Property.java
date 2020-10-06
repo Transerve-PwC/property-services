@@ -49,8 +49,8 @@ public class Property {
 	@JsonProperty("sectorNumber")
 	private String sectorNumber;
 
-	@JsonProperty("isPropertyMasterOrAllotmentOfSite")
-	private Boolean isPropertyMasterOrAllotmentOfSite;
+	@JsonProperty("propertyMasterOrAllotmentOfSite")
+	private String propertyMasterOrAllotmentOfSite;
 
 	@JsonProperty("isCancelationOfSite")
 	private Boolean isCancelationOfSite;

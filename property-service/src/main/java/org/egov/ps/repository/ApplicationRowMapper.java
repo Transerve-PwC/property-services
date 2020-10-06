@@ -98,8 +98,8 @@ public class ApplicationRowMapper implements ResultSetExtractor<List<Application
 										.category(rs.getString("category")).subCategory(rs.getString("sub_category"))
 										.sectorNumber(rs.getString("sector_number"))
 										.siteNumber(rs.getString("site_number"))
-										.isPropertyMasterOrAllotmentOfSite(
-												rs.getBoolean("is_property_master_or_allotment_of_site"))
+										.propertyMasterOrAllotmentOfSite(
+												rs.getString("property_master_or_allotment_of_site"))
 										.isCancelationOfSite(rs.getBoolean("is_cancelation_of_site"))
 										.state(rs.getString("state"))
 										.action(rs.getString("action")).propertyDetails(propertyDetails).build();

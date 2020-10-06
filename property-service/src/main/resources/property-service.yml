@@ -7,7 +7,7 @@ serviceMaps:
     isTransaction: true
     queryMaps:
 
-    - query: INSERT INTO cs_ep_property_v1 (id, file_number, tenantid, category, sub_category, site_number, sector_number, is_property_master_or_allotment_of_site, is_cancelation_of_site, state, action, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO cs_ep_property_v1 (id, file_number, tenantid, category, sub_category, site_number, sector_number, property_master_or_allotment_of_site, is_cancelation_of_site, state, action, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: Properties.*
       jsonMaps:
 
@@ -25,7 +25,7 @@ serviceMaps:
       
       - jsonPath: $.Properties.*.sectorNumber 
       
-      - jsonPath: $.Properties.*.isPropertyMasterOrAllotmentOfSite 
+      - jsonPath: $.Properties.*.propertyMasterOrAllotmentOfSite 
       
       - jsonPath: $.Properties.*.isCancelationOfSite 
       
@@ -121,7 +121,7 @@ serviceMaps:
       - jsonPath: $.Properties.*.id
       
 
-    - query: UPDATE cs_ep_property_v1 SET tenantid = ?, category = ?, sub_category = ?, site_number = ?, sector_number = ?, is_property_master_or_allotment_of_site = ?, is_cancelation_of_site = ?, state = ?, action = ?, last_modified_by = ?, last_modified_time = ? WHERE id = ?;
+    - query: UPDATE cs_ep_property_v1 SET tenantid = ?, category = ?, sub_category = ?, site_number = ?, sector_number = ?, property_master_or_allotment_of_site = ?, is_cancelation_of_site = ?, state = ?, action = ?, last_modified_by = ?, last_modified_time = ? WHERE id = ?;
       basePath: Properties.*
       jsonMaps:
       
@@ -135,7 +135,7 @@ serviceMaps:
       
       - jsonPath: $.Properties.*.sectorNumber 
       
-      - jsonPath: $.Properties.*.isPropertyMasterOrAllotmentOfSite 
+      - jsonPath: $.Properties.*.propertyMasterOrAllotmentOfSite 
       
       - jsonPath: $.Properties.*.isCancelationOfSite
       

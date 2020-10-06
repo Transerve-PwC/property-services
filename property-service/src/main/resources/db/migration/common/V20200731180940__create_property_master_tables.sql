@@ -22,7 +22,7 @@ CREATE TABLE cs_ep_property_v1 (
    sector_number        CHARACTER VARYING (256),
    state    			CHARACTER VARYING (256),
    action   			CHARACTER VARYING (256),
-   is_property_master_or_allotment_of_site	BOOLEAN,
+   property_master_or_allotment_of_site	CHARACTER VARYING (256),
    is_cancelation_of_site					BOOLEAN,
   
    created_by           CHARACTER VARYING (128) NOT NULL,
@@ -180,7 +180,7 @@ CREATE TABLE cs_ep_property_audit_v1 (
    sector_number        CHARACTER VARYING (256),
    state    			CHARACTER VARYING (256),
    action   			CHARACTER VARYING (256),
-   is_property_master_or_allotment_of_site	BOOLEAN,
+   property_master_or_allotment_of_site	CHARACTER VARYING (256),
    is_cancelation_of_site					BOOLEAN,
   
    created_by           CHARACTER VARYING (128) NOT NULL,
