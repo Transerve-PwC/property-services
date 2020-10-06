@@ -86,15 +86,13 @@ public class DateRangeValidator implements IApplicationValidator {
 				}
 
 				if(null == startDateStr && validation.getParams().get("start") instanceof Object) {
-					Object startDt = validation.getParams().get("start");
-					Map<String, Object> values = getFieldNamesAndValues(startDt);
-					startDateStr = calculateDate(values);
+					Map<String, Object> startDt = (Map<String, Object>) validation.getParams().get("start");
+					startDateStr = calculateDate(startDt);
 				}
 
 				if(null == endDateStr && validation.getParams().get("end") instanceof Object) {
-					Object endDt = validation.getParams().get("end");
-					Map<String, Object> values = getFieldNamesAndValues(endDt);
-					endDateStr = calculateDate(values);
+					Map<String, Object> endDt = (Map<String, Object>) validation.getParams().get("end");
+					endDateStr = calculateDate(endDt);
 				}
 
 				//###################################
@@ -143,6 +141,21 @@ public class DateRangeValidator implements IApplicationValidator {
 		if(null != values.get("k")) {
 			String unit = values.get("k").toString();
 			int val = Integer.parseInt(values.get("v").toString());
+
+			if(unit.equalsIgnoreCase("month")) {
+				d = diffDate(Calendar.MONTH, val);
+			}else if(unit.equalsIgnoreCase("year")) {
+				d =  diffDate(Calendar.YEAR, val);
+			}else if(unit.equalsIgnoreCase("date")) {
+				d = diffDate(Calendar.DATE, val);
+			}else if (unit.equalsIgnoreCase("second")) {
+				d = diffDate(Calendar.SECOND, val);
+			}
+		}
+		
+		if(null != values.get("unit")) {
+			String unit = values.get("unit").toString();
+			int val = Integer.parseInt(values.get("value").toString());
 
 			if(unit.equalsIgnoreCase("month")) {
 				d = diffDate(Calendar.MONTH, val);
