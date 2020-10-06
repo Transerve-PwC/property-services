@@ -56,7 +56,7 @@ public class WorkflowCreationService {
 				ApplicationType.builder().name("ES-EB-OT-SaleDeed").prefix("ES_EB_SD_").build(),
 				ApplicationType.builder().name("ES-EB-OT-RegisteredWill").prefix("ES_EB_RW_").build(),
 				ApplicationType.builder().name("ES-EB-OT-UnRegisteredWill").prefix("ES_EB_URW_").build(),
-				ApplicationType.builder().name("ES-EB-OT-InstestateDeath").prefix("ES_EB_ID_").build(),
+				ApplicationType.builder().name("ES-EB-OT-IntestateDeath").prefix("ES_EB_ID_").build(),
 				ApplicationType.builder().name("ES-EB-OT-PatnershipDeed").prefix("ES_EB_PD_").build(),
 				ApplicationType.builder().name("ES-EB-OT-FamilySettlement").prefix("ES_EB_FS_").build(),
 
@@ -64,7 +64,7 @@ public class WorkflowCreationService {
 				ApplicationType.builder().name("ES-EB-OCS-NDC").prefix("ES_EB_NDC_").build(),
 				ApplicationType.builder().name("ES-EB-OCS-Mortgage").prefix("ES_EB_MORTGAGE_").build(),
 				ApplicationType.builder().name("ES-EB-OCS-DuplicateCopy").prefix("ES_EB_DC_").build(),
-				ApplicationType.builder().name("ES-EB-OCS-ResidentailToCommercial").prefix("ES_EB_RTC_").build(),
+				ApplicationType.builder().name("ES-EB-OCS-ScfToSco").prefix("ES_EB_RTC_").build(),
 				ApplicationType.builder().name("ES-EB-OCS-ChangeInTrade").prefix("ES_EB_CIT_").build()));
 		templateMapping.put("template-lease_deed-estate",
 				Arrays.asList(ApplicationType.builder().name("ES-EB-OCS-LeaseDeed").prefix("ES_EB_LD_").build()));
