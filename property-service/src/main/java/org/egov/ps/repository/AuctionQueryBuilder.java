@@ -3,7 +3,6 @@ package org.egov.ps.repository;
 import java.util.Map;
 
 import org.egov.ps.model.AuctionSearchCritirea;
-import org.egov.ps.web.contracts.AutionSearchRequest;
 import org.springframework.stereotype.Component;
 
 @Component

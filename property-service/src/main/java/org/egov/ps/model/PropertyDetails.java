@@ -118,7 +118,8 @@ public class PropertyDetails {
 	private AuditDetails auditDetails;
 
 	@JsonProperty("owners")
-	private List<Owner> owners;
+	@Builder.Default
+	private List<Owner> owners = new ArrayList<Owner>();
 
 	@JsonProperty("companyRegistrationDate")
 	private Long companyRegistrationDate;
@@ -147,7 +148,8 @@ public class PropertyDetails {
 	}
 
 	@JsonProperty("courtCases")
-	private List<CourtCase> courtCases;
+	@Builder.Default
+	private List<CourtCase> courtCases = new ArrayList<CourtCase>();
 
 	public PropertyDetails addCourtCaseItem(CourtCase courtCaseItem) {
 		if (this.courtCases == null) {
@@ -164,7 +166,8 @@ public class PropertyDetails {
 	}
 
 	@JsonProperty("paymentDetails")
-	private List<Payment> paymentDetails;
+	@Builder.Default
+	private List<Payment> paymentDetails = new ArrayList<Payment>();
 
 	public PropertyDetails addPaymentItem(Payment paymentItem) {
 		if (this.paymentDetails == null) {

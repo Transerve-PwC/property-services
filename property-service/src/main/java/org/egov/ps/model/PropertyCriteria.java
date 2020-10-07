@@ -21,10 +21,6 @@ public class PropertyCriteria {
 
 	private String category;
 
-	private String mobileNumber;
-
-	private String ownerName;
-
 	private List<String> state;
 
 	private Long offset;
@@ -32,18 +28,21 @@ public class PropertyCriteria {
 	private Long limit;
 
 	private String propertyId;
-	
+
 	private String branchType;
 
 	private List<String> relations;
 
 	private String tenantId;
 
+	/**
+	 * Created by
+	 */
 	private String userId;
 
 	public boolean isEmpty() {
-		return (this.fileNumber == null && this.category == null && this.mobileNumber == null && this.ownerName == null
-				&& this.state == null && this.offset == null && this.limit == null && this.propertyId == null
-				&& this.relations == null && this.tenantId == null && this.userId == null);
+		return (this.fileNumber == null && this.category == null && this.state == null && this.offset == null
+				&& this.limit == null && this.propertyId == null && this.relations == null && this.tenantId == null
+				&& this.userId == null);
 	}
 }

@@ -1,6 +1,5 @@
 package org.egov.ps.repository;
 
-import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -28,22 +27,15 @@ public class AuctionRowMapper implements ResultSetExtractor<List<Auction>> {
 				AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("createdby"))
 						.createdTime(rs.getLong("createddate")).lastModifiedBy(rs.getString("lastmodifiedby"))
 						.lastModifiedTime(rs.getLong("lastmodifieddate")).build();
-				
-				Auction auction = Auction.builder()
-					   .auditDetails(auditdetails)
-					   .propertyId(rs.getString("propertyid"))
-					   .tenantId(rs.getString("tenantid"))
-					   .auctionDescription(rs.getString("auctionDescription"))
-					   .fileNumber(rs.getString("filenumber"))
-					   .emdValidityDate(rs.getLong("emdValidityDate"))
-					   .id(rs.getString("auctionid"))
-					   .participatedBidders(rs.getString("participatedBidders"))
-					   .refundStatus(rs.getString("refundStatus"))
-					   .depositDate(rs.getLong("depositDate"))
-					   .depositedEMDAmount(rs.getBigDecimal("depositedEMDAmount"))
-					   .build();
+
+				Auction auction = Auction.builder().auditDetails(auditdetails).propertyId(rs.getString("propertyid"))
+						.tenantId(rs.getString("tenantid")).auctionDescription(rs.getString("auctionDescription"))
+						.fileNumber(rs.getString("filenumber")).emdValidityDate(rs.getLong("emdValidityDate"))
+						.id(rs.getString("auctionid")).participatedBidders(rs.getString("participatedBidders"))
+						.refundStatus(rs.getString("refundStatus")).depositDate(rs.getLong("depositDate"))
+						.depositedEMDAmount(rs.getBigDecimal("depositedEMDAmount")).build();
 				auctionMap.put(auctionId, auction);
-			}			
+			}
 		}
 		return new ArrayList<>(auctionMap.values());
 	}
