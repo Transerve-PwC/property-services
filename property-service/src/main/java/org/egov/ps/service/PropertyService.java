@@ -47,7 +47,7 @@ public class PropertyService {
 
 	public List<Property> createProperty(PropertyRequest request) {
 		propertyValidator.validateCreateRequest(request);
-		enrichmentService.enrichCreateRequest(request);
+		enrichmentService.enrichPropertyRequest(request);
 		producer.push(config.getSavePropertyTopic(), request);
 		return request.getProperties();
 	}
@@ -60,7 +60,7 @@ public class PropertyService {
 	 */
 	public List<Property> updateProperty(PropertyRequest request) {
 		propertyValidator.validateUpdateRequest(request);
-		enrichmentService.enrichUpdateRequest(request);
+		enrichmentService.enrichPropertyRequest(request);
 		String action = request.getProperties().get(0).getAction();
 		if (config.getIsWorkflowEnabled() && !action.contentEquals("") && !action.contentEquals("DRAFT")) {
 			wfIntegrator.callWorkFlow(request);
