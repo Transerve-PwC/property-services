@@ -1,22 +1,14 @@
 package org.egov.ps.controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.ps.model.EstateCalculationModel;
 import org.egov.ps.model.ExcelSearchCriteria;
-import org.egov.ps.service.EnrichmentService;
 import org.egov.ps.service.EstateCalculationExcelReadService;
 import org.egov.ps.util.FileStoreUtils;
 import org.egov.ps.util.ResponseInfoFactory;
 import org.egov.ps.web.contracts.EstateCalculationResponse;
+import org.egov.ps.web.contracts.EstateModuleResponse;
 import org.egov.ps.web.contracts.RequestInfoMapper;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,15 +40,14 @@ public class EstateCalculationController {
 	@PostMapping("/_calculation")
 	public ResponseEntity<EstateCalculationResponse> estateCalculation(@Valid @ModelAttribute ExcelSearchCriteria searchCriteria,
 			@Valid @RequestBody RequestInfoMapper requestInfoWrapper) {
-		List<EstateCalculationModel> estateCalculations = new ArrayList<>();
+		EstateModuleResponse estateCalculations = new EstateModuleResponse();
 		try {
 			String filePath = fileStoreUtils.fetchFileStoreUrl(searchCriteria);
 			if (!filePath.isEmpty()) {
 				estateCalculations = estateCalculationExcelReadService.getDatafromExcel(new UrlResource(filePath).getInputStream(), 0);
 			}
 			ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true);
-			EstateCalculationResponse response = EstateCalculationResponse.builder()
-					.estateCalculationModels(estateCalculations).responseInfo(resInfo).build();
+			EstateCalculationResponse response = EstateCalculationResponse.builder().estateModuleResponse(estateCalculations).responseInfo(resInfo).build();
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			log.error("Error occur during runnig controller method estateCalculation():" + e.getMessage());

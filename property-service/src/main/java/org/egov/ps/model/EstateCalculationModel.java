@@ -54,5 +54,14 @@ public class EstateCalculationModel {
 	
 	@JsonProperty("delayedPaymentOfGST")
 	private Double delayedPaymentOfGST;
+	
+	@JsonProperty("rentReceived")
+	private String rentReceived;
+	
+	@JsonProperty("dueDateOfRent")
+	private Long dueDateOfRent;
+	
+	@JsonProperty("rentDateOfReceipt")
+	private Long rentDateOfReceipt;	
 		
 }
