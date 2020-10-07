@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.egov.ps.model.Application;
 import org.egov.ps.model.ApplicationCriteria;
+import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.Property;
@@ -39,6 +40,9 @@ public class PropertyRepository {
 
 	@Autowired
 	private OwnerRowMapper ownerRowMapper;
+	
+	@Autowired
+	private CourtCasesRowMapper courtCasesRowMapper;
 
 	@Autowired
 	WorkflowIntegrator workflowIntegrator;
@@ -68,6 +72,9 @@ public class PropertyRepository {
 		}
 		if (relations.contains(PropertyQueryBuilder.RELATION_OWNER_DOCUMENTS)) {
 			this.addOwnerDocumentsToProperties(properties);
+		}
+		if (relations.contains(PropertyQueryBuilder.RELATION_COURT)) {
+			this.addCourtCasesToProperties(properties);
 		}
 		return properties;
 	}
@@ -128,6 +135,30 @@ public class PropertyRepository {
 					.setOwnerDocuments(documents.stream().filter(
 							document -> document.getReferenceId().equalsIgnoreCase(owner.getOwnerDetails().getId()))
 							.collect(Collectors.toList()));
+		});
+	}
+	
+	private void addCourtCasesToProperties(List<Property> properties) {
+		/**
+		 * Extract property detail ids.
+		 */
+		List<String> propertyDetailsIds = properties.stream().map(property -> property.getPropertyDetails().getId())
+				.collect(Collectors.toList());
+
+		/**
+		 * Fetch court cases from database
+		 */
+		Map<String, Object> params = new HashMap<String, Object>(1);
+		String courtCasesQuery = propertyQueryBuilder.getCourtCasesQuery(propertyDetailsIds, params);
+		List<CourtCase> courtCases = namedParameterJdbcTemplate.query(courtCasesQuery, params, courtCasesRowMapper);
+
+		/**
+		 * Assign court cases to corresponding properties
+		 */
+		properties.stream().forEach(property -> {
+			property.getPropertyDetails().setCourtCases(courtCases.stream().filter(
+					courtCase -> courtCase.getPropertyDetailsId().equalsIgnoreCase(property.getPropertyDetails().getId()))
+					.collect(Collectors.toList()));
 		});
 	}
 

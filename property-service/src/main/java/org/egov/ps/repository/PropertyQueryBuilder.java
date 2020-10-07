@@ -1,7 +1,5 @@
 package org.egov.ps.repository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +85,7 @@ public class PropertyQueryBuilder {
 	// + LEFT_JOIN
 	// + " cs_ep_payment_v1 payment ON ptdl.id=payment.property_details_id ";
 
-	private static final String CC_TABLE = " cs_ep_court_case_v1 cc ON ptdl.id=cc.property_details_id ";
+	private static final String CC_TABLE = " cs_ep_court_case_v1 cc ";
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pmodified_time desc) offset_ FROM " + "({})"
@@ -201,6 +199,15 @@ public class PropertyQueryBuilder {
 		sb.append(OWNER_COLUMNS);
 		sb.append(" FROM " + OWNER_TABLE);
 		sb.append(" where ownership.property_details_id IN (:propertyDetailIds)");
+		params.put("propertyDetailIds", propertyDetailIds);
+		return sb.toString();
+	}
+	
+	public String getCourtCasesQuery(List<String> propertyDetailIds, Map<String, Object> params) {
+		StringBuilder sb = new StringBuilder(SELECT);
+		sb.append(CC_COLUMNS);
+		sb.append(" FROM " + CC_TABLE);
+		sb.append(" where cc.property_details_id IN (:propertyDetailIds)");
 		params.put("propertyDetailIds", propertyDetailIds);
 		return sb.toString();
 	}
