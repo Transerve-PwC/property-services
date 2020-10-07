@@ -31,7 +31,8 @@ public class PropertyCriteria {
 
 	private String branchType;
 
-	private List<String> relations;
+	@Builder.Default
+	private List<String> relations = new ArrayList<String>();
 
 	private String tenantId;
 

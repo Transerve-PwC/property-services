@@ -40,7 +40,7 @@ public class PropertyRepository {
 
 	@Autowired
 	private OwnerRowMapper ownerRowMapper;
-	
+
 	@Autowired
 	private CourtCasesRowMapper courtCasesRowMapper;
 
@@ -60,8 +60,8 @@ public class PropertyRepository {
 		}
 		List<String> relations = criteria.getRelations();
 		if (CollectionUtils.isEmpty(relations)) {
+			relations = new ArrayList<String>();
 			if (properties.size() == 1) {
-				relations = new ArrayList<String>();
 				relations.add(PropertyQueryBuilder.RELATION_OWNER);
 				relations.add(PropertyQueryBuilder.RELATION_OWNER_DOCUMENTS);
 				relations.add(PropertyQueryBuilder.RELATION_COURT);
@@ -137,7 +137,7 @@ public class PropertyRepository {
 							.collect(Collectors.toList()));
 		});
 	}
-	
+
 	private void addCourtCasesToProperties(List<Property> properties) {
 		/**
 		 * Extract property detail ids.
@@ -156,9 +156,11 @@ public class PropertyRepository {
 		 * Assign court cases to corresponding properties
 		 */
 		properties.stream().forEach(property -> {
-			property.getPropertyDetails().setCourtCases(courtCases.stream().filter(
-					courtCase -> courtCase.getPropertyDetailsId().equalsIgnoreCase(property.getPropertyDetails().getId()))
-					.collect(Collectors.toList()));
+			property.getPropertyDetails()
+					.setCourtCases(courtCases.stream()
+							.filter(courtCase -> courtCase.getPropertyDetailsId()
+									.equalsIgnoreCase(property.getPropertyDetails().getId()))
+							.collect(Collectors.toList()));
 		});
 	}
 
