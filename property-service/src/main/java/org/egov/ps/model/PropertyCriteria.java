@@ -1,5 +1,6 @@
 package org.egov.ps.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
