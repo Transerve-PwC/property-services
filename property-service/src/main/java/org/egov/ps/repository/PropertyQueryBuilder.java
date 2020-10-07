@@ -1,7 +1,5 @@
 package org.egov.ps.repository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -25,11 +23,7 @@ public class PropertyQueryBuilder {
 	private static final String INNER_JOIN = " INNER JOIN ";
 	private static final String LEFT_JOIN = " LEFT OUTER JOIN ";
 
-	private static final String PT_ALL = " pt.*, ptdl.*, ";
-	private static final String OWNER_ALL = " ownership.*, od.*, doc.*, "; //payment.*,
-	private static final String CC_ALL = " cc.*, ";
-
-	private static final String PT_COLUMNS = " pt.id as pid, pm_app.branch_type as branch_type, pt.file_number, pt.tenantid as pttenantid, pt.category, pt.sub_category, "
+	private static final String PT_COLUMNS = " pt.id as pid, ptdl.branch_type as branch_type, pt.file_number, pt.tenantid as pttenantid, pt.category, pt.sub_category, "
 			+ " pt.site_number, pt.sector_number, pt.state as pstate, pt.action as paction, pt.created_by as pcreated_by, pt.created_time as pcreated_time, "
 			+ " pt.last_modified_by as pmodified_by, pt.last_modified_time as pmodified_time, "
 			+ " pt.property_master_or_allotment_of_site, pt.is_cancelation_of_site, "
@@ -51,24 +45,30 @@ public class PropertyQueryBuilder {
 			+ " od.owner_name as odowner_name, od.tenantid as odtenantid,"
 			+ " od.guardian_name, od.guardian_relation, od.mobile_number,"
 			+ " od.allotment_number, od.date_of_allotment, od.possesion_date, od.is_approved, "
-			+ " od.is_current_owner, od.is_master_entry, od.address, od.is_director, "
+			+ " od.is_current_owner, od.is_master_entry, od.address, od.is_director ";
 
-			+ " doc.id as docid, doc.reference_id as docowner_details_id, doc.tenantid as doctenantid,"
-			+ " doc.is_active as docis_active, doc.document_type, doc.file_store_id, doc.property_id as docproperty_id,"
-			+ " doc.created_by as dcreated_by, doc.created_time as dcreated_time, doc.last_modified_by as dmodified_by, doc.last_modified_time as dmodified_time ";
-
-//			+ " payment.id as payid, payment.tenantid as paytenantid, payment.property_details_id as payproperty_details_id, "
-//			+ " payment.payment_type, payment.due_date_of_payment, payment.payable, payment.amount, "
-//			+ " payment.total, payment.date_of_deposit, payment.delay_in_payment, "
-//			+ " payment.interest_for_delay, payment.total_amount_due_with_interest, payment.amount_deposited, "
-//			+ " payment.amount_deposited_intt, payment.balance, payment.balance_intt, "
-//			+ " payment.total_due, payment.receipt_number, payment.receipt_date, "
-//			+ " payment.st_rate_of_st_gst, payment.st_amount_of_gst, payment.st_payment_made_by, "
-//			+ " payment.bank_name, payment.cheque_number, " 
-//			+ " payment.installment_one, payment.installment_two, payment.installment_two_due_date, payment.installment_three, payment.installment_three_due_date, "
-//			+ " payment.monthly_or_annually, payment.ground_rent_start_date, payment.rent_revision, "
-//			+ " payment.lease_period, payment.license_fee_of_year, payment.license_fee, payment.security_amount, payment.security_date, "
-//			+ " payment.created_by as paycreated_by, payment.created_time as paycreated_time, payment.last_modified_by as paymodified_by, payment.last_modified_time as paymodified_time ";
+	// + " payment.id as payid, payment.tenantid as paytenantid,
+	// payment.property_details_id as payproperty_details_id, "
+	// + " payment.payment_type, payment.due_date_of_payment, payment.payable,
+	// payment.amount, "
+	// + " payment.total, payment.date_of_deposit, payment.delay_in_payment, "
+	// + " payment.interest_for_delay, payment.total_amount_due_with_interest,
+	// payment.amount_deposited, "
+	// + " payment.amount_deposited_intt, payment.balance, payment.balance_intt, "
+	// + " payment.total_due, payment.receipt_number, payment.receipt_date, "
+	// + " payment.st_rate_of_st_gst, payment.st_amount_of_gst,
+	// payment.st_payment_made_by, "
+	// + " payment.bank_name, payment.cheque_number, "
+	// + " payment.installment_one, payment.installment_two,
+	// payment.installment_two_due_date, payment.installment_three,
+	// payment.installment_three_due_date, "
+	// + " payment.monthly_or_annually, payment.ground_rent_start_date,
+	// payment.rent_revision, "
+	// + " payment.lease_period, payment.license_fee_of_year, payment.license_fee,
+	// payment.security_amount, payment.security_date, "
+	// + " payment.created_by as paycreated_by, payment.created_time as
+	// paycreated_time, payment.last_modified_by as paymodified_by,
+	// payment.last_modified_time as paymodified_time ";
 
 	private static final String CC_COLUMNS = " cc.id as ccid, cc.property_details_id as ccproperty_details_id,"
 			+ " cc.tenantid as cctenantid, cc.estate_officer_court as ccestate_officer_court,"
@@ -77,27 +77,25 @@ public class PropertyQueryBuilder {
 			+ " cc.created_by as cccreated_by, cc.created_time as cccreated_time, cc.last_modified_by as ccmodified_by, cc.last_modified_time as ccmodified_time ";
 
 	private static final String PT_TABLE = " FROM cs_ep_property_v1 pt " + INNER_JOIN
-			+ " cs_ep_property_details_v1 ptdl  ON pt.id =ptdl.property_id "+ LEFT_JOIN
-			+ " cs_ep_application_v1 pm_app ON pt.id= pm_app.property_id ";
+			+ " cs_ep_property_details_v1 ptdl  ON pt.id =ptdl.property_id ";
 
-	private static final String OWNER_TABLE = " cs_ep_owner_v1 ownership  ON ptdl.id=ownership.property_details_id "
-			+ LEFT_JOIN + " cs_ep_owner_details_v1 od ON ownership.id = od.owner_id " + LEFT_JOIN
-			+ " cs_ep_documents_v1 doc ON od.id=doc.reference_id " ;
-//	        + LEFT_JOIN
-//			+ " cs_ep_payment_v1 payment ON ptdl.id=payment.property_details_id ";
+	private static final String OWNER_TABLE = " cs_ep_owner_v1 ownership " + LEFT_JOIN
+			+ " cs_ep_owner_details_v1 od ON ownership.id = od.owner_id ";
 
-	private static final String CC_TABLE = " cs_ep_court_case_v1 cc ON ptdl.id=cc.property_details_id ";
+	// + LEFT_JOIN
+	// + " cs_ep_payment_v1 payment ON ptdl.id=payment.property_details_id ";
+
+	private static final String CC_TABLE = " cs_ep_court_case_v1 cc ";
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pmodified_time desc) offset_ FROM " + "({})"
 			+ " result) result_offset " + "WHERE offset_ > :start AND offset_ <= :end";
 
-	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList, PropertyCriteria criteria) {
+	public static final String RELATION_OWNER = "owner";
+	public static final String RELATION_OWNER_DOCUMENTS = "ownerdocs";
+	public static final String RELATION_COURT = "court";
 
-		/*
-		 * if (criteria.getLimit() == null && criteria.getOffset() == null) return
-		 * query;
-		 */
+	private String addPaginationWrapper(String query, Map<String, Object> preparedStmtList, PropertyCriteria criteria) {
 
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();
@@ -115,7 +113,7 @@ public class PropertyQueryBuilder {
 		preparedStmtList.put("start", offset);
 		preparedStmtList.put("end", limit + offset);
 
-		log.info(finalQuery);
+		log.debug(finalQuery);
 
 		return finalQuery;
 	}
@@ -128,62 +126,11 @@ public class PropertyQueryBuilder {
 	 */
 	public String getPropertySearchQuery(PropertyCriteria criteria, Map<String, Object> preparedStmtList) {
 
-		StringBuilder builder;
-		List<String> relations = criteria.getRelations();
+		StringBuilder builder = new StringBuilder(SELECT);
 
-		if (criteria.getRelations() == null) {
-			builder = new StringBuilder(SELECT);
-			builder.append(PT_ALL + OWNER_ALL + CC_ALL);
-			builder.append(PT_COLUMNS + "," + OWNER_COLUMNS + "," + CC_COLUMNS);
-			builder.append(PT_TABLE + LEFT_JOIN + OWNER_TABLE + LEFT_JOIN + CC_TABLE);
-		} else {
+		builder.append(PT_COLUMNS);
 
-			builder = new StringBuilder(SELECT);
-
-			String columns[] = { PT_COLUMNS };
-			List<String> columnList = new ArrayList<>(Arrays.asList(columns));
-
-			String tables[] = { PT_TABLE };
-			List<String> tableList = new ArrayList<>(Arrays.asList(tables));
-
-			builder.append(PT_ALL);
-
-			if (relations.contains("owner")) {
-				builder.append(OWNER_ALL);
-			}
-
-			if (relations.contains("court")) {
-				builder.append(CC_ALL);
-			}
-
-			// columns
-			if (relations.contains("owner")) {
-				columnList.add(OWNER_COLUMNS);
-			}
-
-			if (relations.contains("court")) {
-				columnList.add(CC_COLUMNS);
-			}
-			String output = columnList.stream().reduce(null, (str1, str2) -> str1 == null ? str2 : str1 + " , " + str2);
-			builder.append(output);
-
-			// Joins
-			if (relations.contains("owner")) {
-				tableList.add(OWNER_TABLE);
-			}
-
-			if (relations.contains("court")) {
-				tableList.add(CC_TABLE);
-			}
-
-			String tableOutput = tableList.stream().reduce(null,
-					(str1, str2) -> str1 == null ? str2 : str1 + LEFT_JOIN + str2);
-			builder.append(tableOutput);
-		}
-
-//		TODO: has doubt
-//		Search Query for Drafted applications
-//		createdBy = currentUserId OR states IN (’STATE1’,’STATE2’,’STATE3’,’STATE4’)
+		builder.append(PT_TABLE);
 
 		if (null != criteria.getState()) {
 			if (criteria.getState().contains(PSConstants.PM_DRAFTED)) {
@@ -201,8 +148,8 @@ public class PropertyQueryBuilder {
 
 		if (!ObjectUtils.isEmpty(criteria.getFileNumber())) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pt.file_number=:filNumber");
-			preparedStmtList.put("filNumber", criteria.getFileNumber());
+			builder.append("pt.file_number=:fileNumber");
+			preparedStmtList.put("fileNumber", criteria.getFileNumber());
 		}
 
 		if (null != criteria.getCategory()) {
@@ -210,24 +157,6 @@ public class PropertyQueryBuilder {
 			builder.append("pt.category = :category");
 			preparedStmtList.put("category", criteria.getCategory());
 		}
-
-		if (null != criteria.getOwnerName()) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("od.owner_name = :name");
-			preparedStmtList.put("name", criteria.getOwnerName());
-		}
-
-		if (null != criteria.getMobileNumber()) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("od.mobile_number = :phone");
-			preparedStmtList.put("phone", criteria.getMobileNumber());
-		}
-
-//		if (null != criteria.getState()) {
-//			addClauseIfRequired(preparedStmtList, builder);
-//			builder.append("pt.state = :state");
-//			preparedStmtList.put("state", criteria.getState());
-//		}
 
 		if (null != criteria.getPropertyId()) {
 			addClauseIfRequired(preparedStmtList, builder);
@@ -237,10 +166,10 @@ public class PropertyQueryBuilder {
 
 		if (null != criteria.getBranchType()) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("pm_app.branch_type = :branch_type");
+			builder.append("ptdl.branch_type = :branch_type");
 			preparedStmtList.put("branch_type", criteria.getBranchType());
 		}
-		
+
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
 
@@ -252,4 +181,34 @@ public class PropertyQueryBuilder {
 		}
 	}
 
+	private static final String OWNER_DOCS_COLUMNS = " doc.id as docid, doc.reference_id as docreference_id, doc.tenantid as doctenantid,"
+			+ " doc.is_active as docis_active, doc.document_type, doc.file_store_id, doc.property_id as docproperty_id,"
+			+ " doc.created_by as dcreated_by, doc.created_time as dcreated_time, doc.last_modified_by as dmodified_by, doc.last_modified_time as dmodified_time ";
+
+	public String getOwnerDocsQuery(List<String> ownerDetailIds, Map<String, Object> params) {
+		StringBuilder sb = new StringBuilder(SELECT);
+		sb.append(OWNER_DOCS_COLUMNS);
+		sb.append(" FROM cs_ep_documents_v1 doc ");
+		sb.append(" where doc.reference_id IN (:references)");
+		params.put("references", ownerDetailIds);
+		return sb.toString();
+	}
+
+	public String getOwnersQuery(List<String> propertyDetailIds, Map<String, Object> params) {
+		StringBuilder sb = new StringBuilder(SELECT);
+		sb.append(OWNER_COLUMNS);
+		sb.append(" FROM " + OWNER_TABLE);
+		sb.append(" where ownership.property_details_id IN (:propertyDetailIds)");
+		params.put("propertyDetailIds", propertyDetailIds);
+		return sb.toString();
+	}
+	
+	public String getCourtCasesQuery(List<String> propertyDetailIds, Map<String, Object> params) {
+		StringBuilder sb = new StringBuilder(SELECT);
+		sb.append(CC_COLUMNS);
+		sb.append(" FROM " + CC_TABLE);
+		sb.append(" where cc.property_details_id IN (:propertyDetailIds)");
+		params.put("propertyDetailIds", propertyDetailIds);
+		return sb.toString();
+	}
 }

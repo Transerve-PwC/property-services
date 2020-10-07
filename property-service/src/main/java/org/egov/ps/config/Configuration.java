@@ -95,6 +95,9 @@ public class Configuration {
 	@Value("${workflow.businessservice.search.path}")
 	private String wfBusinessServiceSearchPath;
 
+	@Value("${workflow.businessservice.create.path}")
+	private String workflowBusinessServiceCreatePath;
+
 	// ID Generation
 
 	@Value("${egov.idgen.host}")

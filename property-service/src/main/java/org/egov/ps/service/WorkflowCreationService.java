@@ -3,30 +3,32 @@ package org.egov.ps.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.io.IOUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.BusinessService;
-import org.egov.ps.web.contracts.BusinessServiceRequest;
 import org.egov.ps.web.contracts.BusinessServiceResponse;
 import org.egov.ps.web.contracts.WorkFlowResponseDetails;
+import org.egov.ps.workflow.WorkflowService;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import com.google.gson.Gson;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @PropertySource(value = "classpath:config.properties", ignoreResourceNotFound = true)
 public class WorkflowCreationService {
@@ -35,18 +37,10 @@ public class WorkflowCreationService {
 	Util util;
 
 	@Autowired
-	RestTemplate restTemplate;
+	WorkflowService workflowService;
 
-	@Value("${workflow.workDir.path}")
-	private String workflowWorkDirPath;
-
-	@Value("${workflow.context.path}")
-	private String workflowContextPath;
-
-	@Value("${workflow.businessservice.create.path}")
-	private String workflowBusinessServiceCreateApi;
-
-	Gson gson = new Gson();
+	@Autowired
+	ObjectMapper objectMapper;
 
 	private static Map<String, List<ApplicationType>> templateMapping = new HashMap<String, List<ApplicationType>>(0);
 
@@ -80,14 +74,19 @@ public class WorkflowCreationService {
 
 	public List<WorkFlowResponseDetails> createWorkflows(RequestInfo requestInfo) throws Exception {
 		List<WorkFlowResponseDetails> workFlowResponseDetailsLst = new ArrayList<WorkFlowResponseDetails>(0);
-		String url = workflowContextPath + "/" + workflowBusinessServiceCreateApi;
 
 		templateMapping.entrySet().stream().forEach(e -> {
 			try {
 				String workflowJson = getFileContents("workflows/" + e.getKey() + ".json");
 				e.getValue().stream().forEach(applicationType -> {
 					// 2. convert JSON String to work flow details ....
-					BusinessService businessService = gson.fromJson(workflowJson, BusinessService.class);
+					BusinessService businessService;
+					try {
+						businessService = this.objectMapper.readValue(workflowJson, BusinessService.class);
+					} catch (IOException e1) {
+						throw new CustomException("INVALID WORKFLOW TEMPLATE",
+								"Could not parse template as valid json to create workflows");
+					}
 					businessService.setBusinessService(applicationType.getName());
 
 					if (null != businessService.getStates()) {
@@ -111,37 +110,25 @@ public class WorkflowCreationService {
 						});
 					}
 
-					List<BusinessService> lst = new ArrayList<BusinessService>(0);
-					lst.add(businessService);
-
-					// 3. Build Request object for rest template ..start
-					BusinessServiceRequest requestObj = BusinessServiceRequest.builder().businessServices(lst)
-							.requestInfo(requestInfo).build();
-
-					// 4. Rest Template call
-					// System.out.println(new Gson().toJson(requestObj));
 					try {
-						BusinessServiceResponse response = restTemplate.postForObject(url, requestObj,
-								BusinessServiceResponse.class);
+						BusinessServiceResponse response = this.workflowService.createBusinessService(requestInfo,
+								Collections.singletonList(businessService));
 						workFlowResponseDetailsLst.add(WorkFlowResponseDetails.builder()
 								.workFlowName(businessService.getBusinessService()).created(true)
 								.message(response.getResponseInfo().getStatus().toString()).build());
-
 					} catch (Exception e2) {
-						e2.printStackTrace();
+						log.warn("Could not create workflow business service with ", e2);
 						workFlowResponseDetailsLst.add(
 								WorkFlowResponseDetails.builder().workFlowName(businessService.getBusinessService())
 										.created(false).message(e2.toString()).build());
 					}
 				});
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				log.warn("Could not create workflow business service with ", e1);
 				workFlowResponseDetailsLst.add(WorkFlowResponseDetails.builder().workFlowName(null).created(false)
 						.message(e1.getMessage().toString()).build());
 			}
 		});
-		// System.out.println("size() ::"+workFlowResponseDetailsLst.size());
 		return workFlowResponseDetailsLst;
 	}
 

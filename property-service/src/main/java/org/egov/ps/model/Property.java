@@ -37,6 +37,17 @@ public class Property {
 	@JsonProperty("fileNumber")
 	private String fileNumber;
 
+	/**
+	 * One of the categories from `data/ch/EstateProperties/Categories.json`
+	 * CAT.RESIDENTIAL,
+	 * CAT.COMMERCIAL,
+	 * CAT.INDUSTRIAL,
+	 * CAT.INSTITUTIONAL,
+	 * CAT.GOVPROPERTY,
+	 * CAT.RELIGIOUS,
+	 * CAT.HOSPITAL,
+	 * 
+	 */
 	@JsonProperty("category")
 	private String category;
 

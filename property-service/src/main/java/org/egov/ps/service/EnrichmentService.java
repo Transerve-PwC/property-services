@@ -125,9 +125,6 @@ public class EnrichmentService {
 
 			property.getPropertyDetails().getOwners().forEach(owner -> {
 
-				AuditDetails ownerAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
-						owner.getId() == null);
-
 				if (owner.getId() == null) {
 
 					owner.setId(UUID.randomUUID().toString());
@@ -135,6 +132,7 @@ public class EnrichmentService {
 					owner.setPropertyDetailsId(property.getPropertyDetails().getId());
 
 				}
+				AuditDetails ownerAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 				owner.setAuditDetails(ownerAuditDetails);
 				enrichOwnerDetail(property, owner, requestInfo);
 
@@ -146,16 +144,15 @@ public class EnrichmentService {
 
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
 
-		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
-				ownerDetails.getId() == null);
-
 		if (ownerDetails.getId() == null || ownerDetails.getId().isEmpty()) {
 
 			ownerDetails.setId(UUID.randomUUID().toString());
 			ownerDetails.setTenantId(property.getTenantId());
 			ownerDetails.setOwnerId(owner.getId());
-			ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
+
 		}
+
+		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
 		enrichOwnerDocs(property, requestInfo);
 
@@ -170,16 +167,15 @@ public class EnrichmentService {
 				if (!CollectionUtils.isEmpty(ownerDocuments)) {
 					ownerDocuments.forEach(document -> {
 
-						AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
-								document.getId() == null);
 						if (document.getId() == null || document.getId().isEmpty()) {
 
 							document.setId(UUID.randomUUID().toString());
 							document.setTenantId(property.getTenantId());
 							document.setReferenceId(owner.getOwnerDetails().getId());
 							document.setPropertyId(property.getId());
-							document.setAuditDetails(docAuditDetails);
+
 						}
+						AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 						document.setAuditDetails(docAuditDetails);
 
 					});
@@ -194,15 +190,14 @@ public class EnrichmentService {
 
 			property.getPropertyDetails().getCourtCases().forEach(courtCase -> {
 
-				AuditDetails courtCaseAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
-						courtCase.getId() == null);
 				if (courtCase.getId() == null || courtCase.getId().isEmpty()) {
 
 					courtCase.setId(UUID.randomUUID().toString());
 					courtCase.setTenantId(property.getTenantId());
 					courtCase.setPropertyDetailsId(property.getPropertyDetails().getId());
-					courtCase.setAuditDetails(courtCaseAuditDetails);
+
 				}
+				AuditDetails courtCaseAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 				courtCase.setAuditDetails(courtCaseAuditDetails);
 
 			});

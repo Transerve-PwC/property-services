@@ -1,6 +1,5 @@
 package org.egov.ps.repository;
 
-import java.util.List;
 import java.util.Map;
 
 import org.egov.ps.config.Configuration;
@@ -16,9 +15,7 @@ public class ApplicationQueryBuilder {
 	private Configuration config;
 
 	private static final String SELECT = "SELECT ";
-	private static final String INNER_JOIN = "INNER JOIN";
 	private static final String LEFT_JOIN = "LEFT OUTER JOIN";
-	private static final String AND_QUERY = " AND ";
 
 	private static final String APP_ALL = " app.*, doc.*, ";
 	private static final String PT_ALL = " pt.*, ptdl.*, ";
@@ -109,7 +106,6 @@ public class ApplicationQueryBuilder {
 	public String getApplicationSearchQuery(ApplicationCriteria criteria, Map<String, Object> preparedStmtList) {
 
 		StringBuilder builder = null;
-		List<String> relations = criteria.getRelations();
 
 		if (null != criteria.getApplicationNumber()) {
 			builder = new StringBuilder(SELECT);
