@@ -72,8 +72,10 @@ public class WorkflowCreationService {
 				.asList(ApplicationType.builder().name("ES-EB-IS-IssuanceOfNotice").prefix("ES_EB_ION_").build()));
 		templateMapping.put("template-leasehold_to_freehold-estate", Arrays
 				.asList(ApplicationType.builder().name("ES-EB-OCS-LeaseholdToFreehold").prefix("ES_EB_LTF_").build()));
-		templateMapping.put("template-property_master-estate", Arrays
-				.asList(ApplicationType.builder().name("ES-EB-PropertyMaster").prefix("ES_").build()));
+		templateMapping.put("template-refund_of_emd-estate",
+				Arrays.asList(ApplicationType.builder().name("ES-EB-IS-RefundOfEmd").prefix("ES_EB_ROE_").build()));
+		templateMapping.put("template-property_master-estate",
+				Arrays.asList(ApplicationType.builder().name("ES-EB-PropertyMaster").prefix("ES_").build()));
 	}
 
 	public List<WorkFlowResponseDetails> createWorkflows(RequestInfo requestInfo) throws Exception {
