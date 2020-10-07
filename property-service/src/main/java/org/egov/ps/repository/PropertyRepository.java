@@ -73,6 +73,9 @@ public class PropertyRepository {
 	}
 
 	private void addOwnersToProperties(List<Property> properties) {
+		if (CollectionUtils.isEmpty(properties)) {
+			return;
+		}
 		/**
 		 * Extract property detail ids.
 		 */
@@ -97,6 +100,9 @@ public class PropertyRepository {
 	}
 
 	private void addOwnerDocumentsToProperties(List<Property> properties) {
+		if (CollectionUtils.isEmpty(properties)) {
+			return;
+		}
 		/**
 		 * Extract ownerIds
 		 */
@@ -104,6 +110,9 @@ public class PropertyRepository {
 				.flatMap(Collection::stream).collect(Collectors.toList());
 		List<String> ownerDetailIds = owners.stream().map(owner -> owner.getOwnerDetails().getId())
 				.collect(Collectors.toList());
+		if (CollectionUtils.isEmpty(ownerDetailIds)) {
+			return;
+		}
 		/**
 		 * Fetch documents from database.
 		 */
