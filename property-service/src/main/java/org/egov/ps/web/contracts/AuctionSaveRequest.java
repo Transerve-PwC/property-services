@@ -5,7 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.ps.model.Auction;
+import org.egov.ps.model.AuctionBidder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -25,5 +25,5 @@ public class AuctionSaveRequest {
 
 	@JsonProperty("Auctions")
 	@Valid
-	private List<Auction> auctions;
+	private List<AuctionBidder> auctions;
 }

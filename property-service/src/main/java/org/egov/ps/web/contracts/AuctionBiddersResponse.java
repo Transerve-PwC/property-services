@@ -6,7 +6,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.ps.model.Auction;
+import org.egov.ps.model.AuctionBidder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -19,20 +19,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AuctionTransactionResponse {
-	
+public class AuctionBiddersResponse {
+
 	@JsonProperty("ResponseInfo")
 	private ResponseInfo responseInfo;
-	
-	@JsonProperty("Auctions")
+
+	@JsonProperty("Bidders")
 	@Valid
-	private List<Auction> auctions;
-	
-	public AuctionTransactionResponse addAuctions(Auction auction) {
-		if (this.auctions == null) {
-			this.auctions = new ArrayList<>();
+	private List<AuctionBidder> bidders;
+
+	public AuctionBiddersResponse addAuctions(AuctionBidder bidder) {
+		if (this.bidders == null) {
+			this.bidders = new ArrayList<>();
 		}
-		this.auctions.add(auction);
+		this.bidders.add(bidder);
 		return this;
 	}
 
