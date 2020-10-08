@@ -260,7 +260,7 @@ serviceMaps:
           jsonMaps:
             - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.id
 
-        - query: INSERT INTO cs_ep_owner_details_v1 (id, owner_id, tenantid, owner_name, guardian_name, guardian_relation, mobile_number, allotment_number, date_of_allotment, possesion_date, is_approved, is_current_owner, is_master_entry, address, is_director, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET owner_name = ?, guardian_name = ?, guardian_relation = ?, mobile_number = ?, allotment_number = ?, date_of_allotment = ?, possesion_date = ?, is_approved = ?, is_current_owner = ?, is_master_entry = ?, address = ?, is_director = ?, last_modified_by = ?, last_modified_time = ?;
+        - query: INSERT INTO cs_ep_owner_details_v1 (id, owner_id, tenantid, owner_name, guardian_name, guardian_relation, mobile_number, allotment_number, date_of_allotment, possesion_date, is_approved, is_current_owner, is_master_entry, address, is_director, seller_name, seller_guardian_name, seller_relation, mode_of_transfer, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET owner_name = ?, guardian_name = ?, guardian_relation = ?, mobile_number = ?, allotment_number = ?, date_of_allotment = ?, possesion_date = ?, is_approved = ?, is_current_owner = ?, is_master_entry = ?, address = ?, is_director = ?, seller_name = ?, seller_guardian_name = ?, seller_relation = ?, mode_of_transfer = ?, last_modified_by = ?, last_modified_time = ?;
           basePath: $.Properties.*.propertyDetails.owners.*.ownerDetails
           jsonMaps:
             - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.id
@@ -292,6 +292,14 @@ serviceMaps:
             - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.address
 
             - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isDirector
+            
+            - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.sellerName
+      
+            - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.sellerGuardianName
+      
+            - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.sellerRelation
+      
+            - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.modeOfTransfer
 
             - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.createdBy
 
@@ -324,6 +332,14 @@ serviceMaps:
             - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.address
 
             - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.isDirector
+            
+            - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.sellerName
+      
+            - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.sellerGuardianName
+      
+            - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.sellerRelation
+      
+            - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.modeOfTransfer
 
             - jsonPath: $.Properties.*.propertyDetails.owners.*.ownerDetails.auditDetails.lastModifiedBy
 
@@ -417,7 +433,7 @@ serviceMaps:
           basePath: $.Properties.*.propertyDetails.inActiveBidders.*
           jsonMaps:
             - jsonPath: $.Properties.*.propertyDetails.inActiveBidders.*.propertyId
-      
+
         - query: INSERT INTO cs_ep_auction (id, property_id, auction_id, auction_description, participated_bidders, deposited_emd_amount, deposit_date, emdValidity_date, refund_status, comment, created_by, last_modified_by, created_date, last_modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET auctionDescription = ?, refundStatus = ?, comment = ?, last_modified_by = ?, last_modified_time = ?;
           basePath: $.Properties.*.propertyDetails.bidders.*
           jsonMaps:
@@ -458,7 +474,7 @@ serviceMaps:
             - jsonPath: $.Properties.*.propertyDetails.bidders.*.auditDetails.lastModifiedBy
 
             - jsonPath: $.Properties.*.propertyDetails.bidders.*.auditDetails.lastModifiedTime
-            
+
     - version: 1.0
       description: Persists Application details in cs_ep_application_v1 table
       fromTopic: save-application-topic

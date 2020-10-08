@@ -45,7 +45,8 @@ public class PropertyQueryBuilder {
 			+ " od.owner_name as odowner_name, od.tenantid as odtenantid,"
 			+ " od.guardian_name, od.guardian_relation, od.mobile_number,"
 			+ " od.allotment_number, od.date_of_allotment, od.possesion_date, od.is_approved, "
-			+ " od.is_current_owner, od.is_master_entry, od.address, od.is_director ";
+			+ " od.is_current_owner, od.is_master_entry, od.address, od.is_director, "
+			+ " od.seller_name, od.seller_guardian_name, od.seller_relation, od.mode_of_transfer ";
 
 	// + " payment.id as payid, payment.tenantid as paytenantid,
 	// payment.property_details_id as payproperty_details_id, "
