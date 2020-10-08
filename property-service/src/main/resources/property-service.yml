@@ -413,7 +413,12 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.propertyDetails.courtCases.*.auditDetails.lastModifiedTime
 
-        - query: INSERT INTO cs_ep_auction (id, property_id,auction_id, file_number, tenant_id, auction_description, participated_bidders, deposited_emd_amount, deposit_date, emdValidity_date,refund_status,comment, created_by, last_modified_by,  created_date, last_modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        - query: DELETE FROM cs_ep_auction WHERE property_id=?;
+          basePath: $.Properties.*.propertyDetails.inActiveBidders.*
+          jsonMaps:
+            - jsonPath: $.Properties.*.propertyDetails.inActiveBidders.*.propertyId
+      
+        - query: INSERT INTO cs_ep_auction (id, property_id, auction_id, auction_description, participated_bidders, deposited_emd_amount, deposit_date, emdValidity_date, refund_status, comment, created_by, last_modified_by, created_date, last_modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET auctionDescription = ?, refundStatus = ?, comment = ?, last_modified_by = ?, last_modified_time = ?;
           basePath: $.Properties.*.propertyDetails.bidders.*
           jsonMaps:
             - jsonPath: $.Properties.*.propertyDetails.bidders.*.id
@@ -444,6 +449,16 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.propertyDetails.bidders.*.auditDetails.lastModifiedTime
 
+            - jsonPath: $.Properties.*.propertyDetails.bidders.*.auctionDescription
+
+            - jsonPath: $.Properties.*.propertyDetails.bidders.*.refundStatus
+
+            - jsonPath: $.Properties.*.propertyDetails.bidders.*.comment
+
+            - jsonPath: $.Properties.*.propertyDetails.bidders.*.auditDetails.lastModifiedBy
+
+            - jsonPath: $.Properties.*.propertyDetails.bidders.*.auditDetails.lastModifiedTime
+            
     - version: 1.0
       description: Persists Application details in cs_ep_application_v1 table
       fromTopic: save-application-topic

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.egov.ps.model.Application;
 import org.egov.ps.model.ApplicationCriteria;
+import org.egov.ps.model.AuctionBidder;
 import org.egov.ps.model.CourtCase;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.Owner;
@@ -45,6 +46,9 @@ public class PropertyRepository {
 	private CourtCasesRowMapper courtCasesRowMapper;
 
 	@Autowired
+	private AuctionRowMapper biddersRowMapper;
+	
+	@Autowired
 	WorkflowIntegrator workflowIntegrator;
 
 	@Autowired
@@ -65,6 +69,7 @@ public class PropertyRepository {
 				relations.add(PropertyQueryBuilder.RELATION_OWNER);
 				relations.add(PropertyQueryBuilder.RELATION_OWNER_DOCUMENTS);
 				relations.add(PropertyQueryBuilder.RELATION_COURT);
+				relations.add(PropertyQueryBuilder.RELATION_BIDDER);
 			}
 		}
 		if (relations.contains(PropertyQueryBuilder.RELATION_OWNER)) {
@@ -75,6 +80,9 @@ public class PropertyRepository {
 		}
 		if (relations.contains(PropertyQueryBuilder.RELATION_COURT)) {
 			this.addCourtCasesToProperties(properties);
+		}
+		if (relations.contains(PropertyQueryBuilder.RELATION_BIDDER)) {
+			this.addBiddersToProperties(properties);
 		}
 		return properties;
 	}
@@ -159,6 +167,32 @@ public class PropertyRepository {
 			property.getPropertyDetails()
 					.setCourtCases(courtCases.stream()
 							.filter(courtCase -> courtCase.getPropertyDetailsId()
+									.equalsIgnoreCase(property.getPropertyDetails().getId()))
+							.collect(Collectors.toList()));
+		});
+	}
+	
+	private void addBiddersToProperties(List<Property> properties) {
+		/**
+		 * Extract property detail ids.
+		 */
+		List<String> propertyDetailsIds = properties.stream().map(property -> property.getPropertyDetails().getId())
+				.collect(Collectors.toList());
+
+		/**
+		 * Fetch bidders from database
+		 */
+		Map<String, Object> params = new HashMap<String, Object>(1);
+		String biddersQuery = propertyQueryBuilder.getBiddersQuery(propertyDetailsIds, params);
+		List<AuctionBidder> bidders = namedParameterJdbcTemplate.query(biddersQuery, params, biddersRowMapper);
+
+		/**
+		 * Assign court cases to corresponding properties
+		 */
+		properties.stream().forEach(property -> {
+			property.getPropertyDetails()
+					.setBidders(bidders.stream()
+							.filter(bidder -> bidder.getPropertyId()
 									.equalsIgnoreCase(property.getPropertyDetails().getId()))
 							.collect(Collectors.toList()));
 		});

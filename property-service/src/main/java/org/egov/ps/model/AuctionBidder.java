@@ -2,9 +2,9 @@ package org.egov.ps.model;
 
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.egov.ps.web.contracts.AuditDetails;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Builder;
 import lombok.Data;
