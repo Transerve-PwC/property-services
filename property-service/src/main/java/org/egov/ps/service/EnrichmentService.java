@@ -353,8 +353,8 @@ public class EnrichmentService {
 	 * @param count       Number of ids to be generated
 	 * @return List of ids generated using idGen service
 	 */
-	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
-		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idformat, count)
+	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, int count) {
+		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, count)
 				.getIdResponses();
 
 		if (CollectionUtils.isEmpty(idResponses))
@@ -362,11 +362,11 @@ public class EnrichmentService {
 
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}
-
+	
 	/**
-	 * Sets the ApplicationNumber for given TradeLicenseRequest
+	 * Sets the ApplicationNumber for given EstateServiceApplicationRequest
 	 *
-	 * @param request TradeLicenseRequest which is to be created
+	 * @param request EstateServiceApplicationRequest which is to be created
 	 */
 	private void setIdgenIds(ApplicationRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
@@ -375,7 +375,7 @@ public class EnrichmentService {
 		int size = request.getApplications().size();
 
 		List<String> applicationNumbers = setIdgenIds(requestInfo, tenantId, size,
-				config.getApplicationNumberIdgenNamePS(), config.getApplicationNumberIdgenFormatPS());
+				config.getApplicationNumberIdgenNamePS());
 		ListIterator<String> itr = applicationNumbers.listIterator();
 
 		if (!CollectionUtils.isEmpty(applications)) {
@@ -385,11 +385,10 @@ public class EnrichmentService {
 		}
 	}
 
-	private List<String> setIdgenIds(RequestInfo requestInfo, String tenantId, int size, String idGenName,
-			String idGenFormate) {
+	private List<String> setIdgenIds(RequestInfo requestInfo, String tenantId, int size, String idGenName) {
 		List<String> applicationNumbers = null;
 
-		applicationNumbers = getIdList(requestInfo, tenantId, idGenName, idGenFormate, size);
+		applicationNumbers = getIdList(requestInfo, tenantId, idGenName, size);
 
 		Map<String, String> errorMap = new HashMap<>();
 		if (applicationNumbers.size() != size) {

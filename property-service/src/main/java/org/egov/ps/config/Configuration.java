@@ -109,9 +109,6 @@ public class Configuration {
 	@Value("${egov.idgen.ps.applicationNum.name}")
 	private String applicationNumberIdgenNamePS;
 
-	@Value("${egov.idgen.ps.applicationNum.format}")
-	private String applicationNumberIdgenFormatPS;
-
 	// MDMS Configuration
 
 	@Value("${egov.mdms.host}")
