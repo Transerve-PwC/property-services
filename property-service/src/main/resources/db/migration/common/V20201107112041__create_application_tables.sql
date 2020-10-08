@@ -21,3 +21,4 @@ CREATE TABLE cs_ep_application_v1 (
   CONSTRAINT pk_cs_ep_application_v1 PRIMARY KEY (id, property_id),
   CONSTRAINT fk_cs_ep_application_v1 FOREIGN KEY (property_id) REFERENCES cs_ep_property_v1 (id)
 );
+CREATE INDEX IF NOT EXISTS application_index ON cs_ep_application_v1 (application_number, state);
