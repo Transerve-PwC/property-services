@@ -55,8 +55,6 @@ public class WorkflowIntegrator {
 
 	private static final String MODULENAMEVALUE = "EP";
 
-	private static final String BPAMODULENAMEVALUE = "BPAREG";
-
 	private static final String WORKFLOWREQUESTARRAYKEY = "ProcessInstances";
 
 	private static final String REQUESTINFOKEY = "RequestInfo";
@@ -100,15 +98,15 @@ public class WorkflowIntegrator {
 			List<Map<String, String>> uuidmaps = new LinkedList<>();
 			List<Map<String, String>> assigneeUuidmaps = new LinkedList<>();
 
-//			if (!CollectionUtils.isEmpty(property.getAssignee())) {
-//
-//				// Adding assignees to processInstance
-//				property.getAssignee().forEach(assignee -> {
-//					Map<String, String> uuidMap = new HashMap<>();
-//					uuidMap.put(UUIDKEY, assignee);
-//					assigneeUuidmaps.add(uuidMap);
-//				});
-//			}
+			// if (!CollectionUtils.isEmpty(property.getAssignee())) {
+			//
+			// // Adding assignees to processInstance
+			// property.getAssignee().forEach(assignee -> {
+			// Map<String, String> uuidMap = new HashMap<>();
+			// uuidMap.put(UUIDKEY, assignee);
+			// assigneeUuidmaps.add(uuidMap);
+			// });
+			// }
 
 			if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 				property.getPropertyDetails().getOwners().forEach(owners -> {
@@ -123,14 +121,14 @@ public class WorkflowIntegrator {
 			obj.put(ACTIONKEY, property.getAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(AUDITDETAILSKEY, property.getAuditDetails());
-//			obj.put(COMMENTKEY, property.getComment());
-//			if (!CollectionUtils.isEmpty(property.getAssignee())) {
-//				if (uuidmaps.size() == 1) {
-//					obj.put(ASSIGNEEKEY, assigneeUuidmaps.get(0));
-//				} else {
-//					obj.put(ASSIGNEEKEY, assigneeUuidmaps);
-//				}
-//			}
+			// obj.put(COMMENTKEY, property.getComment());
+			// if (!CollectionUtils.isEmpty(property.getAssignee())) {
+			// if (uuidmaps.size() == 1) {
+			// obj.put(ASSIGNEEKEY, assigneeUuidmaps.get(0));
+			// } else {
+			// obj.put(ASSIGNEEKEY, assigneeUuidmaps);
+			// }
+			// }
 
 			array.add(obj);
 		}

@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.egov.ps.web.contracts.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
@@ -117,10 +119,6 @@ public class PropertyDetails {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 
-	@JsonProperty("owners")
-	@Builder.Default
-	private List<Owner> owners = new ArrayList<Owner>();
-
 	@JsonProperty("companyRegistrationDate")
 	private Long companyRegistrationDate;
 
@@ -133,6 +131,10 @@ public class PropertyDetails {
 	@JsonProperty("entityType")
 	private String entityType;
 
+	@JsonProperty("owners")
+	@Builder.Default
+	private List<Owner> owners = new ArrayList<Owner>();
+	
 	public PropertyDetails addOwnerItem(Owner newOwnerItem) {
 		if (this.owners == null) {
 			this.owners = new ArrayList<>();
@@ -181,5 +183,27 @@ public class PropertyDetails {
 		this.paymentDetails.add(paymentItem);
 		return this;
 	}
+	
+	@JsonProperty("bidders")
+	@Builder.Default
+	private List<AuctionBidder> bidders = new ArrayList<AuctionBidder>();
+	
+	public PropertyDetails addBidderItem(AuctionBidder newBidderItem) {
+		if (this.bidders == null) {
+			this.bidders = new ArrayList<>();
+		}
+		for (AuctionBidder bidder : bidders) {
+			if (bidder.getId().equalsIgnoreCase(newBidderItem.getId())) {
+				return this;
+			}
+		}
+		this.bidders.add(newBidderItem);
+		return this;
+
+	}
+	
+	@Valid
+	@JsonProperty
+	private List<AuctionBidder> inActiveBidders;
 
 }

@@ -2,6 +2,7 @@ package org.egov.ps.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,9 +14,9 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.config.Configuration;
 import org.egov.ps.model.Application;
-import org.egov.ps.model.Auction;
+import org.egov.ps.model.AuctionBidder;
+import org.egov.ps.model.AuctionSearchCritirea;
 import org.egov.ps.model.Document;
-import org.egov.ps.model.ExcelSearchCriteria;
 import org.egov.ps.model.MortgageDetails;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
@@ -26,19 +27,17 @@ import org.egov.ps.model.calculation.Calculation;
 import org.egov.ps.model.calculation.Category;
 import org.egov.ps.model.calculation.TaxHeadEstimate;
 import org.egov.ps.model.idgen.IdResponse;
+import org.egov.ps.repository.AuctionRepository;
 import org.egov.ps.repository.IdGenRepository;
 import org.egov.ps.repository.PropertyRepository;
-import org.egov.ps.util.FileStoreUtils;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.ApplicationRequest;
 import org.egov.ps.web.contracts.AuctionSaveRequest;
-import org.egov.ps.web.contracts.AuctionTransactionRequest;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.egov.ps.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -46,10 +45,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Slf4j
 public class EnrichmentService {
 
 	@Autowired
@@ -66,15 +62,12 @@ public class EnrichmentService {
 
 	@Autowired
 	private PropertyRepository propertyRepository;
+	
+	@Autowired
+	private AuctionRepository auctionRepository;
 
 	@Autowired
 	private ObjectMapper objectMapper;
-
-	@Autowired
-	private ReadExcelService readExcelService;
-
-	@Autowired
-	private FileStoreUtils fileStoreUtils;
 
 	public void enrichPropertyRequest(PropertyRequest request) {
 
@@ -116,6 +109,7 @@ public class EnrichmentService {
 		enrichOwners(property, requestInfo);
 		enrichCourtCases(property, requestInfo);
 		enrichPaymentDetails(property, requestInfo);
+		enrichBidders(property, requestInfo);
 
 	}
 
@@ -227,6 +221,53 @@ public class EnrichmentService {
 				}
 			});
 		}
+	}
+	
+	private void enrichBidders(Property property, RequestInfo requestInfo) {
+
+		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getBidders())) {
+
+			property.getPropertyDetails().getBidders().forEach(bidder -> {
+
+				if (bidder.getId() == null) {
+
+					bidder.setId(UUID.randomUUID().toString());
+					bidder.setPropertyId(property.getPropertyDetails().getId());
+
+				}
+				AuditDetails buidderAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				bidder.setAuditDetails(buidderAuditDetails);
+
+			});
+		}
+		
+		/**
+		 * Delete existing data as new data is coming in.
+		 */
+		boolean hasAnyNewBidder = property.getPropertyDetails().getBidders().stream()
+				.filter(bidder -> bidder.getId() == null || bidder.getId().isEmpty()).findAny().isPresent();
+		
+		if (hasAnyNewBidder) {
+			AuctionSearchCritirea auctionSearchCritirea = getAuctionCriteriaForSearch(property);
+
+			List<AuctionBidder> existingBidders = auctionRepository.search(auctionSearchCritirea);
+			property.getPropertyDetails().setInActiveBidders(existingBidders);
+			
+		} else {
+			property.getPropertyDetails().setInActiveBidders(Collections.emptyList());
+		}
+
+	}
+	
+	private AuctionSearchCritirea getAuctionCriteriaForSearch(Property property) {
+		AuctionSearchCritirea criteria = new AuctionSearchCritirea();
+		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getBidders())) {
+			property.getPropertyDetails().getBidders().forEach(auction -> {
+				if (auction.getId() != null)
+					criteria.setAuctionId(auction.getId());
+			});
+		}
+		return criteria;
 	}
 
 	/**
@@ -354,15 +395,14 @@ public class EnrichmentService {
 	 * @return List of ids generated using idGen service
 	 */
 	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, int count) {
-		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, count)
-				.getIdResponses();
+		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, count).getIdResponses();
 
 		if (CollectionUtils.isEmpty(idResponses))
 			throw new CustomException("IDGEN ERROR", "No ids returned from idgen Service");
 
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}
-	
+
 	/**
 	 * Sets the ApplicationNumber for given EstateServiceApplicationRequest
 	 *
@@ -488,7 +528,7 @@ public class EnrichmentService {
 		application.setCalculation(calculation);
 	}
 
-//	To be used in future
+	// To be used in future
 	private void enrichUpdateDemand(Application application) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
 
@@ -510,36 +550,7 @@ public class EnrichmentService {
 		return String.format("%s_%s_%s", billingBusService, chargeFor, category.toString());
 	}
 
-	public AuctionSaveRequest enrichAuctionCreateRequest(ExcelSearchCriteria searchCriteria,
-			AuctionTransactionRequest auctionTransactionRequest) {
-		Property property = auctionTransactionRequest.getProperty();
-		List<Auction> auctions = new ArrayList<>();
-		AuctionSaveRequest request = AuctionSaveRequest.builder()
-				.requestInfo(auctionTransactionRequest.getRequestInfo()).build();
-		RequestInfo requestInfo = request.getRequestInfo();
-		AuditDetails auctionAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-		try {
-			String filePath = fileStoreUtils.fetchFileStoreUrl(searchCriteria);
-			if (!filePath.isEmpty()) {
-				auctions = readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream(), 0);
-				auctions.forEach(auction -> {
-					String gen_auction_id = UUID.randomUUID().toString();
-					auction.setAuditDetails(auctionAuditDetails);
-					auction.setAuctionId(auction.getId());
-					auction.setId(gen_auction_id);
-					auction.setPropertyId(property.getId());
-					auction.setTenantId(property.getTenantId());
-					auction.setFileNumber(property.getFileNumber());
-				});
-			}
-			request.setAuctions(auctions);
-		} catch (Exception e) {
-			log.error("Error occur during runnig controller method readExcel():" + e.getMessage());
-		}
-		return request;
-	}
-
-	public void enrichUpdateAuctionRequest(AuctionSaveRequest request, List<Auction> auctionFromSearch) {
+	public void enrichUpdateAuctionRequest(AuctionSaveRequest request, List<AuctionBidder> auctionFromSearch) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
 

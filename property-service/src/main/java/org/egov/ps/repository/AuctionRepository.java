@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.ps.model.Auction;
+import org.egov.ps.model.AuctionBidder;
 import org.egov.ps.model.AuctionSearchCritirea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -17,16 +17,15 @@ public class AuctionRepository {
 	private AuctionQueryBuilder auctionQueryBuilder;
 
 	@Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;	
-	
-	@Autowired
-	private AuctionRowMapper auctionRowMapper;	
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-		
-	public List<Auction> search(AuctionSearchCritirea auctionSearchCritirea) {
+	@Autowired
+	private AuctionRowMapper auctionRowMapper;
+
+	public List<AuctionBidder> search(AuctionSearchCritirea auctionSearchCritirea) {
 		Map<String, Object> preparedStmtList = new HashMap<>();
 		String query = auctionQueryBuilder.getAuctionSearchQuery(auctionSearchCritirea, preparedStmtList);
 		return namedParameterJdbcTemplate.query(query, preparedStmtList, auctionRowMapper);
 	}
-	
+
 }
