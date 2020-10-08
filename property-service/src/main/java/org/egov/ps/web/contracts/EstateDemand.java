@@ -29,6 +29,9 @@ public class EstateDemand {
    */
   @JsonProperty("demandDate")
   private Long demandDate;
+  
+  @JsonProperty("isPrevious")
+  private Boolean isPrevious;
 
   /**
    * Rent of demand.
