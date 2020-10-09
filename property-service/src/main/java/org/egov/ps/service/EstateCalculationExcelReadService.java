@@ -45,7 +45,7 @@ public class EstateCalculationExcelReadService {
 			"dateOfReceipt", "stGstReceiptNo", "noOfDays", "delayedPaymentOfGST" };
 	private static final DecimalFormat DOUBLE_RISTRICT = new DecimalFormat("#.##");
 	private static int SKIP_ROW_COUNT = 1;
-	int count = 0;
+	double temp = 0.0;
 
 	public EstateModuleResponse getDatafromExcel(InputStream inputStream, int sheetIndex) {
 		List<Map<String, Object>> estateCalculations = new ArrayList<>();
@@ -53,15 +53,18 @@ public class EstateCalculationExcelReadService {
 		List<EstatePayment> estatePayments = new ArrayList<EstatePayment>();
 		try {
 			Workbook workbook = WorkbookFactory.create(inputStream);
+			System.out.println(workbook.getSheetName(sheetIndex));
+			FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
 			Sheet sheet = workbook.getSheetAt(sheetIndex);
 			Iterator<Row> rowIterator = sheet.iterator();
+		
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			boolean shouldParseRows = false;
-			List<String> headerCells = new ArrayList<>();
+			List<String> headerCells = new ArrayList<>();		
 			while (rowIterator.hasNext()) {
 				Row currentRow = rowIterator.next();
-
+				
 				if (HEADER_CELL.equalsIgnoreCase(String.valueOf(currentRow.getCell(0)))) {
 					shouldParseRows = true;
 					headerCells = new ArrayList<>();
@@ -85,8 +88,7 @@ public class EstateCalculationExcelReadService {
 					break;
 				}
 
-				if (shouldParseRows && SKIP_ROW_COUNT == 0 && !checkEmpty(currentRow.getCell(0))) {
-					FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+				if (shouldParseRows && SKIP_ROW_COUNT == 0 && !checkEmpty(currentRow.getCell(0))) {					
 					Map<String, Object> cellData = new HashedMap<String, Object>();
 					int headerCount = 0;
 					/* Fetching Body Data will read after this */
@@ -103,19 +105,21 @@ public class EstateCalculationExcelReadService {
 					estateCalculations.add(cellData);
 				}
 			}
-
 			estateCalculations.forEach(estateCalculationMap -> {
+				System.out.println(calculateDelayedPayment(estateCalculationMap));
+				temp = temp+calculateDelayedPayment(estateCalculationMap);
+				System.out.println(temp);
 				estateDemands.add(EstateDemand.builder().isPrevious(checkPreviousTab(estateCalculationMap.get("month")))
-						.demandDate(parseInLong(estateCalculationMap.get("dueDateOfRent")))
-						.rent(parseInDouble(estateCalculationMap.get("rentDue")))
-						.penaltyInterest(parseInDouble(estateCalculationMap.get("penaltyInterest")))
+						.demandDate(checkModifyValueLong(estateCalculationMap.get("dueDateOfRent")))
+						.rent(checkModifyValue(estateCalculationMap.get("rentDue")))
+						.penaltyInterest(checkModifyValue(estateCalculationMap.get("penaltyInterest")))
 						.gstInterest(calculateDelayedPayment(estateCalculationMap)).build());
 
 				if (parseInDouble(estateCalculationMap.get("rentReceived")) != null
 						&& parseInDouble(estateCalculationMap.get("rentReceived")) > 0) {
 					estatePayments.add(EstatePayment.builder()
-							.receiptDate(parseInLong(estateCalculationMap.get("rentDateOfReceipt")))
-							.rentReceived(parseInDouble(estateCalculationMap.get("rentReceived"))).build());
+							.receiptDate(checkModifyValueLong(estateCalculationMap.get("rentDateOfReceipt")))
+							.rentReceived(checkModifyValue(estateCalculationMap.get("rentReceived"))).build());
 
 				}
 			});
@@ -134,15 +138,15 @@ public class EstateCalculationExcelReadService {
 	}
 
 	private Long parseInLong(Object value) {
-		if (value == null || "null".equalsIgnoreCase(value.toString()) || value.toString().isEmpty()) {
+		if (value == null || "null".equalsIgnoreCase(value.toString()) || value.toString().isEmpty() || !NumberUtils.isNumber(value.toString())) {
 			return null;
 		} else {
-			return Long.parseLong(value.toString());
+			return Long.parseLong(value.toString().split("\\.")[0]);
 		}
 	}
 
 	private Double parseInDouble(Object value) {
-		if (value == null || "null".equalsIgnoreCase(value.toString()) || value.toString().isEmpty()) {
+		if (value == null || "null".equalsIgnoreCase(value.toString()) || value.toString().isEmpty() || !NumberUtils.isNumber(value.toString())) {
 			return null;
 		} else {
 			return Double.parseDouble(value.toString());
@@ -159,9 +163,13 @@ public class EstateCalculationExcelReadService {
 	private Double checkModifyValue(Object value) {
 		return parseInDouble(value) == null ? 0.0 : parseInDouble(value);
 	}
+	
+	private Long checkModifyValueLong(Object value) {
+		return parseInLong(value) == null ? Long.parseLong("0"): parseInLong(value);
+	}
 
 	private Double calculateDelayedPayment(Map<String, Object> estateCalculationModel) {
-		Double stGSTDue = checkModifyValue(estateCalculationModel.get("stGstDue"));
+		Double stGSTDue = checkModifyValue(estateCalculationModel.get("stGstRate"))*checkModifyValue(estateCalculationModel.get("rentDue"));
 		Double stGSTRate = checkModifyValue(estateCalculationModel.get("stGstRate"));
 		Double noOfDays = checkModifyValue(estateCalculationModel.get("noOfDays"));
 		return Double.parseDouble(DOUBLE_RISTRICT.format(stGSTDue * stGSTRate * noOfDays / 365));
