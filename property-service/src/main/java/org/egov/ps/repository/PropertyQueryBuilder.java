@@ -77,12 +77,13 @@ public class PropertyQueryBuilder {
 			+ " cc.honorable_high_court as cchonorable_high_court, cc.honorable_supreme_court as cchonorable_supreme_court,"
 			+ " cc.created_by as cccreated_by, cc.created_time as cccreated_time, cc.last_modified_by as ccmodified_by, cc.last_modified_time as ccmodified_time ";
 
-	private static final String BIDDER_COLUMNS = " aut.id as auctionid,aut.property_id as propertyid,"
-			+ "aut.description as description,"
-			+ "aut.bidder_name as bidderName,aut.deposited_emd_amount as depositedEMDAmount,"
-			+ "aut.deposit_date as depositDate,aut.emdValidity_date as emdValidityDate,aut.refund_status as refundStatus,"
-			+ "aut.created_by as createdby,aut.last_modified_by as lastmodifiedby,aut.created_date as createddate,"
-			+ "aut.last_modified_date as lastmodifieddate ";
+	private static final String BIDDER_COLUMNS = " aut.id as auid, aut.auction_id as auauction_id, aut.property_details_id as auproperty_details_id,"
+			+ " aut.description as audescription, "
+			+ " aut.bidder_name as aubidder_name, aut.deposited_emd_amount as audeposited_emd_mount, "
+			+ " aut.deposit_date as audeposit_date, aut.emd_validity_date as auemd_validity_date, aut.refund_status as aurefund_status, "
+			+ " aut.comments as aucomments, aut.state as austate, aut.action as auaction, "
+			+ " aut.created_by as aucreated_by, aut.last_modified_by as aulast_modified_by, aut.created_time as aucreated_time, "
+			+ " aut.last_modified_time as aulast_modified_time ";
 
 	private static final String PT_TABLE = " FROM cs_ep_property_v1 pt " + INNER_JOIN
 			+ " cs_ep_property_details_v1 ptdl  ON pt.id =ptdl.property_id ";
@@ -227,7 +228,7 @@ public class PropertyQueryBuilder {
 		StringBuilder sb = new StringBuilder(SELECT);
 		sb.append(BIDDER_COLUMNS);
 		sb.append(" FROM " + BIDDER_TABLE);
-		sb.append(" where aut.property_id IN (:propertyDetailIds)");
+		sb.append(" where aut.property_details_id IN (:propertyDetailIds)");
 		params.put("propertyDetailIds", propertyDetailIds);
 		return sb.toString();
 	}

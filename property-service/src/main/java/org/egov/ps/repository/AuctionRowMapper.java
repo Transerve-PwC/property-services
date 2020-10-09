@@ -19,15 +19,24 @@ public class AuctionRowMapper implements ResultSetExtractor<List<AuctionBidder>>
 
 		List<AuctionBidder> bidders = new ArrayList<AuctionBidder>();
 		while (rs.next()) {
-			AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("createdby"))
-					.createdTime(rs.getLong("createddate")).lastModifiedBy(rs.getString("lastmodifiedby"))
-					.lastModifiedTime(rs.getLong("lastmodifieddate")).build();
+			AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("aucreated_by"))
+					.createdTime(rs.getLong("aucreated_time")).lastModifiedBy(rs.getString("aulast_modified_by"))
+					.lastModifiedTime(rs.getLong("aulast_modified_time")).build();
 
-			AuctionBidder auction = AuctionBidder.builder().auditDetails(auditdetails)
-					.propertyId(rs.getString("propertyid")).description(rs.getString("description"))
-					.emdValidityDate(rs.getLong("emdValidityDate")).id(rs.getString("auctionid"))
-					.bidderName(rs.getString("bidderName")).refundStatus(rs.getString("refundStatus"))
-					.depositDate(rs.getLong("depositDate")).depositedEMDAmount(rs.getBigDecimal("depositedEMDAmount"))
+			AuctionBidder auction = AuctionBidder.builder()
+					.id(rs.getString("auid"))
+					.auctionId(rs.getString("auauction_id"))
+					.propertyDetailsId(rs.getString("auproperty_details_id"))
+					.description(rs.getString("audescription"))
+					.bidderName(rs.getString("aubidder_name"))
+					.depositedEMDAmount(rs.getBigDecimal("audeposited_emd_mount"))
+					.depositDate(rs.getLong("audeposit_date"))
+					.emdValidityDate(rs.getLong("auemd_validity_date"))
+					.refundStatus(rs.getString("aurefund_status"))
+					.state(rs.getString("austate"))
+					.action(rs.getString("auaction"))
+					.comments(rs.getString("aucomments"))
+					.auditDetails(auditdetails)
 					.build();
 			bidders.add(auction);
 		}

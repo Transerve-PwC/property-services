@@ -227,7 +227,7 @@ public class EnrichmentService {
 				if (bidder.getId() == null) {
 
 					bidder.setId(UUID.randomUUID().toString());
-					bidder.setPropertyId(property.getPropertyDetails().getId());
+					bidder.setPropertyDetailsId(property.getPropertyDetails().getId());
 
 				}
 				AuditDetails buidderAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);

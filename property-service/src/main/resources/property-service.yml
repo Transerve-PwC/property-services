@@ -434,7 +434,7 @@ serviceMaps:
           jsonMaps:
             - jsonPath: $.Properties.*.propertyDetails.inActiveBidders.*.propertyId
 
-        - query: INSERT INTO cs_ep_auction (id, property_id, auction_id, auction_description, participated_bidders, deposited_emd_amount, deposit_date, emdValidity_date, refund_status, comment, created_by, last_modified_by, created_date, last_modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET auctionDescription = ?, refundStatus = ?, comment = ?, last_modified_by = ?, last_modified_time = ?;
+        - query: INSERT INTO cs_ep_auction (id, property_id, auction_id, description, bidder_name, deposited_emd_amount, deposit_date, emdvalidity_date, refund_status, comments, created_by, last_modified_by, created_time, last_modified_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET description = ?, refund_status = ?, comments = ?, last_modified_by = ?, last_modified_time = ?;
           basePath: $.Properties.*.propertyDetails.bidders.*
           jsonMaps:
             - jsonPath: $.Properties.*.propertyDetails.bidders.*.id
@@ -445,7 +445,7 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.propertyDetails.bidders.*.auctionDescription
 
-            - jsonPath: $.Properties.*.propertyDetails.bidders.*.participatedBidders
+            - jsonPath: $.Properties.*.propertyDetails.bidders.*.bidderName
 
             - jsonPath: $.Properties.*.propertyDetails.bidders.*.depositedEMDAmount
 
@@ -455,7 +455,7 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.propertyDetails.bidders.*.refundStatus
 
-            - jsonPath: $.Properties.*.propertyDetails.bidders.*.comment
+            - jsonPath: $.Properties.*.propertyDetails.bidders.*.comments
 
             - jsonPath: $.Properties.*.propertyDetails.bidders.*.auditDetails.createdBy
 
@@ -469,7 +469,7 @@ serviceMaps:
 
             - jsonPath: $.Properties.*.propertyDetails.bidders.*.refundStatus
 
-            - jsonPath: $.Properties.*.propertyDetails.bidders.*.comment
+            - jsonPath: $.Properties.*.propertyDetails.bidders.*.comments
 
             - jsonPath: $.Properties.*.propertyDetails.bidders.*.auditDetails.lastModifiedBy
 
