@@ -78,7 +78,7 @@ public class PropertyQueryBuilder {
 			+ " cc.created_by as cccreated_by, cc.created_time as cccreated_time, cc.last_modified_by as ccmodified_by, cc.last_modified_time as ccmodified_time ";
 
 	private static final String BIDDER_COLUMNS = " aut.id as auctionid,aut.property_id as propertyid,"
-			+ "aut.tenant_id as tenantid,aut.description as description,"
+			+ "aut.description as description,"
 			+ "aut.bidder_name as bidderName,aut.deposited_emd_amount as depositedEMDAmount,"
 			+ "aut.deposit_date as depositDate,aut.emdValidity_date as emdValidityDate,aut.refund_status as refundStatus,"
 			+ "aut.created_by as createdby,aut.last_modified_by as lastmodifiedby,aut.created_date as createddate,"
