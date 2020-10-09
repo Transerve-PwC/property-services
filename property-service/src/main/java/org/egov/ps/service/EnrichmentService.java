@@ -220,6 +220,20 @@ public class EnrichmentService {
 
 	private void enrichBidders(Property property, RequestInfo requestInfo) {
 
+		/**
+		 * Delete existing data as new data is coming in.
+		 */
+		boolean hasAnyNewBidder = property.getPropertyDetails().getBidders().stream()
+				.filter(bidder -> bidder.getId() == null || bidder.getId().isEmpty()).findAny().isPresent();
+
+		if (hasAnyNewBidder) {
+			List<AuctionBidder> existingBidders = propertyRepository
+					.getBiddersForPropertyDetailsIds(Collections.singletonList(property.getPropertyDetails().getId()));
+			property.getPropertyDetails().setInActiveBidders(existingBidders);
+		} else {
+			property.getPropertyDetails().setInActiveBidders(Collections.emptyList());
+		}
+
 		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getBidders())) {
 
 			property.getPropertyDetails().getBidders().forEach(bidder -> {
@@ -234,20 +248,6 @@ public class EnrichmentService {
 				bidder.setAuditDetails(buidderAuditDetails);
 
 			});
-		}
-
-		/**
-		 * Delete existing data as new data is coming in.
-		 */
-		boolean hasAnyNewBidder = property.getPropertyDetails().getBidders().stream()
-				.filter(bidder -> bidder.getId() == null || bidder.getId().isEmpty()).findAny().isPresent();
-
-		if (hasAnyNewBidder) {
-			List<AuctionBidder> existingBidders = propertyRepository
-					.getBiddersForPropertyDetailsIds(Collections.singletonList(property.getPropertyDetails().getId()));
-			property.getPropertyDetails().setInActiveBidders(existingBidders);
-		} else {
-			property.getPropertyDetails().setInActiveBidders(Collections.emptyList());
 		}
 
 	}
