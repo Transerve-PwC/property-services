@@ -47,7 +47,7 @@ public class PropertyRepository {
 
 	@Autowired
 	private AuctionRowMapper biddersRowMapper;
-	
+
 	@Autowired
 	WorkflowIntegrator workflowIntegrator;
 
@@ -171,7 +171,7 @@ public class PropertyRepository {
 							.collect(Collectors.toList()));
 		});
 	}
-	
+
 	private void addBiddersToProperties(List<Property> properties) {
 		/**
 		 * Extract property detail ids.
@@ -182,20 +182,23 @@ public class PropertyRepository {
 		/**
 		 * Fetch bidders from database
 		 */
-		Map<String, Object> params = new HashMap<String, Object>(1);
-		String biddersQuery = propertyQueryBuilder.getBiddersQuery(propertyDetailsIds, params);
-		List<AuctionBidder> bidders = namedParameterJdbcTemplate.query(biddersQuery, params, biddersRowMapper);
+		List<AuctionBidder> bidders = this.getBiddersForPropertyDetailsIds(propertyDetailsIds);
 
 		/**
 		 * Assign court cases to corresponding properties
 		 */
 		properties.stream().forEach(property -> {
 			property.getPropertyDetails()
-					.setBidders(bidders.stream()
-							.filter(bidder -> bidder.getPropertyId()
-									.equalsIgnoreCase(property.getPropertyDetails().getId()))
+					.setBidders(bidders.stream().filter(
+							bidder -> bidder.getPropertyId().equalsIgnoreCase(property.getPropertyDetails().getId()))
 							.collect(Collectors.toList()));
 		});
+	}
+
+	public List<AuctionBidder> getBiddersForPropertyDetailsIds(List<String> propertyDetailsIds) {
+		Map<String, Object> params = new HashMap<String, Object>(1);
+		String biddersQuery = propertyQueryBuilder.getBiddersQuery(propertyDetailsIds, params);
+		return namedParameterJdbcTemplate.query(biddersQuery, params, biddersRowMapper);
 	}
 
 	public Property findPropertyById(String propertyId) {

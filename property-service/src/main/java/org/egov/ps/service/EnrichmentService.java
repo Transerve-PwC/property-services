@@ -11,11 +11,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.config.Configuration;
 import org.egov.ps.model.Application;
 import org.egov.ps.model.AuctionBidder;
-import org.egov.ps.model.AuctionSearchCritirea;
 import org.egov.ps.model.Document;
 import org.egov.ps.model.MortgageDetails;
 import org.egov.ps.model.Owner;
@@ -27,7 +30,6 @@ import org.egov.ps.model.calculation.Calculation;
 import org.egov.ps.model.calculation.Category;
 import org.egov.ps.model.calculation.TaxHeadEstimate;
 import org.egov.ps.model.idgen.IdResponse;
-import org.egov.ps.repository.AuctionRepository;
 import org.egov.ps.repository.IdGenRepository;
 import org.egov.ps.repository.PropertyRepository;
 import org.egov.ps.util.PSConstants;
@@ -40,10 +42,6 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 public class EnrichmentService {
@@ -62,9 +60,6 @@ public class EnrichmentService {
 
 	@Autowired
 	private PropertyRepository propertyRepository;
-	
-	@Autowired
-	private AuctionRepository auctionRepository;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -222,7 +217,7 @@ public class EnrichmentService {
 			});
 		}
 	}
-	
+
 	private void enrichBidders(Property property, RequestInfo requestInfo) {
 
 		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getBidders())) {
@@ -240,34 +235,21 @@ public class EnrichmentService {
 
 			});
 		}
-		
+
 		/**
 		 * Delete existing data as new data is coming in.
 		 */
 		boolean hasAnyNewBidder = property.getPropertyDetails().getBidders().stream()
 				.filter(bidder -> bidder.getId() == null || bidder.getId().isEmpty()).findAny().isPresent();
-		
-		if (hasAnyNewBidder) {
-			AuctionSearchCritirea auctionSearchCritirea = getAuctionCriteriaForSearch(property);
 
-			List<AuctionBidder> existingBidders = auctionRepository.search(auctionSearchCritirea);
+		if (hasAnyNewBidder) {
+			List<AuctionBidder> existingBidders = propertyRepository
+					.getBiddersForPropertyDetailsIds(Collections.singletonList(property.getPropertyDetails().getId()));
 			property.getPropertyDetails().setInActiveBidders(existingBidders);
-			
 		} else {
 			property.getPropertyDetails().setInActiveBidders(Collections.emptyList());
 		}
 
-	}
-	
-	private AuctionSearchCritirea getAuctionCriteriaForSearch(Property property) {
-		AuctionSearchCritirea criteria = new AuctionSearchCritirea();
-		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getBidders())) {
-			property.getPropertyDetails().getBidders().forEach(auction -> {
-				if (auction.getId() != null)
-					criteria.setAuctionId(auction.getId());
-			});
-		}
-		return criteria;
 	}
 
 	/**

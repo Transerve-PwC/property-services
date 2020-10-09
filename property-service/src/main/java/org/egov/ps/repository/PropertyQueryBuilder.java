@@ -77,13 +77,13 @@ public class PropertyQueryBuilder {
 			+ " cc.honorable_high_court as cchonorable_high_court, cc.honorable_supreme_court as cchonorable_supreme_court,"
 			+ " cc.created_by as cccreated_by, cc.created_time as cccreated_time, cc.last_modified_by as ccmodified_by, cc.last_modified_time as ccmodified_time ";
 
-	private static final String BIDDER_COLUMNS = " aut.id as auctionid,aut.property_id as propertyid,aut.file_number as filenumber,"
+	private static final String BIDDER_COLUMNS = " aut.id as auctionid,aut.property_id as propertyid,"
 			+ "aut.tenant_id as tenantid,aut.description as description,"
 			+ "aut.bidder_name as bidderName,aut.deposited_emd_amount as depositedEMDAmount,"
 			+ "aut.deposit_date as depositDate,aut.emdValidity_date as emdValidityDate,aut.refund_status as refundStatus,"
 			+ "aut.created_by as createdby,aut.last_modified_by as lastmodifiedby,aut.created_date as createddate,"
 			+ "aut.last_modified_date as lastmodifieddate ";
-	
+
 	private static final String PT_TABLE = " FROM cs_ep_property_v1 pt " + INNER_JOIN
 			+ " cs_ep_property_details_v1 ptdl  ON pt.id =ptdl.property_id ";
 
@@ -94,7 +94,7 @@ public class PropertyQueryBuilder {
 	// + " cs_ep_payment_v1 payment ON ptdl.id=payment.property_details_id ";
 
 	private static final String CC_TABLE = " cs_ep_court_case_v1 cc ";
-	
+
 	private static final String BIDDER_TABLE = " cs_ep_auction aut ";
 
 	private final String paginationWrapper = "SELECT * FROM "
@@ -213,7 +213,7 @@ public class PropertyQueryBuilder {
 		params.put("propertyDetailIds", propertyDetailIds);
 		return sb.toString();
 	}
-	
+
 	public String getCourtCasesQuery(List<String> propertyDetailIds, Map<String, Object> params) {
 		StringBuilder sb = new StringBuilder(SELECT);
 		sb.append(CC_COLUMNS);
@@ -222,7 +222,7 @@ public class PropertyQueryBuilder {
 		params.put("propertyDetailIds", propertyDetailIds);
 		return sb.toString();
 	}
-	
+
 	public String getBiddersQuery(List<String> propertyDetailIds, Map<String, Object> params) {
 		StringBuilder sb = new StringBuilder(SELECT);
 		sb.append(BIDDER_COLUMNS);
