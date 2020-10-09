@@ -190,7 +190,7 @@ public class PropertyRepository {
 		properties.stream().forEach(property -> {
 			property.getPropertyDetails()
 					.setBidders(bidders.stream().filter(
-							bidder -> bidder.getPropertyId().equalsIgnoreCase(property.getPropertyDetails().getId()))
+							bidder -> bidder.getPropertyDetailsId().equalsIgnoreCase(property.getPropertyDetails().getId()))
 							.collect(Collectors.toList()));
 		});
 	}

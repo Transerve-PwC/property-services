@@ -220,22 +220,6 @@ public class EnrichmentService {
 
 	private void enrichBidders(Property property, RequestInfo requestInfo) {
 
-		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getBidders())) {
-
-			property.getPropertyDetails().getBidders().forEach(bidder -> {
-
-				if (bidder.getId() == null) {
-
-					bidder.setId(UUID.randomUUID().toString());
-					bidder.setPropertyId(property.getPropertyDetails().getId());
-
-				}
-				AuditDetails buidderAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-				bidder.setAuditDetails(buidderAuditDetails);
-
-			});
-		}
-
 		/**
 		 * Delete existing data as new data is coming in.
 		 */
@@ -248,6 +232,22 @@ public class EnrichmentService {
 			property.getPropertyDetails().setInActiveBidders(existingBidders);
 		} else {
 			property.getPropertyDetails().setInActiveBidders(Collections.emptyList());
+		}
+
+		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getBidders())) {
+
+			property.getPropertyDetails().getBidders().forEach(bidder -> {
+
+				if (bidder.getId() == null) {
+
+					bidder.setId(UUID.randomUUID().toString());
+					bidder.setPropertyDetailsId(property.getPropertyDetails().getId());
+
+				}
+				AuditDetails buidderAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				bidder.setAuditDetails(buidderAuditDetails);
+
+			});
 		}
 
 	}
