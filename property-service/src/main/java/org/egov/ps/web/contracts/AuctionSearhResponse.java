@@ -5,11 +5,10 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.common.contract.response.ResponseInfo;
-import org.egov.ps.model.Auction;
-import org.egov.ps.model.Property;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.egov.common.contract.response.ResponseInfo;
+import org.egov.ps.model.AuctionBidder;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,9 +26,9 @@ public class AuctionSearhResponse {
 
 	@JsonProperty("Auctions")
 	@Valid
-	private List<Auction> auctions;
-	
-	public AuctionSearhResponse addAuctions(Auction auction) {
+	private List<AuctionBidder> auctions;
+
+	public AuctionSearhResponse addAuctions(AuctionBidder auction) {
 		if (this.auctions == null) {
 			this.auctions = new ArrayList<>();
 		}

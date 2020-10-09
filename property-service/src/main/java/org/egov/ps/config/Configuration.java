@@ -59,12 +59,6 @@ public class Configuration {
 
 	@Value("${persister.update.application.topic}")
 	private String updateApplicationTopic;
-	
-	@Value("${persister.save.auction.topic}")
-	private String saveAuctionTopic;
-	
-	@Value("${persister.update.auction.topic}")
-	private String updateAuctionTopic;
 
 	// Workflow
 
@@ -95,6 +89,9 @@ public class Configuration {
 	@Value("${workflow.businessservice.search.path}")
 	private String wfBusinessServiceSearchPath;
 
+	@Value("${workflow.businessservice.create.path}")
+	private String workflowBusinessServiceCreatePath;
+
 	// ID Generation
 
 	@Value("${egov.idgen.host}")
@@ -105,9 +102,6 @@ public class Configuration {
 
 	@Value("${egov.idgen.ps.applicationNum.name}")
 	private String applicationNumberIdgenNamePS;
-
-	@Value("${egov.idgen.ps.applicationNum.format}")
-	private String applicationNumberIdgenFormatPS;
 
 	// MDMS Configuration
 
@@ -126,8 +120,8 @@ public class Configuration {
 
 	@Value("${egov.user.search.path}")
 	private String userSearchEndpoint;
-	
-//	BilllingService generating demand 
+
+	// BilllingService generating demand
 
 	@Value("${egov.billingservice.host}")
 	private String billingHost;
@@ -140,7 +134,7 @@ public class Configuration {
 
 	@Value("${egov.demand.search.endpoint}")
 	private String demandSearchEndpoint;
-	
+
 	@Value("${egov.demand.update.endpoint}")
 	private String demandUpdateEndpoint;
 }

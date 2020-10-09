@@ -2,9 +2,11 @@ package org.egov.ps.web.contracts;
 
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.egov.common.contract.response.ResponseInfo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,9 +21,11 @@ public class EstateCalculationResponse {
 
 	@JsonProperty("ResponseInfo")
 	private ResponseInfo responseInfo;
-	
+
 	@JsonProperty("Calculations")
 	@Valid
+
 	private EstateModuleResponse estateModuleResponse;
 	
+
 }

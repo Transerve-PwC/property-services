@@ -76,6 +76,18 @@ public class OwnerDetails {
 	@JsonProperty("isDirector")
 	private Boolean isDirector;
 
+	@JsonProperty("sellerName")
+	private String sellerName;
+
+	@JsonProperty("sellerGuardianName")
+	private String sellerGuardianName;
+
+	@JsonProperty("sellerRelation")
+	private String sellerRelation;
+
+	@JsonProperty("modeOfTransfer")
+	private String modeOfTransfer;
+
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 

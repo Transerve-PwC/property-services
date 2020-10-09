@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-@SuppressWarnings("deprecation")
 public class ReadExcelServiceTest {
 
 	EstateCalculationExcelReadService estateCalculationExcelReadService;
@@ -327,5 +326,6 @@ public class ReadExcelServiceTest {
 	public void testReadExcelsheet46_Jai_GAS() throws FileNotFoundException {
 		String filepath = "excel/Estate Module Revised Calculation sheet.xlsx";
 		testExcelParsing(filepath, 47, 1260000);
+
 	}
 }

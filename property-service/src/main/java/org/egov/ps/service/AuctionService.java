@@ -1,20 +1,12 @@
 package org.egov.ps.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.egov.ps.config.Configuration;
-import org.egov.ps.model.Auction;
+import org.egov.ps.model.AuctionBidder;
 import org.egov.ps.model.ExcelSearchCriteria;
-import org.egov.ps.model.Property;
-import org.egov.ps.producer.Producer;
-import org.egov.ps.repository.AuctionRepository;
 import org.egov.ps.util.FileStoreUtils;
-import org.egov.ps.validator.AuctionValidator;
-import org.egov.ps.web.contracts.AuctionSaveRequest;
 import org.egov.ps.web.contracts.AuctionTransactionRequest;
-import org.egov.ps.web.contracts.AutionSearchRequest;
-import org.egov.ps.web.contracts.PropertyRequest;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -22,46 +14,32 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class AuctionService {
 
 	@Autowired
-	private AuctionRepository auctionRepository;
-	
-	@Autowired
-	private Configuration config;
+	private AuctionExcelParseService readExcelService;
 
 	@Autowired
-	private Producer producer;	
-	
-	@Autowired
-	AuctionValidator auctionValidator;
-	
-	@Autowired
-	private EnrichmentService enrichmentService;	
+	private FileStoreUtils fileStoreUtils;
 
-	public List<Auction> saveAuctionWithProperty(ExcelSearchCriteria searchCriteria, AuctionTransactionRequest auctionTransactionRequest) {		
-		AuctionSaveRequest request = enrichmentService.enrichAuctionCreateRequest(searchCriteria,auctionTransactionRequest);
-		producer.push(config.getSaveAuctionTopic(), request);
-		return request.getAuctions();
-	}
-
-	public List<Auction> searhAuctionMaster(AutionSearchRequest autionSearchRequest) {
-		List<Auction> auctions = auctionRepository.search(autionSearchRequest.getAuctionSearchCritirea());
-		return auctions;
-	}
-
-
-	/**
-	 * Updates the Auction
-	 *
-	 * @param request AuctionSaveRequest containing list of auction to be update
-	 * @return List of updated auction
-	 */
-	public List<Auction> updateAuction(AuctionSaveRequest auctionSaveRequest) {
-		List<Auction> auctionFromSearch = auctionValidator.validateAuctionUpdate(auctionSaveRequest);
-		enrichmentService.enrichUpdateAuctionRequest(auctionSaveRequest, auctionFromSearch);
-		producer.push(config.getUpdateAuctionTopic(), auctionSaveRequest);
-		return auctionSaveRequest.getAuctions();
+	public List<AuctionBidder> saveAuctionWithProperty(ExcelSearchCriteria searchCriteria,
+			AuctionTransactionRequest auctionTransactionRequest) {
+		try {
+			String filePath = fileStoreUtils.fetchFileStoreUrl(searchCriteria);
+			if (!filePath.isEmpty()) {
+				return readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream(), 0);
+			} else {
+				log.error("Could not find a filePath for given tenant '{}' and file store id '{}'",
+						searchCriteria.getTenantId(), searchCriteria.getFileStoreId());
+				throw new CustomException("FILE NOT FOUND", "Uploaded file could not be retrieved.");
+			}
+		} catch (CustomException e) {
+			throw e;
+		} catch (Exception e) {
+			log.error("Error occur during runnig controller method readExcel():", e);
+			throw new CustomException("PARSE FAILED", "Could not parse provided excel file for auction bidders.");
+		}
 	}
 
 }

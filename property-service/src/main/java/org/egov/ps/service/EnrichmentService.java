@@ -2,6 +2,7 @@ package org.egov.ps.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,13 +11,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.ps.config.Configuration;
 import org.egov.ps.model.Application;
-import org.egov.ps.model.Auction;
-import org.egov.ps.model.CourtCase;
+import org.egov.ps.model.AuctionBidder;
 import org.egov.ps.model.Document;
-import org.egov.ps.model.ExcelSearchCriteria;
 import org.egov.ps.model.MortgageDetails;
 import org.egov.ps.model.Owner;
 import org.egov.ps.model.OwnerDetails;
@@ -29,28 +32,18 @@ import org.egov.ps.model.calculation.TaxHeadEstimate;
 import org.egov.ps.model.idgen.IdResponse;
 import org.egov.ps.repository.IdGenRepository;
 import org.egov.ps.repository.PropertyRepository;
-import org.egov.ps.util.FileStoreUtils;
 import org.egov.ps.util.PSConstants;
 import org.egov.ps.util.Util;
 import org.egov.ps.web.contracts.ApplicationRequest;
 import org.egov.ps.web.contracts.AuctionSaveRequest;
-import org.egov.ps.web.contracts.AuctionTransactionRequest;
 import org.egov.ps.web.contracts.AuditDetails;
 import org.egov.ps.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Slf4j
 public class EnrichmentService {
 
 	@Autowired
@@ -70,201 +63,137 @@ public class EnrichmentService {
 
 	@Autowired
 	private ObjectMapper objectMapper;
-	
-	@Autowired
-	private ReadExcelService readExcelService;
 
-	@Autowired
-	private FileStoreUtils fileStoreUtils;
-
-	public void enrichCreateRequest(PropertyRequest request) {
+	public void enrichPropertyRequest(PropertyRequest request) {
 
 		RequestInfo requestInfo = request.getRequestInfo();
-		AuditDetails propertyAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 
 		if (!CollectionUtils.isEmpty(request.getProperties())) {
 			request.getProperties().forEach(property -> {
+				AuditDetails propertyAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+						property.getId() == null);
 
-				String gen_property_id = UUID.randomUUID().toString();
+				if (property.getId() == null) {
+					property.setId(UUID.randomUUID().toString());
+					property.setState(PSConstants.PM_DRAFTED);
+					property.setFileNumber(property.getFileNumber().toUpperCase());
+				}
 
-				PropertyDetails propertyDetail = getPropertyDetail(property, requestInfo, gen_property_id);
-
-				property.setId(gen_property_id);
-				property.setPropertyDetails(propertyDetail);
-				property.setState(PSConstants.PM_DRAFTED);
-				property.setFileNumber(property.getFileNumber().toUpperCase());
 				property.setAuditDetails(propertyAuditDetails);
 
+				enrichPropertyDetail(property, requestInfo);
+
 			});
 		}
 	}
 
-	public PropertyDetails getPropertyDetail(Property property, RequestInfo requestInfo, String gen_property_id) {
+	private void enrichPropertyDetail(Property property, RequestInfo requestInfo) {
 
 		PropertyDetails propertyDetail = property.getPropertyDetails();
-		String gen_property_details_id = UUID.randomUUID().toString();
 
-		AuditDetails propertyDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		AuditDetails propertyDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
+				propertyDetail.getId() == null);
 
-		propertyDetail.setId(gen_property_details_id);
-		propertyDetail.setTenantId(property.getTenantId());
-		propertyDetail.setPropertyId(gen_property_id);
+		if (propertyDetail.getId() == null) {
+			propertyDetail.setId(UUID.randomUUID().toString());
+			propertyDetail.setTenantId(property.getTenantId());
+			propertyDetail.setPropertyId(property.getId());
+		}
 		propertyDetail.setAuditDetails(propertyDetailsAuditDetails);
 
-		return propertyDetail;
+		enrichOwners(property, requestInfo);
+		enrichCourtCases(property, requestInfo);
+		enrichPaymentDetails(property, requestInfo);
+		enrichBidders(property, requestInfo);
+
 	}
 
-	public void enrichUpdateRequest(PropertyRequest request) {
-		RequestInfo requestInfo = request.getRequestInfo();
-		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
+	private void enrichOwners(Property property, RequestInfo requestInfo) {
 
-		if (!CollectionUtils.isEmpty(request.getProperties())) {
-			request.getProperties().forEach(property -> {
+		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 
-				PropertyDetails propertyDetail = updatePropertyDetail(property, requestInfo, auditDetails);
-				property.setPropertyDetails(propertyDetail);
-				property.setAuditDetails(auditDetails);
+			property.getPropertyDetails().getOwners().forEach(owner -> {
 
-			});
-		}
-	}
+				if (owner.getId() == null) {
 
-	private PropertyDetails updatePropertyDetail(Property property, RequestInfo requestInfo,
-			AuditDetails auditDetails) {
-		PropertyDetails propertyDetail = property.getPropertyDetails();
-		List<Owner> owners = getOwners(property, requestInfo);
-		List<CourtCase> courtCases = getCourtCases(property, requestInfo); // TODO:
-		List<Payment> paymentDetails = getPaymentDetails(property, requestInfo);
-
-		propertyDetail.setOwners(owners);
-		propertyDetail.setCourtCases(courtCases); // TODO: Confirm that court details are not updated again
-		propertyDetail.setPaymentDetails(paymentDetails);
-
-		propertyDetail.setAuditDetails(auditDetails);
-
-		return propertyDetail;
-	}
-
-	private List<Owner> getOwners(Property property, RequestInfo requestInfo) {
-
-		List<Owner> owners = property.getPropertyDetails().getOwners();
-
-		if (!CollectionUtils.isEmpty(owners)) {
-
-			owners.forEach(owner -> {
-
-				if (owner.getId() == null || owner.getId().isEmpty()) {
-
-					AuditDetails ownerAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-
-					String gen_owner_id = UUID.randomUUID().toString();
-
-					owner.setId(gen_owner_id);
+					owner.setId(UUID.randomUUID().toString());
 					owner.setTenantId(property.getTenantId());
 					owner.setPropertyDetailsId(property.getPropertyDetails().getId());
 
-					OwnerDetails ownerDetails = getOwnerDetail(property, owner, requestInfo);
-
-//				    owner.setSerialNumber(""); TODO: Whether sr.no will be generated from BackEnd or FrontEnd
-					owner.setOwnerDetails(ownerDetails);
-					owner.setAuditDetails(ownerAuditDetails);
-				} else {
-
-					OwnerDetails ownerDetails = getOwnerDetail(property, owner, requestInfo);
-					owner.setOwnerDetails(ownerDetails);
-
-					AuditDetails ownerAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-					owner.setAuditDetails(ownerAuditDetails);
 				}
+				AuditDetails ownerAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				owner.setAuditDetails(ownerAuditDetails);
+				enrichOwnerDetail(property, owner, requestInfo);
 
 			});
 		}
-		return owners;
 	}
 
-	public OwnerDetails getOwnerDetail(Property property, Owner owner, RequestInfo requestInfo) {
+	private void enrichOwnerDetail(Property property, Owner owner, RequestInfo requestInfo) {
 
 		OwnerDetails ownerDetails = owner.getOwnerDetails();
 
 		if (ownerDetails.getId() == null || ownerDetails.getId().isEmpty()) {
 
-			AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-
-			String gen_owner_details_id = UUID.randomUUID().toString();
-
-			ownerDetails.setId(gen_owner_details_id);
+			ownerDetails.setId(UUID.randomUUID().toString());
 			ownerDetails.setTenantId(property.getTenantId());
 			ownerDetails.setOwnerId(owner.getId());
-			ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
-		} else {
-			List<Document> ownerDocuments = getOwnerDocs(property, requestInfo);
-			ownerDetails.setOwnerDocuments(ownerDocuments);
 
-			AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-			ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
 		}
 
-		return ownerDetails;
+		AuditDetails ownerDetailsAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		ownerDetails.setAuditDetails(ownerDetailsAuditDetails);
+		enrichOwnerDocs(property, requestInfo);
+
 	}
 
-	private List<Document> getOwnerDocs(Property property, RequestInfo requestInfo) {
-		List<Document> ownerDocs = new ArrayList<>();
+	private void enrichOwnerDocs(Property property, RequestInfo requestInfo) {
 		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
+
 			property.getPropertyDetails().getOwners().forEach(owner -> {
 				List<Document> ownerDocuments = owner.getOwnerDetails().getOwnerDocuments();
+
 				if (!CollectionUtils.isEmpty(ownerDocuments)) {
 					ownerDocuments.forEach(document -> {
+
 						if (document.getId() == null || document.getId().isEmpty()) {
-							AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
-									true);
-							String gen_doc_id = UUID.randomUUID().toString();
-							document.setId(gen_doc_id);
+
+							document.setId(UUID.randomUUID().toString());
 							document.setTenantId(property.getTenantId());
 							document.setReferenceId(owner.getOwnerDetails().getId());
 							document.setPropertyId(property.getId());
-							document.setAuditDetails(docAuditDetails);
-						} else {
-							AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
-									true);
-							document.setAuditDetails(docAuditDetails);
+
 						}
+						AuditDetails docAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+						document.setAuditDetails(docAuditDetails);
+
 					});
-					ownerDocs.addAll(ownerDocuments);
 				}
 			});
 		}
-		return ownerDocs;
 	}
 
-	private List<CourtCase> getCourtCases(Property property, RequestInfo requestInfo) {
+	private void enrichCourtCases(Property property, RequestInfo requestInfo) {
 
-		List<CourtCase> courtCases = property.getPropertyDetails().getCourtCases();
+		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getCourtCases())) {
 
-		if (!CollectionUtils.isEmpty(courtCases)) {
+			property.getPropertyDetails().getCourtCases().forEach(courtCase -> {
 
-			courtCases.forEach(courtCase -> {
 				if (courtCase.getId() == null || courtCase.getId().isEmpty()) {
 
-					AuditDetails courtCaseAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
-							true);
-					String gen_court_case_id = UUID.randomUUID().toString();
-
-					courtCase.setId(gen_court_case_id);
+					courtCase.setId(UUID.randomUUID().toString());
 					courtCase.setTenantId(property.getTenantId());
 					courtCase.setPropertyDetailsId(property.getPropertyDetails().getId());
-					courtCase.setAuditDetails(courtCaseAuditDetails);
-				} else {
-					AuditDetails courtCaseAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(),
-							true);
-					courtCase.setAuditDetails(courtCaseAuditDetails);
+
 				}
+				AuditDetails courtCaseAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				courtCase.setAuditDetails(courtCaseAuditDetails);
+
 			});
 		}
-		return courtCases;
 	}
 
-	private List<Payment> getPaymentDetails(Property property, RequestInfo requestInfo) {
-		List<Payment> paymentDetails = new ArrayList<>();
+	private void enrichPaymentDetails(Property property, RequestInfo requestInfo) {
 		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getOwners())) {
 			property.getPropertyDetails().getOwners().forEach(owner -> {
 				List<Payment> payments = property.getPropertyDetails().getPaymentDetails();
@@ -284,11 +213,43 @@ public class EnrichmentService {
 							payment.setAuditDetails(paymentAuditDetails);
 						}
 					});
-					paymentDetails.addAll(payments);
 				}
 			});
 		}
-		return paymentDetails;
+	}
+
+	private void enrichBidders(Property property, RequestInfo requestInfo) {
+
+		/**
+		 * Delete existing data as new data is coming in.
+		 */
+		boolean hasAnyNewBidder = property.getPropertyDetails().getBidders().stream()
+				.filter(bidder -> bidder.getId() == null || bidder.getId().isEmpty()).findAny().isPresent();
+
+		if (hasAnyNewBidder) {
+			List<AuctionBidder> existingBidders = propertyRepository
+					.getBiddersForPropertyDetailsIds(Collections.singletonList(property.getPropertyDetails().getId()));
+			property.getPropertyDetails().setInActiveBidders(existingBidders);
+		} else {
+			property.getPropertyDetails().setInActiveBidders(Collections.emptyList());
+		}
+
+		if (!CollectionUtils.isEmpty(property.getPropertyDetails().getBidders())) {
+
+			property.getPropertyDetails().getBidders().forEach(bidder -> {
+
+				if (bidder.getId() == null) {
+
+					bidder.setId(UUID.randomUUID().toString());
+					bidder.setPropertyDetailsId(property.getPropertyDetails().getId());
+
+				}
+				AuditDetails buidderAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+				bidder.setAuditDetails(buidderAuditDetails);
+
+			});
+		}
+
 	}
 
 	/**
@@ -415,9 +376,8 @@ public class EnrichmentService {
 	 * @param count       Number of ids to be generated
 	 * @return List of ids generated using idGen service
 	 */
-	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
-		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idformat, count)
-				.getIdResponses();
+	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, int count) {
+		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, count).getIdResponses();
 
 		if (CollectionUtils.isEmpty(idResponses))
 			throw new CustomException("IDGEN ERROR", "No ids returned from idgen Service");
@@ -426,9 +386,9 @@ public class EnrichmentService {
 	}
 
 	/**
-	 * Sets the ApplicationNumber for given TradeLicenseRequest
+	 * Sets the ApplicationNumber for given EstateServiceApplicationRequest
 	 *
-	 * @param request TradeLicenseRequest which is to be created
+	 * @param request EstateServiceApplicationRequest which is to be created
 	 */
 	private void setIdgenIds(ApplicationRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
@@ -437,7 +397,7 @@ public class EnrichmentService {
 		int size = request.getApplications().size();
 
 		List<String> applicationNumbers = setIdgenIds(requestInfo, tenantId, size,
-				config.getApplicationNumberIdgenNamePS(), config.getApplicationNumberIdgenFormatPS());
+				config.getApplicationNumberIdgenNamePS());
 		ListIterator<String> itr = applicationNumbers.listIterator();
 
 		if (!CollectionUtils.isEmpty(applications)) {
@@ -447,11 +407,10 @@ public class EnrichmentService {
 		}
 	}
 
-	private List<String> setIdgenIds(RequestInfo requestInfo, String tenantId, int size, String idGenName,
-			String idGenFormate) {
+	private List<String> setIdgenIds(RequestInfo requestInfo, String tenantId, int size, String idGenName) {
 		List<String> applicationNumbers = null;
 
-		applicationNumbers = getIdList(requestInfo, tenantId, idGenName, idGenFormate, size);
+		applicationNumbers = getIdList(requestInfo, tenantId, idGenName, size);
 
 		Map<String, String> errorMap = new HashMap<>();
 		if (applicationNumbers.size() != size) {
@@ -551,7 +510,7 @@ public class EnrichmentService {
 		application.setCalculation(calculation);
 	}
 
-//	To be used in future
+	// To be used in future
 	private void enrichUpdateDemand(Application application) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
 
@@ -572,37 +531,8 @@ public class EnrichmentService {
 	private String getTaxHeadCodeWithCharge(String billingBusService, String chargeFor, Category category) {
 		return String.format("%s_%s_%s", billingBusService, chargeFor, category.toString());
 	}
-	
-	public AuctionSaveRequest enrichAuctionCreateRequest(ExcelSearchCriteria searchCriteria,
-			AuctionTransactionRequest auctionTransactionRequest) {
-		Property property = auctionTransactionRequest.getProperty();
-		List<Auction> auctions = new ArrayList<>();
-		AuctionSaveRequest request = AuctionSaveRequest.builder()
-				.requestInfo(auctionTransactionRequest.getRequestInfo()).build();
-		RequestInfo requestInfo = request.getRequestInfo();
-		AuditDetails auctionAuditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
-		try {
-			String filePath = fileStoreUtils.fetchFileStoreUrl(searchCriteria);
-			if (!filePath.isEmpty()) {				
-				auctions = readExcelService.getDatafromExcel(new UrlResource(filePath).getInputStream(), 0);
-				auctions.forEach(auction -> {
-					String gen_auction_id = UUID.randomUUID().toString();
-					auction.setAuditDetails(auctionAuditDetails);
-					auction.setAuctionId(auction.getId());
-					auction.setId(gen_auction_id);
-					auction.setPropertyId(property.getId());
-					auction.setTenantId(property.getTenantId());
-					auction.setFileNumber(property.getFileNumber());
-				});
-			}
-			request.setAuctions(auctions);
-		} catch (Exception e) {
-			log.error("Error occur during runnig controller method readExcel():" + e.getMessage());
-		}
-		return request;
-	}
-	
-	public void enrichUpdateAuctionRequest(AuctionSaveRequest request, List<Auction> auctionFromSearch) {
+
+	public void enrichUpdateAuctionRequest(AuctionSaveRequest request, List<AuctionBidder> auctionFromSearch) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
 
