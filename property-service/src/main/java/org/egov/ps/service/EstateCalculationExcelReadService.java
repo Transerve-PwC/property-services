@@ -117,7 +117,8 @@ public class EstateCalculationExcelReadService {
 						&& parseInDouble(estateCalculationMap.get("rentReceived")) > 0) {
 					estatePayments.add(EstatePayment.builder()
 							.receiptDate(checkModifyValueLong(estateCalculationMap.get("rentDateOfReceipt")))
-							.rentReceived(checkModifyValue(estateCalculationMap.get("rentReceived"))).build());
+							.rentReceived(checkModifyValue(estateCalculationMap.get("rentReceived")))
+							.receiptNo(String.valueOf(estateCalculationMap.get("rentReceiptNo"))).build());
 
 				}
 			});
