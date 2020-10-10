@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang.NumberUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -23,7 +22,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.util.StringUtil;
 import org.egov.ps.web.contracts.EstateDemand;
 import org.egov.ps.web.contracts.EstateModuleResponse;
 import org.egov.ps.web.contracts.EstatePayment;
@@ -45,7 +43,6 @@ public class EstateCalculationExcelReadService {
 			"dateOfReceipt", "stGstReceiptNo", "noOfDays", "delayedPaymentOfGST" };
 	private static final DecimalFormat DOUBLE_RISTRICT = new DecimalFormat("#.##");
 	private static int SKIP_ROW_COUNT = 1;
-	double temp = 0.0;
 
 	public EstateModuleResponse getDatafromExcel(InputStream inputStream, int sheetIndex) {
 		List<Map<String, Object>> estateCalculations = new ArrayList<>();
@@ -53,7 +50,6 @@ public class EstateCalculationExcelReadService {
 		List<EstatePayment> estatePayments = new ArrayList<EstatePayment>();
 		try {
 			Workbook workbook = WorkbookFactory.create(inputStream);
-			System.out.println(workbook.getSheetName(sheetIndex));
 			FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
 			Sheet sheet = workbook.getSheetAt(sheetIndex);
 			Iterator<Row> rowIterator = sheet.iterator();
@@ -105,15 +101,17 @@ public class EstateCalculationExcelReadService {
 					estateCalculations.add(cellData);
 				}
 			}
-			estateCalculations.forEach(estateCalculationMap -> {
-				System.out.println(calculateDelayedPayment(estateCalculationMap));
-				temp = temp+calculateDelayedPayment(estateCalculationMap);
-				System.out.println(temp);
+			estateCalculations.forEach(estateCalculationMap -> {		
 				estateDemands.add(EstateDemand.builder().isPrevious(checkPreviousTab(estateCalculationMap.get("month")))
 						.demandDate(checkModifyValueLong(estateCalculationMap.get("dueDateOfRent")))
 						.rent(checkModifyValue(estateCalculationMap.get("rentDue")))
 						.penaltyInterest(checkModifyValue(estateCalculationMap.get("penaltyInterest")))
-						.gstInterest(calculateDelayedPayment(estateCalculationMap)).build());
+						.gstInterest(calculateDelayedPayment(estateCalculationMap))
+						.gst((int)(checkModifyValue(estateCalculationMap.get("stGstRate"))*100))
+						.collectedRent(checkModifyValue(estateCalculationMap.get("rentReceived")))
+						.collectedGST(checkModifyValue(estateCalculationMap.get("stGstDue")))
+						.noOfDays(checkModifyValue(estateCalculationMap.get("noOfDays")))
+						.paid(checkModifyValue(estateCalculationMap.get("paid"))).build());
 
 				if (parseInDouble(estateCalculationMap.get("rentReceived")) != null
 						&& parseInDouble(estateCalculationMap.get("rentReceived")) > 0) {

@@ -14,6 +14,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
 @RunWith(JUnit4.class)
 public class ReadExcelServiceTest {
 
@@ -39,6 +43,7 @@ public class ReadExcelServiceTest {
 
 		InputStream inputStream = ReadExcelServiceTest.class.getClassLoader().getResourceAsStream(excelFileToParse);
 		EstateModuleResponse responsne = estateCalculationExcelReadService.getDatafromExcel(inputStream, sheetNo);
+		
 		Double rentReceived = responsne.getEstatePayments().stream().map(EstatePayment::getRentReceived)
 				.collect(Collectors.summingDouble(Double::doubleValue));
 		Double rentDue = responsne.getEstateDemands().stream().map(EstateDemand::getRent)
@@ -56,8 +61,10 @@ public class ReadExcelServiceTest {
 
 	@Test
 	public void testReadExcelsheet0() throws FileNotFoundException {
-		String filepath = "excel/Estate Module Revised Calculation sheet.xlsx";
-		testExcelParsingAll(filepath, 0, 47770, 57001,5697,464);
+		//String filepath = "excel/Estate Module Revised Calculation sheet.xlsx";
+		//testExcelParsingAll(filepath, 0, 47770, 57001,5697,464);
+		String filepath = "excel/Estate Module Payment Calculation_DR4.xlsx";
+		testExcelParsingAll(filepath, 0, 47770, 55323,5697,455);
 	}
 
 	@Test

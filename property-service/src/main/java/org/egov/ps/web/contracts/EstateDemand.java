@@ -55,7 +55,7 @@ public class EstateDemand {
    * GST of demand.
    */
   @JsonProperty("gst")
-  private Double gst;
+  private Integer gst;
   
   /**
    * Collected Rent of demand.
@@ -70,18 +70,15 @@ public class EstateDemand {
   private Double collectedGST;
   
   /**
-   * Collected Interest Penalty of demand.
+   * No of days of demand.
    */
-  @JsonProperty("collectedInterestPenalty")
-  private Double collectedInterestPenalty;
+  @JsonProperty("noOfDays")
+  private Double noOfDays;
   
   /**
-   * Collected GST Penalty of demand.
+   * paid of demand.
    */
-  @JsonProperty("collectedGSTPenalty")
-  private Double collectedGSTPenalty;
-  
-  
-  
-
+  @JsonProperty("paid")
+  private Double paid;
+ 
 }
