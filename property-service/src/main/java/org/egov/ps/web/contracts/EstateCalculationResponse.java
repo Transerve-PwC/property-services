@@ -1,14 +1,12 @@
 package org.egov.ps.web.contracts;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.ps.model.EstateCalculationModel;
+
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,13 +24,8 @@ public class EstateCalculationResponse {
 
 	@JsonProperty("Calculations")
 	@Valid
-	private List<EstateCalculationModel> estateCalculationModels;
 
-	public EstateCalculationResponse addEstateCalculations(EstateCalculationModel estateCalculationModel) {
-		if (this.estateCalculationModels == null) {
-			this.estateCalculationModels = new ArrayList<>();
-		}
-		this.estateCalculationModels.add(estateCalculationModel);
-		return this;
-	}
+	private EstateModuleResponse estateModuleResponse;
+	
+
 }
