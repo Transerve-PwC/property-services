@@ -155,6 +155,14 @@ public class WorkflowIntegrator {
 			obj.put(ACTIONKEY, application.getAction());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(AUDITDETAILSKEY, application.getAuditDetails());
+			obj.put(COMMENTKEY, application.getComments());
+			// if (!CollectionUtils.isEmpty(application.getAssignee())) {
+			// if (uuidmaps.size() == 1) {
+			// obj.put(ASSIGNEEKEY, assigneeUuidmaps.get(0));
+			// } else {
+			// obj.put(ASSIGNEEKEY, assigneeUuidmaps);
+			// }
+			// }
 
 			array.add(obj);
 		}
