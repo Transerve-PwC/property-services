@@ -28,4 +28,10 @@ public class EstatePayment {
 	 */
 	@JsonProperty("rentReceived")
 	private Double rentReceived;
+	
+	/**
+	 * Rent Received of demand.
+	 */
+	@JsonProperty("receiptNo")
+	private String receiptNo;
 }
